@@ -1,0 +1,10 @@
+.DS_Store
+
+.idea/
+
+.tmp/
+bin/
+_output/
+vendor/
+
+coverage.txt

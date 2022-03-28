@@ -1,0 +1,82 @@
+# KubePkg
+
+```mermaid
+%%{init:{'theme':'base'}}%%
+flowchart TD
+    subgraph internet ["Internet"]
+        kubepkg_manifest("KubePkg.yaml")
+        kubepkg_airgap("KubePkg.airgap.tgz")
+    end
+    
+    subgraph intranet ["Intranet"]
+        kubepkg_airgap_intranet("KubePkg.airgap.tgz")
+        
+        subgraph cluster ["k8s/k3s cluster"]
+            kubepkg_agent(("KubePkg\nAgent"))
+            kubepkg_registry[("KubePkg\nRegistry")]
+            kubepkg_crd[["KubePkg CRD"]]
+            kubepkg_operator(("KubePkg\nOperator"))
+            k8s_manifests[["Kuberneters\nManifests"]]
+        end
+    end
+    
+    kubepkg_manifest
+        ==> |`kubepkg save`| kubepkg_airgap 
+        -.-> kubepkg_airgap_intranet
+        ==> |`kubepkg import`| kubepkg_agent    
+    
+    kubepkg_agent
+        -->|apply when images ready| kubepkg_crd
+        -.->|notice changes| kubepkg_operator
+        -->|apply| k8s_manifests
+    
+    kubepkg_agent
+        --> |import image manifests / blobs| kubepkg_registry
+        -.-> |pull| k8s_manifests
+        
+    k8s_manifests
+        -.->|notice changes| kubepkg_operator
+        -->|update status| kubepkg_crd    
+```
+
+## Requires
+
+* Docker Image only support v2
+* k3s/k8s 1.22+
+
+## `kubepkg.airgap.tgz`
+
+```
+kubepkg.json # must be first of all
+blobs/ # blob contents
+  <alg>/
+    <hash> 
+```
+
+### `kubepkg.yaml` or `kubepkg.json`
+
+```typescript
+interface KubePkg {
+    apiVersion: "octohelm.tech/v1alpha1"
+    kind: "KubePkg"
+    metadata: {
+        name: string
+    }
+    spec: {
+        // semver for upgrade checking
+        version: string
+        // manifests of k8s
+        manifests: {
+            // "<metadata.name>.<kind>.<apiGroup>"
+            [key: string]: {
+                apiVersion: string,
+                kind: string,
+                [x: string]: any
+            }
+        }
+        // images with tag may with digest
+        // when digest exists, tag the digest instead of pulling always
+        images: { [imagetag: string]: string | "" }
+    }
+}
+```

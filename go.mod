@@ -10,7 +10,7 @@ require (
 	github.com/distribution/distribution/v3 v3.0.0-20220327152031-d2c9f72c6b75
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7
 	github.com/go-logr/logr v1.2.3
-	github.com/onsi/gomega v1.17.0
+	github.com/onsi/gomega v1.19.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.2
 	github.com/pkg/errors v0.9.1

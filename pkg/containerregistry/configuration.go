@@ -44,7 +44,7 @@ func (c *Configuration) New(ctx context.Context) (distribution.Namespace, error)
 
 	if registryBaseHost == "" && c.Proxy != nil {
 		u, _ := url.Parse(c.Proxy.RemoteURL)
-		c.RegistryBaseHost = u.Host
+		registryBaseHost = u.Host
 	}
 
 	k, err := libtrust.GenerateECP256PrivateKey()

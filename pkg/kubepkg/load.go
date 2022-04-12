@@ -1,6 +1,7 @@
 package kubepkg
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
@@ -17,6 +18,10 @@ func Load(path string) (*v1alpha1.KubePkg, error) {
 
 	if err := yaml.Unmarshal(data, kpkg); err != nil {
 		return nil, err
+	}
+
+	if kpkg.Name == "" {
+		return nil, fmt.Errorf("invalid spec")
 	}
 
 	return kpkg, nil

@@ -24,7 +24,7 @@ serve.registry:
 			serve registry
 
 kubepkg.save:
-	$(KUBEPKG) save --storage-root=.tmp/kubepkg --platform=linux/amd64 --platform=linux/arm64 --output=.tmp/demo.tgz ./testdata/demo.yaml
+	$(KUBEPKG) save -v=1 --storage-root=.tmp/kubepkg --platform=linux/amd64 --platform=linux/arm64 --output=.tmp/demo.tgz ./testdata/demo.yaml
 
 kubepkg.import:
 	mkdir -p .tmp/manifests

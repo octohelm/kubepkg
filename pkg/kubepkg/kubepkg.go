@@ -100,6 +100,7 @@ func KubeTgzRange(ctx context.Context, r io.Reader, each func(ctx context.Contex
 		if err != nil {
 			return nil, err
 		}
+
 		if hdr.Name == "kubepkg.json" {
 			var p v1alpha1.KubePkg
 			if err := json.NewDecoder(tr).Decode(&p); err != nil {

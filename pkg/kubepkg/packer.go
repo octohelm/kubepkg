@@ -6,14 +6,17 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
-	"io"
-	"strings"
-
+	"github.com/containerd/containerd/images"
+	"github.com/containerd/containerd/platforms"
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/reference"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/opencontainers/go-digest"
+	ocispecs "github.com/opencontainers/image-spec/specs-go"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
+	"io"
+	"path"
 )
 
 func NewPacker(n distribution.Namespace) *Packer {
@@ -24,7 +27,7 @@ type Packer struct {
 	distribution.Namespace
 }
 
-func (p *Packer) TgzTo(ctx context.Context, kpkg *v1alpha1.KubePkg, w io.Writer) (dgst digest.Digest, err error) {
+func (p *Packer) KubeTgzTo(ctx context.Context, kpkg *v1alpha1.KubePkg, w io.Writer) (dgst digest.Digest, err error) {
 	digester := digest.Canonical.Digester()
 
 	mw := io.MultiWriter(w, digester.Hash())
@@ -41,64 +44,106 @@ func (p *Packer) TgzTo(ctx context.Context, kpkg *v1alpha1.KubePkg, w io.Writer)
 		_ = tw.Close()
 	}()
 
-	if e := p.writeToTar(ctx, tw, kpkg); e != nil {
+	if e := p.writeToKubeTar(ctx, tw, kpkg); e != nil {
 		return "", e
 	}
 
 	return "", nil
 }
 
-func (p *Packer) writeToTar(ctx context.Context, tw *tar.Writer, kpkg *v1alpha1.KubePkg) error {
-	if err := p.writeKubePkgToTar(ctx, tw, kpkg); err != nil {
+func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alpha1.KubePkg) error {
+	if err := writeJsonToTar(tw, "kubepkg.json", kpkg); err != nil {
 		return err
 	}
 
+	index := ocispec.Index{
+		Versioned: ocispecs.Versioned{SchemaVersion: 2},
+	}
+
 	for i := range kpkg.Status.Digests {
-		d := kpkg.Status.Digests[i]
-		named, _ := reference.WithName(d.Name)
+		dm := kpkg.Status.Digests[i]
+
+		named, _ := reference.WithName(dm.Name)
 
 		repo, err := p.Repository(ctx, named)
 		if err != nil {
 			return err
 		}
 
-		pd, err := digest.Parse(d.Digest)
+		pd, err := digest.Parse(dm.Digest)
 		if err != nil {
 			return err
 		}
 
-		switch d.Type {
+		switch dm.Type {
 		case "blob":
 			blobs := repo.Blobs(ctx)
 			desc, err := blobs.Stat(ctx, pd)
 			if err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", d.Type, d.Name, d.Digest)
+				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
 			f, err := blobs.Open(ctx, pd)
 			if err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", d.Type, d.Name, d.Digest)
+				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
 			if err := p.copyBlobTo(ctx, tw, f, desc); err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", d.Type, d.Name, d.Digest)
+				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
 		case "manifest":
 			manifests, _ := repo.Manifests(ctx)
-			desc, err := manifests.Get(ctx, pd)
+			m, err := manifests.Get(ctx, pd)
 			if err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", d.Type, d.Name, d.Digest)
+				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
-			_, payload, err := desc.Payload()
+			mt, payload, err := m.Payload()
 			if err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", d.Type, d.Name, d.Digest)
+				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
-			if err := p.copyBlobTo(ctx, tw, io.NopCloser(bytes.NewReader(payload)), distribution.Descriptor{
-				Digest: pd,
-				Size:   int64(len(payload)),
-			}); err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", d.Type, d.Name, d.Digest)
+
+			desc := distribution.Descriptor{
+				MediaType: mt,
+				Digest:    pd,
+				Size:      int64(len(payload)),
+				Annotations: map[string]string{
+					images.AnnotationImageName: dm.Name,
+				},
+			}
+
+			if tag := dm.Tag; tag != "" {
+				desc.Annotations[ocispec.AnnotationRefName] = tag
+			}
+
+			if p := dm.Platform; p != "" {
+				pp := platforms.MustParse(dm.Platform)
+				desc.Platform = &pp
+			}
+
+			if err := p.copyBlobTo(ctx, tw, io.NopCloser(bytes.NewReader(payload)), desc); err != nil {
+				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
+			}
+
+			switch desc.MediaType {
+			case images.MediaTypeDockerSchema2Manifest:
+				index.Manifests = append(index.Manifests, ocispec.Descriptor{
+					MediaType:   desc.MediaType,
+					Digest:      desc.Digest,
+					Size:        desc.Size,
+					URLs:        desc.URLs,
+					Annotations: desc.Annotations,
+					Platform:    desc.Platform,
+				})
 			}
 		}
 	}
+
+	if err := writeJsonToTar(tw, "index.json", index); err != nil {
+		return err
+	}
+
+	if err := writeJsonToTar(tw, "oci-layout", map[string]string{"imageLayoutVersion": "1.0.0"}); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -107,44 +152,30 @@ func (p *Packer) copyBlobTo(ctx context.Context, tw *tar.Writer, r io.ReadCloser
 		_ = r.Close()
 	}()
 
-	h := &tar.Header{
-		Name: strings.Join(append([]string{"blobs"}, strings.Split(desc.Digest.String(), ":")...), "/"),
+	return copyToTar(tw, r, tar.Header{
+		Name: path.Join("blobs", desc.Digest.Algorithm().String(), desc.Digest.Hex()),
 		Size: desc.Size,
-		Mode: 0600,
-	}
+	})
+}
 
-	if err := tw.WriteHeader(h); err != nil {
+func copyToTar(tw *tar.Writer, r io.Reader, header tar.Header) error {
+	header.Mode = 0644
+	if err := tw.WriteHeader(&header); err != nil {
 		return err
 	}
-
 	if _, err := io.Copy(tw, r); err != nil {
 		return err
 	}
-
 	return nil
 }
 
-func (p *Packer) writeKubePkgToTar(ctx context.Context, tw *tar.Writer, kpkg *v1alpha1.KubePkg) error {
+func writeJsonToTar(tw *tar.Writer, filename string, v any) error {
 	buf := bytes.NewBuffer(nil)
-
-	e := json.NewEncoder(buf)
-	e.SetIndent("", "  ")
-
-	if err := e.Encode(kpkg); err != nil {
+	if err := json.NewEncoder(buf).Encode(v); err != nil {
 		return err
 	}
-
-	header := &tar.Header{
-		Name: "kubepkg.json",
-		Mode: 0600,
+	return copyToTar(tw, buf, tar.Header{
+		Name: filename,
 		Size: int64(buf.Len()),
-	}
-
-	if err := tw.WriteHeader(header); err != nil {
-		return err
-	}
-	if _, err := io.Copy(tw, buf); err != nil {
-		return err
-	}
-	return nil
+	})
 }

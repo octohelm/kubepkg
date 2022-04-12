@@ -38,7 +38,7 @@ func resolveProjectRoot() string {
 
 func TestKubePkg(t *testing.T) {
 	c := containerregistry.Configuration{
-		StorageRoot: filepath.Join(projectRoot, ".tmp/crpe"),
+		StorageRoot: filepath.Join(projectRoot, ".tmp/kubepkg"),
 		Proxy: &containerregistry.Proxy{
 			RemoteURL: os.Getenv("KUBEPKG_REMOTE_REGISTRY_ENDPOINT"),
 			Username:  os.Getenv("KUBEPKG_REMOTE_REGISTRY_USERNAME"),
@@ -55,7 +55,7 @@ func TestKubePkg(t *testing.T) {
 
 	kpkg, _ := Load(filepath.Join(projectRoot, "testdata/demo.yaml"))
 
-	tgz := filepath.Join(projectRoot, ".tmp/demo.tgz")
+	kubeTgz := filepath.Join(projectRoot, ".tmp/demo.kube.tgz")
 
 	t.Run("packing", func(t *testing.T) {
 		ctx := context.Background()
@@ -65,13 +65,14 @@ func TestKubePkg(t *testing.T) {
 			NewWithT(t).Expect(err).To(BeNil())
 
 			t.Run("to kube.tgz", func(t *testing.T) {
-				f, _ := ioutil.CreateOrOpen(tgz)
+				f, _ := ioutil.CreateOrOpen(kubeTgz)
 				defer f.Close()
 
-				d, e := p.TgzTo(ctx, resolved, f)
+				d, e := p.KubeTgzTo(ctx, resolved, f)
 				if e != nil {
 					fmt.Printf("%+v", e)
 				}
+
 				NewWithT(t).Expect(e).To(BeNil())
 				fmt.Println(d)
 			})
@@ -81,7 +82,7 @@ func TestKubePkg(t *testing.T) {
 	t.Run("import", func(t *testing.T) {
 		ctx := context.Background()
 
-		f, _ := os.Open(tgz)
+		f, _ := os.Open(kubeTgz)
 		defer f.Close()
 
 		kpkg, err := r.ImportFromKubeTgzReader(ctx, f)

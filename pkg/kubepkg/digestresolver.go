@@ -2,9 +2,11 @@ package kubepkg
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 
 	"github.com/containerd/containerd/platforms"
+	"github.com/containerd/containerd/reference/docker"
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/manifest/manifestlist"
 	"github.com/distribution/distribution/v3/manifest/schema2"
@@ -34,7 +36,17 @@ func (r *DigestResolver) Resolve(ctx context.Context, pkg *v1alpha1.KubePkg) (*v
 	}
 
 	for name := range p.Spec.Images {
-		imgCtx := r.parseImageCtx(name, p.Spec.Images[name])
+		ref := name
+		if !strings.Contains(ref, "@") {
+			if mayDigest := p.Spec.Images[name]; mayDigest != "" {
+				ref = ref + "@" + mayDigest
+			}
+		}
+
+		imgCtx, err := parseImageCtx(name)
+		if err != nil {
+			return nil, err
+		}
 		imgCtx.neededPlatforms = neededPlatforms
 
 		repo, err := r.Repository(ctx, imgCtx)
@@ -77,8 +89,6 @@ func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Reposito
 			return distribution.Descriptor{}, err
 		}
 
-		status.Digests = append(status.Digests, imgCtx.toDigestMeta(mt, int64(len(data))))
-
 		switch mt {
 		case manifestlist.MediaTypeManifestList:
 			for _, sub := range m.References() {
@@ -95,11 +105,23 @@ func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Reposito
 				}
 			}
 		case schema2.MediaTypeManifest:
-			for _, sub := range m.References() {
+			dm := m.(*schema2.DeserializedManifest)
+
+			// Read platform from config
+			data, _ := repo.Blobs(ctx).Get(ctx, dm.Config.Digest)
+			p := &v1.Platform{}
+			_ = json.Unmarshal(data, p)
+			if p.OS != "" {
+				imgCtx = imgCtx.withPlatform(p)
+			}
+
+			for _, sub := range dm.References() {
 				subImgCtx := imgCtx.withDigest(sub.Digest)
 				status.Digests = append(status.Digests, subImgCtx.toDigestMeta(sub.MediaType, sub.Size))
 			}
 		}
+
+		status.Digests = append(status.Digests, imgCtx.toDigestMeta(mt, int64(len(data))))
 
 		return distribution.Descriptor{
 			MediaType: mt,
@@ -117,27 +139,27 @@ func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Reposito
 	return r.resolve(ctx, repo, imgCtx.withDigest(d.Digest), status)
 }
 
-func (r *DigestResolver) parseImageCtx(name string, mayDigest string) *imageCtx {
-	if i := strings.Index(name, "@"); i > -1 {
-		d, _ := digest.Parse(name[i+1:])
-		return &imageCtx{name: name[0:i], digest: &d}
+func parseImageCtx(ref string) (*imageCtx, error) {
+	named, err := docker.ParseDockerRef(ref)
+	if err != nil {
+		return nil, err
 	}
 
-	part := strings.Split(name, ":")
-
-	var d *digest.Digest
-
-	if mayDigest != "" {
-		if dd, err := digest.Parse(mayDigest); err == nil {
-			d = &dd
-		}
+	c := &imageCtx{
+		name: named.Name(),
+		tag:  "latest",
 	}
 
-	if len(part) >= 2 {
-		return &imageCtx{name: part[0], tag: part[1], digest: d}
+	if digested, ok := named.(docker.Digested); ok {
+		d := digested.Digest()
+		c.digest = &d
 	}
 
-	return &imageCtx{name: part[0], tag: "latest", digest: d}
+	if tagged, ok := named.(docker.Tagged); ok {
+		c.tag = tagged.Tag()
+	}
+
+	return c, nil
 }
 
 type imageCtx struct {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	"github.com/octohelm/kubepkg/pkg/cli"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
@@ -11,10 +12,10 @@ import (
 )
 
 func init() {
-	app.Add(&Save{})
+	app.Add(&Export{})
 }
 
-type SaveFlags struct {
+type ExportFlags struct {
 	ForceResolve bool     `flag:"force-resolve" desc:"ignore image locked sha256 digest"`
 	Output       string   `flag:"output,o" desc:"output path for kubepkg.tgz"`
 	Platforms    []string `flag:"platform" default:"linux/amd64,linux/arm64" desc:"supported platforms"`
@@ -22,13 +23,13 @@ type SaveFlags struct {
 	RemoteRegistry
 }
 
-type Save struct {
+type Export struct {
 	cli.Name `args:"KUBEPKG_MANIFEST" desc:"Create kubepkg.tgz from kubepkg manifest"`
-	SaveFlags
+	ExportFlags
 	VerboseFlags
 }
 
-func (s *Save) Run(ctx context.Context, args []string) error {
+func (s *Export) Run(ctx context.Context, args []string) error {
 	l := logr.FromContextOrDiscard(ctx)
 	ctx = containerregistry.WithLogger(ctx, l)
 
@@ -73,7 +74,7 @@ func (s *Save) Run(ctx context.Context, args []string) error {
 		return err
 	}
 
-	d, err := p.TgzTo(ctx, resolved, tgz)
+	d, err := p.KubeTgzTo(ctx, resolved, tgz)
 	if err != nil {
 		return err
 	}

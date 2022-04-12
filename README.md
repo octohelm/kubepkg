@@ -46,11 +46,15 @@ flowchart BT
 
 ## `kubepkg.airgap.tgz`
 
+kubepkg.json & [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md)
+
 ```
 kubepkg.json # must be first of all
 blobs/ # blob contents
   <alg>/
-    <hash> 
+    <hash>
+index.json # oci image layout required
+oci-layout # oci image layout required    
 ```
 
 ### `kubepkg.yaml` or `kubepkg.json`

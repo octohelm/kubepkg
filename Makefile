@@ -23,20 +23,29 @@ serve.registry:
 		--storage-root=.tmp/kubepkg \
 			serve registry
 
-kubepkg.save:
-	$(KUBEPKG) save -v=1 --storage-root=.tmp/kubepkg --platform=linux/amd64 --platform=linux/arm64 --output=.tmp/demo.tgz ./testdata/demo.yaml
+kubepkg.export:
+	$(KUBEPKG) export -v=1 --storage-root=.tmp/kubepkg --platform=linux/amd64 --platform=linux/arm64 --output=.tmp/demo.kube.tgz ./testdata/demo.yaml
 
 kubepkg.import:
 	mkdir -p .tmp/manifests
-	$(KUBEPKG) import -i=.tmp/kubepkg --manifest-output=.tmp/manifests .tmp/demo.tgz
+	$(KUBEPKG) import -i=.tmp/kubepkg --manifest-output=.tmp/manifests .tmp/demo.kube.tgz
 
 kubepkg.import.remote:
 	@echo "incremental import without debug"
-	$(KUBEPKG) import -i=http://0.0.0.0:36060 --incremental .tmp/demo.tgz
+	$(KUBEPKG) import -i=http://0.0.0.0:36060 --incremental .tmp/demo.kube.tgz
 	@echo "incremental import with debug"
-	$(KUBEPKG) import -v=1 -i=http://0.0.0.0:36060 --incremental .tmp/demo.tgz
-#	$(KUBEPKG) import -i=http://0.0.0.0:36060 .tmp/demo.tgz
+	$(KUBEPKG) import -v=1 -i=http://0.0.0.0:36060 --incremental .tmp/demo.kube.tgz
+#	$(KUBEPKG) import -i=http://0.0.0.0:36060 .tmp/demo.kube.tgz
 
-debug: kubepkg.save kubepkg.import
+debug: kubepkg.export kubepkg.import
+
+remote.debug: kubepkg.export remote.sync remote.ctr.import
+
+remote.sync:
+	scp .tmp/demo.kube.tgz root@crpe-test:/data/demo.kube.tgz
+
+remote.ctr.import:
+	@echo "if kube.pkg multi-arch supported --all-platforms is required"
+	ssh root@crpe-test "gzip --decompress --stdout /data/demo.kube.tgz | ctr image import --all-platforms -"
 
 include tools/mk/*.mk

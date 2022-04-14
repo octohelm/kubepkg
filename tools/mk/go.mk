@@ -12,6 +12,11 @@ go.build:
 	CGO_ENABLED=0 GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) \
 		go build $(GO_FLAGS) -o ./bin/$(TARGET_EXEC)-$(TARGET_OS)-$(TARGET_ARCH) ./cmd/$(TARGET_EXEC)
 
+
+go.install:
+	CGO_ENABLED=0 GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) \
+		go install $(GO_FLAGS) ./cmd/$(TARGET_EXEC)
+
 go.fmt:
 	goimports -l -w .
 

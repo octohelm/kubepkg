@@ -2,13 +2,12 @@ package cmd
 
 import (
 	"context"
-	"os"
-
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -19,11 +18,12 @@ func NewLogger(lvl int) (l logr.Logger) {
 
 	return zapr.NewLoggerWithOptions(
 		func(opts ...zap.Option) *zap.Logger {
+			c := zap.NewProductionConfig()
 			if os.Getenv("GOENV") == "DEV" {
-				l, _ := zap.NewDevelopment(opts...)
-				return l
+				c = zap.NewDevelopmentConfig()
 			}
-			l, _ := zap.NewProduction(opts...)
+			c.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+			l, _ := c.Build(opts...)
 			return l
 		}(zap.IncreaseLevel(zap.NewAtomicLevelAt(zapcore.Level(lvl)))),
 	)

@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"context"
+	"os"
+
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 

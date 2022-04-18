@@ -2,11 +2,12 @@ build:
 	$(MAKE) go.xbuild TARGET_OS=linux TARGET_ARCH="$(TARGET_ARCH)"
 
 KUBEPKG = $(GO_RUN)
+KUBECONFIG = ${HOME}/.kube_config/config--crpe-test.yaml
 
 serve.operator:
 	$(KUBEPKG) \
 		--watch-namespace=default \
-		--kubeconfig=${HOME}/.kube/config--crpe-test.yaml \
+		--kubeconfig=$(KUBECONFIG) \
 			serve operator
 
 serve.agent:
@@ -14,7 +15,7 @@ serve.agent:
 		--addr=:36060 \
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(shell go env GOARCH) \
-		--kubeconfig=${HOME}/.kube/config--crpe-test.yaml \
+		--kubeconfig=$(KUBECONFIG) \
 			serve agent
 
 serve.registry:

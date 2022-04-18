@@ -22,6 +22,7 @@ func init() {
 type ImportFlags struct {
 	ImportTo       string `flag:"import-to,i" desc:"Import to. REMOTE_AGENT (http://ip:port) or STORAGE_ROOT (dir path)"`
 	Incremental    bool   `flag:"incremental" desc:"Only for importing to REMOTE_AGENT"`
+	SkipBlobs      bool   `flag:"skip-blobs" desc:"Only for importing to REMOTE_AGENT without blobs, when --incremental set"`
 	ManifestOutput string `flag:"manifest-output" desc:"Dir to output manifest. Only for importing to STORAGE_ROOT"`
 }
 
@@ -105,7 +106,7 @@ func (s *Import) importToRemote(ctx context.Context, kubeAgentEndpoint string, t
 		defer tgzFile.Close()
 
 		if s.Incremental {
-			kpkg, err := client.IncrementalImport(ctx, ac, tgzFile)
+			kpkg, err := client.IncrementalImport(ctx, ac, tgzFile, s.SkipBlobs)
 			if err != nil {
 				return err
 

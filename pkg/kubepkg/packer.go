@@ -6,6 +6,9 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"io"
+	"path"
+
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/platforms"
 	"github.com/distribution/distribution/v3"
@@ -15,8 +18,6 @@ import (
 	ocispecs "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
-	"io"
-	"path"
 )
 
 func NewPacker(n distribution.Namespace) *Packer {

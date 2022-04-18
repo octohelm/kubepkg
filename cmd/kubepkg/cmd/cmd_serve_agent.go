@@ -21,8 +21,8 @@ type AgentFlags struct {
 	Storage
 
 	AgentID    string   `flag:"agent-id" default:"dev" env:"KUBEPKG_AGENT_ID" desc:"output path for kubepkg.tgz"`
-	Platforms  []string `flag:"platform" env:"KUBEPKG_PLATFORMS"  default:"linux/amd64,linux/arm64" desc:"supported platforms"`
-	Addr       string   `flag:"addr" default:":36060" desc:"The address the server endpoint binds to"`
+	Platforms  []string `flag:"platform" env:"KUBEPKG_PLATFORMS" default:"linux/amd64,linux/arm64" desc:"supported platforms"`
+	Addr       string   `flag:"addr" env:"AGENT_ADDR" default:":36060" desc:"The address the server endpoint binds to"`
 	KubeConfig string   `flag:"kubeconfig" env:"KUBECONFIG" desc:"Paths to a kubeconfig. Only required if out-of-cluster."`
 }
 

@@ -31,7 +31,7 @@ func (c *Client) AgentInfo(ctx context.Context) (*agent.AgentInfo, error) {
 		return nil, err
 	}
 
-	cc, err := GetShortConnClientContext(ctx, c.HttpTransports...)
+	cc, err := GetConnClientContext(ctx, c.HttpTransports...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *Client) ExistsDigest(ctx context.Context, dm *v1alpha1.DigestMeta) (boo
 		return false, err
 	}
 
-	cc, err := GetShortConnClientContext(ctx, c.HttpTransports...)
+	cc, err := GetConnClientContext(ctx, c.HttpTransports...)
 	if err != nil {
 		return false, err
 	}
@@ -89,15 +89,48 @@ func (c *Client) ExistsDigest(ctx context.Context, dm *v1alpha1.DigestMeta) (boo
 	return true, nil
 }
 
+type progressWriter struct {
+	dm      *v1alpha1.DigestMeta
+	written int64
+	l       logr.Logger
+	t       *time.Ticker
+}
+
+func (pw *progressWriter) Write(p []byte) (n int, err error) {
+	n = len(p)
+	pw.written += int64(n)
+	return
+}
+
+func (pw *progressWriter) Start() {
+	pw.t = time.NewTicker(time.Second)
+	go func() {
+		for range pw.t.C {
+			pw.l.V(1).Info(fmt.Sprintf(
+				"uploading %s/%s %s (%s)",
+				v1alpha1.FileSize(pw.written), pw.dm.Size, pw.dm.Digest, pw.dm.Name,
+			))
+		}
+	}()
+}
+
+func (pw *progressWriter) Stop() {
+	pw.t.Stop()
+}
+
 func (c *Client) ImportDigest(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader) error {
-	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/blobs", c.Endpoint), br)
+	p := &progressWriter{dm: dm, l: logr.FromContextOrDiscard(ctx)}
+	p.Start()
+	defer p.Stop()
+
+	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/blobs", c.Endpoint), io.TeeReader(br, p))
 	if err != nil {
 		return err
 	}
 
 	r.Header.Set("Content-Type", mime.ToContentType(dm))
 
-	cc, err := GetShortConnClientContext(ctx, c.HttpTransports...)
+	cc, err := GetConnClientContext(ctx, c.HttpTransports...)
 	if err != nil {
 		return err
 	}
@@ -129,7 +162,7 @@ func (c *Client) ImportKubePkg(ctx context.Context, kubePkg *v1alpha1.KubePkg) (
 
 	r.Header.Set("Content-Type", "application/json; encoding=utf-8")
 
-	cc, err := GetShortConnClientContext(ctx, c.HttpTransports...)
+	cc, err := GetConnClientContext(ctx, c.HttpTransports...)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +196,7 @@ func (c *Client) ImportKubePkgTgz(ctx context.Context, tgzReader io.Reader) (*v1
 
 	r.Header.Set("Content-Type", mime.MediaTypeKubePkg)
 
-	cc, err := GetShortConnClientContext(ctx, c.HttpTransports...)
+	cc, err := GetConnClientContext(ctx, c.HttpTransports...)
 	if err != nil {
 		return nil, err
 	}

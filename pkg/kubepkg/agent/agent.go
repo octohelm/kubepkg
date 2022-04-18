@@ -61,9 +61,9 @@ func (a *Agent) Serve(ctx context.Context) error {
 
 	router.Path("/").HandlerFunc(a.liveness)
 
-	router.Path("/kubepkgs").Methods(http.MethodHead).HandlerFunc(a.liveness)
 	router.Path("/kubepkgs").Methods(http.MethodGet).HandlerFunc(a.list)
 	router.Path("/kubepkgs").Methods(http.MethodPut).HandlerFunc(a.applyByTgz)
+	router.Path("/kubepkgs/{name}").Methods(http.MethodGet).HandlerFunc(a.get)
 	router.Path("/kubepkgs/{name}").Methods(http.MethodDelete).HandlerFunc(a.del)
 
 	router.Path("/blobs/{digest}").Methods(http.MethodHead).HandlerFunc(a.statBlob)
@@ -242,6 +242,29 @@ func (a *Agent) del(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	rw.WriteHeader(http.StatusNoContent)
+}
+
+func (a *Agent) get(rw http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	kpkg := &v1alpha1.KubePkg{}
+	kpkg.SetGroupVersionKind(v1alpha1.SchemeGroupVersion.WithKind("KubePkg"))
+
+	kpkg.Name = mux.Vars(req)["name"]
+	kpkg.Namespace = req.URL.Query().Get("namespace")
+
+	if kpkg.Namespace == "" {
+		kpkg.Namespace = "default"
+	}
+
+	if err := a.c.Get(ctx, client.ObjectKeyFromObject(kpkg), kpkg); err != nil {
+		writeStatusErr(rw, http.StatusBadRequest, err)
+		return
+	}
+
+	rw.Header().Set("Content-Type", "application/json; encoding=utf-8")
+	rw.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(rw).Encode(kpkg)
 }
 
 func (a *Agent) AgentInfo() *AgentInfo {

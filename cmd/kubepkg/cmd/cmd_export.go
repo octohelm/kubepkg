@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/go-logr/logr"
 	"github.com/octohelm/kubepkg/pkg/cli"
@@ -57,7 +58,7 @@ func (s *Export) Run(ctx context.Context, args []string) error {
 
 	tgz, err := ioutil.CreateOrOpen(s.Output)
 	if err != nil {
-		return err
+		return errors.Errorf("open output %s failed", s.Output)
 	}
 	defer tgz.Close()
 

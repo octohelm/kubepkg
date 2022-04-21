@@ -219,6 +219,10 @@ func (l *logRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	started := time.Now()
 
 	resp, err := l.next.RoundTrip(req)
+	if err != nil {
+		logr.FromContextOrDiscard(req.Context()).Error(err, fmt.Sprintf("request failed: %s %s", req.Method, req.URL))
+		return nil, err
+	}
 
 	logr.FromContextOrDiscard(req.Context()).V(1).Info(
 		fmt.Sprintf("%s %s", req.Method, req.URL),

@@ -6,6 +6,8 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/octohelm/kubepkg/pkg/ioutil"
 	"io"
 	"path"
 
@@ -87,7 +89,7 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 			if err != nil {
 				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
-			if err := p.copyBlobTo(ctx, tw, f, desc); err != nil {
+			if err := p.copyBlobTo(ctx, tw, f, desc, i, len(kpkg.Status.Digests)); err != nil {
 				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
 		case "manifest":
@@ -119,7 +121,7 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 				desc.Platform = &pp
 			}
 
-			if err := p.copyBlobTo(ctx, tw, io.NopCloser(bytes.NewReader(payload)), desc); err != nil {
+			if err := p.copyBlobTo(ctx, tw, io.NopCloser(bytes.NewReader(payload)), desc, i, len(kpkg.Status.Digests)); err != nil {
 				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
 			}
 
@@ -148,12 +150,16 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 	return nil
 }
 
-func (p *Packer) copyBlobTo(ctx context.Context, tw *tar.Writer, r io.ReadCloser, desc distribution.Descriptor) error {
+func (p *Packer) copyBlobTo(ctx context.Context, tw *tar.Writer, r io.ReadCloser, desc distribution.Descriptor, i int, total int) error {
 	defer func() {
 		_ = r.Close()
 	}()
 
-	return copyToTar(tw, r, tar.Header{
+	pw := ioutil.NewProgressWriter(ctx, fmt.Sprintf("exporting (%d/%d) %s", i, total, desc.Digest), desc.Size)
+	pw.Start()
+	defer pw.Stop()
+
+	return copyToTar(tw, io.TeeReader(r, pw), tar.Header{
 		Name: path.Join("blobs", desc.Digest.Algorithm().String(), desc.Digest.Hex()),
 		Size: desc.Size,
 	})

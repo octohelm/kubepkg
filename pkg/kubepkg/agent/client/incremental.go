@@ -2,6 +2,8 @@ package client
 
 import (
 	"context"
+	"fmt"
+	"github.com/octohelm/kubepkg/pkg/ioutil"
 	"io"
 
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
@@ -15,7 +17,7 @@ func IncrementalImport(ctx context.Context, c *Client, tgz io.Reader, skipBlobs 
 		return nil, err
 	}
 
-	kpkg, err := kubepkg.KubeTgzRange(ctx, tgz, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader) error {
+	kpkg, err := kubepkg.KubeTgzRange(ctx, tgz, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
 		if skipBlobs {
 			return nil
 		}
@@ -29,7 +31,11 @@ func IncrementalImport(ctx context.Context, c *Client, tgz io.Reader, skipBlobs 
 		if exists {
 			return nil
 		}
-		if err := c.ImportDigest(ctx, dm, br); err != nil {
+
+		p := ioutil.NewProgressWriter(ctx, fmt.Sprintf("importing (%d/%d) %s", i, total, dm.Digest), int64(dm.Size))
+		p.Start()
+		defer p.Stop()
+		if err := c.ImportDigest(ctx, dm, io.TeeReader(br, p)); err != nil {
 			return errors.Wrapf(err, "import %s failed", dm)
 		}
 		return nil

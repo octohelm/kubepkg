@@ -89,41 +89,8 @@ func (c *Client) ExistsDigest(ctx context.Context, dm *v1alpha1.DigestMeta) (boo
 	return true, nil
 }
 
-type progressWriter struct {
-	dm      *v1alpha1.DigestMeta
-	written int64
-	l       logr.Logger
-	t       *time.Ticker
-}
-
-func (pw *progressWriter) Write(p []byte) (n int, err error) {
-	n = len(p)
-	pw.written += int64(n)
-	return
-}
-
-func (pw *progressWriter) Start() {
-	pw.t = time.NewTicker(time.Second)
-	go func() {
-		for range pw.t.C {
-			pw.l.V(1).Info(fmt.Sprintf(
-				"uploading %s/%s %s (%s)",
-				v1alpha1.FileSize(pw.written), pw.dm.Size, pw.dm.Digest, pw.dm.Name,
-			))
-		}
-	}()
-}
-
-func (pw *progressWriter) Stop() {
-	pw.t.Stop()
-}
-
 func (c *Client) ImportDigest(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader) error {
-	p := &progressWriter{dm: dm, l: logr.FromContextOrDiscard(ctx)}
-	p.Start()
-	defer p.Stop()
-
-	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/blobs", c.Endpoint), io.TeeReader(br, p))
+	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/blobs", c.Endpoint), br)
 	if err != nil {
 		return err
 	}
@@ -243,11 +210,7 @@ func LogHttpTransport() HttpTransport {
 				}
 
 				if resp != nil {
-					l2 := l
-					if req.Method == http.MethodHead {
-						l2 = l2.V(1)
-					}
-					l2.Info(fmt.Sprintf("%s %s", req.Method, req.URL.String()), values...)
+					l.V(1).Info(fmt.Sprintf("%s %s", req.Method, req.URL.String()), values...)
 				} else {
 					l.Error(err, fmt.Sprintf("%s %s", req.Method, req.URL.String()), values...)
 				}

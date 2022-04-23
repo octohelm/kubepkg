@@ -3,6 +3,7 @@ package containerregistry
 import (
 	"context"
 	"fmt"
+	"github.com/octohelm/kubepkg/pkg/httputil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -47,7 +48,7 @@ func Serve(ctx context.Context, c *Configuration) error {
 
 	s.Addr = c.RegistryAddr
 
-	s.Handler = enableMirrors(app)
+	s.Handler = httputil.LogHandler(logr.FromContextOrDiscard(ctx))(enableMirrors(app))
 
 	go func() {
 		l.Info(fmt.Sprintf("registry@%s serve on %s (%s/%s)", version.Version, s.Addr, runtime.GOOS, runtime.GOARCH))

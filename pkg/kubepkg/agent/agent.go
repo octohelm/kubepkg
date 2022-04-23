@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/octohelm/kubepkg/pkg/httputil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -69,7 +70,13 @@ func (a *Agent) Serve(ctx context.Context) error {
 	router.Path("/blobs/{digest}").Methods(http.MethodHead).HandlerFunc(a.statBlob)
 	router.Path("/blobs").Methods(http.MethodPut).HandlerFunc(a.uploadBlob)
 
-	router.Use(a.loggerHandler(l))
+	router.Use(httputil.LogHandler(l))
+	router.Use(func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Set(HEADER_KUBEPKG_AGENT, ToKubeAgentHead(a.AgentInfo()))
+			handler.ServeHTTP(rw, req)
+		})
+	})
 
 	s := &http.Server{}
 	s.Addr = a.opts.Addr
@@ -99,36 +106,6 @@ func (a *Agent) Serve(ctx context.Context) error {
 	defer cancel()
 
 	return s.Shutdown(ctx)
-}
-
-func (a *Agent) loggerHandler(l logr.Logger) func(handler http.Handler) http.Handler {
-	return func(handler http.Handler) http.Handler {
-		return http.HandlerFunc(func(rws http.ResponseWriter, req *http.Request) {
-			nextCtx := req.Context()
-			nextCtx = logr.NewContext(nextCtx, l)
-
-			started := time.Now()
-
-			rw := &responseWriter{ResponseWriter: rws}
-
-			rw.Header().Set(HEADER_KUBEPKG_AGENT, ToKubeAgentHead(a.AgentInfo()))
-
-			handler.ServeHTTP(rw, req.WithContext(nextCtx))
-
-			if req.Method != "HEAD" && req.URL.Path != "/" {
-				values := []interface{}{
-					"cost", time.Since(started),
-					"status", rw.StatusCode,
-				}
-
-				if ct := req.Header.Get("Content-Type"); ct != "" {
-					values = append(values, "req.content-type", ct)
-				}
-
-				l.Info(fmt.Sprintf("%s %s", req.Method, req.URL.String()), values...)
-			}
-		})
-	}
 }
 
 func (a *Agent) liveness(rw http.ResponseWriter, req *http.Request) {

@@ -10,40 +10,42 @@ spec:
   images:
     docker.io/library/nginx:alpine: 'sha256:1746c349c5113b180cd0c2d5c0420c89563a65a5555655b5253cf0f2575a027c'
   manifests:
-    web.service:
-      apiVersion: v1
-      kind: Service
-      metadata:
-        name: web
-      spec:
-        selector:
-          app: web
-        ports:
-          - name: http-80
-            protocol: TCP
-            port: 80
-            targetPort: 80
-    web.deployment:
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: web
-      spec:
-        replicas: 1
-        selector:
-          matchLabels:
+    services:
+      web:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: web
+        spec:
+          selector:
             app: web
-        template:
-          metadata:
-            labels:
+          ports:
+            - name: http-80
+              protocol: TCP
+              port: 80
+              targetPort: 80
+    deployments:
+      web:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: web
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
               app: web
-          spec:
-            containers:
-              - image: docker.io/library/nginx:alpine
-                imagePullPolicy: IfNotPresent
-                name: web
-                ports:
-                  - containerPort: 80
-                    name: http
-                  - containerPort: 443
-                    name: https
+          template:
+            metadata:
+              labels:
+                app: web
+            spec:
+              containers:
+                - image: docker.io/library/nginx:alpine
+                  imagePullPolicy: IfNotPresent
+                  name: web
+                  ports:
+                    - containerPort: 80
+                      name: http
+                    - containerPort: 443
+                      name: https

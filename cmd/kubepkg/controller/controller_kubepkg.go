@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 
 	"github.com/go-logr/logr"
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
@@ -58,8 +59,14 @@ func (r *KubePkgReconciler) Reconcile(ctx context.Context, request reconcile.Req
 
 	r.Log.Info(fmt.Sprintf("Reconciling %s.%s", kpkg.GetName(), kpkg.GetNamespace()))
 
-	for name := range kpkg.Spec.Manifests {
-		o := kpkg.Spec.Manifests[name]
+	manifests, err := manifest.Extract(kpkg.Spec.Manifests)
+	if err != nil {
+		r.Log.Error(err, "extra manifests failed")
+		return reconcile.Result{}, nil
+	}
+
+	for name := range manifests {
+		o := manifests[name]
 
 		// skip namespace
 		if o.GetObjectKind().GroupVersionKind().Kind == "Namespace" {
@@ -79,7 +86,7 @@ func (r *KubePkgReconciler) Reconcile(ctx context.Context, request reconcile.Req
 	return reconcile.Result{}, nil
 }
 
-func (r *KubePkgReconciler) ensureManifest(ctx context.Context, kpkg *kubepkgv1alpha1.KubePkg, key string, o *unstructured.Unstructured) error {
+func (r *KubePkgReconciler) ensureManifest(ctx context.Context, kpkg *kubepkgv1alpha1.KubePkg, key string, o client.Object) error {
 	gvk := o.GetObjectKind().GroupVersionKind()
 
 	if err := r.setControllerReference(kpkg, o); err != nil {

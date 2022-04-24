@@ -25,7 +25,12 @@ serve.registry:
 			serve registry
 
 kubepkg.export:
-	$(KUBEPKG) export -v=1 --storage-root=.tmp/kubepkg --platform=linux/amd64 --platform=linux/arm64 --output=.tmp/demo.kube.tgz ./testdata/demo.yaml
+	$(KUBEPKG) export -v=1 \
+		--storage-root=.tmp/kubepkg \
+		--platform=linux/amd64 \
+		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
+ 		--output=.tmp/demo.kube.tgz \
+ 			./testdata/demo.yaml
 
 kubepkg.import:
 	mkdir -p .tmp/manifests

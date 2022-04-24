@@ -3,7 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/go-logr/logr"
 	"github.com/octohelm/kubepkg/pkg/cli"
@@ -17,9 +20,10 @@ func init() {
 }
 
 type ExportFlags struct {
-	ForceResolve bool     `flag:"force-resolve" desc:"ignore image locked sha256 digest"`
-	Output       string   `flag:"output,o" desc:"output path for kubepkg.tgz"`
-	Platforms    []string `flag:"platform" default:"linux/amd64,linux/arm64" desc:"supported platforms"`
+	ForceResolve         bool     `flag:"force-resolve" desc:"ignore image locked sha256 digest"`
+	Output               string   `flag:"output,o" desc:"output path for kubepkg.tgz"`
+	ExtractManifestsYaml string   `flag:"extract-manifests-yaml" desc:"extract manifests as yaml"`
+	Platforms            []string `flag:"platform" default:"linux/amd64,linux/arm64" desc:"supported platforms"`
 	Storage
 	RemoteRegistry
 }
@@ -84,6 +88,32 @@ func (s *Export) Run(ctx context.Context, args []string) error {
 		fmt.Sprintf("%s generated.", s.Output),
 		"digest", d,
 	)
+
+	if s.ExtractManifestsYaml != "" {
+		manifestsYaml, err := ioutil.CreateOrOpen(s.ExtractManifestsYaml)
+		if err != nil {
+			return errors.Wrapf(err, "open %s failed", s.ExtractManifestsYaml)
+		}
+		defer manifestsYaml.Close()
+
+		manifests, err := manifest.Extract(resolved.Spec.Manifests, func(o manifest.Object) manifest.Object {
+			o.SetNamespace(resolved.GetNamespace())
+			return o
+		})
+		if err != nil {
+			return errors.Wrapf(err, "extract manifests failed: %s", s.ExtractManifestsYaml)
+		}
+
+		w := yaml.NewEncoder(manifestsYaml)
+		for _, m := range manifests {
+			if u, ok := m.(*unstructured.Unstructured); ok {
+				if err := w.Encode(u.Object); err != nil {
+					return errors.Wrapf(err, "encoding to yaml failed: %s", s.ExtractManifestsYaml)
+				}
+			}
+		}
+		_ = w.Close()
+	}
 
 	return nil
 }

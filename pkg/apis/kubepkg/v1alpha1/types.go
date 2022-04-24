@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 func init() {
@@ -29,9 +28,19 @@ type KubePkg struct {
 }
 
 type KubePkgSpec struct {
-	Version   string                                `json:"version"`
-	Images    map[string]string                     `json:"images,omitempty"`
-	Manifests map[string]*unstructured.Unstructured `json:"manifests,omitempty"`
+	Version   string            `json:"version"`
+	Images    map[string]string `json:"images,omitempty"`
+	Manifests Manifests         `json:"manifests,omitempty"`
+}
+
+type Manifests map[string]any
+
+func (s Manifests) DeepCopy() Manifests {
+	m := make(Manifests)
+	for k := range s {
+		m[k] = s[k]
+	}
+	return m
 }
 
 type KubePkgStatus struct {
@@ -64,7 +73,7 @@ func (f FileSize) String() string {
 	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPE"[exp])
 }
 
-type Statuses map[string]interface{}
+type Statuses map[string]any
 
 func (s Statuses) DeepCopy() Statuses {
 	m := make(Statuses)

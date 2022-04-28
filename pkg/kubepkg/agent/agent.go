@@ -190,7 +190,7 @@ func (a *Agent) applyByTgz(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err := a.c.Patch(ctx, kpkg, client.Apply, controller.FieldOwner); err != nil {
+	if err := a.c.Patch(ctx, kpkg, client.Apply, controller.FieldOwner, client.ForceOwnership); err != nil {
 		writeStatusErr(rw, http.StatusBadRequest, err)
 		return
 	}

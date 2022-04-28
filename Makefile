@@ -2,7 +2,7 @@ build:
 	$(MAKE) go.xbuild TARGET_OS=linux TARGET_ARCH="$(TARGET_ARCH)"
 
 KUBEPKG = $(GO_RUN)
-KUBECONFIG = ${HOME}/.kube_config/config--crpe-test.yaml
+KUBECONFIG = ${HOME}/.kube_config/config--hw-test.yaml
 
 serve.operator:
 	$(KUBEPKG) \
@@ -31,6 +31,9 @@ kubepkg.export:
 		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
  		--output=.tmp/demo.kube.tgz \
  			./testdata/demo.yaml
+
+kubepkg.apply:
+	$(KUBEPKG) apply --kubeconfig=$(KUBECONFIG) --force --dry-run ./testdata/demo.yaml
 
 kubepkg.import:
 	mkdir -p .tmp/manifests

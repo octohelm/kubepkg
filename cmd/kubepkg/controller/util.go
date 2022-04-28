@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-var FieldOwner = client.FieldOwner("kubepkg-operator")
+var FieldOwner = client.FieldOwner("kubepkg")
 
 func allWatchableGroupVersionKinds(conf *rest.Config) (gvks []schema.GroupVersionKind, err error) {
 	dc, e := discovery.NewDiscoveryClientForConfig(conf)

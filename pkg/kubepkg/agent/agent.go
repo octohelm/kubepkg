@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/octohelm/kubepkg/pkg/httputil"
+	"github.com/octohelm/kubepkg/pkg/kubepkg/controller"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,10 +21,9 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gorilla/mux"
-	"github.com/octohelm/kubepkg/cmd/kubepkg/controller"
-	"github.com/octohelm/kubepkg/internal/version"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
+	"github.com/octohelm/kubepkg/version"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -248,6 +248,6 @@ func (a *Agent) AgentInfo() *AgentInfo {
 	return &AgentInfo{
 		AgentID:            a.opts.AgentID,
 		SupportedPlatforms: a.opts.SupportedPlatforms,
-		Version:            version.Version,
+		Version:            version.FullVersion(),
 	}
 }

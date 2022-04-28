@@ -2,14 +2,13 @@ package cmd
 
 import (
 	"context"
+	"github.com/innoai-tech/infra/pkg/cli"
+	"github.com/octohelm/kubepkg/version"
 	"os"
-
-	"github.com/octohelm/kubepkg/internal/version"
-	"github.com/octohelm/kubepkg/pkg/cli"
 )
 
-var app = cli.NewApp("kubepkg", version.Version)
+var app = cli.NewApp("kubepkg", version.FullVersion())
 
 func Run(ctx context.Context) error {
-	return app.Run(ctx, os.Args)
+	return cli.Execute(ctx, app, os.Args[1:])
 }

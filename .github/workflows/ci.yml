@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "*"
+    tags:
+      - 'v*'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '^1.18'
+
+      - uses: dagger/dagger-for-github@v3
+        with:
+          version: https://github.com/morlay/dagger.git#release-main
+          install-only: true
+
+      - run: make build push
+        env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          GIT_SHA: ${{ github.sha }}
+          GIT_REF: ${{ github.ref }}

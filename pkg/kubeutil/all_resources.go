@@ -1,20 +1,14 @@
-package controller
+package kubeutil
 
 import (
 	"context"
-	"strings"
-
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
+	"strings"
 )
 
-var FieldOwner = client.FieldOwner("kubepkg")
-
-func allWatchableGroupVersionKinds(conf *rest.Config) (gvks []schema.GroupVersionKind, err error) {
+func AllWatchableGroupVersionKinds(ctx context.Context, conf *rest.Config) (gvks []schema.GroupVersionKind, err error) {
 	dc, e := discovery.NewDiscoveryClientForConfig(conf)
 	if e != nil {
 		return nil, e
@@ -48,21 +42,4 @@ func allWatchableGroupVersionKinds(conf *rest.Config) (gvks []schema.GroupVersio
 		}
 	}
 	return
-}
-
-func GetClientWithoutCache(m ctrl.Manager) client.Client {
-	return &clientWithoutCache{Client: m.GetClient(), r: m.GetAPIReader()}
-}
-
-type clientWithoutCache struct {
-	r client.Reader
-	client.Client
-}
-
-func (c *clientWithoutCache) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
-	return c.r.Get(ctx, key, obj)
-}
-
-func (c *clientWithoutCache) List(ctx context.Context, key client.ObjectList, opts ...client.ListOption) error {
-	return c.r.List(ctx, key, opts...)
 }

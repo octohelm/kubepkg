@@ -1,11 +1,23 @@
-build:
-	$(MAKE) go.xbuild TARGET_OS=linux TARGET_ARCH="$(TARGET_ARCH)"
+export GIT_SHA ?= $(shell git rev-parse HEAD)
+export GIT_REF ?= HEAD
 
-KUBEPKG = $(GO_RUN)
+DAGGER = dagger --log-format=plain -p ./dagger
+
+build:
+	$(DAGGER) do build
+.PHONY: build
+
+push:
+	$(DAGGER) do push
+.PHONY: push
+
+KUBEPKG = go run ./cmd/kubepkg
 KUBECONFIG = ${HOME}/.kube_config/config--hw-test.yaml
 
 serve.operator:
 	$(KUBEPKG) \
+		--internal-host="{{ .Name }}---{{ .Namespace }}.hw-test.innoai.tech" \
+		--enable-https=true \
 		--watch-namespace=default \
 		--kubeconfig=$(KUBECONFIG) \
 			serve operator
@@ -35,6 +47,9 @@ kubepkg.export:
 kubepkg.apply:
 	$(KUBEPKG) apply --kubeconfig=$(KUBECONFIG) --force --dry-run ./testdata/demo.yaml
 
+kubepkg.manifests:
+	$(KUBEPKG) manifests ./testdata/demo.yaml
+
 kubepkg.import:
 	mkdir -p .tmp/manifests
 	$(KUBEPKG) import -i=.tmp/kubepkg --manifest-output=.tmp/manifests .tmp/demo.kube.tgz
@@ -57,4 +72,10 @@ remote.ctr.import:
 	@echo "if kube.pkg multi-arch supported --all-platforms is required"
 	ssh root@crpe-test "gzip --decompress --stdout /data/demo.kube.tgz | ctr image import --all-platforms -"
 
-include tools/mk/*.mk
+gen: gen-deepcopy
+
+gen-deepcopy:
+	deepcopy-gen \
+		--output-file-base zz_generated.deepcopy \
+		--go-header-file ./hack/boilerplate.go.txt \
+		--input-dirs $(PKG)/pkg/apis/kubepkg/v1alpha1

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-logr/logr"
-	"github.com/octohelm/kubepkg/pkg/cli"
+	"github.com/innoai-tech/infra/pkg/cli"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/agent/client"
@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	app.Add(&Import{})
+	cli.Add(app, &Import{})
 }
 
 type ImportFlags struct {
@@ -32,17 +32,17 @@ type Import struct {
 	VerboseFlags
 }
 
-func (s *Import) Run(ctx context.Context, args []string) error {
+func (s *Import) Run(ctx context.Context) error {
 	u, err := url.Parse(s.ImportTo)
 	if err != nil {
 		return err
 	}
 
 	if u.Scheme == "" {
-		return s.importToStorageRoot(ctx, s.ImportTo, args)
+		return s.importToStorageRoot(ctx, s.ImportTo, s.Args)
 	}
 
-	return s.importToRemote(ctx, fmt.Sprintf("%s://%s", u.Scheme, u.Host), args)
+	return s.importToRemote(ctx, fmt.Sprintf("%s://%s", u.Scheme, u.Host), s.Args)
 }
 
 func (s *Import) importToStorageRoot(ctx context.Context, root string, tgzFilenames []string) error {

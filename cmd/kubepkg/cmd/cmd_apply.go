@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
+	"github.com/innoai-tech/infra/pkg/cli"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
-	"github.com/octohelm/kubepkg/pkg/cli"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	app.Add(&Apply{})
+	cli.Add(app, &Apply{})
 }
 
 type ApplyFlags struct {
@@ -29,13 +29,13 @@ type Apply struct {
 	VerboseFlags
 }
 
-func (s *Apply) Run(ctx context.Context, args []string) error {
+func (s *Apply) Run(ctx context.Context) error {
 	c, err := kubeutil.NewClient(s.KubeConfig)
 	if err != nil {
 		return err
 	}
 
-	kpkg, err := kubepkg.Load(args[0])
+	kpkg, err := kubepkg.Load(s.Args[0])
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (s *Apply) applyKubePkg(ctx context.Context, c client.Client, kpkg *v1alpha
 		"host", config.Host,
 	)
 
-	manifests, err := manifest.Extract(kpkg.Spec.Manifests)
+	manifests, err := manifest.ExtractComplete(kpkg)
 	if err != nil {
 		return err
 	}

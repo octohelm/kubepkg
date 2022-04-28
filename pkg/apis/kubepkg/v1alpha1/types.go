@@ -75,10 +75,10 @@ func (f FileSize) String() string {
 
 type Statuses map[string]any
 
-func (s Statuses) DeepCopy() Statuses {
+func (ss Statuses) DeepCopy() Statuses {
 	m := make(Statuses)
-	for k := range s {
-		m[k] = s[k]
+	for k := range ss {
+		m[k] = ss[k]
 	}
 	return m
 }

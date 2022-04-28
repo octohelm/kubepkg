@@ -3,12 +3,12 @@ package cmd
 import (
 	"context"
 
-	"github.com/octohelm/kubepkg/pkg/cli"
+	"github.com/innoai-tech/infra/pkg/cli"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 )
 
 func init() {
-	serve.Add(&Registry{})
+	cli.Add(serve, &Registry{})
 }
 
 type RegistryFlags struct {
@@ -23,7 +23,7 @@ type Registry struct {
 	VerboseFlags
 }
 
-func (s *Registry) Run(ctx context.Context, args []string) error {
+func (s *Registry) Run(ctx context.Context) error {
 	c := &containerregistry.Configuration{}
 
 	c.StorageRoot = s.Storage.Root

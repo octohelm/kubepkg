@@ -3,6 +3,7 @@ package kubepkg
 import (
 	"context"
 	"encoding/json"
+	"github.com/octohelm/kubepkg/pkg/annotation"
 	"strings"
 
 	"github.com/containerd/containerd/platforms"
@@ -30,7 +31,7 @@ func (r *DigestResolver) Resolve(ctx context.Context, pkg *v1alpha1.KubePkg) (*v
 	var neededPlatforms []string
 
 	if annotations := pkg.GetAnnotations(); annotations != nil {
-		if s, ok := annotations[annotationPlatforms]; ok && s != "" {
+		if s, ok := annotations[annotation.Platforms]; ok && s != "" {
 			neededPlatforms = strings.Split(s, ",")
 		}
 	}
@@ -65,13 +66,11 @@ func (r *DigestResolver) Resolve(ctx context.Context, pkg *v1alpha1.KubePkg) (*v
 	return p, nil
 }
 
-const annotationPlatforms = "octohelm.tech/platforms"
-
 func AnnotationPlatforms(k *v1alpha1.KubePkg, platforms []string) {
 	if k.Annotations == nil {
 		k.Annotations = map[string]string{}
 	}
-	k.Annotations[annotationPlatforms] = strings.Join(platforms, ",")
+	k.Annotations[annotation.Platforms] = strings.Join(platforms, ",")
 }
 
 func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Repository, imgCtx *imageCtx, status *v1alpha1.KubePkgStatus) (distribution.Descriptor, error) {

@@ -4,18 +4,28 @@ metadata:
   name: demo
   namespace: default
   annotations:
-    octohelm.tech/platforms: linux/amd64,linux/arm64
+    octohelm.tech/platform: linux/amd64,linux/arm64
 spec:
   version: 0.0.1
   images:
     docker.io/library/nginx:alpine: 'sha256:1746c349c5113b180cd0c2d5c0420c89563a65a5555655b5253cf0f2575a027c'
   manifests:
+    configMaps:
+      web:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: web
+        data:
+          X: "x"
     services:
       web:
         apiVersion: v1
         kind: Service
         metadata:
           name: web
+          annotations:
+            "ingress.octohelm.tech/host": "internal"
         spec:
           selector:
             app: web
@@ -49,3 +59,14 @@ spec:
                       name: http
                     - containerPort: 443
                       name: https
+                  env:
+                    - name: "SRV_XXX"
+                      valueFrom:
+                        configMapKeyRef:
+                          name: "srv-xxx"
+                          key: "endpoint"
+                    - name: "X"
+                      valueFrom:
+                        configMapKeyRef:
+                          name: "web"
+                          key: "X"

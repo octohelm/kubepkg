@@ -10,7 +10,7 @@ import (
 	"sort"
 )
 
-type ObjectProcess = func(o Object) Object
+type ObjectProcess = func(o Object) (Object, error)
 
 func Extract(m any, progress ...ObjectProcess) (map[string]Object, error) {
 	w := &walker{
@@ -50,7 +50,10 @@ func (w *walker) walkObj(obj objx.Map, p path) error {
 		}
 
 		for i := range w.progress {
-			co = w.progress[i](co)
+			co, err = w.progress[i](co)
+			if err != nil {
+				return err
+			}
 		}
 
 		w.manifests[p.Full()] = co
@@ -97,10 +100,14 @@ type path []any
 
 func (p path) Full() string {
 	b := bytes.NewBuffer(nil)
-	for _, v := range p {
+	for i, v := range p {
 		switch value := v.(type) {
 		case string:
-			_, _ = fmt.Fprintf(b, ".%s", value)
+			if i == 0 {
+				_, _ = fmt.Fprintf(b, "%s", value)
+			} else {
+				_, _ = fmt.Fprintf(b, ".%s", value)
+			}
 		case int:
 			_, _ = fmt.Fprintf(b, "[%d]", value)
 		}

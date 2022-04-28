@@ -9,14 +9,14 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/go-logr/logr"
-	"github.com/octohelm/kubepkg/pkg/cli"
+	"github.com/innoai-tech/infra/pkg/cli"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"github.com/octohelm/kubepkg/pkg/ioutil"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 )
 
 func init() {
-	app.Add(&Export{})
+	cli.Add(app, &Export{})
 }
 
 type ExportFlags struct {
@@ -34,11 +34,11 @@ type Export struct {
 	VerboseFlags
 }
 
-func (s *Export) Run(ctx context.Context, args []string) error {
+func (s *Export) Run(ctx context.Context) error {
 	l := logr.FromContextOrDiscard(ctx)
 	ctx = containerregistry.WithLogger(ctx, l)
 
-	kpkg, err := kubepkg.Load(args[0])
+	kpkg, err := kubepkg.Load(s.Args[0])
 	if err != nil {
 		return err
 	}
@@ -96,9 +96,9 @@ func (s *Export) Run(ctx context.Context, args []string) error {
 		}
 		defer manifestsYaml.Close()
 
-		manifests, err := manifest.Extract(resolved.Spec.Manifests, func(o manifest.Object) manifest.Object {
+		manifests, err := manifest.Extract(resolved.Spec.Manifests, func(o manifest.Object) (manifest.Object, error) {
 			o.SetNamespace(resolved.GetNamespace())
-			return o
+			return o, nil
 		})
 		if err != nil {
 			return errors.Wrapf(err, "extract manifests failed: %s", s.ExtractManifestsYaml)

@@ -17,7 +17,7 @@ import (
 	"github.com/distribution/distribution/v3/configuration"
 	"github.com/distribution/distribution/v3/registry/handlers"
 	regsitrymiddleware "github.com/distribution/distribution/v3/registry/middleware/registry"
-	"github.com/octohelm/kubepkg/internal/version"
+	"github.com/octohelm/kubepkg/version"
 )
 
 func Serve(ctx context.Context, c *Configuration) error {
@@ -51,7 +51,7 @@ func Serve(ctx context.Context, c *Configuration) error {
 	s.Handler = httputil.LogHandler(logr.FromContextOrDiscard(ctx))(enableMirrors(app))
 
 	go func() {
-		l.Info(fmt.Sprintf("registry@%s serve on %s (%s/%s)", version.Version, s.Addr, runtime.GOOS, runtime.GOARCH))
+		l.Info(fmt.Sprintf("registry@%s serve on %s (%s/%s)", version.FullVersion(), s.Addr, runtime.GOOS, runtime.GOARCH))
 		if c.Proxy != nil {
 			l.Info(fmt.Sprintf("proxy fallback %s enabled", c.Proxy.RemoteURL))
 		}

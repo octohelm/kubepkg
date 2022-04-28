@@ -3,8 +3,8 @@ package cmd
 import (
 	"context"
 
-	releasev1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
-	"github.com/octohelm/kubepkg/pkg/cli"
+	"github.com/innoai-tech/infra/pkg/cli"
+	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/agent"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	serve.Add(&Agent{})
+	cli.Add(serve, &Agent{})
 }
 
 type AgentFlags struct {
@@ -32,7 +32,7 @@ type Agent struct {
 	VerboseFlags
 }
 
-func (s *Agent) Run(ctx context.Context, args []string) error {
+func (s *Agent) Run(ctx context.Context) error {
 	kc, err := kubeutil.GetConfig(s.KubeConfig)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (s *Agent) Run(ctx context.Context, args []string) error {
 	scheme := runtime.NewScheme()
 
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(releasev1alpha1.AddToScheme(scheme))
+	utilruntime.Must(kubepkgv1alpha1.AddToScheme(scheme))
 
 	c, err := client.New(kc, client.Options{Scheme: scheme})
 	if err != nil {

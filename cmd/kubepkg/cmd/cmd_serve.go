@@ -1,21 +1,11 @@
 package cmd
 
 import (
-	"context"
-
-	"github.com/octohelm/kubepkg/pkg/cli"
+	"github.com/innoai-tech/infra/pkg/cli"
 )
 
-var serve = &Serve{}
-
-func init() {
-	app.Add(serve)
-}
+var serve = cli.Add(app, &Serve{})
 
 type Serve struct {
 	cli.Name `desc:"serve"`
-}
-
-func (s *Serve) Run(ctx context.Context, args []string) error {
-	return nil
 }

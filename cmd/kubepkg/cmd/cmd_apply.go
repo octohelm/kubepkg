@@ -17,9 +17,10 @@ func init() {
 }
 
 type ApplyFlags struct {
-	KubeConfig string `flag:"kubeconfig" env:"KUBECONFIG" desc:"Paths to a kubeconfig. Only required if out-of-cluster."`
-	DryRun     bool   `flag:"dry-run" desc:"enable dry run"`
-	Force      bool   `flag:"force" desc:"force ownership"`
+	KubeConfig      string `flag:"kubeconfig" env:"KUBECONFIG" desc:"Paths to a kubeconfig. Only required if out-of-cluster."`
+	DryRun          bool   `flag:"dry-run" desc:"Enable dry run"`
+	Force           bool   `flag:"force" desc:"Force overwrites ownership"`
+	CreateNamespace bool   `flag:"create-namespace" desc:"Create namespace if not exists"`
 }
 
 type Apply struct {
@@ -38,6 +39,13 @@ func (s *Apply) Run(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	if s.CreateNamespace {
+		if _, err := kubeutil.ApplyNamespace(ctx, kubeutil.KubeConfigFromClient(c), kpkg.Namespace); err != nil {
+			return err
+		}
+	}
+
 	return s.applyKubePkg(ctx, c, kpkg)
 }
 

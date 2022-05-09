@@ -18,7 +18,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/smartystreets/assertions v1.13.0
 	github.com/smartystreets/goconvey v1.7.2
-	github.com/stretchr/objx v0.3.0
+	github.com/stretchr/objx v0.4.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b

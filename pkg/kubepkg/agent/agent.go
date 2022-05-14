@@ -23,7 +23,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
-	"github.com/octohelm/kubepkg/version"
+	"github.com/octohelm/kubepkg/pkg/version"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 

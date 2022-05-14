@@ -1,7 +1,7 @@
 export GIT_SHA ?= $(shell git rev-parse HEAD)
 export GIT_REF ?= HEAD
 
-DAGGER = dagger --log-format=plain -p ./dagger
+DAGGER = dagger --log-format=plain
 
 build:
 	$(DAGGER) do build
@@ -55,6 +55,8 @@ kubepkg.import:
 	$(KUBEPKG) import -i=.tmp/kubepkg --manifest-output=.tmp/manifests .tmp/demo.kube.tgz
 
 kubepkg.import.remote:
+	@echo "incremental import with spec directly"
+	$(KUBEPKG) import -i=http://0.0.0.0:36060 --incremental ./testdata/demo.yaml
 	@echo "incremental import without debug"
 	$(KUBEPKG) import -i=http://0.0.0.0:36060 --incremental .tmp/demo.kube.tgz
 	@echo "incremental import with debug"

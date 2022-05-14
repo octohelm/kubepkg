@@ -17,12 +17,15 @@ jobs:
         with:
           go-version: '^1.18'
 
-      - uses: dagger/dagger-for-github@v3
+      - uses: giantswarm/install-binary-action@v1.0.0
         with:
-          version: https://github.com/morlay/dagger.git#release-main
-          install-only: true
+          binary: "dagger"
+          download_url: "https://github.com/morlay/dagger/releases/download/${version}/${binary}_${version}_linux_amd64.tar.gz"
+          version: "v0.3.0-beta"
+          tarball_binary_path: "${binary}"
+          smoke_test: "${binary} version"
 
-      - run: make build push
+      - run: make push
         env:
           GH_USERNAME: ${{ github.actor }}
           GH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}

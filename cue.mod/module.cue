@@ -1,9 +1,10 @@
 module: "github.com/octohelm/kubepkg"
 
 require: {
-	"github.com/morlay/dagger": "v0.2.8-0.20220506022722-cdd29e3cfad8" @vcs("release-main")
-	"k8s.io/api":               "v0.24.0"
-	"k8s.io/apimachinery":      "v0.24.0"
+	"dagger.io":           "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
+	"k8s.io/api":          "v0.24.0"
+	"k8s.io/apimachinery": "v0.24.0"
+	"universe.dagger.io":  "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
 }
 
 replace: {

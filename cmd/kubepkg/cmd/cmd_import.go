@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
+	"github.com/pkg/errors"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -27,7 +29,7 @@ type ImportFlags struct {
 }
 
 type Import struct {
-	cli.Name `args:"KUBEPKG_TGZ..." desc:"import kubepkg.tgz"`
+	cli.Name `args:"KUBEPKG_TGZ|KUBEPKG_SPEC..." desc:"import kubepkg.tgz or kubepkg.{json,yaml}"`
 	ImportFlags
 	VerboseFlags
 }
@@ -93,10 +95,31 @@ func (s *Import) importToStorageRoot(ctx context.Context, root string, tgzFilena
 	return nil
 }
 
-func (s *Import) importToRemote(ctx context.Context, kubeAgentEndpoint string, tgzFilenames []string) error {
+func (s *Import) importToRemote(ctx context.Context, kubeAgentEndpoint string, filenames []string) error {
 	l := logr.FromContextOrDiscard(ctx)
 
 	ac := client.NewAgentClient(kubeAgentEndpoint)
+
+	importSpec := func(jsonOrYamlFile string) error {
+		specFileRaw, err := os.ReadFile(jsonOrYamlFile)
+		if err != nil {
+			return err
+		}
+
+		kp := &v1alpha1.KubePkg{}
+		if err := yaml.Unmarshal(specFileRaw, kp); err != nil {
+			return errors.Wrapf(err, "unmarshal %s failed", jsonOrYamlFile)
+		}
+
+		kpkg, err := ac.ImportKubePkg(ctx, kp)
+		if err != nil {
+			return err
+		}
+
+		l.Info(fmt.Sprintf("%s@%s is imported.", kpkg.Name, kpkg.Spec.Version))
+
+		return nil
+	}
 
 	importTgz := func(tgzFilename string) error {
 		tgzFile, err := os.Open(tgzFilename)
@@ -120,14 +143,22 @@ func (s *Import) importToRemote(ctx context.Context, kubeAgentEndpoint string, t
 			return err
 		}
 
-		l.Info(fmt.Sprintf("%s@%s.tgz is imported.", kpkg.Name, kpkg.Spec.Version))
+		l.Info(fmt.Sprintf("%s@%s is imported.", kpkg.Name, kpkg.Spec.Version))
 
 		return nil
 	}
 
-	for i := range tgzFilenames {
-		if err := importTgz(tgzFilenames[i]); err != nil {
-			return err
+	for i := range filenames {
+		filename := filenames[i]
+		switch filepath.Ext(filename) {
+		case ".json", ".yaml":
+			if err := importSpec(filename); err != nil {
+				return err
+			}
+		default:
+			if err := importTgz(filename); err != nil {
+				return err
+			}
 		}
 	}
 

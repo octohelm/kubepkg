@@ -2,7 +2,9 @@ package main
 
 import (
 	"strings"
+
 	"dagger.io/dagger"
+	"dagger.io/dagger/core"
 	"universe.dagger.io/docker"
 	"universe.dagger.io/alpine"
 	"github.com/octohelm/kubepkg/cuepkg/tool"
@@ -23,22 +25,21 @@ dagger.#Plan & {
 			GH_PASSWORD: dagger.#Secret
 		}
 
-		filesystem: "./": read: {
-			contents: dagger.#FS
-			exclude: [
-				"cue.mod/gen/",
-				"cue.mod/pkg/",
-				"build/",
-			]
-		}
-
 		for _os in actions.build.os for _arch in actions.build.arch {
 			filesystem: "build/output/\(actions.build.name)_\(_os)_\(_arch)": write: contents: actions.build["\(_os)"]["\(_arch)"].output
 		}
 	}
 
 	actions: {
-		_source: client.filesystem."./".read.contents
+		_source: core.#Source & {
+			path: "."
+			include: [
+				"cmd/",
+				"pkg/",
+				"go.mod",
+				"go.sum",
+			]
+		}
 		_env: {
 			for k, v in client.env if k != "$dagger" {
 				"\(k)": v
@@ -60,13 +61,13 @@ dagger.#Plan & {
 		_tag: _version
 
 		info: tool.#GoModInfo & {
-			source: _source
+			source: _source.output
 		}
 
 		_archs: ["amd64", "arm64"]
 
 		build: tool.#GoBuild & {
-			source: _source
+			source: _source.output
 			arch:   _archs
 			os: ["linux"]
 			env: _env & {

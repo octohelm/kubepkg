@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 	"github.com/innoai-tech/infra/pkg/cli"
-	"github.com/octohelm/kubepkg/version"
+	"github.com/octohelm/kubepkg/pkg/version"
 	"os"
 )
 

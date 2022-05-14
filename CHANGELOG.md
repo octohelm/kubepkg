@@ -5,6 +5,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+# [0.1.0](https://github.com/octohelm/kubepkg/compare/v0.0.1...v0.1.0)
+
+### Features
+
+* **feat(cmd):** support import with spec ([5bb22b4](https://github.com/octohelm/kubepkg/commit/5bb22b4e80de0d10f32167bf8f7d4268b6716cfa))
+* **feat** manifests completer ([443abc9](https://github.com/octohelm/kubepkg/commit/443abc9f044898f061abe53d4ff1ab321cbb1529))
+
+
+
 # 0.0.1
 
 ### Bug Fixes

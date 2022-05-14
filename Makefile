@@ -14,6 +14,9 @@ push:
 KUBEPKG = go run ./cmd/kubepkg
 KUBECONFIG = ${HOME}/.kube_config/config--hw-test.yaml
 
+test:
+	go test -race -v ./pkg/...
+
 serve.operator:
 	$(KUBEPKG) \
 		--internal-host="{{ .Name }}---{{ .Namespace }}.hw-test.innoai.tech" \

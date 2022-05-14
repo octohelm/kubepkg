@@ -25,8 +25,8 @@ dagger.#Plan & {
 			GH_PASSWORD: dagger.#Secret
 		}
 
-		for _os in actions.build.os for _arch in actions.build.arch {
-			filesystem: "build/output/\(actions.build.name)_\(_os)_\(_arch)": write: contents: actions.build["\(_os)"]["\(_arch)"].output
+		for _os in actions.build.targetPlatform.os for _arch in actions.build.targetPlatform.arch {
+			filesystem: "./build/output/\(actions.build.name)_\(_os)_\(_arch)": write: contents: actions.build["\(_os)/\(_arch)"].output
 		}
 	}
 
@@ -68,10 +68,12 @@ dagger.#Plan & {
 
 		build: tool.#GoBuild & {
 			source: _source.output
-			arch:   _archs
-			os: ["linux"]
-			env: _env & {
-				CGO_ENABLED: "0"
+			targetPlatform: {
+				arch: _archs
+				os: ["linux", "darwin"]
+			}
+			run: {
+				env: _env
 			}
 			ldflags: [
 				"-s -w",
@@ -83,7 +85,7 @@ dagger.#Plan & {
 
 		image: {
 			for _arch in _archs {
-				"\(_arch)": docker.#Build & {
+				"linux/\(_arch)": docker.#Build & {
 					steps: [
 						alpine.#Build & {
 							packages: {
@@ -91,7 +93,7 @@ dagger.#Plan & {
 							}
 						},
 						docker.#Copy & {
-							contents: build.linux["\(_arch)"].output
+							contents: build["linux/\(_arch)"].output
 							source:   "./kubepkg"
 							dest:     "/kubepkg"
 						},
@@ -116,7 +118,7 @@ dagger.#Plan & {
 			dest: "\(_imageName):\(_tag)"
 			images: {
 				for _arch in _archs {
-					"linux/\(_arch)": image["\(_arch)"].output
+					"linux/\(_arch)": image["linux/\(_arch)"].output
 				}
 			}
 			auth: {

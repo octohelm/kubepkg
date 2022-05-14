@@ -1,10 +1,11 @@
 module: "github.com/octohelm/kubepkg"
 
 require: {
-	"dagger.io":           "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
-	"k8s.io/api":          "v0.24.0"
-	"k8s.io/apimachinery": "v0.24.0"
-	"universe.dagger.io":  "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
+	"dagger.io":                          "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
+	"github.com/innoai-tech/webappserve": "v0.0.0-20220513070549-200ff12980f5"
+	"k8s.io/api":                         "v0.24.0"
+	"k8s.io/apimachinery":                "v0.24.0"
+	"universe.dagger.io":                 "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
 }
 
 replace: {

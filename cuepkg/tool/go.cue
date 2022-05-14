@@ -13,118 +13,131 @@ import (
 #GoModInfo: {
 	source: dagger.#FS
 
-	_readGoMod: core.#ReadFile & {
+	_gomod: core.#ReadFile & {
 		input: source
 		path:  "go.mod"
 	}
 
-	go:     regexp.FindSubmatch(#"go (.+)\n"#, _readGoMod.contents)[1]
-	module: regexp.FindSubmatch(#"module (.+)\n"#, _readGoMod.contents)[1]
+	module: regexp.FindSubmatch(#"module (.+)\n"#, _gomod.contents)[1]
+	go:     regexp.FindSubmatch(#"go (.+)\n"#, _gomod.contents)[1]
 }
 
 #GoBuild: {
 	source:  dagger.#FS
 	package: string
-	env: [Key=string]: string | dagger.#Secret
-	os: [...string]
-	arch: [...string]
-	ldflags: *["-x -w"] | [...string]
 	name:    path.Base(package)
+
+	cgoEnabled: bool | *false
+	ldflags:    *["-x -w"] | [...string]
+
+	targetPlatform: {
+		os: [...string]
+		arch: [...string]
+	}
+
+	buildPlatform?: {
+		os:   string
+		arch: string
+	}
 
 	gomod: #GoModInfo & {
 		"source": source
 	}
 
-	packages: [Name=string]: string | *""
+	image: {
+		goVersion: "\(gomod.go)"
+		packages: [pkgName=string]: string | *""
+	}
+
+	run: {
+		workdir: "/go/src"
+		mounts: [Name=string]: core.#Mount
+		env: [Name=string]:    string | dagger.#Secret
+		env: {
+			if cgoEnabled {
+				CGO_ENABLED: "1"
+			}
+			if !cgoEnabled {
+				CGO_ENABLED: "0"
+			}
+		}
+
+		mounts: {
+			codesource: core.#Mount & {
+				dest:     workdir
+				contents: source
+			}
+		}
+	}
+
+	_caches: #BuildCacheMounts & {_, #caches: {
+		go_mod_cache:   "/go/pkg/mod"
+		go_build_cache: "/root/.cache/go-build"
+	}}
+
+	_image: image
+
+	if cgoEnabled {
+		for _os in targetPlatform.os for _arch in targetPlatform.arch {
+			"\(_os)/\(_arch)": {
+				goimage: #GoImage & {
+					_image
+					platform: "\(_os)/\(_arch)"
+				}
+				_build: input: goimage.output
+			}
+		}
+	}
+
+	if !cgoEnabled {
+		goimage: #GoImage & {
+			_image
+		}
+
+		for _os in targetPlatform.os for _arch in targetPlatform.arch {
+			"\(_os)/\(_arch)": {
+				_build: input: goimage.output
+			}
+		}
+	}
+
+	for _os in targetPlatform.os for _arch in targetPlatform.arch {
+		"\(_os)/\(_arch)": {
+			_build: docker.#Run & {
+				workdir: run.workdir
+				mounts: {
+					run.mounts
+					_caches
+				}
+				env: {
+					run.env
+					GOOS:   _os
+					GOARCH: _arch
+				}
+				command: name: "go"
+				command: args: [
+					"build",
+					"-ldflags", strings.Join(ldflags, " "),
+					"-o", "/output/\(name)",
+					"\(package)",
+				]
+				export: directories: "/output": _
+			}
+
+			output: _build.export.directories."/output"
+		}
+	}
+}
+
+#GoImage: {
+	goVersion: string | *"1.18"
+
 	packages: {
 		"git":        _
 		"alpine-sdk": _
 	}
 
-	_image: docker.#Build & {
-		steps: [
-			docker.#Pull & {
-				source: "golang:\(gomod.go)-alpine"
-			},
-			for pkgName, version in packages {
-				docker.#Run & {
-					command: {
-						name: "apk"
-						args: ["add", "\(pkgName)\(version)"]
-						flags: {
-							"-U":         true
-							"--no-cache": true
-						}
-					}
-				}
-			},
-		]
-	}
-
-	_sourcePath: "/go/src"
-
-	_cacheMounts: {
-		_paths: {
-			mod_cache:   "/go/pkg/mod"
-			build_cache: "/root/.cache/go-build"
-		}
-
-		for n, p in _paths {
-			"\(p)": core.#Mount & {
-				dest:     p
-				contents: core.#CacheDir & {
-					id: "go_\(n)"
-				}
-			}
-		}
-	}
-
-	_#go: docker.#Run & {
-		input:   _image.output
-		workdir: _sourcePath
-		"env":   env
-		mounts:  _cacheMounts & {
-			"source": core.#Mount & {
-				dest:     _sourcePath
-				contents: source
-			}
-		}
-		command: name: "go"
-	}
-
-	_dep: _#go & {
-		command: args: [
-			"mod",
-			"download",
-			"-x",
-		]
-	}
-
-	for _os in os {
-		"\(_os)": {
-			for _arch in arch {
-				"\(_arch)": {
-					_build: _#go & {
-						env: {
-							GOOS:   _os
-							GOARCH: _arch
-						}
-						command: {
-							args: [
-								"\(package)",
-							]
-							flags: {
-								build:      true
-								"-ldflags": strings.Join(ldflags, " ")
-								"-o":       "/output/\(name)"
-							}
-						}
-						export: directories: "/output": _
-					}
-
-					output: _build.export.directories."/output"
-				}
-			}
-		}
+	#AlpineBuild & {
+		source: "golang:\(goVersion)-alpine"
 	}
 }

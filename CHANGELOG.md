@@ -5,6 +5,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+# [0.1.1](https://github.com/octohelm/kubepkg/compare/v0.1.0...v0.1.1)
+
+### Bug Fixes
+
+* **fix(packer):** should be with full images when tagged ([a1bfeca](https://github.com/octohelm/kubepkg/commit/a1bfecaf1d43d68824b792f4031ca58630e18444))
+
+
+
 # [0.1.0](https://github.com/octohelm/kubepkg/compare/v0.0.1...v0.1.0)
 
 ### Features

@@ -114,6 +114,7 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 
 			if tag := dm.Tag; tag != "" {
 				desc.Annotations[ocispec.AnnotationRefName] = tag
+				desc.Annotations[images.AnnotationImageName] = fmt.Sprintf("%s:%s", dm.Name, tag)
 			}
 
 			if p := dm.Platform; p != "" {

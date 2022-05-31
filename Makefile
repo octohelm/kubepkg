@@ -84,3 +84,6 @@ gen-deepcopy:
 		--output-file-base zz_generated.deepcopy \
 		--go-header-file ./hack/boilerplate.go.txt \
 		--input-dirs $(PKG)/pkg/apis/kubepkg/v1alpha1
+
+eval:
+	cuem eval -o components.yaml ./cuepkg/kubepkg

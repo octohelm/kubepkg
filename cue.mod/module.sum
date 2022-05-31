@@ -1,2 +1,14 @@
-github.com/dagger/dagger v0.2.8-0.20220513062922-fef589b33ac3 h1:tEe/VFnrzVVfJ63novQiE0WL45Tb7jO9QQixWZVTkVo=
-github.com/dagger/dagger v0.2.8-0.20220513062922-fef589b33ac3 h1:tEe/VFnrzVVfJ63novQiE0WL45Tb7jO9QQixWZVTkVo=
+github.com/innoai-tech/runtime v0.0.0-20220601071556-095a6fb0ff7a h1:cSptYZYY3OeUAXj0Tw0GkSzZp/ciBIjtWKPWFU26B7w=
+github.com/innoai-tech/runtime/cuepkg/kube v0.0.0-20220601071556-095a6fb0ff7a h1:cSptYZYY3OeUAXj0Tw0GkSzZp/ciBIjtWKPWFU26B7w=
+k8s.io/api v0.24.1 h1:BjCMRDcyEYz03joa3K1+rbshwh1Ay6oB53+iUx2H8UY=
+k8s.io/api/apps/v1 v0.24.1 h1:BjCMRDcyEYz03joa3K1+rbshwh1Ay6oB53+iUx2H8UY=
+k8s.io/api/core/v1 v0.24.1 h1:BjCMRDcyEYz03joa3K1+rbshwh1Ay6oB53+iUx2H8UY=
+k8s.io/api/networking/v1 v0.24.1 h1:BjCMRDcyEYz03joa3K1+rbshwh1Ay6oB53+iUx2H8UY=
+k8s.io/api/rbac/v1 v0.24.1 h1:BjCMRDcyEYz03joa3K1+rbshwh1Ay6oB53+iUx2H8UY=
+k8s.io/apimachinery v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
+k8s.io/apimachinery/pkg/api/resource v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
+k8s.io/apimachinery/pkg/apis/meta/v1 v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
+k8s.io/apimachinery/pkg/runtime v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
+k8s.io/apimachinery/pkg/types v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
+k8s.io/apimachinery/pkg/util/intstr v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
+k8s.io/apimachinery/pkg/watch v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=

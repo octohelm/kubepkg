@@ -5,6 +5,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+# [0.1.2](https://github.com/octohelm/kubepkg/compare/v0.1.1...v0.1.2)
+
+
 # [0.1.1](https://github.com/octohelm/kubepkg/compare/v0.1.0...v0.1.1)
 
 ### Bug Fixes

@@ -6,7 +6,6 @@ import (
 	"dagger.io/dagger"
 	"dagger.io/dagger/core"
 	"universe.dagger.io/docker"
-	"universe.dagger.io/alpine"
 	"github.com/octohelm/kubepkg/cuepkg/tool"
 )
 
@@ -87,9 +86,9 @@ dagger.#Plan & {
 			for _arch in _archs {
 				"linux/\(_arch)": docker.#Build & {
 					steps: [
-						alpine.#Build & {
+						tool.#DebianBuild & {
 							packages: {
-								"ca-certificates": {}
+								"ca-certificates": _
 							}
 						},
 						docker.#Copy & {

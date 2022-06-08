@@ -38,11 +38,13 @@ import (
 		command: {
 			name: "sh"
 			flags: "-c": """
+				echo "//npm.pkg.github.com/:_authToken=${GH_PASSWORD}" >> ~/.npmrc
+				echo "@innoai-tech:registry=https://npm.pkg.github.com/" >> ~/.npmrc
 				npm install -g pnpm
 				pnpm --version
 				pnpm config list
 				pnpm install
-				pnpx vite build --mode=production --config=\(configFile) --outDir=/output
+				./node_modules/.bin/vite build --mode=production --config=\(configFile) --outDir=/output
 				"""
 		}
 		export: directories: "/output": _
@@ -55,11 +57,10 @@ import (
 	nodeVersion: string | *"18"
 
 	packages: {
-		"git":        _
-		"alpine-sdk": _
+		"build-dep": _
 	}
 
-	#AlpineBuild & {
-		source: "node:\(nodeVersion)-alpine"
+	#DebianBuild & {
+		source: "node:\(nodeVersion)-\(#DebianVersion)"
 	}
 }

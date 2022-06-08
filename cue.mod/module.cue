@@ -1,17 +1,17 @@
 module: "github.com/octohelm/kubepkg"
 
 require: {
-	"dagger.io":                          "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
-	"github.com/innoai-tech/runtime":     "v0.0.0-20220601071556-095a6fb0ff7a"
+	"dagger.io":                          "v0.2.18-0.20220608061142-088cc896def9"
+	"github.com/innoai-tech/runtime":     "v0.0.0-20220608062226-8ea0e7f327e6"
 	"github.com/innoai-tech/webappserve": "v0.0.0-20220513070549-200ff12980f5"
 	"k8s.io/api":                         "v0.24.1"
 	"k8s.io/apimachinery":                "v0.24.1"
-	"universe.dagger.io":                 "v0.2.8-0.20220513062922-fef589b33ac3" @vcs("release-main")
+	"universe.dagger.io":                 "v0.2.18-0.20220608061142-088cc896def9"
 }
 
 replace: {
-	"dagger.io":          "github.com/morlay/dagger/pkg/dagger.io@release-main"
-	"universe.dagger.io": "github.com/morlay/dagger/pkg/universe.dagger.io@release-main"
+	"dagger.io":          "github.com/morlay/dagger/pkg/dagger.io@v0.2.18-0.20220608061142-088cc896def9#release-main"
+	"universe.dagger.io": "github.com/morlay/dagger/pkg/universe.dagger.io@v0.2.18-0.20220608061142-088cc896def9#release-main"
 }
 
 replace: {

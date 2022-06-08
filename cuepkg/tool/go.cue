@@ -133,11 +133,10 @@ import (
 	goVersion: string | *"1.18"
 
 	packages: {
-		"git":        _
-		"alpine-sdk": _
+		"git": _
 	}
 
-	#AlpineBuild & {
-		source: "golang:\(goVersion)-alpine"
+	#DebianBuild & {
+		source: "golang:\(goVersion)-\(#DebianVersion)"
 	}
 }

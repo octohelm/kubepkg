@@ -20,8 +20,8 @@ jobs:
       - uses: giantswarm/install-binary-action@v1.0.0
         with:
           binary: "dagger"
-          download_url: "https://github.com/morlay/dagger/releases/download/${version}/${binary}_${version}_linux_amd64.tar.gz"
-          version: "v0.3.0-beta"
+          download_url: "https://github.com/morlay/dagger/releases/download/latest/${binary}_${version}_linux_amd64.tar.gz"
+          version: "v0.3.0"
           tarball_binary_path: "${binary}"
           smoke_test: "${binary} version"
 

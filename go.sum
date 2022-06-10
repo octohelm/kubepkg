@@ -324,6 +324,8 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/innoai-tech/infra v0.0.0-20220429051008-d9b368838461 h1:XTnY0nE78gP+Yi8zs22sUE6DrMQbEhWPwIeOM/60eXQ=
 github.com/innoai-tech/infra v0.0.0-20220429051008-d9b368838461/go.mod h1:Qu7bAClCtoQYEEXgA3jBT7nxCQ+z9zAoFgR2zAgyNB4=
+github.com/innoai-tech/runtime v0.0.0-20220610150018-093e8031f7ea h1:/JOw3m7pq+VqjXxZ/oBlaBlOjimOCJYeMKFml7cma7Y=
+github.com/innoai-tech/runtime v0.0.0-20220610150018-093e8031f7ea/go.mod h1:YxjJlK7sTna/9TY8Tyi7SslLvcz5obuWX44Fd5+JuTE=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
 github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=

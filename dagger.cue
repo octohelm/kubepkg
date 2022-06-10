@@ -6,7 +6,10 @@ import (
 	"dagger.io/dagger"
 	"dagger.io/dagger/core"
 	"universe.dagger.io/docker"
-	"github.com/octohelm/kubepkg/cuepkg/tool"
+
+	"github.com/innoai-tech/runtime/cuepkg/tool"
+	"github.com/innoai-tech/runtime/cuepkg/debian"
+	"github.com/innoai-tech/runtime/cuepkg/golang"
 )
 
 dagger.#Plan & {
@@ -22,15 +25,17 @@ dagger.#Plan & {
 
 			GH_USERNAME: string | *""
 			GH_PASSWORD: dagger.#Secret
+
+			LINUX_MIRROR: string | *""
 		}
 
-		for _os in actions.build.targetPlatform.os for _arch in actions.build.targetPlatform.arch {
-			filesystem: "./build/output/\(actions.build.name)_\(_os)_\(_arch)": write: contents: actions.build["\(_os)/\(_arch)"].output
-		}
+		filesystem: "build/output": write: contents: actions.export.output
 	}
 
 	actions: {
-		_source: core.#Source & {
+		version: (tool.#ResolveVersion & {ref: client.env.GIT_REF, version: "\(client.env.VERSION)"}).output
+
+		source: core.#Source & {
 			path: "."
 			include: [
 				"cmd/",
@@ -39,68 +44,56 @@ dagger.#Plan & {
 				"go.sum",
 			]
 		}
-		_env: {
-			for k, v in client.env if k != "$dagger" {
-				"\(k)": v
-			}
+
+		info: golang.#Info & {
+			"source": source.output
 		}
 
-		_imageName: "ghcr.io/octohelm/kubepkg"
-
-		_version: [
-				if strings.HasPrefix(_env.GIT_REF, "refs/tags/v") {
-				strings.TrimPrefix(_env.GIT_REF, "refs/tags/v")
-			},
-			if strings.HasPrefix(_env.GIT_REF, "refs/heads/") {
-				strings.TrimPrefix(_env.GIT_REF, "refs/heads/")
-			},
-			_env.VERSION,
-		][0]
-
-		_tag: _version
-
-		info: tool.#GoModInfo & {
-			source: _source.output
-		}
-
-		_archs: ["amd64", "arm64"]
-
-		build: tool.#GoBuild & {
-			source: _source.output
-			targetPlatform: {
-				arch: _archs
+		build: golang.#Build & {
+			"source": source.output
+			go: {
 				os: ["linux", "darwin"]
+				arch: ["amd64", "arm64"]
+				package: "./cmd/kubepkg"
+				ldflags: [
+					"-s -w",
+					"-X \(info.module)/pkg/version.Version=\(version)",
+					"-X \(info.module)/pkg/version.Revision=\(client.env.GIT_SHA)",
+				]
 			}
-			run: {
-				env: _env
+			image: mirror: client.env.LINUX_MIRROR
+			run: env: {
+				GOPROXY:   client.env.GOPROXY
+				GOPRIVATE: client.env.GOPRIVATE
+				GOSUMDB:   client.env.GOSUMDB
 			}
-			ldflags: [
-				"-s -w",
-				"-X \(info.module)/version.Version=\(_version)",
-				"-X \(info.module)/version.Revision=\(_env.GIT_SHA)",
-			]
-			package: "./cmd/kubepkg"
 		}
 
-		image: {
-			for _arch in _archs {
-				"linux/\(_arch)": docker.#Build & {
+		export: tool.#Export & {
+			archive: true
+			directories: {
+				for _os in build.go.os for _arch in build.go.arch {
+					"\(build.go.name)_\(_os)_\(_arch)": build["\(_os)/\(_arch)"].output
+				}
+			}
+		}
+
+		images: {
+			for arch in build.go.arch {
+				"linux/\(arch)": docker.#Build & {
 					steps: [
-						tool.#DebianBuild & {
+						debian.#Build & {
+							platform: "linux/\(arch)"
+							mirror:   client.env.LINUX_MIRROR
 							packages: {
 								"ca-certificates": _
 							}
-						},
-						docker.#Copy & {
-							contents: build["linux/\(_arch)"].output
-							source:   "./kubepkg"
-							dest:     "/kubepkg"
 						},
 						docker.#Set & {
 							config: {
 								label: {
 									"org.opencontainers.image.source":   "https://\(info.module)"
-									"org.opencontainers.image.revision": "\(_env.GIT_SHA)"
+									"org.opencontainers.image.revision": "\(client.env.GIT_SHA)"
 								}
 								workdir: "/"
 								env: KUBEPKG_STORAGE_ROOT: "/etc/kubepkg"
@@ -108,21 +101,26 @@ dagger.#Plan & {
 								entrypoint: ["/kubepkg"]
 							}
 						},
+						docker.#Copy & {
+							contents: build["linux/\(arch)"].output
+							source:   "./kubepkg"
+							dest:     "/kubepkg"
+						},
 					]
 				}
 			}
 		}
 
-		push: docker.#Push & {
-			dest: "\(_imageName):\(_tag)"
-			images: {
-				for _arch in _archs {
-					"linux/\(_arch)": image["linux/\(_arch)"].output
+		ship: docker.#Push & {
+			dest: "\(strings.Replace(info.module, "github.com/", "ghcr.io/", -1)):\(version)"
+			"images": {
+				for p, image in images {
+					"\(p)": image.output
 				}
 			}
 			auth: {
-				username: _env.GH_USERNAME
-				secret:   _env.GH_PASSWORD
+				username: client.env.GH_USERNAME
+				secret:   client.env.GH_PASSWORD
 			}
 		}
 	}

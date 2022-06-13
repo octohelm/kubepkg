@@ -1,3 +1,3 @@
-github.com/dagger/dagger v0.2.18-0.20220608061142-088cc896def9 h1:ommgkb3YJdCcpzTbbuGdTHKWxYEFXc/NYuoN9BBCRRI=
-github.com/dagger/dagger v0.2.18-0.20220608061142-088cc896def9 h1:ommgkb3YJdCcpzTbbuGdTHKWxYEFXc/NYuoN9BBCRRI=
-github.com/innoai-tech/runtime v0.0.0-20220610150018-093e8031f7ea h1:/JOw3m7pq+VqjXxZ/oBlaBlOjimOCJYeMKFml7cma7Y=
+dagger.io v0.3.0 
+github.com/innoai-tech/runtime v0.0.0-20220613025431-4b3df16551f1 h1:tBx5q+M8qegvGCx0/sK0RJHn4E+gINwUcghL3V90lWM=
+universe.dagger.io v0.3.0 

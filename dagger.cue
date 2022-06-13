@@ -9,6 +9,7 @@ import (
 
 	"github.com/innoai-tech/runtime/cuepkg/tool"
 	"github.com/innoai-tech/runtime/cuepkg/debian"
+	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
 )
 
@@ -35,22 +36,50 @@ dagger.#Plan & {
 	actions: {
 		version: (tool.#ResolveVersion & {ref: client.env.GIT_REF, version: "\(client.env.VERSION)"}).output
 
-		source: core.#Source & {
-			path: "."
-			include: [
-				"cmd/",
-				"pkg/",
-				"go.mod",
-				"go.sum",
-			]
+		src: {
+			web: core.#Source & {path: "."
+				include: [
+					"webapp/",
+					"nodepkg/",
+					"package.json",
+					"pnpm-lock.yaml",
+					"tsconfig.json",
+					"vite.config.ts",
+				]
+			}
+			go: core.#Source & {
+				path: "."
+				include: [
+					"cmd/",
+					"pkg/",
+					"internal/",
+					"go.mod",
+					"go.sum",
+				]
+			}
 		}
 
 		info: golang.#Info & {
-			"source": source.output
+			source: src.go.output
+		}
+
+		web: {
+			agent: node.#ViteBuild & {
+				source: src.web.output
+				image: mirror: client.env.LINUX_MIRROR
+				run: env: {
+					APP:         "agent"
+					GH_PASSWORD: client.env.GH_PASSWORD
+				}
+				node: npmrc: """
+					//npm.pkg.github.com/:_authToken=${GH_PASSWORD}
+					@innoai-tech:registry=https://npm.pkg.github.com/
+					"""
+			}
 		}
 
 		build: golang.#Build & {
-			"source": source.output
+			"source": src.go.output
 			go: {
 				os: ["linux", "darwin"]
 				arch: ["amd64", "arm64"]
@@ -62,10 +91,18 @@ dagger.#Plan & {
 				]
 			}
 			image: mirror: client.env.LINUX_MIRROR
-			run: env: {
-				GOPROXY:   client.env.GOPROXY
-				GOPRIVATE: client.env.GOPRIVATE
-				GOSUMDB:   client.env.GOSUMDB
+			run: {
+				mounts: {
+					webui: core.#Mount & {
+						dest:     "/go/src/internal/agent/dist"
+						contents: web.agent.output
+					}
+				}
+				env: {
+					GOPROXY:   client.env.GOPROXY
+					GOPRIVATE: client.env.GOPRIVATE
+					GOSUMDB:   client.env.GOSUMDB
+				}
 			}
 		}
 

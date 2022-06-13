@@ -122,7 +122,7 @@ func (c *Client) ImportDigest(ctx context.Context, dm *v1alpha1.DigestMeta, br i
 func (c *Client) ImportKubePkg(ctx context.Context, kubePkg *v1alpha1.KubePkg) (*v1alpha1.KubePkg, error) {
 	data, _ := json.Marshal(kubePkg)
 
-	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/kubepkgs", c.Endpoint), bytes.NewBuffer(data))
+	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/api/kubepkg.innoai.tech/v1/kubepkgs", c.Endpoint), bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (c *Client) ImportKubePkg(ctx context.Context, kubePkg *v1alpha1.KubePkg) (
 }
 
 func (c *Client) ImportKubePkgTgz(ctx context.Context, tgzReader io.Reader) (*v1alpha1.KubePkg, error) {
-	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/kubepkgs", c.Endpoint), tgzReader)
+	r, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("%s/api/kubepkg.innoai.tech/v1/kubepkgs", c.Endpoint), tgzReader)
 	if err != nil {
 		return nil, err
 	}

@@ -11,8 +11,8 @@ push:
 	$(DAGGER) do push
 .PHONY: push
 
+KUBECONFIG = ${HOME}/.kube_config/config--crpe-test.yaml
 KUBEPKG = go run ./cmd/kubepkg
-KUBECONFIG = ${HOME}/.kube_config/config--hw-test.yaml
 
 test:
 	go test -race -v ./pkg/...
@@ -90,3 +90,10 @@ gen-deepcopy:
 
 eval:
 	cuem eval -o components.yaml ./cuepkg/kubepkg
+
+web.dev:
+	./node_modules/.bin/vite --config=vite.config.ts
+
+web.build:
+	./node_modules/.bin/vite build  --mode=production --config=vite.config.ts
+

@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "__types__/*",
+        "*"
+      ]
+    },
+    "moduleResolution": "node",
+    "lib": [
+      "dom",
+      "esnext",
+      "webworker"
+    ],
+    "target": "es2016",
+    "module": "es2015",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "allowJs": false,
+    "skipLibCheck": true,
+    "noEmit": true
+  }
+}

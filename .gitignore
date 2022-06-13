@@ -7,5 +7,6 @@ bin/
 _output/
 vendor/
 build/
+dist/
 
 coverage.txt

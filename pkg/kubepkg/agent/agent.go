@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/octohelm/kubepkg/internal/agent"
 	"github.com/octohelm/kubepkg/pkg/httputil"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/controller"
+	"github.com/rs/cors"
 	"net/http"
 	"os"
 	"os/signal"
@@ -60,16 +62,17 @@ func (a *Agent) Serve(ctx context.Context) error {
 
 	router := mux.NewRouter()
 
-	router.Path("/").HandlerFunc(a.liveness)
+	router.Path("/api/kubepkg.innoai.tech/v1/kubepkgs").Methods(http.MethodPut).HandlerFunc(a.applyByTgz)
+	router.Path("/api/kubepkg.innoai.tech/v1/kubepkgs").Methods(http.MethodGet).HandlerFunc(a.list)
+	router.Path("/api/kubepkg.innoai.tech/v1/kubepkgs/{name}").Methods(http.MethodGet).HandlerFunc(a.get)
+	router.Path("/api/kubepkg.innoai.tech/v1/kubepkgs/{name}").Methods(http.MethodDelete).HandlerFunc(a.del)
 
-	router.Path("/kubepkgs").Methods(http.MethodGet).HandlerFunc(a.list)
-	router.Path("/kubepkgs").Methods(http.MethodPut).HandlerFunc(a.applyByTgz)
-	router.Path("/kubepkgs/{name}").Methods(http.MethodGet).HandlerFunc(a.get)
-	router.Path("/kubepkgs/{name}").Methods(http.MethodDelete).HandlerFunc(a.del)
+	router.Path("/api/kubepkg.innoai.tech/v1/blobs/{digest}").Methods(http.MethodHead).HandlerFunc(a.statBlob)
+	router.Path("/api/kubepkg.innoai.tech/v1/blobs").Methods(http.MethodPut).HandlerFunc(a.uploadBlob)
 
-	router.Path("/blobs/{digest}").Methods(http.MethodHead).HandlerFunc(a.statBlob)
-	router.Path("/blobs").Methods(http.MethodPut).HandlerFunc(a.uploadBlob)
+	router.PathPrefix("/").Handler(agent.WebUI)
 
+	router.Use(AllowAll().Handler)
 	router.Use(httputil.LogHandler(l))
 	router.Use(func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -124,6 +127,7 @@ func (a *Agent) list(rw http.ResponseWriter, req *http.Request) {
 		l.Items = []v1alpha1.KubePkg{}
 	}
 
+	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(rw).Encode(l.Items)
 }
@@ -250,4 +254,21 @@ func (a *Agent) AgentInfo() *AgentInfo {
 		SupportedPlatforms: a.opts.SupportedPlatforms,
 		Version:            version.FullVersion(),
 	}
+}
+
+func AllowAll() *cors.Cors {
+	return cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{
+			http.MethodOptions,
+			http.MethodHead,
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodPatch,
+			http.MethodDelete,
+		},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: false,
+	})
 }

@@ -26,7 +26,8 @@ client: env: {
 	GH_USERNAME: string | *""
 	GH_PASSWORD: dagger.#Secret
 
-	LINUX_MIRROR: string | *""
+	LINUX_MIRROR:                  string | *""
+	CONTAINER_REGISTRY_PULL_PROXY: string | *""
 }
 
 client: filesystem: "build/output": write: contents: actions.go.archive.output
@@ -34,6 +35,16 @@ client: filesystem: "build/output": write: contents: actions.go.archive.output
 actions: version: tool.#ResolveVersion & {
 	ref:     "\(client.env.GIT_REF)"
 	version: "\(client.env.VERSION)"
+}
+
+mirror: {
+	linux: client.env.LINUX_MIRROR
+	pull:  client.env.CONTAINER_REGISTRY_PULL_PROXY
+}
+
+auth: {
+	username: client.env.GH_USERNAME
+	secret:   client.env.GH_PASSWORD
 }
 
 actions: agentui: node.#ViteProject & {
@@ -56,7 +67,7 @@ actions: agentui: node.#ViteProject & {
 			"pnpm install",
 		]
 		image: {
-			mirror: client.env.LINUX_MIRROR
+			"mirror": mirror
 			steps: [
 				node.#ConfigPrivateRegistry & {
 					scope: "@innoai-tech"
@@ -115,14 +126,15 @@ actions: go: golang.#Project & {
 		pre: [
 			"go mod download",
 		]
-		image: mirror: client.env.LINUX_MIRROR
+		image: "mirror": mirror
 	}
 
 	ship: {
 		name: "\(strings.Replace(go.module, "github.com/", "ghcr.io/", -1))"
 
 		image: {
-			source: "debian:bullseye-slim"
+			source:   "gcr.io/distroless/static-debian11:debug"
+			"mirror": mirror
 		}
 
 		config: {
@@ -133,9 +145,6 @@ actions: go: golang.#Project & {
 			cmd: ["serve", "registry"]
 		}
 
-		push: auth: {
-			username: client.env.GH_USERNAME
-			secret:   client.env.GH_PASSWORD
-		}
+		push: "auth": auth
 	}
 }

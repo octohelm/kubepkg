@@ -7,7 +7,7 @@ import { vendorChunks } from "./nodepkg/tool/vendor-chunks";
 
 const cwd = process.cwd();
 
-const appName = process.env.APP || "agent"
+const appName = process.env.APP || "agent";
 
 const outDir = join(cwd, `internal/${appName}`, "dist");
 
@@ -15,6 +15,7 @@ console.log(`bundling to ${outDir}`);
 
 export default defineConfig({
   root: `./webapp/${appName}`,
+  base: `/${appName}/`,
   build: {
     outDir,
     emptyOutDir: true

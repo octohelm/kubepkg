@@ -7,7 +7,7 @@ import (
 	"dagger.io/dagger/core"
 
 	"github.com/innoai-tech/runtime/cuepkg/tool"
-	"github.com/innoai-tech/runtime/cuepkg/crutil"
+	"github.com/innoai-tech/runtime/cuepkg/imagetool"
 	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
 )
@@ -42,7 +42,7 @@ mirror: {
 	pull:  client.env.CONTAINER_REGISTRY_PULL_PROXY
 }
 
-auth: {
+auths: "ghcr.io": {
 	username: client.env.GH_USERNAME
 	secret:   client.env.GH_PASSWORD
 }
@@ -74,7 +74,7 @@ actions: agentui: node.#ViteProject & {
 					host:  "npm.pkg.github.com"
 					token: client.env.GH_PASSWORD
 				},
-				crutil.#Script & {
+				imagetool.#Script & {
 					run: [
 						"npm i -g pnpm",
 					]
@@ -126,17 +126,11 @@ actions: go: golang.#Project & {
 		pre: [
 			"go mod download",
 		]
-		image: "mirror": mirror
 	}
 
 	ship: {
 		name: "\(strings.Replace(go.module, "github.com/", "ghcr.io/", -1))"
-
-		image: {
-			source:   "gcr.io/distroless/static-debian11:debug"
-			"mirror": mirror
-		}
-
+		from: "gcr.io/distroless/static-debian11:debug"
 		config: {
 			workdir: "/"
 			env: {
@@ -144,7 +138,7 @@ actions: go: golang.#Project & {
 			}
 			cmd: ["serve", "registry"]
 		}
-
-		push: "auth": auth
 	}
+	"auths":  auths
+	"mirror": mirror
 }

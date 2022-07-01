@@ -17,7 +17,7 @@ jobs:
       - run: curl -sSLf https://raw.githubusercontent.com/octohelm/dagger/main/install.sh | sudo sh
 
       - run: |
-          dagger do go ship push
+          dagger do go ship pushx
           dagger do go archive
         env:
           DAGGER_LOG_FORMAT: plain

@@ -28,7 +28,7 @@ func FromContentType(ct string) (*v1alpha1.DigestMeta, error) {
 	dm := &v1alpha1.DigestMeta{}
 
 	if v := params["type"]; v != "" {
-		dm.Type = v
+		dm.Type = v1alpha1.DigestMetaType(v)
 	}
 
 	if v := params["name"]; v != "" {
@@ -57,7 +57,7 @@ func FromContentType(ct string) (*v1alpha1.DigestMeta, error) {
 
 func ToContentType(dm *v1alpha1.DigestMeta) string {
 	values := map[string]string{
-		"type":   dm.Type,
+		"type":   string(dm.Type),
 		"name":   dm.Name,
 		"size":   strconv.Itoa(int(dm.Size)),
 		"digest": dm.Digest,

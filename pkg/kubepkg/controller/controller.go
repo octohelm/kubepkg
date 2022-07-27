@@ -7,10 +7,10 @@ import (
 
 var FieldOwner = client.FieldOwner("kubepkg")
 
-func SetupWithManager(mgr ctrl.Manager, options Options) error {
+func SetupWithManager(mgr ctrl.Manager, hostOptions HostOptions) error {
 	reconcilers := []Reconciler{
 		&ServiceReconciler{
-			HostOptions: options.HostOptions,
+			HostOptions: hostOptions,
 		},
 		&KubePkgApplyReconciler{},
 		&KubePkgStatusReconciler{},

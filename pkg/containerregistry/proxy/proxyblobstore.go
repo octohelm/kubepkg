@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/pkg/errors"
+
 	"github.com/octohelm/kubepkg/pkg/ioutil"
 
 	"github.com/distribution/distribution/v3"
@@ -74,7 +76,7 @@ func (pbs *proxyBlobStore) Stat(ctx context.Context, dgst digest.Digest) (distri
 		return desc, err
 	}
 
-	if err != distribution.ErrBlobUnknown {
+	if !errors.Is(err, distribution.ErrBlobUnknown) {
 		return distribution.Descriptor{}, err
 	}
 
@@ -82,7 +84,34 @@ func (pbs *proxyBlobStore) Stat(ctx context.Context, dgst digest.Digest) (distri
 		return distribution.Descriptor{}, err
 	}
 
-	return pbs.remoteStore.Stat(ctx, dgst)
+	d, err := pbs.remoteStore.Stat(ctx, dgst)
+	if err != nil {
+		if errors.Is(err, distribution.ErrBlobUnknown) {
+			// FIXME hack to use open to trigger remote sync
+			// harbor will return 404 when stat, util digest full synced
+			b, err := pbs.remoteStore.Open(ctx, dgst)
+			if err != nil {
+				return distribution.Descriptor{}, err
+			}
+
+			bw, err := pbs.localStore.Create(ctx)
+			if err != nil {
+				return distribution.Descriptor{}, err
+			}
+			if _, err := io.Copy(bw, b); err != nil {
+				return distribution.Descriptor{}, err
+			}
+			defer b.Close()
+			if _, err := bw.Commit(ctx, distribution.Descriptor{Digest: dgst}); err != nil {
+				return distribution.Descriptor{}, err
+			}
+			// use local stat
+			return pbs.localStore.Stat(ctx, dgst)
+		}
+
+		return distribution.Descriptor{}, err
+	}
+	return d, nil
 }
 
 func (pbs *proxyBlobStore) Get(ctx context.Context, dgst digest.Digest) ([]byte, error) {

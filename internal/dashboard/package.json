@@ -1,0 +1,7 @@
+{
+  "name": "@api/dashboard",
+  "license": "MIT",
+  "private": true,
+  "scripts": {},
+  "type": "module"
+}

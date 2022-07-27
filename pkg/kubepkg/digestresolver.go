@@ -3,7 +3,6 @@ package kubepkg
 import (
 	"context"
 	"encoding/json"
-	"github.com/octohelm/kubepkg/pkg/annotation"
 	"strings"
 
 	"github.com/containerd/containerd/platforms"
@@ -11,6 +10,7 @@ import (
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/manifest/manifestlist"
 	"github.com/distribution/distribution/v3/manifest/schema2"
+	"github.com/octohelm/kubepkg/pkg/annotation"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/opencontainers/go-digest"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
@@ -37,17 +37,18 @@ func (r *DigestResolver) Resolve(ctx context.Context, pkg *v1alpha1.KubePkg) (*v
 	}
 
 	for name := range p.Spec.Images {
-		ref := name
-		if !strings.Contains(ref, "@") {
-			if mayDigest := p.Spec.Images[name]; mayDigest != "" {
-				ref = ref + "@" + mayDigest
-			}
-		}
-
 		imgCtx, err := parseImageCtx(name)
 		if err != nil {
 			return nil, err
 		}
+
+		if mayDigest := p.Spec.Images[name]; mayDigest != "" {
+			d, err := digest.Parse(mayDigest)
+			if err == nil {
+				imgCtx.digest = &d
+			}
+		}
+
 		imgCtx.neededPlatforms = neededPlatforms
 
 		repo, err := r.Repository(ctx, imgCtx)
@@ -158,6 +159,16 @@ func parseImageCtx(ref string) (*imageCtx, error) {
 		c.tag = tagged.Tag()
 	}
 
+	if i := strings.Index(ref, "@"); i != -1 {
+		namedWithoutDigest, err := docker.ParseDockerRef(ref[0:i])
+		if err != nil {
+			return nil, err
+		}
+		if tagged, ok := namedWithoutDigest.(docker.Tagged); ok {
+			c.tag = tagged.Tag()
+		}
+	}
+
 	return c, nil
 }
 
@@ -208,11 +219,11 @@ func (i *imageCtx) String() string {
 }
 
 func (i imageCtx) toDigestMeta(mediaType string, size int64) v1alpha1.DigestMeta {
-	typ := "blob"
+	typ := v1alpha1.DigestMetaBlob
 
 	switch mediaType {
 	case schema2.MediaTypeManifest, manifestlist.MediaTypeManifestList:
-		typ = "manifest"
+		typ = v1alpha1.DigestMetaManifest
 	}
 
 	return v1alpha1.DigestMeta{

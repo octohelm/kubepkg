@@ -10,7 +10,9 @@ func init() {
 	SchemeBuilder.Register(&KubePkg{}, &KubePkgList{})
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// KubePkgList
+// +gengo:deepcopy
+// +gengo:deepcopy:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type KubePkgList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -18,13 +20,14 @@ type KubePkgList struct {
 	Items []KubePkg `json:"items"`
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// KubePkg
+// +gengo:deepcopy
+// +gengo:deepcopy:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type KubePkg struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   KubePkgSpec   `json:"spec,omitempty"`
-	Status KubePkgStatus `json:"status,omitempty"`
+	Spec              KubePkgSpec   `json:"spec"`
+	Status            KubePkgStatus `json:"status,omitempty"`
 }
 
 type KubePkgSpec struct {
@@ -35,26 +38,28 @@ type KubePkgSpec struct {
 
 type Manifests map[string]any
 
-func (s Manifests) DeepCopy() Manifests {
-	m := make(Manifests)
-	for k := range s {
-		m[k] = s[k]
-	}
-	return m
-}
-
 type KubePkgStatus struct {
 	Statuses Statuses     `json:"statuses,omitempty"`
 	Digests  []DigestMeta `json:"digests,omitempty"`
 }
 
+type Statuses map[string]any
+
+// +gengo:enum
+type DigestMetaType string
+
+const (
+	DigestMetaManifest DigestMetaType = "manifest"
+	DigestMetaBlob     DigestMetaType = "blob"
+)
+
 type DigestMeta struct {
-	Type     string   `json:"type"`
-	Digest   string   `json:"digest"`
-	Name     string   `json:"name"`
-	Size     FileSize `json:"size"`
-	Tag      string   `json:"tag,omitempty"`
-	Platform string   `json:"platform,omitempty"`
+	Type     DigestMetaType `json:"type"`
+	Digest   string         `json:"digest"`
+	Name     string         `json:"name"`
+	Size     FileSize       `json:"size"`
+	Tag      string         `json:"tag,omitempty"`
+	Platform string         `json:"platform,omitempty"`
 }
 
 type FileSize int64
@@ -71,14 +76,4 @@ func (f FileSize) String() string {
 		exp++
 	}
 	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPE"[exp])
-}
-
-type Statuses map[string]any
-
-func (ss Statuses) DeepCopy() Statuses {
-	m := make(Statuses)
-	for k := range ss {
-		m[k] = ss[k]
-	}
-	return m
 }

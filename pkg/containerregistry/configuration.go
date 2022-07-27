@@ -16,6 +16,17 @@ import (
 
 type Proxy = configuration.Proxy
 
+type Storage struct {
+	// Storage dir root
+	Root string `flag:",omitempty,volume"`
+}
+
+func (s *Storage) SetDefaults() {
+	if s.Root == "" {
+		s.Root = "/etc/kubepkg"
+	}
+}
+
 type Configuration struct {
 	StorageRoot string
 

@@ -1,0 +1,38 @@
+{
+  "name": "@webapp/dashboard",
+  "version": "0.0.0",
+  "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@fontsource/roboto": "^4.5.8",
+    "@innoai-tech/config": "^0.4.12",
+    "@innoai-tech/fetcher": "^0.3.1",
+    "@innoai-tech/form": "^0.2.0",
+    "@innoai-tech/lodash": "^0.2.0",
+    "@innoai-tech/reactutil": "^0.3.16",
+    "@mui/base": "5.0.0-alpha.100",
+    "@mui/icons-material": "^5.10.6",
+    "@mui/material": "^5.10.8",
+    "@mui/system": "^5.10.8",
+    "@mui/x-date-pickers": "5.0.4",
+    "@types/node": "^18.8.3",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "date-fns": "^2.29.3",
+    "filesize": "^10.0.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router": "^6.4.2",
+    "react-router-dom": "^6.4.2",
+    "rxjs": "^7.5.7",
+    "copy-to-clipboard": "^3.3.2",
+    "uuid": "^9.0.0"
+  },
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "vite build --mode=production --config=vite.config.ts",
+    "dev": "vite --config=vite.config.ts",
+    "lint": "prettier --write ."
+  },
+  "type": "module"
+}

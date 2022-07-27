@@ -8,6 +8,8 @@ import (
 	"io"
 	"strings"
 
+	contextx "github.com/octohelm/x/context"
+
 	"github.com/octohelm/kubepkg/pkg/ioutil"
 
 	"github.com/distribution/distribution/v3"
@@ -18,6 +20,17 @@ import (
 	"github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
 )
+
+type registryCtx struct {
+}
+
+func RegistryFromContext(ctx context.Context) *Registry {
+	return ctx.Value(registryCtx{}).(*Registry)
+}
+
+func ContextWithRegistry(ctx context.Context, r *Registry) context.Context {
+	return contextx.WithValue(ctx, registryCtx{}, r)
+}
 
 func NewRegistry(cr distribution.Namespace, ds driver.StorageDriver) *Registry {
 	return &Registry{

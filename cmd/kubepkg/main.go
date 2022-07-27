@@ -4,16 +4,18 @@ import (
 	"context"
 	"os"
 
-	"github.com/octohelm/kubepkg/cmd/kubepkg/cmd"
-	ctrl "sigs.k8s.io/controller-runtime"
+	"github.com/innoai-tech/infra/pkg/cli"
+	"github.com/octohelm/kubepkg/pkg/version"
 )
 
-func init() {
-}
+var App = cli.NewApp("kubepkg", version.Version(), cli.WithImageNamespace("ghcr.io/octohelm"))
+
+var Serve = cli.AddTo(App, &struct {
+	cli.C `name:"serve"`
+}{})
 
 func main() {
-	if err := cmd.Run(context.Background()); err != nil {
-		ctrl.Log.Error(err, "")
-		os.Exit(1)
+	if err := cli.Execute(context.Background(), App, os.Args[1:]); err != nil {
+		panic(err)
 	}
 }

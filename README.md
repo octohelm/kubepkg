@@ -61,26 +61,26 @@ oci-layout # oci image layout required
 
 ```typescript
 interface KubePkg {
-    apiVersion: "octohelm.tech/v1alpha1"
-    kind: "KubePkg"
-    metadata: {
-        name: string
+  apiVersion: "octohelm.tech/v1alpha1"
+  kind: "KubePkg"
+  metadata: {
+    name: string
+  }
+  spec: {
+    // semver for upgrade checking
+    version: string
+    // manifests of k8s
+    manifests: {
+      // "<metadata.name>.<kind>.<apiGroup>"
+      [key: string]: {
+        apiVersion: string,
+        kind: string,
+        [x: string]: any
+      }
     }
-    spec: {
-        // semver for upgrade checking
-        version: string
-        // manifests of k8s
-        manifests: {
-            // "<metadata.name>.<kind>.<apiGroup>"
-            [key: string]: {
-                apiVersion: string,
-                kind: string,
-                [x: string]: any
-            }
-        }
-        // images with tag may with digest
-        // when digest exists, tag the digest instead of pulling always
-        images: { [imagetag: string]: string | "" }
-    }
+    // images with tag may with digest
+    // when digest exists, tag the digest instead of pulling always
+    images: { [imagetag: string]: string | "" }
+  }
 }
 ```

@@ -2,10 +2,8 @@ package main
 
 import (
 	"strings"
-	"encoding/yaml"
 
 	"dagger.io/dagger"
-	"dagger.io/dagger/core"
 
 	"github.com/innoai-tech/runtime/cuepkg/kubepkg"
 	"github.com/innoai-tech/runtime/cuepkg/tool"
@@ -13,7 +11,7 @@ import (
 	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
 
-	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/kubepkg"
+	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/component/kubepkg"
 )
 
 dagger.#Plan
@@ -38,8 +36,6 @@ client: env: {
 	KUBEPKG_REMOTE_REGISTRY_PASSWORD: _ | *""
 }
 
-client: filesystem: "build/output": write: contents: actions.go.archive.output
-
 actions: version: tool.#ResolveVersion & {
 	ref:     "\(client.env.GIT_REF)"
 	version: "\(client.env.VERSION)"
@@ -55,28 +51,33 @@ auths: "ghcr.io": {
 	secret:   client.env.GH_PASSWORD
 }
 
-actions: agentui: node.#ViteProject & {
+client: filesystem: "cmd/kubepkg/webapp": write: contents: actions.webapp.build.output
+actions: webapp: node.#Project & {
 	source: {
 		path: "."
 		include: [
 			"webapp/",
 			"nodepkg/",
-			"package.json",
-			"pnpm-lock.yaml",
-			"tsconfig.json",
-			"vite.config.ts",
+			".npmrc",
+			"pnpm-*.yaml",
+			"*.json",
 		]
 	}
 
-	env: APP: "agent"
+	env: "CI": "true"
 
 	build: {
+		outputs: {
+			"agent/dist":     "webapp/agent/dist"
+			"dashboard/dist": "webapp/dashboard/dist"
+		}
 		pre: [
 			"pnpm install",
 		]
+		script: "pnpm exec turbo run build"
 		image: {
 			"mirror": mirror
-			steps: [
+			"steps": [
 				node.#ConfigPrivateRegistry & {
 					scope: "@innoai-tech"
 					host:  "npm.pkg.github.com"
@@ -92,6 +93,7 @@ actions: agentui: node.#ViteProject & {
 	}
 }
 
+client: filesystem: ".build/output": write: contents: actions.go.archive.output
 actions: go: golang.#Project & {
 	source: {
 		path: "."
@@ -112,17 +114,9 @@ actions: go: golang.#Project & {
 	main: "./cmd/kubepkg"
 	ldflags: [
 		"-s -w",
-		"-X \(go.module)/pkg/version.Version=\(go.version)",
-		"-X \(go.module)/pkg/version.Revision=\(go.revision)",
+		"-X \(go.module)/pkg/version.version=\(go.version)",
+		"-X \(go.module)/pkg/version.revision=\(go.revision)",
 	]
-
-	mounts: {
-		webui: core.#Mount & {
-			contents: actions.agentui.build.output.rootfs
-			source:   "/output"
-			dest:     "/go/src/internal/agent/dist"
-		}
-	}
 
 	env: {
 		GOPROXY:   client.env.GOPROXY
@@ -151,29 +145,35 @@ actions: go: golang.#Project & {
 	"mirror": mirror
 }
 
+client: filesystem: ".build/kubepkg": write: contents: actions.kubepkg.output
 actions: "kubepkg": {
-	_version: "dev@sha256:c96854e97ef8d985feb683e26b9552591aeed292753442c99f7c649f934c67da"
-	//        _version: "f4118d4"
+	_version: "\(strings.TrimLeft(actions.go.ship.pushx.result, "\(actions.go.ship.name):"))"
 
-	core.#WriteFile & {
-		input:    dagger.#Scratch
-		path:     "/kubepkg.yaml"
-		contents: yaml.Marshal(kubepkg.#KubePkg & {
+	kubepkg.#Export & {
+		"run": tag: "\(_version)"
+		"arch":     "amd64"
+		"filename": "kubepkg.amd64.kube.tgz"
+		"env": {
+			"KUBEPKG_LOG_LEVEL":                "DEBUG"
+			"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "\(client.env.KUBEPKG_REMOTE_REGISTRY_ENDPOINT)"
+			"KUBEPKG_REMOTE_REGISTRY_USERNAME": "\(client.env.KUBEPKG_REMOTE_REGISTRY_USERNAME)"
+			"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "\(client.env.KUBEPKG_REMOTE_REGISTRY_PASSWORD)"
+		}
+		"kubepkg": kubepkg.#KubePkg & {
 			metadata: name:      "kubepkg"
 			metadata: namespace: "kube-system"
 			spec: "version":     "1.2.0+kubepkg"
 			spec: images: {
-				"ghcr.io/octohelm/kubepkg": "\(_version)"
+				"ghcr.io/octohelm/kubepkg:\(_version)": ""
 			}
-
 			spec: manifests: {
-				agent: (kubepkgcomponent.#Agent & {
+				agent: (kubepkgcomponent.#KubepkgAgent & {
 					app: version: "\(_version)"
 				}).kube
-				operator: (kubepkgcomponent.#Operator & {
+				operator: (kubepkgcomponent.#KubepkgOperator & {
 					app: version: "\(_version)"
 				}).kube
-				registry: (kubepkgcomponent.#Registry & {
+				registry: (kubepkgcomponent.#ContainerRegistry & {
 					app: version: "\(_version)"
 					config: {
 						"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "\(client.env.KUBEPKG_REMOTE_REGISTRY_ENDPOINT)"
@@ -182,8 +182,6 @@ actions: "kubepkg": {
 					}
 				}).kube
 			}
-		})
+		}
 	}
 }
-
-client: filesystem: "build/kubepkg": write: contents: actions.kubepkg.output

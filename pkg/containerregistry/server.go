@@ -2,72 +2,111 @@ package containerregistry
 
 import (
 	"context"
-	"fmt"
-	"github.com/octohelm/kubepkg/pkg/httputil"
 	"net/http"
-	"os"
-	"os/signal"
 	"runtime"
-	"syscall"
-	"time"
-
-	"github.com/go-logr/logr"
 
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/configuration"
 	"github.com/distribution/distribution/v3/registry/handlers"
 	regsitrymiddleware "github.com/distribution/distribution/v3/registry/middleware/registry"
-	"github.com/octohelm/kubepkg/pkg/version"
+	"github.com/go-courier/logr"
+	infraconfiguration "github.com/innoai-tech/infra/pkg/configuration"
+	"github.com/innoai-tech/infra/pkg/http/middleware"
+	"github.com/octohelm/courier/pkg/courierhttp/handler"
 )
 
-func Serve(ctx context.Context, c *Configuration) error {
-	l := logr.FromContextOrDiscard(ctx)
+type RemoteRegistry struct {
+	// Remote container registry endpoint
+	Endpoint string `flag:",omitempty"`
+	// Remote container registry username
+	Username string `flag:",omitempty"`
+	// Remote container registry password
+	Password string `flag:",omitempty,secret"`
+}
+
+type Server struct {
+	Storage Storage
+
+	RemoteRegistry RemoteRegistry
+	// The address the server endpoint binds to
+	RegistryAddr string `flag:",omitempty,expose=http"`
+
+	s *http.Server
+}
+
+func (s *Server) SetDefaults() {
+	if s.RegistryAddr == "" {
+		s.RegistryAddr = ":5000"
+	}
+}
+
+func (s *Server) Init(ctx context.Context) error {
+	if s.s != nil {
+		return nil
+	}
+
+	c := &Configuration{}
+
+	c.StorageRoot = s.Storage.Root
+	c.RegistryAddr = s.RegistryAddr
+
+	if s.RemoteRegistry.Endpoint != "" {
+		c.Proxy = &Proxy{
+			RemoteURL: s.RemoteRegistry.Endpoint,
+			Username:  s.RemoteRegistry.Username,
+			Password:  s.RemoteRegistry.Password,
+		}
+	}
 
 	cr, err := c.New(ctx)
 	if err != nil {
 		return err
 	}
 
-	_ = regsitrymiddleware.Register("custom", func(ctx context.Context, registry distribution.Namespace, options map[string]interface{}) (distribution.Namespace, error) {
+	_ = regsitrymiddleware.Register("custom", func(ctx context.Context, registry distribution.Namespace, options map[string]any) (distribution.Namespace, error) {
 		return cr, nil
 	})
 
-	app := handlers.NewApp(WithLogger(ctx, l), &configuration.Configuration{
+	app := handlers.NewApp(ctx, &configuration.Configuration{
 		// just hack
-		Storage: configuration.Storage{"filesystem": map[string]interface{}{
+		Storage: configuration.Storage{"filesystem": map[string]any{
 			"rootdirectory": c.StorageRoot,
 		}},
 		Middleware: map[string][]configuration.Middleware{
-			"registry": {{
-				Name: "custom",
-			}},
+			"registry": {
+				{Name: "custom"},
+			},
 		},
 	})
 
-	s := &http.Server{}
+	svc := &http.Server{}
 
-	s.Addr = c.RegistryAddr
+	svc.Addr = c.RegistryAddr
+	svc.Handler = handler.ApplyHandlerMiddlewares(
+		middleware.HealthCheckHandler(),
+		middleware.ContextInjectorMiddleware(infraconfiguration.ContextInjectorFromContext(ctx)),
+		middleware.LogHandler(),
+		enableMirrors,
+	)(app)
 
-	s.Handler = httputil.LogHandler(logr.FromContextOrDiscard(ctx))(enableMirrors(app))
+	s.s = svc
 
-	go func() {
-		l.Info(fmt.Sprintf("registry@%s serve on %s (%s/%s)", version.FullVersion(), s.Addr, runtime.GOOS, runtime.GOARCH))
-		if c.Proxy != nil {
-			l.Info(fmt.Sprintf("proxy fallback %s enabled", c.Proxy.RemoteURL))
-		}
-		if err := s.ListenAndServe(); err != nil {
-			l.Error(err, "")
-		}
-	}()
+	return nil
+}
 
-	stopCh := make(chan os.Signal, 1)
-	signal.Notify(stopCh, os.Interrupt, syscall.SIGTERM)
-	<-stopCh
+func (s *Server) Serve(ctx context.Context) error {
+	if s.s == nil {
+		return nil
+	}
+	l := logr.FromContext(ctx)
 
-	timeout := 10 * time.Second
+	l.Info("container registry serve on %s (%s/%s)", s.s.Addr, runtime.GOOS, runtime.GOARCH)
+	if s.RemoteRegistry.Endpoint != "" {
+		l.Info("proxy fallback %s enabled", s.RemoteRegistry.Endpoint)
+	}
+	return s.s.ListenAndServe()
+}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	return s.Shutdown(ctx)
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.s.Shutdown(ctx)
 }

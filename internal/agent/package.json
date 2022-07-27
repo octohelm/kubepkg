@@ -1,0 +1,7 @@
+{
+  "name": "@api/agent",
+  "license": "MIT",
+  "private": true,
+  "scripts": {},
+  "type": "module"
+}

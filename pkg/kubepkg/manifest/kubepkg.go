@@ -1,6 +1,8 @@
 package manifest
 
 import (
+	"strings"
+
 	"github.com/containerd/containerd/platforms"
 	"github.com/octohelm/kubepkg/pkg/annotation"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
@@ -8,7 +10,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	"strings"
 )
 
 type CompleteOption struct {
@@ -74,7 +75,7 @@ func ExtractComplete(kpkg *v1alpha1.KubePkg) (map[string]Object, error) {
 
 type completer struct {
 	kpkg *v1alpha1.KubePkg
-	refs map[string][]string
+	//refs map[string][]string
 }
 
 func (c *completer) GetAnnotation(key string) string {

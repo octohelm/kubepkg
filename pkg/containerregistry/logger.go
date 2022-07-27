@@ -2,10 +2,8 @@ package containerregistry
 
 import (
 	"context"
-	"fmt"
 
-	dcontext "github.com/distribution/distribution/v3/context"
-	"github.com/go-logr/logr"
+	"github.com/go-courier/logr"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -23,7 +21,7 @@ func (f formatter) Format(entry *logrus.Entry) ([]byte, error) {
 		ctx = context.Background()
 	}
 
-	l := logr.FromContextOrDiscard(ctx)
+	l := logr.FromContext(ctx)
 
 	keyValues := make([]any, 0, len(entry.Data)*2)
 
@@ -37,32 +35,28 @@ func (f formatter) Format(entry *logrus.Entry) ([]byte, error) {
 		keyValues = append(keyValues, k, entry.Data[k])
 	}
 
+	l = l.WithValues(keyValues...)
+
 	switch entry.Level {
 	case logrus.TraceLevel:
-		l.V(10).Info(entry.Message, keyValues...)
+		l.Trace(entry.Message)
 	case logrus.DebugLevel:
-		l.V(1).Info(entry.Message, keyValues...)
+		l.Debug(entry.Message)
 	case logrus.InfoLevel:
-		l.Info(entry.Message, keyValues...)
+		l.Info(entry.Message)
 	case logrus.WarnLevel:
-		l.V(1).Info(entry.Message, keyValues...)
+		l.Info(entry.Message)
 	default:
 		if err, ok := entry.Data[logrus.ErrorKey]; ok {
 			if e, ok := err.(error); ok {
-				l.Error(e, entry.Message, keyValues...)
+				l.Error(e)
 			} else {
-				l.Error(fmt.Errorf("%s", e), entry.Message, keyValues...)
+				l.Error(errors.Wrap(e, entry.Message))
 			}
 		} else {
-			l.Error(errors.New(entry.Message), entry.Message, keyValues...)
+			l.Error(errors.New(entry.Message))
 		}
-
 	}
 
 	return nil, nil
-}
-
-func WithLogger(ctx context.Context, l logr.Logger) context.Context {
-	ctx = logr.NewContext(ctx, l)
-	return dcontext.WithLogger(ctx, logrus.WithContext(ctx))
 }

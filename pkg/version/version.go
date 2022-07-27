@@ -1,17 +1,17 @@
 package version
 
-const (
-	DevelopmentVersion = "devel"
-)
-
 var (
-	Version  = DevelopmentVersion
-	Revision = "-"
+	version  = "0.0.0.dev"
+	revision = ""
 )
 
-func FullVersion() string {
-	if len([]byte(Revision)) > 7 {
-		return Version + ".sha+" + Revision[0:7]
+func shortSha(sha string) string {
+	if len(sha) > 8 {
+		return ".shortSha+" + sha[0:8]
 	}
-	return Version + ".sha+" + Revision
+	return ".shortSha+00000000"
+}
+
+func Version() string {
+	return version + shortSha(revision)
 }

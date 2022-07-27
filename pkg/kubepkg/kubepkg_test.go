@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/distribution/distribution/v3/reference"
+	. "github.com/octohelm/kubepkg/internal/testingutil"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"github.com/octohelm/kubepkg/pkg/ioutil"
-	. "github.com/octohelm/kubepkg/pkg/testutil"
 	"github.com/opencontainers/go-digest"
 )
 
@@ -36,14 +36,14 @@ func TestKubePkg(t *testing.T) {
 	kpkg, _ := Load(filepath.Join(projectRoot, "testdata/demo.yaml"))
 	kubeTgz := filepath.Join(projectRoot, ".tmp/demo.kube.tgz")
 
-	t.Run("When packing", WithT(func() {
+	t.Run("When packing", func(t *testing.T) {
 		ctx := context.Background()
 
-		It("Should resolve digests", func() {
+		t.Run("Should resolve digests", func(t *testing.T) {
 			resolved, err := dr.Resolve(ctx, kpkg)
-			So(err, ShouldBeNil)
+			Expect(t, err, Be[error](nil))
 
-			It("Should create kube.tgz", func() {
+			t.Run("Should create kube.tgz", func(t *testing.T) {
 				f, _ := ioutil.CreateOrOpen(kubeTgz)
 				defer f.Close()
 
@@ -52,45 +52,45 @@ func TestKubePkg(t *testing.T) {
 					fmt.Printf("%+v", e)
 				}
 
-				So(e, ShouldBeNil)
-				So(dgst, ShouldNotBeEmpty)
+				Expect(t, err, Be[error](nil))
+				Expect(t, dgst.String(), NotBe(""))
 			})
 		})
-	}))
+	})
 
-	t.Run("When import", WithT(func() {
+	t.Run("When import", func(t *testing.T) {
 		ctx := context.Background()
 		f, _ := os.Open(kubeTgz)
 		defer f.Close()
 
 		kpkg, err := r.ImportFromKubeTgzReader(ctx, f)
-		So(err, ShouldBeNil)
+		Expect(t, err, Be[error](nil))
 
-		It("Should find digests in registry storage", func() {
+		t.Run("Should find digests in registry storage", func(t *testing.T) {
 			for i := range kpkg.Status.Digests {
 				dm := kpkg.Status.Digests[i]
 				d, _ := digest.Parse(dm.Digest)
 				named, _ := reference.WithName(dm.Name)
 
-				It(fmt.Sprintf("Should exists %s %s", dm.Type, d), func() {
+				t.Run(fmt.Sprintf("Should exists %s %s", dm.Type, d), func(t *testing.T) {
 					_, err := lcr.BlobStatter().Stat(ctx, d)
-					So(err, ShouldBeNil)
+					Expect(t, err, Be[error](nil))
 
 					if dm.Type == "manifest" {
 						repo, _ := lcr.Repository(ctx, named)
 						manifests, _ := repo.Manifests(ctx)
 						exists, _ := manifests.Exists(ctx, d)
-						So(exists, ShouldBeTrue)
+						Expect(t, exists, Be(true))
 
 						if dm.Platform == "" && dm.Tag != "" {
-							It("Should tag the correct digest", func() {
+							t.Run("Should tag the correct digest", func(t *testing.T) {
 								tagged, _ := repo.Tags(ctx).Get(ctx, dm.Tag)
-								So(tagged.Digest, ShouldEqual, d)
+								Expect(t, tagged.Digest, Equal(d))
 							})
 						}
 					}
 				})
 			}
 		})
-	}))
+	})
 }

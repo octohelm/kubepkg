@@ -9,6 +9,6 @@ commit-msg = [
 ]
 
 [lint-staged]
-"{pkg/,cmd/}{**/}*.go" = [
+"{pkg/,cmd/,internal/}{**/}*.go" = [
     "goimports -l -w"
 ]

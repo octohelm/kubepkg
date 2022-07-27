@@ -8,7 +8,7 @@ metadata:
 spec:
   version: 0.0.1
   images:
-    docker.io/library/nginx:alpine: 'sha256:1746c349c5113b180cd0c2d5c0420c89563a65a5555655b5253cf0f2575a027c'
+    docker.io/library/nginx:alpine@sha256:1746c349c5113b180cd0c2d5c0420c89563a65a5555655b5253cf0f2575a027c: ''
   manifests:
     configMaps:
       web:
@@ -60,11 +60,6 @@ spec:
                     - containerPort: 443
                       name: https
                   env:
-                    - name: "SRV_XXX"
-                      valueFrom:
-                        configMapKeyRef:
-                          name: "srv-xxx"
-                          key: "endpoint"
                     - name: "X"
                       valueFrom:
                         configMapKeyRef:

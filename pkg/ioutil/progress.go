@@ -3,14 +3,15 @@ package ioutil
 import (
 	"context"
 	"fmt"
-	"github.com/go-logr/logr"
-	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"time"
+
+	"github.com/go-courier/logr"
+	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 )
 
 func NewProgressWriter(ctx context.Context, label string, size int64) *ProgressWriter {
 	return &ProgressWriter{
-		l:     logr.FromContextOrDiscard(ctx),
+		l:     logr.FromContext(ctx),
 		label: label,
 		size:  size,
 	}

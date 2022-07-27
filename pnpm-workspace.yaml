@@ -1,0 +1,5 @@
+packages:
+  - "nodedevpkg/*"
+  - "nodepkg/*"
+  - "webapp/*"
+  - "internal/*"

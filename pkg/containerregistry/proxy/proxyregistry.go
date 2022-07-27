@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
 
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/configuration"
@@ -20,6 +20,7 @@ import (
 	"github.com/distribution/distribution/v3/registry/client/transport"
 	"github.com/distribution/distribution/v3/registry/storage"
 	"github.com/distribution/distribution/v3/registry/storage/driver"
+	"github.com/go-courier/logr"
 )
 
 // proxyingRegistry fetches content from a remote registry and caches it locally
@@ -172,7 +173,7 @@ func (r *remoteAuthChallenger) tryEstablishChallenges(ctx context.Context) error
 		return err
 	}
 
-	logr.FromContextOrDiscard(ctx).V(1).Info(
+	logr.FromContext(ctx).Debug(
 		fmt.Sprintf("Challenge established with upstream: %s", remoteURL.String()),
 	)
 
@@ -220,15 +221,16 @@ func (l *logRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	resp, err := l.next.RoundTrip(req)
 	if err != nil {
-		logr.FromContextOrDiscard(req.Context()).Error(err, fmt.Sprintf("request failed: %s %s", req.Method, req.URL))
+		logr.FromContext(req.Context()).Error(errors.Wrapf(err, "request failed: %s %s", req.Method, req.URL))
 		return nil, err
 	}
 
-	logr.FromContextOrDiscard(req.Context()).V(1).Info(
-		fmt.Sprintf("%s %s", req.Method, req.URL),
-		"cost", time.Since(started),
-		"status", resp.StatusCode,
-	)
+	logr.FromContext(req.Context()).
+		WithValues(
+			"cost", time.Since(started),
+			"status", resp.StatusCode,
+		).
+		Info("%s %s", req.Method, req.URL)
 
 	return resp, err
 }

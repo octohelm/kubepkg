@@ -1,7 +1,7 @@
 .DS_Store
 
 .idea/
-
+.build/
 .tmp/
 bin/
 _output/
@@ -9,4 +9,11 @@ vendor/
 build/
 dist/
 
+*.log
+*.iml
+
 coverage.txt
+*.sqlite
+
+.turbo/
+.swc/

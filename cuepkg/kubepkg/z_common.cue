@@ -16,7 +16,7 @@ import (
 	}
 }
 
-#KubepkgServiceAccount: kube.#ServiceAccount &{
+#KubepkgServiceAccount: kube.#ServiceAccount & {
 	role: "ClusterRole"
 	rules: [
 		{

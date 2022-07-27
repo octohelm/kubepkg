@@ -4,11 +4,11 @@ export GIT_REF ?= HEAD
 DAGGER = dagger --log-format=plain
 
 build:
-	$(DAGGER) do build
+	$(DAGGER) do go build
 .PHONY: build
 
-push:
-	$(DAGGER) do push
+ship:
+	$(DAGGER) do go ship pushx
 .PHONY: push
 
 KUBECONFIG = ${HOME}/.kube_config/config--crpe-test.yaml
@@ -50,15 +50,16 @@ kubepkg.export:
  		--output=.tmp/demo.kube.tgz \
  			./testdata/demo.yaml
 
-kubepkg.apply:
+kubepkg.import:
+	mkdir -p .tmp/manifests
+	$(KUBEPKG) import -i=.tmp/kubepkg --manifest-output=.tmp/manifests .tmp/demo.kube.tgz
+
+
+kubepkg.apply.demo:
 	$(KUBEPKG) apply --kubeconfig=$(KUBECONFIG) --force --dry-run ./testdata/demo.yaml
 
 kubepkg.manifests:
 	$(KUBEPKG) manifests ./testdata/demo.yaml
-
-kubepkg.import:
-	mkdir -p .tmp/manifests
-	$(KUBEPKG) import -i=.tmp/kubepkg --manifest-output=.tmp/manifests .tmp/demo.kube.tgz
 
 kubepkg.import.remote:
 	@echo "incremental import with spec directly"
@@ -68,6 +69,13 @@ kubepkg.import.remote:
 	@echo "incremental import with debug"
 	$(KUBEPKG) import -v=1 -i=http://0.0.0.0:36060 --incremental .tmp/demo.kube.tgz
 #	$(KUBEPKG) import -i=http://0.0.0.0:36060 .tmp/demo.kube.tgz
+
+
+export.kubepkg:
+	dagger do kubepkg
+
+upgrade:
+	$(KUBEPKG) apply --kubeconfig=$(KUBECONFIG) --force ./build/kubepkg/kubepkg.yaml
 
 debug: kubepkg.export kubepkg.import
 

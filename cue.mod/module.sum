@@ -1,3 +1,5 @@
 dagger.io v0.3.0 
-github.com/innoai-tech/runtime v0.0.0-20220624081938-3e42d0c3cd66 h1:YTQjWlH9+CQ2WDkdgBC1IvbU6jZcc99ncqd3Ub+iDtU=
+github.com/innoai-tech/runtime v0.0.0-20220727060308-999f68258cd9 h1:nq5oJbKdQpTdxFCmShc+mS9ZXtIfIRteCXn9zCHmD2U=
+k8s.io/api v0.24.1 h1:BjCMRDcyEYz03joa3K1+rbshwh1Ay6oB53+iUx2H8UY=
+k8s.io/apimachinery v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
 universe.dagger.io v0.3.0 

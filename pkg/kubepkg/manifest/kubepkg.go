@@ -7,6 +7,7 @@ import (
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"strings"
 )
 
@@ -87,6 +88,35 @@ func (c *completer) GetAnnotation(key string) string {
 
 func (c *completer) patchNamespace(o Object) (Object, error) {
 	o.SetNamespace(c.kpkg.Namespace)
+
+	if gvk := o.GetObjectKind().GroupVersionKind(); gvk.Group == rbacv1.GroupName {
+		switch gvk.Kind {
+		case "RoleBinding":
+			d, err := FromUnstructured[rbacv1.RoleBinding](o)
+			if err != nil {
+				return nil, err
+			}
+			for i := range d.Subjects {
+				s := d.Subjects[i]
+				s.Namespace = c.kpkg.Namespace
+				d.Subjects[i] = s
+			}
+			return d, nil
+		case "ClusterRoleBinding":
+			d, err := FromUnstructured[rbacv1.ClusterRoleBinding](o)
+			if err != nil {
+				return nil, err
+			}
+			for i := range d.Subjects {
+				s := d.Subjects[i]
+				s.Namespace = c.kpkg.Namespace
+				d.Subjects[i] = s
+			}
+			return d, nil
+
+		}
+	}
+
 	return o, nil
 }
 

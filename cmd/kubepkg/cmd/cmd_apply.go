@@ -78,7 +78,11 @@ func (s *Apply) applyKubePkg(ctx context.Context, c client.Client, kpkg *v1alpha
 
 	for name := range manifests {
 		o := manifests[name]
-		o.SetNamespace(kpkg.Namespace)
+
+		// skip namespace
+		if o.GetObjectKind().GroupVersionKind().Kind == "Namespace" {
+			continue
+		}
 
 		gvk := o.GetObjectKind().GroupVersionKind()
 

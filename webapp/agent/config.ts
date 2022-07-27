@@ -3,7 +3,7 @@ import { AppConfig, AppContext, confLoader } from "@innoai-tech/config";
 const APP_CONFIG = {
   SRV_API: ({ env }: AppContext) => {
     if (env === "local") {
-      return `//0.0.0.0:36060`;
+      return `//crpe-test:36060`;
     }
     return "";
   }

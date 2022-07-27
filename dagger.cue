@@ -2,14 +2,18 @@ package main
 
 import (
 	"strings"
+	"encoding/yaml"
 
 	"dagger.io/dagger"
 	"dagger.io/dagger/core"
 
+	"github.com/innoai-tech/runtime/cuepkg/kubepkg"
 	"github.com/innoai-tech/runtime/cuepkg/tool"
 	"github.com/innoai-tech/runtime/cuepkg/imagetool"
 	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
+
+	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/kubepkg"
 )
 
 dagger.#Plan
@@ -28,6 +32,10 @@ client: env: {
 
 	LINUX_MIRROR:                  string | *""
 	CONTAINER_REGISTRY_PULL_PROXY: string | *""
+
+	KUBEPKG_REMOTE_REGISTRY_ENDPOINT: _ | *""
+	KUBEPKG_REMOTE_REGISTRY_USERNAME: _ | *""
+	KUBEPKG_REMOTE_REGISTRY_PASSWORD: _ | *""
 }
 
 client: filesystem: "build/output": write: contents: actions.go.archive.output
@@ -142,3 +150,40 @@ actions: go: golang.#Project & {
 	"auths":  auths
 	"mirror": mirror
 }
+
+actions: "kubepkg": {
+	_version: "dev@sha256:c96854e97ef8d985feb683e26b9552591aeed292753442c99f7c649f934c67da"
+	//        _version: "f4118d4"
+
+	core.#WriteFile & {
+		input:    dagger.#Scratch
+		path:     "/kubepkg.yaml"
+		contents: yaml.Marshal(kubepkg.#KubePkg & {
+			metadata: name:      "kubepkg"
+			metadata: namespace: "kube-system"
+			spec: "version":     "1.2.0+kubepkg"
+			spec: images: {
+				"ghcr.io/octohelm/kubepkg": "\(_version)"
+			}
+
+			spec: manifests: {
+				agent: (kubepkgcomponent.#Agent & {
+					app: version: "\(_version)"
+				}).kube
+				operator: (kubepkgcomponent.#Operator & {
+					app: version: "\(_version)"
+				}).kube
+				registry: (kubepkgcomponent.#Registry & {
+					app: version: "\(_version)"
+					config: {
+						"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "\(client.env.KUBEPKG_REMOTE_REGISTRY_ENDPOINT)"
+						"KUBEPKG_REMOTE_REGISTRY_USERNAME": "\(client.env.KUBEPKG_REMOTE_REGISTRY_USERNAME)"
+						"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "\(client.env.KUBEPKG_REMOTE_REGISTRY_PASSWORD)"
+					}
+				}).kube
+			}
+		})
+	}
+}
+
+client: filesystem: "build/kubepkg": write: contents: actions.kubepkg.output

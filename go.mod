@@ -3,7 +3,7 @@ module github.com/octohelm/kubepkg
 go 1.18
 
 require (
-	github.com/containerd/containerd v1.6.6
+	github.com/containerd/containerd v1.6.8
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/distribution/v3 v3.0.0-20220725133111-4bf3547399eb
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7

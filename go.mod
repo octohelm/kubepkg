@@ -20,7 +20,7 @@ require (
 	github.com/smartystreets/assertions v1.13.0
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/stretchr/objx v0.4.0
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 	golang.org/x/net v0.0.0-20220726230323-06994584191e
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.24.3

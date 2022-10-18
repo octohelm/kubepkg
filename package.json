@@ -28,7 +28,7 @@
     "@innoai-tech/fetcher": "^0.1.3",
     "@innoai-tech/lodash": "^0.1.2",
     "@innoai-tech/reactutil": "^0.2.4",
-    "@mui/base": "5.0.0-alpha.91",
+    "@mui/base": "5.0.0-alpha.102",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.9.2",
     "@mui/system": "^5.9.2",

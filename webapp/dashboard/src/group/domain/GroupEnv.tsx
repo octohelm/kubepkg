@@ -16,7 +16,7 @@ export const GroupEnvsProvider = createDomain(({}, use) => {
     {
       groupName: group$.value.name,
       list$: listGroupEnv$,
-      put$: putGroupEnv$
+      put$: putGroupEnv$,
     },
     (groupEnvs$) => groupEnvs$.list$.pipe(map((resp) => resp.body)),
     (groupEnvs$) =>
@@ -38,3 +38,13 @@ export const GroupEnvsProvider = createDomain(({}, use) => {
 
   return groupEnv$;
 });
+
+export const GroupEnvProvider = createDomain(
+  ({ groupName, envName }: { groupName: string; envName: string }, use) => {
+    return use(
+      `groups/${groupName}/envs/${envName}`,
+      { groupName, envName } as { groupName: string; envName: string },
+      {}
+    );
+  }
+);

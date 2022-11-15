@@ -1,31 +1,20 @@
 package kubepkg
 
-import (
-	"github.com/innoai-tech/runtime/cuepkg/kube"
-)
-
-#KubepkgOperator: kube.#App & {
+#KubepkgOperator: spec: {
 	serviceAccount: #KubepkgServiceAccount
 }
 
-#ContainerRegistry: kube.#App & {
-	app: _
-	volumes: storage: #KubepkgStorage
-
-	services: "\(app.name)": {
-		clusterIP: *"10.68.0.255" | string
+#ContainerRegistry: spec: {
+	volumes: "~container-registry-storage": #KubepkgStorage
+	services: "#": {
+		//		clusterIP: *"10.68.0.255" | string
 	}
 }
 
-#KubepkgAgent: kube.#App & {
-	app: _
-
-	services: "\(app.name)": {
-		expose: {
-			type: "NodePort"
-		}
+#KubepkgAgent: spec: {
+	services: "#": {
+		expose: type: "NodePort"
 	}
-
-	volumes: storage: #KubepkgStorage
+	volumes: "~container-registry-storage": #KubepkgStorage
 	serviceAccount: #KubepkgServiceAccount
 }

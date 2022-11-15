@@ -10,17 +10,20 @@ export default defineConfig({
     injectWebAppConfig(async (c, ctx) => {
       if (ctx.env !== "$") {
         await generateClients(join(c.root!, "client"), ctx, {
-          expose: "createRequest",
-          importPath: "./client",
+          requestCreator: {
+            expose: "createRequest",
+            importPath: "./client"
+          },
+          includesRawOpenAPI: true
         });
       }
     }),
     presetReact({
       chunkGroups: {
-        core: /rollup|core-js|tslib|babel|scheduler|history|object-assign|hey-listen|react|react-router/,
-        utils: /innoai-tech|date-fns|lodash|rxjs|filesize|buffer/,
-        styling: /emotion|react-spring|mui/,
-      },
-    }),
-  ],
+        core: /rollup|core-js|tslib|babel|scheduler|history|object-assign|hey-listen/,
+        utils: /date-fns|lodash|rxjs|filesize|buffer|copy-to-clipboard/,
+        ui: /react|react-router|emotion|mui|react-spring|innoai-tech/
+      }
+    })
+  ]
 });

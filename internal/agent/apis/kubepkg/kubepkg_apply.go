@@ -41,7 +41,11 @@ func (req *ApplyKubePkg) Output(ctx context.Context) (any, error) {
 		kpkg = k
 	}
 
-	if err := kubeutil.ClientFromContext(ctx).Patch(ctx, kpkg, client.Apply, controller.FieldOwner, client.ForceOwnership); err != nil {
+	if err := kubeutil.ClientFromContext(ctx).Patch(ctx, &v1alpha1.KubePkg{
+		TypeMeta:   kpkg.TypeMeta,
+		ObjectMeta: kpkg.ObjectMeta,
+		Spec:       kpkg.Spec,
+	}, client.Apply, controller.FieldOwner, client.ForceOwnership); err != nil {
 		return nil, err
 	}
 

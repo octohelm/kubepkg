@@ -3,16 +3,16 @@ package main
 import (
 	"context"
 
+	"sigs.k8s.io/yaml"
+
 	"github.com/go-courier/logr"
 	"github.com/innoai-tech/infra/pkg/cli"
-	"github.com/innoai-tech/infra/pkg/otel"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"github.com/octohelm/kubepkg/pkg/ioutil"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
+	"github.com/octohelm/kubepkg/pkg/logutil"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 // BindKubepkg kubepkg.tgz from kubepkg manifest
 type Export struct {
 	cli.C
-	otel.Otel
+	logutil.Logger
 	Exporter
 }
 
@@ -85,8 +85,8 @@ func (s *Exporter) Run(ctx context.Context) error {
 	kubepkg.AnnotationPlatforms(kpkg, s.Platform)
 
 	if s.ForceResolve {
-		for k := range kpkg.Spec.Images {
-			kpkg.Spec.Images[k] = ""
+		for k := range kpkg.Status.Images {
+			kpkg.Status.Images[k] = ""
 		}
 	}
 
@@ -111,23 +111,19 @@ func (s *Exporter) Run(ctx context.Context) error {
 		}
 		defer manifestsYaml.Close()
 
-		manifests, err := manifest.Extract(resolved.Spec.Manifests, func(o manifest.Object) (manifest.Object, error) {
-			o.SetNamespace(resolved.GetNamespace())
-			return o, nil
-		})
+		manifests, err := manifest.ExtractComplete(resolved)
 		if err != nil {
 			return errors.Wrapf(err, "extract manifests failed: %s", s.ExtractManifestsYaml)
 		}
 
-		w := yaml.NewEncoder(manifestsYaml)
 		for _, m := range manifests {
-			if u, ok := m.(*unstructured.Unstructured); ok {
-				if err := w.Encode(u.Object); err != nil {
-					return errors.Wrapf(err, "encoding to yaml failed: %s", s.ExtractManifestsYaml)
-				}
+			data, err := yaml.Marshal(m)
+			if err != nil {
+				return errors.Wrapf(err, "encoding to yaml failed: %s", s.ExtractManifestsYaml)
 			}
+			_, _ = manifestsYaml.WriteString("---\n")
+			_, _ = manifestsYaml.Write(data)
 		}
-		_ = w.Close()
 	}
 
 	return nil

@@ -5,12 +5,13 @@ import (
 
 	"dagger.io/dagger"
 
-	"github.com/innoai-tech/runtime/cuepkg/kubepkg"
 	"github.com/innoai-tech/runtime/cuepkg/tool"
 	"github.com/innoai-tech/runtime/cuepkg/imagetool"
 	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
 
+	kubepkg "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
+	"github.com/octohelm/kubepkg/cuepkg/kubepkgcli"
 	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/component/kubepkg"
 )
 
@@ -34,6 +35,10 @@ client: env: {
 	KUBEPKG_REMOTE_REGISTRY_ENDPOINT: _ | *""
 	KUBEPKG_REMOTE_REGISTRY_USERNAME: _ | *""
 	KUBEPKG_REMOTE_REGISTRY_PASSWORD: _ | *""
+
+	KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT: _ | *""
+	KUBEPKG_SIGN_PRIVATE_KEY:            _ | *""
+	KUBEPKG_DB_ENDPOINT:                 _ | *""
 }
 
 actions: version: tool.#ResolveVersion & {
@@ -145,43 +150,72 @@ actions: go: golang.#Project & {
 	"mirror": mirror
 }
 
-client: filesystem: ".build/kubepkg": write: contents: actions.kubepkg.output
-actions: "kubepkg": {
+actions: {
 	_version: "\(strings.TrimLeft(actions.go.ship.pushx.result, "\(actions.go.ship.name):"))"
 
-	kubepkg.#Export & {
+	#Export: kubepkgcli.#Export & {
 		"run": tag: "\(_version)"
-		"arch":     "amd64"
-		"filename": "kubepkg.amd64.kube.tgz"
 		"env": {
 			"KUBEPKG_LOG_LEVEL":                "DEBUG"
 			"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "\(client.env.KUBEPKG_REMOTE_REGISTRY_ENDPOINT)"
 			"KUBEPKG_REMOTE_REGISTRY_USERNAME": "\(client.env.KUBEPKG_REMOTE_REGISTRY_USERNAME)"
 			"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "\(client.env.KUBEPKG_REMOTE_REGISTRY_PASSWORD)"
 		}
-		"kubepkg": kubepkg.#KubePkg & {
-			metadata: name:      "kubepkg"
-			metadata: namespace: "kube-system"
-			spec: "version":     "1.2.0+kubepkg"
-			spec: images: {
-				"ghcr.io/octohelm/kubepkg:\(_version)": ""
-			}
-			spec: manifests: {
-				agent: (kubepkgcomponent.#KubepkgAgent & {
-					app: version: "\(_version)"
-				}).kube
-				operator: (kubepkgcomponent.#KubepkgOperator & {
-					app: version: "\(_version)"
-				}).kube
-				registry: (kubepkgcomponent.#ContainerRegistry & {
-					app: version: "\(_version)"
-					config: {
-						"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "\(client.env.KUBEPKG_REMOTE_REGISTRY_ENDPOINT)"
-						"KUBEPKG_REMOTE_REGISTRY_USERNAME": "\(client.env.KUBEPKG_REMOTE_REGISTRY_USERNAME)"
-						"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "\(client.env.KUBEPKG_REMOTE_REGISTRY_PASSWORD)"
+	}
+
+	"dashboard": {
+		for arch in ["amd64", "arm64"] {
+			"\(arch)": #Export & {
+				"arch":     "\(arch)"
+				"filename": "dashboard.\(arch).kube.tgz"
+				"kubepkg":  kubepkgcomponent.#KubepkgDashboard & {
+					metadata: namespace: "kubepkg"
+					spec: {
+						version: "\(_version)"
+						config: {
+							"KUBEPKG_SIGN_PRIVATE_KEY":            "\(client.env.KUBEPKG_SIGN_PRIVATE_KEY)"
+							"KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT": "\(client.env.KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT)"
+							"KUBEPKG_DB_ENDPOINT":                 "\(client.env.KUBEPKG_DB_ENDPOINT)"
+							"KUBEPKG_DB_ENABLE_MIGRATE":           "true"
+						}
 					}
-				}).kube
+				}
+			}
+		}
+	}
+
+	"kubepkg": {
+		for arch in ["amd64", "arm64"] {
+			"\(arch)": #Export & {
+				"arch":     "\(arch)"
+				"filename": "dashboard.\(arch).kube.tgz"
+				"kubepkg":  kubepkg.#KubePkg & {
+					metadata: name:      "kubepkg"
+					metadata: namespace: "kube-system"
+					spec: "version":     "1.2.0+kubepkg"
+					spec: manifests: {
+						agent: (kubepkgcomponent.#KubepkgAgent & {
+							spec: version: "\(_version)"
+						})
+						operator: (kubepkgcomponent.#KubepkgOperator & {
+							spec: version: "\(_version)"
+						})
+						registry: (kubepkgcomponent.#ContainerRegistry & {
+							spec: {
+								version: "\(_version)"
+								config: {
+									"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "\(client.env.KUBEPKG_REMOTE_REGISTRY_ENDPOINT)"
+									"KUBEPKG_REMOTE_REGISTRY_USERNAME": "\(client.env.KUBEPKG_REMOTE_REGISTRY_USERNAME)"
+									"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "\(client.env.KUBEPKG_REMOTE_REGISTRY_PASSWORD)"
+								}
+							}
+						})
+					}
+				}
 			}
 		}
 	}
 }
+
+client: filesystem: ".build/dashboard/arm64": write: contents: actions.dashboard.arm64.output
+client: filesystem: ".build/kubepkg/arm64": write: contents:   actions.kubepkg.arm64.output

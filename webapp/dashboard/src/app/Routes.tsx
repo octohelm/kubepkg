@@ -11,7 +11,11 @@ import {
   GroupTitle,
   GroupAccountMain,
 } from "../group";
-import { GroupEnvMain, GroupEnvMenu } from "../group-env";
+import {
+  GroupEnvDeploymentMain,
+  GroupEnvMain,
+  GroupEnvMenu,
+} from "../group-env";
 import { Outlet } from "react-router-dom";
 import { AccountMain, AdminAccountMain } from "../account";
 import { GroupRobotMain } from "../group";
@@ -34,7 +38,7 @@ export const groupRoutes = path("groups/:group")
         path(":env")
           .title("环境")
           .menu(<GroupEnvMenu />)
-          .element(<Scaffold>env</Scaffold>)
+          .element(<GroupEnvDeploymentMain />)
       ),
     path("members")
       .title("成员")

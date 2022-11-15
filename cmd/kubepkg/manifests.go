@@ -17,11 +17,11 @@ func init() {
 // Show manifests
 type Manifests struct {
 	cli.C
-
 	PrintManifests
 }
 
 type PrintManifests struct {
+	Namespace   string `flag:",omitempty"`
 	KubepkgJSON string `arg:""`
 }
 
@@ -29,6 +29,10 @@ func (p *PrintManifests) Run(ctx context.Context) error {
 	kpkg, err := kubepkg.Load(p.KubepkgJSON)
 	if err != nil {
 		return err
+	}
+
+	if p.Namespace != "" {
+		kpkg.Namespace = p.Namespace
 	}
 
 	manifests, err := manifest.ExtractComplete(kpkg)

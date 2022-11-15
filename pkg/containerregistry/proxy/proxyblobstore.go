@@ -126,7 +126,7 @@ func (pbs *proxyBlobStore) Get(ctx context.Context, dgst digest.Digest) ([]byte,
 	return buf.Bytes(), nil
 }
 
-func (pbs *proxyBlobStore) Open(ctx context.Context, dgst digest.Digest) (distribution.ReadSeekCloser, error) {
+func (pbs *proxyBlobStore) Open(ctx context.Context, dgst digest.Digest) (io.ReadSeekCloser, error) {
 	blob, err := pbs.localStore.Open(ctx, dgst)
 	if err == nil {
 		return blob, nil

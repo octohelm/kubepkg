@@ -3,10 +3,11 @@ package controller
 import (
 	"context"
 
-	"github.com/innoai-tech/infra/pkg/otel"
-
 	"github.com/go-courier/logr"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg"
+
+	"github.com/octohelm/kubepkg/pkg/logutil"
+
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	"github.com/pkg/errors"
@@ -55,7 +56,7 @@ func (s *Operator) Serve(ctx context.Context) error {
 	utilruntime.Must(kubepkgv1alpha1.AddToScheme(scheme))
 
 	ctrlOpt := ctrl.Options{
-		Logger:             otel.GoLogrFromContext(ctx),
+		Logger:             logutil.GoLogrFromContext(ctx),
 		Scheme:             scheme,
 		LeaderElectionID:   "a2v1z20az.octohelm.tech",
 		LeaderElection:     s.EnableLeaderElection,

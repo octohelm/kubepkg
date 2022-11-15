@@ -1,9 +1,10 @@
 export GIT_SHA ?= $(shell git rev-parse HEAD)
 export GIT_REF ?= HEAD
 
-KUBECONFIG = ${HOME}/.kube_config/config--crpe-test.yaml
-KUBEPKG = go run ./cmd/kubepkg
+ARCH=$(shell go env GOARCH)
 
+KUBECONFIG = ${HOME}/.kube/config
+KUBEPKG = go run ./cmd/kubepkg
 
 gen:
 	go run ./tool/internal/cmd/tool gen ./cmd/kubepkg
@@ -15,48 +16,49 @@ test:
 install:
 	go install ./cmd/kubepkg
 
-k.k8s:
+gen.kubepkg:
+	cuem gen -i=go -o ./cuepkg/kubepkg ./pkg/apis/kubepkg/v1alpha1
+
+k.k8s: gen.kubepkg
 	$(KUBEPKG) serve operator --dump-k8s
 	$(KUBEPKG) serve registry --dump-k8s
 	$(KUBEPKG) serve agent --dump-k8s
 	$(KUBEPKG) serve dashboard --dump-k8s
 
+
 k.dashboard:
 	$(KUBEPKG) serve dashboard --log-level=debug -c \
+		--addr=:8081 \
  		--db-enable-migrate \
  		--auth-provider-oidc-endpoint=${OIDC_PROVIDER}
 
 k.operator:
-	$(KUBEPKG) serve operator --help
 	$(KUBEPKG) \
-		--internal-host="{{ .Name }}---{{ .Namespace }}.hw-test.innoai.tech" \
+		--internal-host="{{ .Name }}---{{ .Namespace }}.hw-dev.innoai.tech" \
 		--enable-https=true \
-		--watch-namespace=default \
+		--watch-namespace=kube-system \
 		--kubeconfig=$(KUBECONFIG) \
 			serve operator
 
 k.agent:
-	$(KUBEPKG) serve agent --help
 	$(KUBEPKG) \
-		--agent-addr=:36060 \
+		--agent-addr=:32060 \
 		--storage-root=.tmp/kubepkg \
-		--platform=linux/$(shell go env GOARCH) \
+		--platform=linux/$(ARCH) \
 		--kubeconfig=$(KUBECONFIG) \
 			serve agent
 
 k.registry:
-	$(KUBEPKG) serve registry --help
 	$(KUBEPKG) \
 		--registry-addr=:6060 \
 		--storage-root=.tmp/kubepkg \
 			serve registry
 
 k.export:
-	$(KUBEPKG) export --help
 	$(KUBEPKG) export \
 		--log-level=debug \
 		--storage-root=.tmp/kubepkg \
-		--platform=linux/$(go env GOARCH) \
+		--platform=linux/$(ARCH) \
 		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
  		--output=.tmp/demo.kube.tgz \
  			./testdata/demo.yaml
@@ -65,7 +67,6 @@ k.apply.demo:
 	$(KUBEPKG) apply --kubeconfig=$(KUBECONFIG) --force --dry-run ./testdata/demo.yaml
 
 k.manifests:
-	$(KUBEPKG) manifests --help
 	$(KUBEPKG) manifests ./testdata/demo.yaml
 
 k.import:
@@ -74,27 +75,27 @@ k.import:
 
 k.import.remote:
 	@echo "incremental import with spec directly"
-	$(KUBEPKG) import --import-to=http://0.0.0.0:36060 --incremental ./testdata/demo.yaml
+	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 --incremental ./testdata/demo.yaml
 	@echo "incremental import with debug"
-	$(KUBEPKG) import --log-level=debug --import-to=http://0.0.0.0:36060 --incremental .tmp/demo.kube.tgz
+	$(KUBEPKG) import --log-level=debug --import-to=http://0.0.0.0:32060 --incremental .tmp/demo.kube.tgz
 	@echo "incremental import without debug"
-	$(KUBEPKG) import --import-to=http://0.0.0.0:36060 --incremental .tmp/demo.kube.tgz
+	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 --incremental .tmp/demo.kube.tgz
 	@echo "import kube.tgz debug"
-	$(KUBEPKG) import --import-to=http://0.0.0.0:36060 .tmp/demo.kube.tgz
+	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 .tmp/demo.kube.tgz
 
 install.demo:
-	$(KUBEPKG) import -i=http://crpe-test:36060 ./testdata/demo.yaml
+	$(KUBEPKG) import -i=http://localhost:32060 ./testdata/demo.yaml
 
 debug: k.export k.import
 
 remote.debug: k.export remote.sync remote.ctr.import
 
 remote.sync:
-	scp .tmp/demo.kube.tgz root@crpe-test:/data/demo.kube.tgz
+	scp .tmp/demo.kube.tgz root@localhost:/data/demo.kube.tgz
 
 remote.ctr.import:
 	@echo "if kube.pkg multi-arch supported --all-platforms is required"
-	ssh root@crpe-test "gzip --decompress --stdout /data/demo.kube.tgz | ctr image import --all-platforms -"
+	ssh root@localhost "gzip --decompress --stdout /data/demo.kube.tgz | ctr image import --all-platforms -"
 
 eval:
 	cuem eval -o components.yaml ./cuepkg/kubepkg
@@ -123,20 +124,16 @@ build.webapp:
 ship:
 	dagger do go ship pushx
 
-ship.go:
-	dagger do go ship pushx
-
 kubetgz:
-	dagger do kubepkg
+	dagger do kubepkg $(ARCH)
 
-debug.kubetgz:
-	$(KUBEPKG) export \
-		--log-level=debug \
-		--storage-root=.tmp/kubepkg \
-		--platform=linux/$(shell go env GOARCH) \
- 		--output=./.build/kubepkg/images/kubepkg.kube.tgz \
- 			./.build/kubepkg/kubepkg.yaml
+kubetgz.dashboard:
+	dagger do dashboard $(ARCH)
 
-deploy: 
-	$(KUBEPKG) import --import-to=http://crpe-test:36060 ./.build/kubepkg/images/kubepkg.amd64.kube.tgz
+KUBEPKGTGZ=.build/kubepkg/$(ARCH)/images/kubepkg.$(ARCH).kube.tgz
+
+deploy:
+	$(KUBEPKG) import \
+		--import-to=http://localhost:32060 \
+		$(KUBEPKGTGZ)
 

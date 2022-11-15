@@ -58,8 +58,13 @@ func (c *ValidAccount) Output(ctx context.Context) (interface{}, error) {
 	a.AdminRole = group.ROLE_TYPE__GUEST
 	a.AccountType = account.TYPE__USER
 
-	if len(audience) > 1 {
-		a.AccountType, _ = account.ParseTypeFromString(audience[1])
+	for i, aud := range audience {
+		if i == 1 {
+			a.AccountType, _ = account.ParseTypeFromString(aud)
+		}
+		if aud == "ADMIN_INIT" {
+			a.AdminRole = group.ROLE_TYPE__OWNER
+		}
 	}
 
 	if a.AccountType == account.TYPE__USER {
@@ -78,8 +83,9 @@ func (c *ValidAccount) Output(ctx context.Context) (interface{}, error) {
 
 type Account struct {
 	account.User
-	AccountType account.Type   `json:"accountType"`
-	AdminRole   group.RoleType `json:"adminRole"`
+	AccountType account.Type                `json:"accountType"`
+	AdminRole   group.RoleType              `json:"adminRole"`
+	GroupRoles  map[group.ID]group.RoleType `json:"groupRoles,omitempty"`
 }
 
 func (a *Account) InjectContext(ctx context.Context) context.Context {

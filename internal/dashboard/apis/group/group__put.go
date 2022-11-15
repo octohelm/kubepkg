@@ -3,15 +3,13 @@ package group
 import (
 	"context"
 
-	authoperator "github.com/octohelm/kubepkg/internal/dashboard/apis/auth/operator"
-
 	"github.com/octohelm/courier/pkg/courier"
-	"github.com/octohelm/courier/pkg/expression"
-	"github.com/octohelm/kubepkg/pkg/rbac"
-
 	"github.com/octohelm/courier/pkg/courierhttp"
+	"github.com/octohelm/courier/pkg/expression"
+	authoperator "github.com/octohelm/kubepkg/internal/dashboard/apis/auth/operator"
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/group"
 	grouprepository "github.com/octohelm/kubepkg/internal/dashboard/domain/group/repository"
+	"github.com/octohelm/kubepkg/pkg/rbac"
 )
 
 func (PutGroup) MiddleOperators() courier.MiddleOperators {

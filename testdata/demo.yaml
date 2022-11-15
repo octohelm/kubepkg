@@ -3,65 +3,43 @@ kind: KubePkg
 metadata:
   name: demo
   namespace: default
-  annotations:
-    octohelm.tech/platform: linux/amd64,linux/arm64
 spec:
-  version: 0.0.1
-  images:
-    docker.io/library/nginx:alpine@sha256:1746c349c5113b180cd0c2d5c0420c89563a65a5555655b5253cf0f2575a027c: ''
-  manifests:
-    configMaps:
-      web:
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: web
+  version: 0.0.2
+
+  config:
+    X: "x"
+
+  deploy:
+    kind: "Deployment"
+    spec:
+      replicas: 1
+
+  containers:
+    web:
+      image:
+        name: docker.io/library/nginx
+        tag: alpine
+        pullPolicy: IfNotPresent
+        platforms:
+          - linux/amd64
+          - linux/arm64
+      ports:
+        http: 80
+
+  services:
+    "#":
+      ports:
+        http: 80
+      expose:
+        type: "Ingress"
+        paths:
+          http: "//internal/"
+
+  volumes:
+    html:
+      mountPath: /usr/share/nginx/html
+      type: ConfigMap
+      spec:
         data:
-          X: "x"
-    services:
-      web:
-        apiVersion: v1
-        kind: Service
-        metadata:
-          name: web
-          annotations:
-            "ingress.octohelm.tech/host": "internal"
-        spec:
-          selector:
-            app: web
-          ports:
-            - name: http-80
-              protocol: TCP
-              port: 80
-              targetPort: 80
-    deployments:
-      web:
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-          name: web
-        spec:
-          replicas: 1
-          selector:
-            matchLabels:
-              app: web
-          template:
-            metadata:
-              labels:
-                app: web
-            spec:
-              containers:
-                - image: docker.io/library/nginx:alpine
-                  imagePullPolicy: IfNotPresent
-                  name: web
-                  ports:
-                    - containerPort: 80
-                      name: http
-                    - containerPort: 443
-                      name: https
-                  env:
-                    - name: "X"
-                      valueFrom:
-                        configMapKeyRef:
-                          name: "web"
-                          key: "X"
+          index.html: "<div>hello</div>"
+

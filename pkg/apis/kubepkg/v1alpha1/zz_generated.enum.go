@@ -4,8 +4,18 @@ DON'T EDIT THIS FILE
 */
 package v1alpha1
 
+func (DeployKind) EnumValues() []any {
+	return []any{
+		DeployKindCronJob, DeployKindDaemonSet, DeployKindDeployment, DeployKindJob, DeployKindStatefulSet,
+	}
+}
 func (DigestMetaType) EnumValues() []any {
 	return []any{
 		DigestMetaBlob, DigestMetaManifest,
+	}
+}
+func (ScopeType) EnumValues() []any {
+	return []any{
+		ScopeTypeCluster, ScopeTypeNamespace,
 	}
 }

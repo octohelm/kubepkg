@@ -7,11 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/octohelm/kubepkg/pkg/logutil"
+
 	"sigs.k8s.io/yaml"
 
 	"github.com/go-courier/logr"
 	"github.com/innoai-tech/infra/pkg/cli"
-	"github.com/innoai-tech/infra/pkg/otel"
 	clientagent "github.com/octohelm/kubepkg/internal/agent/client/agent"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
@@ -26,7 +27,7 @@ func init() {
 // import kubepkg.tgz or kubepkg.{json,yaml}
 type Import struct {
 	cli.C
-	otel.Otel
+	logutil.Logger
 	Importer
 }
 
@@ -35,6 +36,8 @@ type Importer struct {
 
 	// Import to. REMOTE_AGENT (http://ip:port) or STORAGE_ROOT (dir path)
 	ImportTo string `flag:",omitempty" `
+	// Namespace Force overwrites Namespaces of resources
+	Namespace string `flag:",omitempty" `
 	// Only for importing to REMOTE_AGENT
 	Incremental bool `flag:",omitempty"`
 	// Only for importing to REMOTE_AGENT without blobs, when --incremental set
@@ -80,6 +83,10 @@ func (s *Importer) importToStorageRoot(ctx context.Context, root string, tgzFile
 		}
 
 		l.Info("blobs of %s@%s is imported.", kpkg.Name, kpkg.Spec.Version)
+
+		if s.Namespace != "" {
+			kpkg.Namespace = s.Namespace
+		}
 
 		if s.ManifestOutput != "" {
 			f := filepath.Join(s.ManifestOutput, fmt.Sprintf("%s.%s.kubepkg.yaml", kpkg.Name, kpkg.Namespace))

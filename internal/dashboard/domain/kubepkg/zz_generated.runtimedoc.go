@@ -57,6 +57,8 @@ func (v Ref) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "SettingID":
 			return []string{}, true
+		case "DefaultSettings":
+			return []string{}, true
 
 		}
 
@@ -76,11 +78,11 @@ func (v Revision) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "Digest":
 			return []string{
-				"hash of manifest",
+				"hash of spec",
 			}, true
-		case "Manifests":
+		case "Spec":
 			return []string{
-				"manifests",
+				"spec",
 			}, true
 		case "CreationTime":
 			return []string{}, true

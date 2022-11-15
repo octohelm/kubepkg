@@ -25,7 +25,7 @@ import {
 } from "../client/dashboard";
 import { createSubject, Scaffold, stringAvatar } from "../layout";
 import { useAccountAutocomplete } from "./AccountAutocomplete";
-import { AccessControl, CurrentUserProvider } from "../auth";
+import { AccessControl } from "../auth";
 import { map } from "@innoai-tech/lodash";
 
 export const AdminAccountProvider = createSubject(({}, use) => {
@@ -33,7 +33,9 @@ export const AdminAccountProvider = createSubject(({}, use) => {
   const putAdminAccount$ = useRequest(putAdminAccount);
   const deleteAdminAccount$ = useRequest(deleteAdminAccount);
 
-  return use({} as typeof listAdminAccount.TRespData, {
+  return use(
+    {} as typeof listAdminAccount.TRespData,
+    {
       list$: listAccount$,
       del$: deleteAdminAccount$,
       put$: putAdminAccount$
@@ -57,7 +59,6 @@ export const AdminAccountProvider = createSubject(({}, use) => {
 });
 
 const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
-  const user$ = CurrentUserProvider.use$();
   const account$ = AdminAccountProvider.use$();
 
   return (
@@ -99,17 +100,15 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
                     </MenuItem>
                   )
                 ),
-                ...(user$.canAccess(account$.del$)
-                  ? [
-                    <Divider key={"--"} />,
-                    <MenuItem
-                      key={GroupRoleType.GUEST}
-                      value={GroupRoleType.GUEST}
-                    >
-                      移除管理员
-                    </MenuItem>
-                  ]
-                  : [])
+                <AccessControl key={"--"} op={account$.del$}>
+                  <Divider />,
+                  <MenuItem
+                    key={GroupRoleType.GUEST}
+                    value={GroupRoleType.GUEST}
+                  >
+                    移除管理员
+                  </MenuItem>
+                </AccessControl>
               ]}
             </Select>
           </AccessControl>

@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
@@ -43,7 +44,7 @@ func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
-	l := r.GetLogger().WithName("KubePkgStatus").WithValues("request", request.NamespacedName)
+	l := r.GetLogger().WithValues("Reconcile", "Status", "request", request.NamespacedName)
 
 	kpkg := &kubepkgv1alpha1.KubePkg{}
 
@@ -87,6 +88,10 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 			return reconcile.Result{}, nil
 		}
 		return reconcile.Result{}, err
+	}
+
+	if kpkg.Status == nil {
+		kpkg.Status = &kubepkgv1alpha1.Status{}
 	}
 	kpkg.Status.Statuses = statuses
 	if err := cc.Status().Update(ctx, kpkg); err != nil {

@@ -14,18 +14,37 @@ func runtimeDoc(v any, names ...string) ([]string, bool) {
 	return nil, false
 }
 
-func (v Group) RuntimeDoc(names ...string) ([]string, bool) {
+func (v GroupC) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "Group":
 			return []string{}, true
-		case "RoleType":
-			return []string{
-				"TODO added group role",
-			}, true
+		case "CurrentAccountRoleType":
+			return []string{}, true
 
 		}
 		if doc, ok := runtimeDoc(v.Group, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v GroupEnvC) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "GroupC":
+			return []string{}, true
+		case "Env":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.GroupC, names...); ok {
+			return doc, ok
+		}
+		if doc, ok := runtimeDoc(v.Env, names...); ok {
 			return doc, ok
 		}
 
@@ -38,6 +57,21 @@ func (v ValidGroup) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "GroupName":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v ValidGroupEnv) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "GroupName":
+			return []string{}, true
+		case "EnvName":
 			return []string{}, true
 
 		}

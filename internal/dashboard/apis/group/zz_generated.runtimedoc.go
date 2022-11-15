@@ -94,6 +94,22 @@ func (v ListGroupEnv) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v ListGroupEnvDeployment) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Pager":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.Pager, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v ListGroupRobot) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -149,6 +165,19 @@ func (v PutGroupEnv) RuntimeDoc(names ...string) ([]string, bool) {
 		case "EnvName":
 			return []string{}, true
 		case "Info":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v PutGroupEnvDeployment) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "KubePkg":
 			return []string{}, true
 
 		}

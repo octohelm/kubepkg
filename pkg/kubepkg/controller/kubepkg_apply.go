@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+
 	"github.com/octohelm/kubepkg/pkg/annotation"
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
@@ -58,7 +59,7 @@ func (r *KubePkgApplyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
-	l := r.GetLogger().WithName("KubePkgApply").WithValues("request", request.NamespacedName)
+	l := r.GetLogger().WithValues("Reconcile", "Apply", "request", request.NamespacedName)
 
 	kpkg := &kubepkgv1alpha1.KubePkg{}
 
@@ -69,7 +70,7 @@ func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcil
 		return reconcile.Result{}, err
 	}
 
-	l.Info(fmt.Sprintf("%s.%s", kpkg.GetName(), kpkg.GetNamespace()))
+	l.Info(fmt.Sprintf("Applying %s.%s", kpkg.GetName(), kpkg.GetNamespace()))
 
 	manifests, err := manifest.ExtractComplete(kpkg)
 	if err != nil {
@@ -88,10 +89,12 @@ func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcil
 
 		if err := r.patchExternalConfigMapOrSecretIfNeed(ctx, kpkg, o); err != nil {
 			l.Error(err, fmt.Sprintf("%s `%s`: patch external configMaps failed", o.GetObjectKind().GroupVersionKind(), o.GetName()))
+			continue
 		}
 
 		if err := r.applyManifest(ctx, kpkg, o); err != nil {
 			l.Error(err, fmt.Sprintf("%s `%s`: apply sub-manifest failed", o.GetObjectKind().GroupVersionKind(), o.GetName()))
+			continue
 		}
 	}
 

@@ -30,30 +30,39 @@ func TestKubepkgRepository(t *testing.T) {
 	repo := repository.NewKubepkgRepository()
 
 	t.Run("When add a kubepkg", func(t *testing.T) {
-		created, _, err := repo.Add(ctx, k)
+		created, _, err := repo.Put(ctx, k)
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 
 		t.Run("recreated should return previous version", func(t *testing.T) {
 			v := k.DeepCopy()
-			v.Spec.Version = "xxxx"
+			v.Spec.Version = "v0.1.0"
 
-			recreated, _, err := repo.Add(ctx, k)
+			recreated, _, err := repo.Put(ctx, k)
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
-			testingutil.Expect(t, recreated.Spec.Version, testingutil.Be(created.Spec.Version))
+			testingutil.Expect(t, recreated.Spec.Version, testingutil.Equal(created.Spec.Version))
 		})
 
 		t.Run("list", func(t *testing.T) {
-			list, err := repo.ListVersion(ctx, "test", "test", kubepkg.CHANNEL__DEV, nil, nil)
+			list, err := repo.List(ctx, "test", kubepkg.KubepkgQueryParams{})
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
 			testingutil.Expect(t, len(list) > 0, testingutil.Be(true))
 		})
 
-		t.Run("Should delete", func(t *testing.T) {
-			var rid kubepkg.RevisionID
-			_ = rid.UnmarshalText([]byte(k.Annotations["kubepkg.innoai.tech/revision"]))
-
-			err := repo.DeleteRevision(ctx, rid)
+		t.Run("list version", func(t *testing.T) {
+			list, err := repo.ListVersion(ctx, "test", "test", kubepkg.CHANNEL__DEV, nil, nil)
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
+			testingutil.Expect(t, len(list) > 0, testingutil.Be(true))
+
+			_, err2 := repo.Get(ctx, "test", "test", kubepkg.CHANNEL__DEV, list[0].RevisionID)
+			testingutil.Expect(t, err2, testingutil.Be[error](nil))
+		})
+
+		t.Run("latest versions", func(t *testing.T) {
+			latestVersions, err := repo.Latest(ctx, []string{
+				"test/test@DEV",
+			})
+			testingutil.Expect(t, err, testingutil.Be[error](nil))
+			testingutil.Expect(t, len(latestVersions) > 0, testingutil.Be(true))
 		})
 	})
 }

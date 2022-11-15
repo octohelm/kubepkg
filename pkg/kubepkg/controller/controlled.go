@@ -58,6 +58,7 @@ var supported = []client.Object{
 	&batchv1.Job{},
 	&batchv1.CronJob{},
 
+	&corev1.ServiceAccount{},
 	&rbacv1.ClusterRole{},
 	&rbacv1.ClusterRoleBinding{},
 	&rbacv1.Role{},

@@ -23,6 +23,8 @@ func (v Account) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "AdminRole":
 			return []string{}, true
+		case "GroupRoles":
+			return []string{}, true
 
 		}
 		if doc, ok := runtimeDoc(v.User, names...); ok {
@@ -40,10 +42,6 @@ func (v ValidAccount) RuntimeDoc(names ...string) ([]string, bool) {
 		case "Authorization":
 			return []string{
 				"Bearer access_token",
-			}, true
-		case "AuthorizationInQuery":
-			return []string{
-				"Bearer access_token in query",
 			}, true
 
 		}

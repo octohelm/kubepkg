@@ -1,32 +1,31 @@
 package kubepkg
 
 import (
-	"github.com/innoai-tech/runtime/cuepkg/kube"
+	kubepkg "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
 )
 
-#KubepkgStorage: kube.#Volume & {
+#KubepkgStorage: kubepkg.#Volume & {
 	mountPath: "/etc/kubepkg"
-	source: {
-		claimName: "storage-kubepkg"
-		spec: {
-			accessModes: ["ReadWriteOnce"]
-			resources: requests: storage: "10Gi"
-			storageClassName: "local-path"
-		}
+	type:      "PersistentVolumeClaim"
+	opt: claimName: "storage-kubepkg"
+	spec: {
+		accessModes: ["ReadWriteOnce"]
+		resources: requests: storage: "10Gi"
+		storageClassName: "local-path"
 	}
 }
 
-#KubepkgServiceAccount: kube.#ServiceAccount & {
-	role: "ClusterRole"
+#KubepkgServiceAccount: kubepkg.#ServiceAccount & {
+	scope: "Cluster"
 	rules: [
 		{
-			verbs: ["*"]
 			apiGroups: ["*"]
 			resources: ["*"]
+			verbs: ["*"]
 		},
 		{
-			verbs: ["*"]
 			nonResourceURLs: ["*"]
+			verbs: ["*"]
 		},
 	]
 }

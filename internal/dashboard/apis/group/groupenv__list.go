@@ -21,5 +21,6 @@ type ListGroupEnv struct {
 }
 
 func (p *ListGroupEnv) Output(ctx context.Context) (any, error) {
-	return grouprepository.NewGroupEnvRepository(operator.GroupContext.From(ctx)).List(ctx, nil)
+	g := operator.GroupContext.From(ctx)
+	return grouprepository.NewGroupEnvRepository(g).List(ctx, nil)
 }

@@ -78,6 +78,23 @@ func (v Info) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v InstanceStatus) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "ID":
+			return []string{}, true
+		case "Ping":
+			return []string{}, true
+		case "SupportedPlatforms":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (NetType) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }

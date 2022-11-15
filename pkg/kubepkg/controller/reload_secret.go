@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+
 	"github.com/octohelm/kubepkg/pkg/annotation"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
@@ -39,33 +40,35 @@ func (r *SecretReloadReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func (r *SecretReloadReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
 	l := r.GetLogger().WithName("SecretReload").WithValues("request", request.NamespacedName)
 
-	cm := &corev1.Secret{}
+	s := &corev1.Secret{}
 
-	if err := r.GetAPIReader().Get(ctx, request.NamespacedName, cm); err != nil {
+	if err := r.GetAPIReader().Get(ctx, request.NamespacedName, s); err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
 		return reconcile.Result{}, err
 	}
 
-	hashKey := annotation.SecretHashKey(cm.Name)
-	hash := manifest.DataHash(cm.Data)
-	prevHash := kubeutil.GetAnnotate(cm, hashKey)
+	if label := kubeutil.GetLabel(s, annotation.LabelAppName); label == "" {
+		return reconcile.Result{}, nil
+	}
+
+	hashKey := annotation.SecretHashKey(s.Name)
+	hash := manifest.DataHash(s.Data)
+	prevHash := kubeutil.GetAnnotate(s, hashKey)
 	if hash == prevHash {
 		return reconcile.Result{}, nil
 	}
 
-	kubeutil.Label(cm, annotation.AppName, cm.Name)
-	kubeutil.Annotate(cm, annotation.ReloadHash, hash)
+	kubeutil.Annotate(s, annotation.ReloadHash, hash)
 
-	if err := r.GetClient().Patch(ctx, cm, client.Merge); err != nil {
+	if err := r.GetClient().Patch(ctx, s, client.Merge); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	err := RangeWorkload(ctx, r.GetClient(), request.Namespace, func(o client.Object) error {
 		if IsReloadMatch(o, annotation.ReloadSecret, request.Name) {
 			AnnotateHash(o, hashKey, hash)
-
 			if err := r.GetClient().Patch(ctx, o, client.Merge); err != nil {
 				return err
 			}

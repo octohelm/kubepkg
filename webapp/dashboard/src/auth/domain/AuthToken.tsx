@@ -1,7 +1,7 @@
 import { createDomain } from "../../layout";
 import { useRequest } from "@innoai-tech/reactutil";
 import { exchangeToken } from "../../client/dashboard";
-import { map } from "rxjs/operators";
+import { map } from "rxjs";
 import { isAfter } from "date-fns";
 
 export interface Token {
@@ -18,8 +18,7 @@ const validateToken = (tokenStr?: string) => {
         (JSON.parse(atob(tokenStr.split(".")[1]!)).exp - 30) * 1000,
         Date.now()
       );
-    } catch (_) {
-    }
+    } catch (_) {}
   }
   return false;
 };
@@ -27,16 +26,20 @@ const validateToken = (tokenStr?: string) => {
 export const TokenProvider = createDomain(({}, use) => {
   const exchangeToken$ = useRequest(exchangeToken);
 
-  return use("token", {} as Token, {
+  return use(
+    "token",
+    {} as Token,
+    {
       exchange$: exchangeToken$,
-      validateToken
-    }, (token$) =>
+      validateToken,
+    },
+    (token$) =>
       token$.exchange$.pipe(
         map((resp) => ({
           type: resp.body.type,
           accessToken: resp.body.accessToken,
           refreshToken: resp.body.refreshToken || "",
-          id: resp.body.id || ""
+          id: resp.body.id || "",
         }))
       )
   );

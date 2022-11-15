@@ -78,9 +78,6 @@ interface KubePkg {
         [x: string]: any
       }
     }
-    // images with tag may with digest
-    // when digest exists, tag the digest instead of pulling always
-    images: { [imagetag: string]: string | "" }
   }
 }
 ```

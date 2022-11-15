@@ -1,6 +1,7 @@
 package group
 
 import (
+	"github.com/octohelm/kubepkg/internal/dashboard/domain/cluster"
 	"github.com/octohelm/kubepkg/pkg/datatypes"
 )
 
@@ -37,10 +38,10 @@ type EnvInfo struct {
 
 type EnvCluster struct {
 	// 关联集群
-	ClusterID datatypes.SFID `db:"f_cluster_id,default=0" json:"clusterID"`
+	ClusterID cluster.ID `db:"f_cluster_id,default=0" json:"-"`
 	// 对应 namespace
 	// <group>--<env-name>
-	Namespace string `db:"f_namespace,default=''" json:"-"`
+	Namespace string `db:"f_namespace,default=''" json:"namespace"`
 }
 
 // +gengo:enum

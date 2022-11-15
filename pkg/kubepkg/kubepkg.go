@@ -79,7 +79,7 @@ func (reg *Registry) Wrap(ctx context.Context, r io.ReadCloser, dgst *digest.Dig
 	return rc, nil
 }
 
-func KubeTgzRange(ctx context.Context, r io.Reader, each func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error) (*v1alpha1.KubePkg, error) {
+func KubeTgzRange(ctx context.Context, r io.Reader, eachBlob func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error) ([]*v1alpha1.KubePkg, error) {
 	gzr, err := gzip.NewReader(r)
 	if err != nil {
 		return nil, err
@@ -90,19 +90,21 @@ func KubeTgzRange(ctx context.Context, r io.Reader, each func(ctx context.Contex
 
 	tr := tar.NewReader(gzr)
 
-	var kpkg *v1alpha1.KubePkg
+	var kpkgs []*v1alpha1.KubePkg
 	var digests map[string]v1alpha1.DigestMeta
 
-	var digestMeta = func(d string) *v1alpha1.DigestMeta {
+	var digestMeta = func(d string) (*v1alpha1.DigestMeta, int) {
 		if digests == nil {
 			digests = map[string]v1alpha1.DigestMeta{}
-			for i := range kpkg.Status.Digests {
-				dm := kpkg.Status.Digests[i]
-				digests[dm.Digest] = dm
+			for _, kpkg := range kpkgs {
+				for i := range kpkg.Status.Digests {
+					dm := kpkg.Status.Digests[i]
+					digests[dm.Digest] = dm
+				}
 			}
 		}
 		dm := digests[d]
-		return &dm
+		return &dm, len(digests)
 	}
 
 	i := -1
@@ -115,38 +117,47 @@ func KubeTgzRange(ctx context.Context, r io.Reader, each func(ctx context.Contex
 		if err != nil {
 			return nil, err
 		}
-
 		if hdr.Name == "kubepkg.json" {
-			var p v1alpha1.KubePkg
-			if err := json.NewDecoder(tr).Decode(&p); err != nil {
+			data, err := io.ReadAll(tr)
+			if err != nil {
+				return nil, errors.Wrap(err, "read kubepkg.json failed")
+			}
+
+			list, err := LoadKubePkgs(data)
+			if err != nil {
 				return nil, errors.Wrap(err, "extract kubepkg.json failed")
 			}
-			kpkg = &p
+			kpkgs = list
 			continue
 		}
 
-		if strings.HasPrefix(hdr.Name, "blobs/") {
-			i++
+		if eachBlob != nil {
+			if strings.HasPrefix(hdr.Name, "blobs/") {
+				i++
 
-			if kpkg == nil {
-				return nil, errors.New("invalid kubepkg.tgz, `kubepkg.json` must the first file")
-			}
+				if kpkgs == nil {
+					return nil, errors.New("invalid kubepkg.tgz, `kubepkg.json` must the first file")
+				}
 
-			parts := strings.Split(hdr.Name, "/")
-			if len(parts) != 3 {
-				return nil, errors.Wrap(err, "invalid kubepkg.tgz, blob path must be `blobs/<alg>/<hash>`")
-			}
+				parts := strings.Split(hdr.Name, "/")
+				if len(parts) != 3 {
+					return nil, errors.Wrap(err, "invalid kubepkg.tgz, blob path must be `blobs/<alg>/<hash>`")
+				}
 
-			if err := each(ctx, digestMeta(strings.Join(parts[1:3], ":")), tr, i, len(kpkg.Status.Digests)); err != nil {
-				return nil, err
+				d, total := digestMeta(strings.Join(parts[1:3], ":"))
+				if err := eachBlob(ctx, d, tr, i, total); err != nil {
+					return nil, err
+				}
 			}
+		} else {
+			break
 		}
 	}
 
-	return kpkg, nil
+	return kpkgs, nil
 }
 
-func (reg *Registry) ImportFromKubeTgzReader(ctx context.Context, r io.Reader) (*v1alpha1.KubePkg, error) {
+func (reg *Registry) ImportFromKubeTgzReader(ctx context.Context, r io.Reader) ([]*v1alpha1.KubePkg, error) {
 	return KubeTgzRange(ctx, r, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
 		return reg.ImportDigest(ctx, dm, br)
 	})

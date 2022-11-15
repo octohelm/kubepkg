@@ -1,5 +1,5 @@
 import { GroupInfo, putGroup } from "../client/dashboard";
-import { tap, map as rxMap, ignoreElements } from "rxjs/operators";
+import { tap, map as rxMap, ignoreElements } from "rxjs";
 import { useForm, fromErrorFields, useProxy, useDialogForm } from "../layout";
 import { useRequest } from "@innoai-tech/reactutil";
 import { string, required, match, objectOf } from "@innoai-tech/form";
@@ -15,13 +15,15 @@ export const useGroupForm = (
         .label("组织名称")
         .need(required(), match(/[a-z][a-z0-9-]+/))
         .readOnly(!!initials),
-      desc: string().label("组织描述")
+      desc: string().label("组织描述"),
     })
   );
 
-  return useProxy(form$, {
+  return useProxy(
+    form$,
+    {
       operationID: putGroup$.operationID,
-      post$: putGroup$
+      post$: putGroup$,
     },
     (form$) =>
       form$.post$.error$.pipe(
@@ -34,7 +36,7 @@ export const useGroupForm = (
         tap(({ name, ...others }) => {
           form$.post$.next({
             groupName: name,
-            body: others
+            body: others,
           });
         }),
         ignoreElements()
@@ -51,9 +53,12 @@ export const useGroupFormWithDialog = (
 
   const dialog$ = useDialogForm(form$, { action, title });
 
-  return useProxy(form$, {
-      dialog$: dialog$
-    }, (form$) =>
+  return useProxy(
+    form$,
+    {
+      dialog$: dialog$,
+    },
+    (form$) =>
       form$.post$.pipe(
         tap(() => form$.dialog$.next(false)),
         ignoreElements()

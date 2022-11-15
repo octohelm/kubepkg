@@ -3,7 +3,7 @@ import { GroupProvider } from "./Group";
 import {
   deleteGroupAccount,
   listGroupAccount,
-  putGroupAccount
+  putGroupAccount,
 } from "../../client/dashboard";
 import { useRequest } from "@innoai-tech/reactutil";
 import { ignoreElements, map, tap } from "rxjs/operators";
@@ -14,16 +14,19 @@ export const GroupAccountProvider = createSubject(({}, use) => {
   const putGroupAccount$ = useRequest(putGroupAccount);
   const deleteGroupAccount$ = useRequest(deleteGroupAccount);
 
-  return use({} as typeof listGroupAccount.TRespData, {
+  return use(
+    {} as typeof listGroupAccount.TRespData,
+    {
       groupName: group$.value.name,
       list$: listAccount$,
       del$: deleteGroupAccount$,
-      put$: putGroupAccount$
-    }, (accounts$) =>
+      put$: putGroupAccount$,
+    },
+    (accounts$) =>
       accounts$.put$.pipe(
         tap(() => {
           accounts$.list$.next({
-            groupName: group$.value.name
+            groupName: group$.value.name,
           });
         }),
         ignoreElements()
@@ -32,7 +35,7 @@ export const GroupAccountProvider = createSubject(({}, use) => {
       accounts$.del$.pipe(
         tap(() => {
           accounts$.list$.next({
-            groupName: group$.value.name
+            groupName: group$.value.name,
           });
         }),
         ignoreElements()

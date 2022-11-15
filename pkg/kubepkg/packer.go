@@ -7,9 +7,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/octohelm/kubepkg/pkg/ioutil"
 	"io"
 	"path"
+
+	"github.com/octohelm/kubepkg/pkg/ioutil"
 
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/platforms"
@@ -30,7 +31,7 @@ type Packer struct {
 	distribution.Namespace
 }
 
-func (p *Packer) KubeTgzTo(ctx context.Context, kpkg *v1alpha1.KubePkg, w io.Writer) (dgst digest.Digest, err error) {
+func (p *Packer) KubeTgzTo(ctx context.Context, w io.Writer, kpkgs ...*v1alpha1.KubePkg) (dgst digest.Digest, err error) {
 	digester := digest.Canonical.Digester()
 
 	mw := io.MultiWriter(w, digester.Hash())
@@ -47,18 +48,32 @@ func (p *Packer) KubeTgzTo(ctx context.Context, kpkg *v1alpha1.KubePkg, w io.Wri
 		_ = tw.Close()
 	}()
 
-	if e := p.writeToKubeTar(ctx, tw, kpkg); e != nil {
-		return "", e
+	if n := len(kpkgs); n == 1 {
+		if err := writeJsonToTar(tw, "kubepkg.json", kpkgs[0]); err != nil {
+			return "", err
+		}
+	} else {
+		list := &v1alpha1.KubePkgList{}
+		list.SetGroupVersionKind(v1alpha1.SchemeGroupVersion.WithKind("KubePkgList"))
+		list.Items = make([]v1alpha1.KubePkg, n)
+		for i := range list.Items {
+			list.Items[i] = *kpkgs[i]
+		}
+		if err := writeJsonToTar(tw, "kubepkg.json", list); err != nil {
+			return "", err
+		}
+	}
+
+	for i := range kpkgs {
+		if e := p.writeToKubeTar(ctx, tw, kpkgs[i]); e != nil {
+			return "", e
+		}
 	}
 
 	return "", nil
 }
 
 func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alpha1.KubePkg) error {
-	if err := writeJsonToTar(tw, "kubepkg.json", kpkg); err != nil {
-		return err
-	}
-
 	index := ocispec.Index{
 		Versioned: ocispecs.Versioned{SchemaVersion: 2},
 	}

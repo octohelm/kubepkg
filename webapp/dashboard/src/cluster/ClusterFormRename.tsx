@@ -12,22 +12,25 @@ export const useClusterFormRename = (oldName: string) => {
     objectOf<{ newName: string }>({
       newName: string()
         .label("集群名称")
-        .need(required(), match(/[a-z][a-z0-9-]+/))
+        .need(required(), match(/[a-z][a-z0-9-]+/)),
     })
   );
 
   const oldNameRef = useRef<string>(oldName);
   oldNameRef.current = oldName;
 
-  return useProxy(form$, {
+  return useProxy(
+    form$,
+    {
       operationID: renameCluster$.operationID,
-      post$: renameCluster$
-    }, (form$) =>
+      post$: renameCluster$,
+    },
+    (form$) =>
       form$.pipe(
         tap(({ newName }) =>
           form$.post$.next({
             name: oldNameRef.current,
-            newName
+            newName,
           })
         )
       ),
@@ -46,9 +49,12 @@ export const useClusterFormRenameWithDialog = (oldName: string) => {
 
   const dialog$ = useDialogForm(form$, { action, title: action });
 
-  return useProxy(form$, {
-      dialog$: dialog$
-    }, (form$) =>
+  return useProxy(
+    form$,
+    {
+      dialog$: dialog$,
+    },
+    (form$) =>
       form$.post$.pipe(
         tap(() => form$.dialog$.next(false)),
         ignoreElements()

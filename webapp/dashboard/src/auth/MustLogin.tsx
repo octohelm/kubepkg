@@ -4,21 +4,53 @@ import { ReactNode, useRef } from "react";
 import { useObservableEffect } from "@innoai-tech/reactutil";
 import { tap } from "rxjs";
 import { stringifySearch } from "@innoai-tech/fetcher";
-import { CurrentUserProvider, Op, TokenProvider } from "./domain";
+import { CurrentUserProvider, Op, TokenProvider, User } from "./domain";
+import { createProvider } from "../layout";
+import { get, has, isFunction } from "@innoai-tech/lodash";
+import { create } from "@innoai-tech/form";
+
+export const createCanAccess =
+  (groupID?: string) => (operationID: string, user: User) => {
+    if (user.permissions) {
+      if (has(user.permissions || {}, operationID)) {
+        const exec = create(user.permissions[operationID]! as any)({
+          root: groupID
+            ? {
+                ...user,
+                groupRole: get(user.groupRoles, [groupID]),
+              }
+            : user,
+          schema: {},
+        });
+        return !!exec(0);
+      }
+      return true;
+    }
+    return false;
+  };
+
+export const AccessControlProvider = createProvider({
+  canAccess: createCanAccess(),
+});
 
 export const AccessControl = ({
   op,
   children,
 }: {
   op: Op;
-  children: ReactNode;
+  children: ReactNode | ((ok: boolean) => ReactNode);
 }) => {
   const user$ = CurrentUserProvider.use$();
+  const { canAccess } = AccessControlProvider.use();
+  const ok = canAccess(op.operationID, user$.value);
 
-  if (!user$.canAccess(op)) {
-    return null;
+  if (isFunction(children)) {
+    return <>{children(ok)}</>;
   }
 
+  if (!ok) {
+    return null;
+  }
   return <>{children}</>;
 };
 

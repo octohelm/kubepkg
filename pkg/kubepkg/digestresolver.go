@@ -5,6 +5,10 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/containerd/containerd/platforms"
 	"github.com/containerd/containerd/reference/docker"
 	"github.com/distribution/distribution/v3"
@@ -25,8 +29,59 @@ type DigestResolver struct {
 	distribution.Namespace
 }
 
+func (r *DigestResolver) collectImages(images map[string]string, pkg *v1alpha1.KubePkg) error {
+	manifests, err := manifest.ExtractComplete(pkg)
+	if err != nil {
+		return err
+	}
+
+	fromContainers := func(containers []corev1.Container) {
+		for _, c := range containers {
+			parts := strings.Split(c.Image, "@")
+			d := ""
+			if resolved, ok := images[parts[0]]; ok {
+				d = resolved
+			}
+			if len(parts) > 1 {
+				d = parts[1]
+			}
+			images[parts[0]] = d
+		}
+	}
+
+	for _, o := range manifests {
+		switch x := o.(type) {
+		case *v1alpha1.KubePkg:
+			if err := r.collectImages(images, x); err != nil {
+				return err
+			}
+		case *appsv1.Deployment:
+			fromContainers(x.Spec.Template.Spec.Containers)
+		case *appsv1.DaemonSet:
+			fromContainers(x.Spec.Template.Spec.Containers)
+		case *appsv1.StatefulSet:
+			fromContainers(x.Spec.Template.Spec.Containers)
+		}
+	}
+
+	return nil
+}
+
 func (r *DigestResolver) Resolve(ctx context.Context, pkg *v1alpha1.KubePkg) (*v1alpha1.KubePkg, error) {
 	p := pkg.DeepCopy()
+
+	if p.Status == nil {
+		p.Status = &v1alpha1.Status{}
+	}
+
+	images := p.Status.Images
+	if images == nil {
+		images = map[string]string{}
+	}
+	if err := r.collectImages(images, pkg); err != nil {
+		return nil, err
+	}
+	p.Status.Images = images
 
 	var neededPlatforms []string
 
@@ -36,13 +91,13 @@ func (r *DigestResolver) Resolve(ctx context.Context, pkg *v1alpha1.KubePkg) (*v
 		}
 	}
 
-	for name := range p.Spec.Images {
+	for name := range p.Status.Images {
 		imgCtx, err := parseImageCtx(name)
 		if err != nil {
 			return nil, err
 		}
 
-		if mayDigest := p.Spec.Images[name]; mayDigest != "" {
+		if mayDigest := p.Status.Images[name]; mayDigest != "" {
 			d, err := digest.Parse(mayDigest)
 			if err == nil {
 				imgCtx.digest = &d
@@ -56,12 +111,14 @@ func (r *DigestResolver) Resolve(ctx context.Context, pkg *v1alpha1.KubePkg) (*v
 			return nil, err
 		}
 
-		d, err := r.resolve(ctx, repo, imgCtx, &p.Status)
+		d, err := r.resolve(ctx, repo, imgCtx, p.Status)
 		if err != nil {
 			return nil, err
 		}
 
-		p.Spec.Images[name] = d.Digest.String()
+		if p.Status.Images != nil {
+			p.Status.Images[name] = d.Digest.String()
+		}
 	}
 
 	return p, nil
@@ -74,7 +131,7 @@ func AnnotationPlatforms(k *v1alpha1.KubePkg, platforms []string) {
 	k.Annotations[annotation.Platforms] = strings.Join(platforms, ",")
 }
 
-func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Repository, imgCtx *imageCtx, status *v1alpha1.KubePkgStatus) (distribution.Descriptor, error) {
+func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Repository, imgCtx *imageCtx, status *v1alpha1.Status) (distribution.Descriptor, error) {
 	if imgCtx.digest != nil {
 		ms, err := repo.Manifests(ctx)
 		if err != nil {

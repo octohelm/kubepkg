@@ -3,10 +3,11 @@ package controller
 import (
 	"context"
 
-	"github.com/innoai-tech/infra/pkg/otel"
-
 	"github.com/go-courier/logr"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg"
+
+	"github.com/octohelm/kubepkg/pkg/logutil"
+
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	"github.com/pkg/errors"
@@ -17,14 +18,8 @@ import (
 )
 
 type HostOptions struct {
-	// Cluster hostname or ip for internal access
-	InternalHost string `flag:",omitempty"`
-	// Cluster hostname or ip for external access
-	ExternalHost string `flag:",omitempty"`
-	// https enabled or not
-	EnableHttps bool `flag:",omitempty"`
-	// When enabled, all service http 80 will bind internal host
-	EnableAutoInternalHost bool `flag:",omitempty"`
+	// Cluster Ingress Gateway template
+	IngressGateway []string `flag:",omitempty"`
 }
 
 type Operator struct {
@@ -55,7 +50,7 @@ func (s *Operator) Serve(ctx context.Context) error {
 	utilruntime.Must(kubepkgv1alpha1.AddToScheme(scheme))
 
 	ctrlOpt := ctrl.Options{
-		Logger:             otel.GoLogrFromContext(ctx),
+		Logger:             logutil.GoLogrFromContext(ctx),
 		Scheme:             scheme,
 		LeaderElectionID:   "a2v1z20az.octohelm.tech",
 		LeaderElection:     s.EnableLeaderElection,

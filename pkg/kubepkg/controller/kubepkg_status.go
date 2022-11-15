@@ -3,6 +3,11 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
+
+	"github.com/octohelm/kubepkg/pkg/annotation"
+	corev1 "k8s.io/api/core/v1"
+
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
@@ -16,6 +21,7 @@ import (
 
 type KubePkgStatusReconciler struct {
 	ctrl.Manager
+	HostOptions HostOptions
 }
 
 func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -31,11 +37,9 @@ func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	for i := range gvks {
 		u := &unstructured.Unstructured{}
 		u.SetGroupVersionKind(gvks[i])
-
 		if !IsSupportedGroupKind(u) {
 			continue
 		}
-
 		c = c.Owns(u, builder.OnlyMetadata)
 	}
 
@@ -43,7 +47,7 @@ func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
-	l := r.GetLogger().WithName("KubePkgStatus").WithValues("request", request.NamespacedName)
+	l := r.GetLogger().WithValues("Reconcile", "Status", "request", request.NamespacedName)
 
 	kpkg := &kubepkgv1alpha1.KubePkg{}
 
@@ -60,6 +64,10 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 
 	statuses := map[string]any{}
 
+	if len(r.HostOptions.IngressGateway) > 0 {
+		kubeutil.Annotate(kpkg, annotation.IngressGateway, strings.Join(r.HostOptions.IngressGateway, ","))
+	}
+
 	manifests, err := manifest.ExtractComplete(kpkg)
 	if err != nil {
 		l.Error(err, "extra manifests failed")
@@ -68,6 +76,7 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 
 	for name := range manifests {
 		o := manifests[name]
+
 		// skip unsupported
 		if !IsSupportedGroupKind(o) {
 			statuses[name] = map[string]any{
@@ -88,7 +97,11 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 		}
 		return reconcile.Result{}, err
 	}
+	if kpkg.Status == nil {
+		kpkg.Status = &kubepkgv1alpha1.Status{}
+	}
 	kpkg.Status.Statuses = statuses
+
 	if err := cc.Status().Update(ctx, kpkg); err != nil {
 		l.Error(err, "update status err")
 		return reconcile.Result{}, nil
@@ -112,7 +125,13 @@ func (r *KubePkgStatusReconciler) syncManifestStatus(ctx context.Context, status
 		if status, ok := u.Object["status"]; ok {
 			statuses[name] = status
 		} else {
-			statuses[name] = map[string]any{}
+			status = map[string]any{}
+			if u.GetObjectKind().GroupVersionKind() == corev1.SchemeGroupVersion.WithKind("ConfigMap") && strings.HasPrefix(u.GetName(), "endpoint-") {
+				if data, ok := u.Object["data"]; ok {
+					status = data
+				}
+			}
+			statuses[name] = status
 		}
 	}
 

@@ -17,13 +17,13 @@ func runtimeDoc(v any, names ...string) ([]string, bool) {
 func (v ApplyKubePkg) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "KubepkgV1Alpha1KubePkg":
+		case "ApisKubepkgV1Alpha1KubePkg":
 			return []string{}, true
 		case "ReadCloser":
 			return []string{}, true
 
 		}
-		if doc, ok := runtimeDoc(v.KubepkgV1Alpha1KubePkg, names...); ok {
+		if doc, ok := runtimeDoc(v.ApisKubepkgV1Alpha1KubePkg, names...); ok {
 			return doc, ok
 		}
 		if doc, ok := runtimeDoc(v.ReadCloser, names...); ok {
@@ -78,9 +78,58 @@ func (v GetKubePkg) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v GithubComDistributionDistributionV3Descriptor) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Annotations":
+			return []string{}, true
+		case "Digest":
+			return []string{}, true
+		case "MediaType":
+			return []string{}, true
+		case "Platform":
+			return []string{}, true
+		case "Size":
+			return []string{}, true
+		case "Urls":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (GithubComOpencontainersGoDigestDigest) RuntimeDoc(names ...string) ([]string, bool) {
+	return []string{}, true
+}
+func (v GithubComOpencontainersImageSpecSpecsGoV1Platform) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Architecture":
+			return []string{}, true
+		case "Os":
+			return []string{}, true
+		case "OsFeatures":
+			return []string{}, true
+		case "OsVersion":
+			return []string{}, true
+		case "Variant":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v ListKubePkg) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
+		case "Namespace":
+			return []string{}, true
 
 		}
 

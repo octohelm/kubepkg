@@ -2,10 +2,11 @@ package controller
 
 import (
 	"context"
+	"strings"
+
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	appsv1 "k8s.io/api/apps/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"strings"
 )
 
 func Apply(ctx context.Context, cc client.Client, o client.Object) error {

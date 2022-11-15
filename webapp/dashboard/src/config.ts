@@ -5,7 +5,7 @@ const APP_CONFIG = {
     openapi: "/api/kubepkg-dashboard",
   })(({ env }: AppContext) => {
     if (env === "local") {
-      return "http://0.0.0.0:80";
+      return "http://0.0.0.0:8081";
     }
     return "";
   }),

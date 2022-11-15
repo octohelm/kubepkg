@@ -9,13 +9,15 @@ var FieldOwner = client.FieldOwner("kubepkg")
 
 func SetupWithManager(mgr ctrl.Manager, hostOptions HostOptions) error {
 	reconcilers := []Reconciler{
-		&ServiceReconciler{
+		&KubePkgApplyReconciler{
 			HostOptions: hostOptions,
 		},
-		&KubePkgApplyReconciler{},
-		&KubePkgStatusReconciler{},
+		&KubePkgStatusReconciler{
+			HostOptions: hostOptions,
+		},
 		&ConfigMapReloadReconciler{},
 		&SecretReloadReconciler{},
+		&ClusterInfoReconciler{},
 	}
 	for i := range reconcilers {
 		if err := reconcilers[i].SetupWithManager(mgr); err != nil {

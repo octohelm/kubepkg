@@ -30,7 +30,7 @@ func TestGroupEnvRepository(t *testing.T) {
 		Name: "test",
 	})
 
-	t.Run("When put group", func(t *testing.T) {
+	t.Run("When put env", func(t *testing.T) {
 		created, err := repo.Put(ctx, "test", group.EnvInfo{
 			EnvType: group.ENV_TYPE__DEV,
 			Desc:    "test",
@@ -38,10 +38,15 @@ func TestGroupEnvRepository(t *testing.T) {
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 		testingutil.Expect(t, created.EnvID > 0, testingutil.Be(true))
 
+		created, err = repo.BindCluster(ctx, "test", 1)
+		testingutil.Expect(t, err, testingutil.Be[error](nil))
+		testingutil.Expect(t, created.EnvID > 0, testingutil.Be(true))
+
 		t.Run("Should get by name", func(t *testing.T) {
 			found, err := repo.Get(ctx, "test")
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
 			testingutil.Expect(t, found.EnvID, testingutil.Be(created.EnvID))
+			testingutil.Expect(t, found.ClusterID, testingutil.Be(created.ClusterID))
 		})
 
 		t.Run("Should list by name prefix", func(t *testing.T) {

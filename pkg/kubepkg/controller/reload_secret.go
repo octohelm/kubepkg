@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+
 	"github.com/octohelm/kubepkg/pkg/annotation"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
@@ -65,7 +66,6 @@ func (r *SecretReloadReconciler) Reconcile(ctx context.Context, request reconcil
 	err := RangeWorkload(ctx, r.GetClient(), request.Namespace, func(o client.Object) error {
 		if IsReloadMatch(o, annotation.ReloadSecret, request.Name) {
 			AnnotateHash(o, hashKey, hash)
-
 			if err := r.GetClient().Patch(ctx, o, client.Merge); err != nil {
 				return err
 			}

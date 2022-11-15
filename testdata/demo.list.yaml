@@ -1,0 +1,47 @@
+apiVersion: octohelm.tech/v1alpha1
+kind: KubePkgList
+items:
+  - apiVersion: octohelm.tech/v1alpha1
+    kind: KubePkg
+    metadata:
+      name: demo
+      namespace: default
+      annotations:
+        "ingress.octohelm.tech/gateway": "public+https://{{ .Name }}---{{ .Namespace }}.public,internal+https://{{ .Name }}---{{ .Namespace }}.internal?always=true"
+    spec:
+      version: 0.0.2
+
+      config:
+        X: "x"
+
+      deploy:
+        kind: "Deployment"
+        spec:
+          replicas: 1
+
+      containers:
+        web:
+          image:
+            name: docker.io/library/nginx
+            tag: alpine
+            pullPolicy: IfNotPresent
+            platforms:
+              - linux/amd64
+              - linux/arm64
+          ports:
+            http: 80
+
+      services:
+        "#":
+          ports:
+            http: 80
+          paths:
+            http: "/"
+
+      volumes:
+        html:
+          mountPath: /usr/share/nginx/html
+          type: ConfigMap
+          spec:
+            data:
+              index.html: "<div>hello</div>"

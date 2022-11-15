@@ -8,7 +8,7 @@ import {
   MenuList,
   MenuItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
 import { filter, map, tap, debounceTime } from "rxjs/operators";
 import { Search as Icon, Add } from "@mui/icons-material";
@@ -24,7 +24,7 @@ const Search = styled("label")(({ theme }) => ({
   width: "100%",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
 }));
 
 const SearchIcon = styled("div")(({ theme }) => ({
@@ -33,22 +33,22 @@ const SearchIcon = styled("div")(({ theme }) => ({
   width: "3em",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     transition: theme.transitions.create("width"),
-    width: "100%"
+    width: "100%",
   },
   color: "inherit",
-  flex: 1
+  flex: 1,
 }));
 
 export const useAccountAutocomplete = ({
-                                         placeholder
-                                       }: {
+  placeholder,
+}: {
   placeholder?: string;
 }) => {
   const selected$ = useStateSubject("");
@@ -115,7 +115,7 @@ export const useAccountAutocomplete = ({
                   anchorEl={anchorElRef.current}
                   anchorOrigin={{
                     vertical: "bottom",
-                    horizontal: "left"
+                    horizontal: "left",
                   }}
                   onClose={() => {
                     popper$.next(false);
@@ -125,8 +125,7 @@ export const useAccountAutocomplete = ({
                 >
                   <MenuList
                     style={{
-                      width:
-                      anchorElRef.current?.getBoundingClientRect().width
+                      width: anchorElRef.current?.getBoundingClientRect().width,
                     }}
                   >
                     <Subscribe value$={options$}>
@@ -161,6 +160,6 @@ export const useAccountAutocomplete = ({
           </Subscribe>
         </Search>
       );
-    }
+    },
   });
 };

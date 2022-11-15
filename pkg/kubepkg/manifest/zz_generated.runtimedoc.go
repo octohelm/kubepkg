@@ -14,14 +14,17 @@ func runtimeDoc(v any, names ...string) ([]string, bool) {
 	return nil, false
 }
 
-func (v CompleteOption) RuntimeDoc(names ...string) ([]string, bool) {
+func (v GatewayTemplate) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "AutoIngress":
-			return []string{
-				"AutoIngress",
-				"base host or path mod",
-			}, true
+		case "Name":
+			return []string{}, true
+		case "Host":
+			return []string{}, true
+		case "Https":
+			return []string{}, true
+		case "AlwaysEnabled":
+			return []string{}, true
 
 		}
 

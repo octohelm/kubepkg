@@ -33,8 +33,9 @@ func TestKubePkg(t *testing.T) {
 	p := NewPacker(cr)
 	r := NewRegistry(lcr, c.MustStorage())
 
-	kpkg, _ := Load(filepath.Join(projectRoot, "testdata/demo.yaml"))
+	kpkgs, _ := Load(filepath.Join(projectRoot, "testdata/demo.yaml"))
 	kubeTgz := filepath.Join(projectRoot, ".tmp/demo.kube.tgz")
+	kpkg := kpkgs[0]
 
 	t.Run("When packing", func(t *testing.T) {
 		ctx := context.Background()
@@ -47,7 +48,7 @@ func TestKubePkg(t *testing.T) {
 				f, _ := ioutil.CreateOrOpen(kubeTgz)
 				defer f.Close()
 
-				dgst, e := p.KubeTgzTo(ctx, resolved, f)
+				dgst, e := p.KubeTgzTo(ctx, f, resolved)
 				if e != nil {
 					fmt.Printf("%+v", e)
 				}
@@ -63,10 +64,12 @@ func TestKubePkg(t *testing.T) {
 		f, _ := os.Open(kubeTgz)
 		defer f.Close()
 
-		kpkg, err := r.ImportFromKubeTgzReader(ctx, f)
+		kpkgs, err := r.ImportFromKubeTgzReader(ctx, f)
 		Expect(t, err, Be[error](nil))
 
 		t.Run("Should find digests in registry storage", func(t *testing.T) {
+			kpkg := kpkgs[0]
+
 			for i := range kpkg.Status.Digests {
 				dm := kpkg.Status.Digests[i]
 				d, _ := digest.Parse(dm.Digest)

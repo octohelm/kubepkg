@@ -3,8 +3,11 @@ import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import type { ReactNode } from "react";
 import { useParams, Link } from "react-router-dom";
 import { stringAvatar } from "../layout";
-import { GroupProvider } from "./domain/Group";
-import { GroupEnvsProvider } from "./domain/GroupEnv";
+import {
+  GroupProvider,
+  GroupEnvsProvider,
+  GroupAccessControlProvider,
+} from "./domain";
 
 export const GroupTitle = () => {
   const group$ = GroupProvider.use$();
@@ -36,7 +39,9 @@ export const GlobalGroupProvider = ({
 
   return (
     <GroupProvider groupName={groupName || params["group"] || ""}>
-      <GroupEnvsProvider>{children}</GroupEnvsProvider>
+      <GroupAccessControlProvider>
+        <GroupEnvsProvider>{children}</GroupEnvsProvider>
+      </GroupAccessControlProvider>
     </GroupProvider>
   );
 };

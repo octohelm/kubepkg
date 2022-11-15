@@ -3,6 +3,10 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
+
+	"github.com/pkg/errors"
+
 	"github.com/octohelm/kubepkg/pkg/annotation"
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
@@ -22,6 +26,7 @@ import (
 
 type KubePkgApplyReconciler struct {
 	ctrl.Manager
+	HostOptions HostOptions
 }
 
 func (r *KubePkgApplyReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -57,24 +62,50 @@ func (r *KubePkgApplyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return c.Complete(r)
 }
 
-func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
-	l := r.GetLogger().WithName("KubePkgApply").WithValues("request", request.NamespacedName)
+func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcile.Request) (ret reconcile.Result, err error) {
+	l := r.GetLogger().WithValues("Reconcile", "Apply", "request", request.NamespacedName)
 
 	kpkg := &kubepkgv1alpha1.KubePkg{}
 
-	if err := r.GetClient().Get(ctx, request.NamespacedName, kpkg); err != nil {
+	cc := r.GetClient()
+
+	if err := cc.Get(ctx, request.NamespacedName, kpkg); err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
 		return reconcile.Result{}, err
 	}
 
-	l.Info(fmt.Sprintf("%s.%s", kpkg.GetName(), kpkg.GetNamespace()))
+	l.Info(fmt.Sprintf("Applying %s.%s", kpkg.GetName(), kpkg.GetNamespace()))
+
+	if len(r.HostOptions.IngressGateway) > 0 {
+		kubeutil.Annotate(kpkg, annotation.IngressGateway, strings.Join(r.HostOptions.IngressGateway, ","))
+	}
+
+	defer func() {
+		if err != nil {
+			kpkg.Status = &kubepkgv1alpha1.Status{
+				Resources: []map[string]any{
+					{
+						"apiVersion": kpkg.APIVersion,
+						"kind":       kpkg.Kind,
+						"status": map[string]any{
+							"reason":  "InvalidSpec",
+							"message": err.Error(),
+						},
+					},
+				},
+			}
+
+			if err := cc.Status().Update(ctx, kpkg); err != nil {
+				l.Error(err, "update status err")
+			}
+		}
+	}()
 
 	manifests, err := manifest.ExtractComplete(kpkg)
 	if err != nil {
-		l.Error(err, "extra manifests failed")
-		return reconcile.Result{}, nil
+		return reconcile.Result{}, errors.Wrapf(err, "extra manifests failed")
 	}
 
 	for name := range manifests {
@@ -87,11 +118,11 @@ func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcil
 		}
 
 		if err := r.patchExternalConfigMapOrSecretIfNeed(ctx, kpkg, o); err != nil {
-			l.Error(err, fmt.Sprintf("%s `%s`: patch external configMaps failed", o.GetObjectKind().GroupVersionKind(), o.GetName()))
+			return reconcile.Result{}, errors.Wrapf(err, "%s `%s`: patch external configMaps failed", o.GetObjectKind().GroupVersionKind(), o.GetName())
 		}
 
 		if err := r.applyManifest(ctx, kpkg, o); err != nil {
-			l.Error(err, fmt.Sprintf("%s `%s`: apply sub-manifest failed", o.GetObjectKind().GroupVersionKind(), o.GetName()))
+			return reconcile.Result{}, errors.Wrapf(err, "%s `%s`: apply sub-manifest failed", o.GetObjectKind().GroupVersionKind(), o.GetName())
 		}
 	}
 
@@ -111,7 +142,7 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 
 		for i := range cms.Items {
 			cm := cms.Items[i]
-			kubeutil.Annotate(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
+			AnnotateHash(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
 		}
 	}
 
@@ -127,7 +158,7 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 
 		for i := range ss.Items {
 			s := ss.Items[i]
-			kubeutil.Annotate(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
+			AnnotateHash(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
 		}
 	}
 

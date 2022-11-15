@@ -21,35 +21,35 @@ func AgentInfo(ctx context.Context) (*agent.AgentInfo, error) {
 	stat := &StatBlob{
 		Digest: "",
 	}
-	meta, _ := stat.Invoke(ctx)
+	_, meta, _ := stat.Invoke(ctx)
 	return agent.FromKubeAgentHead(meta.Get(agent.HEADER_KUBEPKG_AGENT))
 }
 
-func ImportKubePkg(ctx context.Context, kubePkg *v1alpha1.KubePkg) (*v1alpha1.KubePkg, error) {
-	apply := &ApplyKubePkg{
-		KubepkgV1Alpha1KubePkg: kubePkg,
+func ImportKubePkg(ctx context.Context, kubePkgs ...*v1alpha1.KubePkg) error {
+	for i := range kubePkgs {
+		kubePkg := kubePkgs[i]
+		if _, err := (&ApplyKubePkg{ApisKubepkgV1Alpha1KubePkg: kubePkg}).Invoke(ctx); err != nil {
+			return err
+		}
 	}
-	k, _, err := apply.Invoke(ctx)
-	return k, err
+	return nil
 }
 
-func ImportKubePkgTgz(ctx context.Context, tgz io.ReadCloser, incremental bool, skipBlobs bool) (*v1alpha1.KubePkg, error) {
+func ImportKubePkgTgz(ctx context.Context, tgz io.ReadCloser, incremental bool, skipBlobs bool) error {
 	if !incremental {
-		apply := &ApplyKubePkg{
-			ReadCloser: courierhttp.WrapReadCloser(tgz),
-		}
-		k, _, err := apply.Invoke(ctx)
-		return k, err
+		apply := &ApplyKubePkg{ReadCloser: courierhttp.WrapReadCloser(tgz)}
+		_, err := apply.Invoke(ctx)
+		return err
 	}
 
 	ai, err := AgentInfo(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer tgz.Close()
 
-	kpkg, err := kubepkg.KubeTgzRange(ctx, tgz, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
+	kpkgs, err := kubepkg.KubeTgzRange(ctx, tgz, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
 		if skipBlobs {
 			return nil
 		}
@@ -62,7 +62,7 @@ func ImportKubePkgTgz(ctx context.Context, tgz io.ReadCloser, incremental bool, 
 		}
 
 		exists := true
-		if _, err := stat.Invoke(ctx); err != nil {
+		if _, _, err := stat.Invoke(ctx); err != nil {
 			if statuserror.FromErr(err).StatusCode() != http.StatusNotFound {
 				return errors.Wrapf(err, "import %s failed", dm)
 			}
@@ -87,10 +87,10 @@ func ImportKubePkgTgz(ctx context.Context, tgz io.ReadCloser, incremental bool, 
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return ImportKubePkg(ctx, kpkg)
+	return ImportKubePkg(ctx, kpkgs...)
 }
 
 func sliceContains[T comparable](list []T, target T) bool {

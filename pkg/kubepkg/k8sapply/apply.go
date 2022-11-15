@@ -43,28 +43,36 @@ func (c *Apply) InjectContext(ctx context.Context) context.Context {
 }
 
 func (c *Apply) Run(ctx context.Context) error {
-	kpkg, err := kubepkg.Load(c.KubepkgJSON)
+	kpkgs, err := kubepkg.Load(c.KubepkgJSON)
 	if err != nil {
 		return err
 	}
 
-	if c.CreateNamespace {
-		if _, err := kubeutil.ApplyNamespace(ctx, kubeutil.KubeConfigFromClient(c.c), kpkg.Namespace); err != nil {
+	for i := range kpkgs {
+		kpkg := kpkgs[i]
+
+		if c.CreateNamespace {
+			if _, err := kubeutil.ApplyNamespace(ctx, kubeutil.KubeConfigFromClient(c.c), kpkg.Namespace); err != nil {
+				return err
+			}
+		}
+
+		options := make([]client.PatchOption, 0)
+
+		if c.DryRun {
+			options = append(options, client.DryRunAll)
+		}
+
+		if c.Force {
+			options = append(options, client.ForceOwnership)
+		}
+
+		if err := applyKubePkg(ctx, kpkg, options...); err != nil {
 			return err
 		}
 	}
 
-	options := make([]client.PatchOption, 0)
-
-	if c.DryRun {
-		options = append(options, client.DryRunAll)
-	}
-
-	if c.Force {
-		options = append(options, client.ForceOwnership)
-	}
-
-	return applyKubePkg(ctx, kpkg, options...)
+	return nil
 }
 
 func applyKubePkg(ctx context.Context, kpkg *kubepkgv1alpha1.KubePkg, patchOptions ...client.PatchOption) error {

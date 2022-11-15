@@ -6,10 +6,21 @@ package group
 
 import (
 	github_com_octohelm_courier_pkg_courier "github.com/octohelm/courier/pkg/courier"
+	github_com_octohelm_courier_pkg_statuserror "github.com/octohelm/courier/pkg/statuserror"
 	github_com_octohelm_kubepkg_internal_dashboard_domain_account "github.com/octohelm/kubepkg/internal/dashboard/domain/account"
+	github_com_octohelm_kubepkg_internal_dashboard_domain_cluster "github.com/octohelm/kubepkg/internal/dashboard/domain/cluster"
 	github_com_octohelm_kubepkg_internal_dashboard_domain_group "github.com/octohelm/kubepkg/internal/dashboard/domain/group"
+	github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	github_com_octohelm_kubepkg_pkg_auth "github.com/octohelm/kubepkg/pkg/auth"
 )
+
+func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&BindGroupEnvCluster{}))
+}
+
+func (*BindGroupEnvCluster) ResponseContent() any {
+	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.Env{}
+}
 
 func init() {
 	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&CreateGroupRobot{}))
@@ -36,6 +47,42 @@ func (*GetGroup) ResponseContent() any {
 }
 
 func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&GetGroupEnvClusterDeployments{}))
+}
+
+func (*GetGroupEnvClusterDeployments) ResponseContent() any {
+	return &[]github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+}
+
+func (*GetGroupEnvClusterDeployments) ResponseErrors() []error {
+	return []error{
+		&(github_com_octohelm_courier_pkg_statuserror.StatusErr{
+			Code: 403,
+			Key:  "NoClusterBind",
+			Msg:  "NoClusterBind",
+		}),
+	}
+}
+
+func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&GetGroupEnvClusterStatus{}))
+}
+
+func (*GetGroupEnvClusterStatus) ResponseContent() any {
+	return &github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.InstanceStatus{}
+}
+
+func (*GetGroupEnvClusterStatus) ResponseErrors() []error {
+	return []error{
+		&(github_com_octohelm_courier_pkg_statuserror.StatusErr{
+			Code: 403,
+			Key:  "NoClusterBind",
+			Msg:  "NoClusterBind",
+		}),
+	}
+}
+
+func init() {
 	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&ListGroup{}))
 }
 
@@ -57,6 +104,14 @@ func init() {
 
 func (*ListGroupEnv) ResponseContent() any {
 	return &[]github_com_octohelm_kubepkg_internal_dashboard_domain_group.Env{}
+}
+
+func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&ListGroupEnvDeployment{}))
+}
+
+func (*ListGroupEnvDeployment) ResponseContent() any {
+	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.DeploymentDataList{}
 }
 
 func init() {
@@ -92,9 +147,25 @@ func (*PutGroupEnv) ResponseContent() any {
 }
 
 func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&PutGroupEnvDeployment{}))
+}
+
+func (*PutGroupEnvDeployment) ResponseContent() any {
+	return &github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+}
+
+func init() {
 	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&RefreshGroupRobotToken{}))
 }
 
 func (*RefreshGroupRobotToken) ResponseContent() any {
 	return &github_com_octohelm_kubepkg_pkg_auth.Token{}
+}
+
+func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&UnbindGroupEnvCluster{}))
+}
+
+func (*UnbindGroupEnvCluster) ResponseContent() any {
+	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.Env{}
 }

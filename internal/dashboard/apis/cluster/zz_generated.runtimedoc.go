@@ -14,6 +14,19 @@ func runtimeDoc(v any, names ...string) ([]string, bool) {
 	return nil, false
 }
 
+func (v GetClusterStatus) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Name":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v ListCluster) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {

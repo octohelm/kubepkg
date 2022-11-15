@@ -2,7 +2,7 @@ import {
   ClusterEnvType,
   ClusterInfo,
   ClusterNetType,
-  putCluster
+  putCluster,
 } from "../client/dashboard";
 import { tap, map as rxMap, ignoreElements } from "rxjs/operators";
 import { useForm, fromErrorFields, useProxy, useDialogForm } from "../layout";
@@ -16,7 +16,7 @@ import {
   get,
   pipe,
   objectOf,
-  oneOfEnum
+  oneOfEnum,
 } from "@innoai-tech/form";
 
 const useClusterForm = (initials?: Partial<ClusterInfo & { name: string }>) => {
@@ -39,20 +39,22 @@ const useClusterForm = (initials?: Partial<ClusterInfo & { name: string }>) => {
         .label("集群访问地址")
         .need(
           when(pipe(get("netType"), eq(ClusterNetType.DIRECT)), required())
-        )
+        ),
     })
   );
 
-  return useProxy(form$, {
+  return useProxy(
+    form$,
+    {
       post$: putCluster$,
-      operationID: putCluster$.operationID
+      operationID: putCluster$.operationID,
     },
     (form$) =>
       form$.pipe(
         tap(({ name, ...others }) =>
           form$.post$.next({
             name,
-            body: others
+            body: others,
           })
         )
       ),
@@ -74,8 +76,10 @@ export const useClusterFormWithDialog = (
 
   const dialog$ = useDialogForm(form$, { action, title });
 
-  return useProxy(form$, {
-      dialog$: dialog$
+  return useProxy(
+    form$,
+    {
+      dialog$: dialog$,
     },
     (form$) =>
       form$.post$.pipe(

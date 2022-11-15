@@ -2,6 +2,7 @@ package group
 
 import (
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/kubepkg"
+	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/datatypes"
 )
 
@@ -15,13 +16,12 @@ type Deployment struct {
 	GroupEnvID EnvID `db:"f_group_env_id" json:"groupEnvID"`
 
 	DeploymentID DeploymentID `db:"f_deployment_id" json:"-"`
-
 	// DeploymentName default is EnvName of Kubepkg
 	DeploymentName string `db:"f_deployment_name" json:"deploymentName"`
 
-	KubepkgRel
-
 	datatypes.CreationUpdationTime
+
+	KubepkgRel
 }
 
 type KubepkgRel struct {
@@ -42,4 +42,13 @@ func (id DeploymentID) MarshalText() (text []byte, err error) {
 
 func (id DeploymentID) String() string {
 	return datatypes.SFID(id).String()
+}
+
+type DeploymentWithKubePkg struct {
+	Deployment
+}
+
+type DeploymentDataList struct {
+	Data  []*v1alpha1.KubePkg `json:"data"`
+	Total int                 `json:"total,omitempty"`
 }

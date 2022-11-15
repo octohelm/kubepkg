@@ -9,7 +9,7 @@ import (
 	"github.com/octohelm/storage/pkg/sqlbuilder"
 )
 
-const AdminGroupID = 10000
+const AdminGroupID group.ID = 10000
 
 func AdminGroup() *group.Group {
 	return &group.Group{
@@ -88,4 +88,11 @@ func (GroupRepository) List(ctx context.Context, where sqlbuilder.SqlExpr) ([]*g
 	}
 
 	return list, nil
+}
+
+func (GroupRepository) RangeGroupAccount(ctx context.Context, where sqlbuilder.SqlExpr, each func(ga *group.Account) error) error {
+	return dal.From(group.AccountT).
+		Where(where).
+		Scan(dal.Recv(each)).
+		Find(ctx)
 }

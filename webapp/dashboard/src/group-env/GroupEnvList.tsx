@@ -25,7 +25,7 @@ import {
   ListItemLink,
 } from "../layout";
 import { tap } from "rxjs/operators";
-import { GroupEnvsProvider, GroupProvider } from "../group/domain";
+import { GroupEnvsProvider, GroupProvider } from "../group";
 import type { GroupEnv } from "../client/dashboard";
 import { Link } from "react-router-dom";
 import { AccessControl } from "../auth";

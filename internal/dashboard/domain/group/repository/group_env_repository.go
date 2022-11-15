@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/octohelm/kubepkg/internal/dashboard/domain/cluster"
+
 	"github.com/octohelm/kubepkg/pkg/vault"
 
 	"github.com/octohelm/kubepkg/pkg/idgen"
@@ -40,6 +42,34 @@ func (r *GroupEnvRepository) Get(ctx context.Context, envName string) (*group.En
 	return env, nil
 }
 
+func (r *GroupEnvRepository) BindCluster(ctx context.Context, envName string, clusterID cluster.ID) (*group.Env, error) {
+	env := &group.Env{}
+
+	if err := dal.Prepare(env).
+		ForUpdateSet(
+			group.EnvT.ClusterID.By(sqlbuilder.Value(clusterID)),
+		).
+		Where(sqlbuilder.And(
+			group.EnvT.GroupID.V(sqlbuilder.Eq(r.Group.ID)),
+			group.EnvT.EnvName.V(sqlbuilder.Eq(envName)),
+		)).
+		Returning(
+			group.EnvT.EnvID,
+			group.EnvT.EnvName,
+			group.EnvT.EnvType,
+			group.EnvT.ClusterID,
+			group.EnvT.Namespace,
+			group.EnvT.CreatedAt,
+			group.EnvT.UpdatedAt,
+		).
+		Scan(env).
+		Save(ctx); err != nil {
+		return nil, err
+	}
+
+	return env, nil
+}
+
 func (r *GroupEnvRepository) Put(ctx context.Context, envName string, info group.EnvInfo) (*group.Env, error) {
 	env := &group.Env{}
 
@@ -56,7 +86,7 @@ func (r *GroupEnvRepository) Put(ctx context.Context, envName string, info group
 
 	env.RandPassword = s.Password
 
-	if err := dal.Prepare(env).
+	err = dal.Prepare(env).
 		OnConflict(group.EnvT.I.IEnvName).
 		DoUpdateSet(
 			group.EnvT.Desc,
@@ -69,7 +99,9 @@ func (r *GroupEnvRepository) Put(ctx context.Context, envName string, info group
 			group.EnvT.CreatedAt,
 			group.EnvT.UpdatedAt,
 		).
-		Scan(env).Save(ctx); err != nil {
+		Scan(env).
+		Save(ctx)
+	if err != nil {
 		return nil, err
 	}
 

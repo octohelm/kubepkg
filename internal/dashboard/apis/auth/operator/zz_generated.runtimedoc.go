@@ -23,6 +23,8 @@ func (v Account) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "AdminRole":
 			return []string{}, true
+		case "GroupRoles":
+			return []string{}, true
 
 		}
 		if doc, ok := runtimeDoc(v.User, names...); ok {

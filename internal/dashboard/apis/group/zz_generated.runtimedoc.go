@@ -14,6 +14,19 @@ func runtimeDoc(v any, names ...string) ([]string, bool) {
 	return nil, false
 }
 
+func (v BindGroupEnvCluster) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "ClusterID":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v CreateGroupRobot) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -56,6 +69,28 @@ func (v GetGroup) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v GetGroupEnvClusterDeployments) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v GetGroupEnvClusterStatus) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v ListGroup) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -87,6 +122,22 @@ func (v ListGroupEnv) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v ListGroupEnvDeployment) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Pager":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.Pager, names...); ok {
+			return doc, ok
 		}
 
 		return nil, false
@@ -158,6 +209,19 @@ func (v PutGroupEnv) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v PutGroupEnvDeployment) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "KubePkg":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v RefreshGroupRobotToken) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -189,6 +253,19 @@ func (v RefreshGroupRobotTokenData) RuntimeDoc(names ...string) ([]string, bool)
 		}
 		if doc, ok := runtimeDoc(v.RoleInfo, names...); ok {
 			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v UnbindGroupEnvCluster) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "ClusterID":
+			return []string{}, true
+
 		}
 
 		return nil, false

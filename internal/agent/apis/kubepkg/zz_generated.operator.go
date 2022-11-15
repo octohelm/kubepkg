@@ -15,7 +15,7 @@ func init() {
 }
 
 func (*ApplyKubePkg) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+	return nil
 }
 
 func (*ApplyKubePkg) ResponseErrors() []error {

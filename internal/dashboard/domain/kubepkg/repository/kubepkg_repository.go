@@ -24,22 +24,31 @@ type KubepkgRepository struct {
 
 func (KubepkgRepository) Add(ctx context.Context, k *v1alpha1.KubePkg) (*v1alpha1.KubePkg, *kubepkg.Ref, error) {
 	kpkg := &kubepkg.Kubepkg{}
-	kpkg.Name = k.Name
 	kpkg.Group = k.Namespace
+	kpkg.Name = k.Name
 
 	revision := &kubepkg.Revision{}
-
 	version := &kubepkg.Version{}
 	version.Channel = kubepkg.CHANNEL__DEV
 	version.Version = k.Spec.Version
 
-	data, err := json.Marshal(k.Spec.Manifests)
+	ref := &kubepkg.Ref{}
+
+	if config := k.Spec.Config; config != nil {
+		ref.DefaultSettings = map[string]string{}
+		for k := range config {
+			vv, _ := config[k].MarshalText()
+			ref.DefaultSettings[k] = string(vv)
+		}
+		k.Spec.Config = nil
+	}
+
+	data, err := json.Marshal(k.Spec)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// FIXME added config schema
-	revision.Manifests = data
+	revision.Spec = data
 	revision.Digest = digest.FromBytes(data).String()
 
 	id, err := idgen.FromContextAndCast[kubepkg.ID](ctx).ID()
@@ -62,7 +71,7 @@ func (KubepkgRepository) Add(ctx context.Context, k *v1alpha1.KubePkg) (*v1alpha
 			Scan(kpkg).
 			Save(ctx)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		// bind to kubepkg
@@ -76,8 +85,9 @@ func (KubepkgRepository) Add(ctx context.Context, k *v1alpha1.KubePkg) (*v1alpha
 			).
 			Scan(revision).
 			Save(ctx)
+
 		if err != nil {
-			return nil
+			return err
 		}
 
 		version.RevisionID = revision.ID
@@ -98,13 +108,14 @@ func (KubepkgRepository) Add(ctx context.Context, k *v1alpha1.KubePkg) (*v1alpha
 	if k.Annotations == nil {
 		k.Annotations = map[string]string{}
 	}
+
 	k.Annotations["kubepkg.innoai.tech/revision"] = revision.ID.String()
 	k.Spec.Version = version.Version
 
-	return k, &kubepkg.Ref{
-		KubepkgID:         kpkg.ID,
-		KubepkgRevisionID: revision.ID,
-	}, nil
+	ref.KubepkgID = kpkg.ID
+	ref.KubepkgRevisionID = revision.ID
+
+	return k, ref, nil
 }
 
 func (KubepkgRepository) Delete(ctx context.Context, group string, name string) error {
@@ -139,7 +150,7 @@ func (KubepkgRepository) ListVersion(ctx context.Context, group string, name str
 		k.Annotations["kubepkg.innoai.tech/revision"] = kk.Revision.ID.String()
 		k.Spec.Version = kk.Version.Version + "+" + strings.ToLower(kk.Version.Channel.String())
 
-		if err := json.Unmarshal(kk.Revision.Manifests, &k.Spec.Manifests); err != nil {
+		if err := json.Unmarshal(kk.Revision.Spec, &k.Spec); err != nil {
 			return nil, err
 		}
 		return k, nil

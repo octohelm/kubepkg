@@ -3,7 +3,7 @@ import { parseSearch } from "@innoai-tech/fetcher";
 import { useObservableEffect } from "@innoai-tech/reactutil";
 import { useEffect } from "react";
 import { merge } from "rxjs";
-import { tap } from "rxjs/operators";
+import { tap } from "rxjs";
 import { TokenProvider } from "./domain";
 
 export const AuthorizeCallback = ({ name }: { name?: string }) => {

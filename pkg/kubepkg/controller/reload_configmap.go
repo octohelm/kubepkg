@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+
 	"github.com/octohelm/kubepkg/pkg/annotation"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
@@ -48,6 +49,10 @@ func (r *ConfigMapReloadReconciler) Reconcile(ctx context.Context, request recon
 		return reconcile.Result{}, err
 	}
 
+	if label := kubeutil.GetLabel(cm, annotation.LabelAppName); label == "" {
+		return reconcile.Result{}, nil
+	}
+
 	hashKey := annotation.ConfigMapHashKey(cm.Name)
 	hash := manifest.StringDataHash(cm.Data)
 	prevHash := kubeutil.GetAnnotate(cm, hashKey)
@@ -55,7 +60,7 @@ func (r *ConfigMapReloadReconciler) Reconcile(ctx context.Context, request recon
 		return reconcile.Result{}, nil
 	}
 
-	kubeutil.Label(cm, annotation.AppName, cm.Name)
+	kubeutil.Label(cm, annotation.LabelAppName, cm.Name)
 	kubeutil.Annotate(cm, annotation.ReloadHash, hash)
 
 	if err := r.GetClient().Patch(ctx, cm, client.Merge); err != nil {
@@ -65,7 +70,6 @@ func (r *ConfigMapReloadReconciler) Reconcile(ctx context.Context, request recon
 	err := RangeWorkload(ctx, r.GetClient(), request.Namespace, func(o client.Object) error {
 		if IsReloadMatch(o, annotation.ReloadConfigMap, request.Name) {
 			AnnotateHash(o, hashKey, hash)
-
 			if err := r.GetClient().Patch(ctx, o, client.Merge); err != nil {
 				return err
 			}

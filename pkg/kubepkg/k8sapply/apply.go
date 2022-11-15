@@ -13,14 +13,15 @@ import (
 )
 
 type Apply struct {
+	// KubePkg or KubePkgList json file
 	KubepkgJSON string `arg:""`
 	// Paths to a kubeconfig. Only required if out-of-cluster."
 	Kubeconfig string `flag:",omitempty"`
 	// Enable dry run
 	DryRun bool `flag:",omitempty"`
-	// Force overwrites ownership
+	// overwrites ownership
 	Force bool `flag:",omitempty" `
-	// BindKubepkg namespace if not exists
+	// Create namespace if not exists
 	CreateNamespace bool `flag:",omitempty" `
 
 	c client.Client
@@ -43,28 +44,36 @@ func (c *Apply) InjectContext(ctx context.Context) context.Context {
 }
 
 func (c *Apply) Run(ctx context.Context) error {
-	kpkg, err := kubepkg.Load(c.KubepkgJSON)
+	kpkgs, err := kubepkg.Load(c.KubepkgJSON)
 	if err != nil {
 		return err
 	}
 
-	if c.CreateNamespace {
-		if _, err := kubeutil.ApplyNamespace(ctx, kubeutil.KubeConfigFromClient(c.c), kpkg.Namespace); err != nil {
+	for i := range kpkgs {
+		kpkg := kpkgs[i]
+
+		if c.CreateNamespace {
+			if _, err := kubeutil.ApplyNamespace(ctx, kubeutil.KubeConfigFromClient(c.c), kpkg.Namespace); err != nil {
+				return err
+			}
+		}
+
+		options := make([]client.PatchOption, 0)
+
+		if c.DryRun {
+			options = append(options, client.DryRunAll)
+		}
+
+		if c.Force {
+			options = append(options, client.ForceOwnership)
+		}
+
+		if err := applyKubePkg(ctx, kpkg, options...); err != nil {
 			return err
 		}
 	}
 
-	options := make([]client.PatchOption, 0)
-
-	if c.DryRun {
-		options = append(options, client.DryRunAll)
-	}
-
-	if c.Force {
-		options = append(options, client.ForceOwnership)
-	}
-
-	return applyKubePkg(ctx, kpkg, options...)
+	return nil
 }
 
 func applyKubePkg(ctx context.Context, kpkg *kubepkgv1alpha1.KubePkg, patchOptions ...client.PatchOption) error {

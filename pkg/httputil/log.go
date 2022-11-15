@@ -2,10 +2,11 @@ package httputil
 
 import (
 	"fmt"
-	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
 	"net/http"
 	"time"
+
+	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
 )
 
 func LogHandler(l logr.Logger) func(handler http.Handler) http.Handler {

@@ -74,11 +74,20 @@ func (ClusterRepository) Delete(ctx context.Context, name string) error {
 		Save(ctx)
 }
 
-func (ClusterRepository) Get(ctx context.Context, name string) (*cluster.Cluster, error) {
+func (ClusterRepository) Get(ctx context.Context, nameOrID string) (*cluster.Cluster, error) {
 	c := &cluster.Cluster{}
+	_ = c.ID.UnmarshalText([]byte(nameOrID))
+
+	var where sqlbuilder.SqlExpr
+
+	if c.ID != 0 {
+		where = cluster.ClusterT.ID.V(sqlbuilder.Eq(c.ID))
+	} else {
+		where = cluster.ClusterT.Name.V(sqlbuilder.Eq(nameOrID))
+	}
 
 	if err := dal.From(cluster.ClusterT).
-		Where(cluster.ClusterT.Name.V(sqlbuilder.Eq(name))).
+		Where(where).
 		Scan(c).
 		Find(ctx); err != nil {
 		return nil, err

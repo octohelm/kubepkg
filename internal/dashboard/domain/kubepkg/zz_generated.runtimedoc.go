@@ -57,6 +57,8 @@ func (v Ref) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "SettingID":
 			return []string{}, true
+		case "DefaultSettings":
+			return []string{}, true
 
 		}
 
@@ -76,11 +78,11 @@ func (v Revision) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "Digest":
 			return []string{
-				"hash of manifest",
+				"hash of spec",
 			}, true
-		case "Manifests":
+		case "Spec":
 			return []string{
-				"manifests",
+				"spec",
 			}, true
 		case "CreationTime":
 			return []string{}, true
@@ -103,13 +105,21 @@ func (v Version) RuntimeDoc(names ...string) ([]string, bool) {
 		switch names[0] {
 		case "ID":
 			return []string{}, true
-		case "Channel":
-			return []string{
-				"版本分支",
-			}, true
+		case "KubepkgID":
+			return []string{}, true
 		case "Version":
 			return []string{
 				"版本号",
+			}, true
+		case "Major":
+			return []string{}, true
+		case "Minor":
+			return []string{}, true
+		case "Patch":
+			return []string{}, true
+		case "Channel":
+			return []string{
+				"版本分支",
 			}, true
 		case "RevisionID":
 			return []string{}, true
@@ -119,6 +129,21 @@ func (v Version) RuntimeDoc(names ...string) ([]string, bool) {
 		}
 		if doc, ok := runtimeDoc(v.CreationTime, names...); ok {
 			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v VersionInfo) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "RevisionID":
+			return []string{}, true
+		case "Version":
+			return []string{}, true
+
 		}
 
 		return nil, false

@@ -8,6 +8,7 @@ import (
 	context "context"
 
 	github_com_octohelm_kubepkg_internal_dashboard_domain_account "github.com/octohelm/kubepkg/internal/dashboard/domain/account"
+	github_com_octohelm_kubepkg_internal_dashboard_domain_cluster "github.com/octohelm/kubepkg/internal/dashboard/domain/cluster"
 	github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg "github.com/octohelm/kubepkg/internal/dashboard/domain/kubepkg"
 	github_com_octohelm_storage_pkg_datatypes "github.com/octohelm/storage/pkg/datatypes"
 	github_com_octohelm_storage_pkg_sqlbuilder "github.com/octohelm/storage/pkg/sqlbuilder"
@@ -187,10 +188,10 @@ type tableDeployment struct {
 	GroupEnvID     github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[EnvID]
 	DeploymentID   github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[DeploymentID]
 	DeploymentName github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
-	KubepkgID      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.ID]
-	KubepkgChannel github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.Channel]
 	CreatedAt      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.Timestamp]
 	UpdatedAt      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.Timestamp]
+	KubepkgID      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.ID]
+	KubepkgChannel github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.Channel]
 }
 
 type indexNameOfDeployment struct {
@@ -202,10 +203,10 @@ var DeploymentT = &tableDeployment{
 	GroupEnvID:     github_com_octohelm_storage_pkg_sqlbuilder.CastCol[EnvID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("GroupEnvID")),
 	DeploymentID:   github_com_octohelm_storage_pkg_sqlbuilder.CastCol[DeploymentID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("DeploymentID")),
 	DeploymentName: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("DeploymentName")),
-	KubepkgID:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.ID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("KubepkgID")),
-	KubepkgChannel: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.Channel](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("KubepkgChannel")),
 	CreatedAt:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.Timestamp](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("CreatedAt")),
 	UpdatedAt:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.Timestamp](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("UpdatedAt")),
+	KubepkgID:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.ID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("KubepkgID")),
+	KubepkgChannel: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.Channel](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).F("KubepkgChannel")),
 
 	I: indexNameOfDeployment{
 		Primary: github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Deployment{}).Cols([]string{
@@ -491,7 +492,7 @@ type tableEnv struct {
 	EnvName      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
 	Desc         github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
 	EnvType      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[EnvType]
-	ClusterID    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.SFID]
+	ClusterID    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.ID]
 	Namespace    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
 	RandPassword github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[[]uint8]
 	CreatedAt    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.Timestamp]
@@ -510,7 +511,7 @@ var EnvT = &tableEnv{
 	EnvName:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("EnvName")),
 	Desc:         github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("Desc")),
 	EnvType:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[EnvType](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("EnvType")),
-	ClusterID:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.SFID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("ClusterID")),
+	ClusterID:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.ID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("ClusterID")),
 	Namespace:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("Namespace")),
 	RandPassword: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[[]uint8](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("RandPassword")),
 	CreatedAt:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.Timestamp](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).F("CreatedAt")),

@@ -2,10 +2,11 @@ package kubeutil
 
 import (
 	"context"
+	"strings"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
-	"strings"
 )
 
 func AllWatchableGroupVersionKinds(ctx context.Context, conf *rest.Config) (gvks []schema.GroupVersionKind, err error) {

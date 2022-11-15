@@ -1,4 +1,4 @@
-import { tap, map as rxMap, ignoreElements } from "rxjs/operators";
+import { tap, map as rxMap, ignoreElements } from "rxjs";
 import { useForm, fromErrorFields, useProxy, useDialogForm } from "../layout";
 import { string, required, match, objectOf } from "@innoai-tech/form";
 import { GroupRobotProvider } from "./domain";
@@ -12,13 +12,15 @@ export const useGroupRobotForm = (initials?: Partial<AccountRobotInfo>) => {
       name: string()
         .label("机器人名称")
         .need(required(), match(/[a-z][a-z0-9-]+/))
-        .readOnly(!!initials)
+        .readOnly(!!initials),
     })
   );
 
-  return useProxy(form$, {
+  return useProxy(
+    form$,
+    {
       operationID: groupRobots$.create$.operationID,
-      post$: groupRobots$.create$
+      post$: groupRobots$.create$,
     },
     (form$) =>
       form$.post$.error$.pipe(
@@ -31,7 +33,7 @@ export const useGroupRobotForm = (initials?: Partial<AccountRobotInfo>) => {
         tap((formData) => {
           form$.post$.next({
             groupName: groupRobots$.groupName,
-            body: formData
+            body: formData,
           });
         }),
         ignoreElements()
@@ -48,9 +50,12 @@ export const useGroupRobotFormWithDialog = (
 
   const dialog$ = useDialogForm(form$, { action, title });
 
-  return useProxy(form$, {
-      dialog$: dialog$
-    }, (form$) =>
+  return useProxy(
+    form$,
+    {
+      dialog$: dialog$,
+    },
+    (form$) =>
       form$.post$.pipe(
         tap(() => form$.dialog$.next(false)),
         ignoreElements()

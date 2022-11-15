@@ -45,13 +45,13 @@ func (v Agent) RuntimeDoc(names ...string) ([]string, bool) {
 func (v Apply) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "Otel":
+		case "Logger":
 			return []string{}, true
 		case "Apply":
 			return []string{}, true
 
 		}
-		if doc, ok := runtimeDoc(v.Otel, names...); ok {
+		if doc, ok := runtimeDoc(v.Logger, names...); ok {
 			return doc, ok
 		}
 		if doc, ok := runtimeDoc(v.Apply, names...); ok {
@@ -99,13 +99,13 @@ func (v Dashboard) RuntimeDoc(names ...string) ([]string, bool) {
 func (v Export) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "Otel":
+		case "Logger":
 			return []string{}, true
 		case "Exporter":
 			return []string{}, true
 
 		}
-		if doc, ok := runtimeDoc(v.Otel, names...); ok {
+		if doc, ok := runtimeDoc(v.Logger, names...); ok {
 			return doc, ok
 		}
 		if doc, ok := runtimeDoc(v.Exporter, names...); ok {
@@ -115,7 +115,7 @@ func (v Export) RuntimeDoc(names ...string) ([]string, bool) {
 		return nil, false
 	}
 	return []string{
-		"BindKubepkg kubepkg.tgz from kubepkg manifest",
+		"Export kubepkg.tgz from kubepkg manifest",
 	}, true
 }
 
@@ -155,13 +155,13 @@ func (v Exporter) RuntimeDoc(names ...string) ([]string, bool) {
 func (v Import) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "Otel":
+		case "Logger":
 			return []string{}, true
 		case "Importer":
 			return []string{}, true
 
 		}
-		if doc, ok := runtimeDoc(v.Otel, names...); ok {
+		if doc, ok := runtimeDoc(v.Logger, names...); ok {
 			return doc, ok
 		}
 		if doc, ok := runtimeDoc(v.Importer, names...); ok {
@@ -171,7 +171,7 @@ func (v Import) RuntimeDoc(names ...string) ([]string, bool) {
 		return nil, false
 	}
 	return []string{
-		"import kubepkg.tgz or kubepkg.{json,yaml}",
+		"Import kubepkg.tgz or kubepkg.{json,yaml}",
 	}, true
 }
 
@@ -183,6 +183,10 @@ func (v Importer) RuntimeDoc(names ...string) ([]string, bool) {
 		case "ImportTo":
 			return []string{
 				"Import to. REMOTE_AGENT (http://ip:port) or STORAGE_ROOT (dir path)",
+			}, true
+		case "Namespace":
+			return []string{
+				"Namespace Force overwrites Namespaces of resources",
 			}, true
 		case "Incremental":
 			return []string{
@@ -253,6 +257,8 @@ func (v Operator) RuntimeDoc(names ...string) ([]string, bool) {
 func (v PrintManifests) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
+		case "Namespace":
+			return []string{}, true
 		case "KubepkgJSON":
 			return []string{}, true
 

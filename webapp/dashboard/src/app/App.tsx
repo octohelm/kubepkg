@@ -1,6 +1,13 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { Link, Routes } from "react-router-dom";
-import { index, Main, NotificationProvider, NotificationSnackbar, path, Scaffold } from "../layout";
+import {
+  index,
+  Main,
+  NotificationProvider,
+  NotificationSnackbar,
+  path,
+  Scaffold,
+} from "../layout";
 import { loginRoutes } from "./login";
 import { adminRoutes, groupRoutes } from "./Routes";
 import { GroupCardList } from "../group";
@@ -11,12 +18,12 @@ import { MustLogon } from "../auth";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#3f51b5"
+      main: "#3f51b5",
     },
     secondary: {
-      main: "#f50057"
-    }
-  }
+      main: "#f50057",
+    },
+  },
 });
 
 const mainRoutes = path("/")

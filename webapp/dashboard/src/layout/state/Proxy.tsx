@@ -6,10 +6,10 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef
+  useRef,
 } from "react";
 import { from, merge, Observable } from "rxjs";
-import { mergeMap, tap } from "rxjs/operators";
+import { mergeMap, tap } from "rxjs";
 
 export const useEpics = <D, T extends Observable<D>>(
   ob$: T,
@@ -35,9 +35,11 @@ export const useEpics = <D, T extends Observable<D>>(
   }, [ob$]);
 };
 
-export const useProxy = <T extends any,
+export const useProxy = <
+  T extends any,
   S extends Observable<T>,
-  E extends { [k: string]: any }>(
+  E extends { [k: string]: any }
+>(
   ob$: S,
   extensions: E,
   ...epics: Array<(subject$: S & E) => Observable<T>>
@@ -47,10 +49,8 @@ export const useProxy = <T extends any,
   const s$ = useMemo(() => {
     return new Proxy(ob$, {
       get: (_, prop) => {
-        return (
-          extensionsRef.current[prop as string] || (ob$ as any)[prop]
-        );
-      }
+        return extensionsRef.current[prop as string] || (ob$ as any)[prop];
+      },
     }) as S & E;
   }, [ob$]);
 
@@ -67,9 +67,11 @@ const useSubject$ = <T, E extends { [k: string]: any }>(
   return useProxy(useStateSubject(initials), extensions, ...epics);
 };
 
-export const createSubject = <T extends any,
+export const createSubject = <
+  T extends any,
   E extends { [k: string]: any },
-  TProps extends {}>(
+  TProps extends {}
+>(
   useProvider: (
     props: TProps,
     use: typeof useSubject$
@@ -80,9 +82,9 @@ export const createSubject = <T extends any,
   const C = createContext<{ [key]: ReturnType<typeof useProvider> }>({} as any);
 
   const Provider = ({
-                      children,
-                      ...props
-                    }: TProps & {
+    children,
+    ...props
+  }: TProps & {
     children: ReactNode;
   }) => {
     const subject$ = useProvider(props as any, useSubject$);

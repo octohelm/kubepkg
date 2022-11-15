@@ -2,30 +2,72 @@ import {
   useObservable,
   useRequest,
   Subscribe,
-  useStateSubject,
+  useStateSubject
 } from "@innoai-tech/reactutil";
 import {
   AddToDriveOutlined,
   SettingsOutlined,
-  DriveFileRenameOutlineOutlined,
+  DriveFileRenameOutlineOutlined
 } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   Divider,
+  Link,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
+  useTheme
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
-import { Cluster, listCluster } from "../client/dashboard";
+import { Cluster, ClusterInstanceStatus, ClusterNetType, getClusterStatus, listCluster } from "../client/dashboard";
 import { useClusterFormWithDialog } from "./ClusterForm";
 import { Scaffold, stringAvatar, useEpics } from "../layout";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
 import { useClusterFormRenameWithDialog } from "./ClusterFormRename";
-import { map } from "rxjs/operators";
+import { ignoreElements, map, tap } from "rxjs";
+import { interval } from "rxjs";
+
+export const ClusterStatus = ({ cluster }: { cluster: Cluster }) => {
+  const clusterStatus$ = useStateSubject<ClusterInstanceStatus>({} as any);
+  const request$ = useRequest(getClusterStatus);
+  const theme = useTheme();
+
+  useEpics(clusterStatus$,
+    () => {
+      request$.next({ name: cluster.clusterID });
+
+      return interval(10 * 1000)
+        .pipe(
+          tap(() => {
+            request$.next({ name: cluster.clusterID });
+          }),
+          ignoreElements()
+        );
+    },
+    () => request$.pipe(map((resp) => resp.body)),
+    () => request$.error$.pipe(map(() => ({ id: "-", ping: "-" })))
+  );
+
+  return (
+    <Subscribe value$={clusterStatus$}>
+      {(status) => (
+        <Box
+          component={"small"}
+          sx={{
+            opacity: 0.7,
+            color: status.ping == "-" ? theme.palette.error.main : theme.palette.success.main
+          }}
+        >
+          {status.id} {status.ping}
+        </Box>
+      )}
+    </Subscribe>
+  );
+};
+
 
 const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
   const cluster$ = useStateSubject<Cluster>(initialCluster);
@@ -40,14 +82,14 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
       clusterForm$.post$.pipe(
         map((resp) => ({
           ...cluster$.value,
-          ...resp.body,
+          ...resp.body
         }))
       ),
     (cluster$) =>
       clusterRenameForm$.post$.pipe(
         map((resp) => ({
           ...cluster$.value,
-          ...resp.body,
+          ...resp.body
         }))
       )
   );
@@ -81,23 +123,48 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
         }
       >
         <Subscribe value$={cluster$}>
-          {(cluster) => (
-            <>
-              <ListItemAvatar>
-                <Avatar variant="rounded">{stringAvatar(cluster.name)}</Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={<Box>{`${cluster.name} | ${cluster.envType}`}</Box>}
-                secondary={
-                  <Box component="span" sx={{ display: "inline" }}>
-                    {`${cluster.desc || "-"} | ${cluster.endpoint || "-"} | ${
-                      cluster.netType
-                    }`}
-                  </Box>
-                }
-              />
-            </>
-          )}
+          {(cluster) => {
+            const canAccess = cluster.netType == ClusterNetType.DIRECT && cluster.endpoint;
+
+            return (
+              <>
+                <ListItemAvatar>
+                  <Avatar variant="rounded">{stringAvatar(cluster.name)}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Box component="span">
+                      <Box
+                        sx={{
+                          display: "inline-block",
+                          fontFamily: "monospace",
+                          paddingRight: 1
+                        }}>
+                        {`${cluster.envType}/${cluster.name}`}
+                      </Box>
+                      {canAccess && <ClusterStatus cluster={cluster} />}
+                    </Box>
+                  }
+                  secondary={
+                    <Box component="span">
+                      <Box component="span">
+                        {cluster.desc || "-"} {" "}
+                      </Box>
+                      {(canAccess) ? (
+                        <Link target={"_blank"} href={cluster.endpoint}>
+                          {cluster.netType}
+                        </Link>
+                      ) : (
+                        <Box component="span">
+                          {cluster.netType}
+                        </Box>
+                      )}
+                    </Box>
+                  }
+                />
+              </>
+            );
+          }}
         </Subscribe>
       </ListItem>
     </>

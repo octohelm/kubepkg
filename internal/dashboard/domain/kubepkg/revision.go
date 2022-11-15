@@ -16,10 +16,10 @@ type Revision struct {
 
 	KubepkgID ID `db:"f_kubepkg_id" json:"-"`
 
-	// hash of manifest
+	// hash of spec
 	Digest string `db:"f_digest" json:"-"`
-	// manifests
-	Manifests []byte `db:"f_manifests" json:"-"`
+	// spec
+	Spec []byte `db:"f_spec" json:"-"`
 
 	datatypes.CreationTime
 }
@@ -46,13 +46,14 @@ const (
 	CHANNEL__DEV            // 开发
 	CHANNEL__BETA           // 测试
 	CHANNEL__RC             // 预览
-	CHANNEL__STABLE         // 线上
+	CHANNEL__STABLE         // 正式
 )
 
 type Ref struct {
 	KubepkgID         ID
 	KubepkgRevisionID RevisionID
 	SettingID         uint64
+	DefaultSettings   map[string]string
 }
 
 func (r Ref) WithSettingID(settingID uint64) *Ref {

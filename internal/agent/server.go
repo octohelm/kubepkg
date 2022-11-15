@@ -44,7 +44,7 @@ func (s *Server) SetDefaults() {
 	}
 
 	if s.AgentAddr == "" {
-		s.AgentAddr = ":36060"
+		s.AgentAddr = ":32060"
 	}
 
 	if s.Platforms == nil {

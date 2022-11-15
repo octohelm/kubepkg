@@ -4,10 +4,10 @@ import (
 	"context"
 	"os"
 
+	"github.com/octohelm/kubepkg/pkg/logutil"
+
 	"github.com/innoai-tech/infra/devpkg/gengo"
 	"github.com/innoai-tech/infra/pkg/cli"
-	"github.com/innoai-tech/infra/pkg/otel"
-
 	_ "github.com/octohelm/courier/devpkg/clientgen"
 	_ "github.com/octohelm/courier/devpkg/operatorgen"
 	_ "github.com/octohelm/gengo/devpkg/deepcopygen"
@@ -21,7 +21,7 @@ var App = cli.NewApp("gengo", "dev")
 func init() {
 	cli.AddTo(App, &struct {
 		cli.C `name:"gen"`
-		otel.Otel
+		logutil.Logger
 		gengo.Gengo
 	}{})
 }

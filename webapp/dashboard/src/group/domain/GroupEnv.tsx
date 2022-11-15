@@ -1,9 +1,16 @@
 import { createDomain } from "../../layout";
-import { GroupEnv, listGroupEnv, putGroupEnv } from "../../client/dashboard";
+import {
+  bindGroupEnvCluster,
+  GroupEnv, GroupEnvWithCluster,
+  listGroupEnv,
+  putGroupEnv,
+  unbindGroupEnvCluster
+} from "../../client/dashboard";
 import { useRequest } from "@innoai-tech/reactutil";
-import { map } from "rxjs/operators";
+import { map } from "rxjs";
 import { useEffect } from "react";
 import { GroupProvider } from "./Group";
+import { find, pick } from "@innoai-tech/lodash";
 
 export const GroupEnvsProvider = createDomain(({}, use) => {
   const group$ = GroupProvider.use$();
@@ -38,3 +45,39 @@ export const GroupEnvsProvider = createDomain(({}, use) => {
 
   return groupEnv$;
 });
+
+export const GroupEnvProvider = createDomain(
+  ({ groupName, envName }: { groupName: string; envName: string }, use) => {
+    const groupEnvs$ = GroupEnvsProvider.use$();
+
+    const bindCluster$ = useRequest(bindGroupEnvCluster);
+    const unbindCluster$ = useRequest(unbindGroupEnvCluster);
+
+    return use(
+      `groups/${groupName}/envs/${envName}?`,
+      { groupName, envName } as { groupName: string; envName: string } & Partial<GroupEnvWithCluster>,
+      {
+        bindCluster$: bindCluster$,
+        unbindCluster$: unbindCluster$
+      },
+      (groupEnv$) => bindCluster$.pipe(map((resp) => {
+        return {
+          ...pick(groupEnv$.value, ["groupName", "envName"]),
+          ...resp.body
+        };
+      })),
+      (groupEnv$) => unbindCluster$.pipe(map((resp) => {
+        return {
+          ...pick(groupEnv$.value, ["groupName", "envName"]),
+          ...resp.body
+        };
+      })),
+      (groupEnv$) => groupEnvs$.pipe(map((groupEnvs) => {
+        return {
+          ...pick(groupEnv$.value, ["groupName", "envName"]),
+          ...(find(groupEnvs, (groupEnv) => groupEnv.envName == envName) || {})
+        };
+      }))
+    );
+  }
+);

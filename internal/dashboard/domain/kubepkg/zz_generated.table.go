@@ -186,7 +186,7 @@ type tableRevision struct {
 	ID        github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[RevisionID]
 	KubepkgID github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[ID]
 	Digest    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
-	Manifests github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[[]uint8]
+	Spec      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[[]uint8]
 	CreatedAt github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.Timestamp]
 }
 
@@ -199,7 +199,7 @@ var RevisionT = &tableRevision{
 	ID:        github_com_octohelm_storage_pkg_sqlbuilder.CastCol[RevisionID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Revision{}).F("ID")),
 	KubepkgID: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[ID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Revision{}).F("KubepkgID")),
 	Digest:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Revision{}).F("Digest")),
-	Manifests: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[[]uint8](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Revision{}).F("Manifests")),
+	Spec:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[[]uint8](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Revision{}).F("Spec")),
 	CreatedAt: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.Timestamp](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Revision{}).F("CreatedAt")),
 
 	I: indexNameOfRevision{
@@ -226,6 +226,7 @@ func (Version) Primary() []string {
 func (Version) UniqueIndexes() github_com_octohelm_storage_pkg_sqlbuilder.Indexes {
 	return github_com_octohelm_storage_pkg_sqlbuilder.Indexes{
 		"i_version": []string{
+			"KubepkgID",
 			"Channel",
 			"Version",
 		},
@@ -236,6 +237,11 @@ func (Version) Indexes() github_com_octohelm_storage_pkg_sqlbuilder.Indexes {
 	return github_com_octohelm_storage_pkg_sqlbuilder.Indexes{
 		"i_created_at": []string{
 			"CreatedAt",
+		},
+		"i_semver": []string{
+			"Major",
+			"Minor",
+			"Patch",
 		},
 	}
 }
@@ -280,8 +286,12 @@ type tableVersion struct {
 	I          indexNameOfVersion
 	table      github_com_octohelm_storage_pkg_sqlbuilder.Table
 	ID         github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.SFID]
-	Channel    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[Channel]
+	KubepkgID  github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[ID]
 	Version    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
+	Major      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[int]
+	Minor      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[int]
+	Patch      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[int]
+	Channel    github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[Channel]
 	RevisionID github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[RevisionID]
 	CreatedAt  github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.Timestamp]
 }
@@ -293,8 +303,12 @@ type indexNameOfVersion struct {
 
 var VersionT = &tableVersion{
 	ID:         github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.SFID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("ID")),
-	Channel:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[Channel](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("Channel")),
+	KubepkgID:  github_com_octohelm_storage_pkg_sqlbuilder.CastCol[ID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("KubepkgID")),
 	Version:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("Version")),
+	Major:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[int](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("Major")),
+	Minor:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[int](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("Minor")),
+	Patch:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[int](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("Patch")),
+	Channel:    github_com_octohelm_storage_pkg_sqlbuilder.CastCol[Channel](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("Channel")),
 	RevisionID: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[RevisionID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("RevisionID")),
 	CreatedAt:  github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.Timestamp](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).F("CreatedAt")),
 
@@ -303,6 +317,7 @@ var VersionT = &tableVersion{
 			"ID",
 		}...),
 		IVersion: github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Version{}).Cols([]string{
+			"KubepkgID",
 			"Channel",
 			"Version",
 		}...),

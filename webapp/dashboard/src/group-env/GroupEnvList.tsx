@@ -1,11 +1,11 @@
 import {
   useObservable,
   useStateSubject,
-  useObservableEffect,
+  useObservableEffect
 } from "@innoai-tech/reactutil";
 import {
   AddCircleOutlineOutlined,
-  SettingsOutlined,
+  SettingsOutlined
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -14,25 +14,26 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 import { useGroupEnvFormWithDialog } from "./GroupEnvForm";
 import {
   Scaffold,
   IconButtonWithTooltip,
   stringAvatar,
-  ListItemLink,
+  ListItemLink
 } from "../layout";
-import { tap } from "rxjs/operators";
-import { GroupEnvsProvider, GroupProvider } from "../group/domain";
+import { tap } from "rxjs";
+import { GroupEnvsProvider, GroupProvider } from "../group";
 import type { GroupEnv } from "../client/dashboard";
 import { Link } from "react-router-dom";
 import { AccessControl } from "../auth";
+import { map, orderBy } from "@innoai-tech/lodash";
 
 const GroupEnvListItem = ({
-  groupEnv: initialGroupEnv,
-}: {
+                            groupEnv: initialGroupEnv
+                          }: {
   groupEnv: GroupEnv;
 }) => {
   const group$ = GroupProvider.use$();
@@ -45,10 +46,10 @@ const GroupEnvListItem = ({
         tap((resp) => {
           groupEnv$.next((group) => ({
             ...group,
-            ...resp.body,
+            ...resp.body
           }));
         })
-      ),
+      )
     ],
     []
   );
@@ -137,16 +138,13 @@ const GroupMainToolbar = () => {
 
 export const GroupEnvMenu = () => {
   const groupEnvs$ = GroupEnvsProvider.use$();
-
   const groupEnvs = useObservable(groupEnvs$);
 
-  if (!groupEnvs) {
-    return null;
-  }
+  const envs = useMemo(() => orderBy(groupEnvs, (groupEnv) => groupEnv.envName), [groupEnvs]);
 
   return (
     <List>
-      {groupEnvs.map((groupEnv) => {
+      {map(envs, (groupEnv) => {
         return (
           <ListItemLink
             key={groupEnv.envName}

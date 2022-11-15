@@ -7,16 +7,17 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
+
+	"github.com/octohelm/kubepkg/pkg/logutil"
+
 	"sigs.k8s.io/yaml"
 
 	"github.com/go-courier/logr"
 	"github.com/innoai-tech/infra/pkg/cli"
-	"github.com/innoai-tech/infra/pkg/otel"
 	clientagent "github.com/octohelm/kubepkg/internal/agent/client/agent"
-	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -26,7 +27,7 @@ func init() {
 // import kubepkg.tgz or kubepkg.{json,yaml}
 type Import struct {
 	cli.C
-	otel.Otel
+	logutil.Logger
 	Importer
 }
 
@@ -35,6 +36,8 @@ type Importer struct {
 
 	// Import to. REMOTE_AGENT (http://ip:port) or STORAGE_ROOT (dir path)
 	ImportTo string `flag:",omitempty" `
+	// Namespace Force overwrites Namespaces of resources
+	Namespace string `flag:",omitempty" `
 	// Only for importing to REMOTE_AGENT
 	Incremental bool `flag:",omitempty"`
 	// Only for importing to REMOTE_AGENT without blobs, when --incremental set
@@ -74,20 +77,28 @@ func (s *Importer) importToStorageRoot(ctx context.Context, root string, tgzFile
 		}
 		defer tgzFile.Close()
 
-		kpkg, err := r.ImportFromKubeTgzReader(ctx, tgzFile)
+		kpkgs, err := r.ImportFromKubeTgzReader(ctx, tgzFile)
 		if err != nil {
 			return err
 		}
 
-		l.Info("blobs of %s@%s is imported.", kpkg.Name, kpkg.Spec.Version)
+		for i := range kpkgs {
+			kpkg := kpkgs[i]
 
-		if s.ManifestOutput != "" {
-			f := filepath.Join(s.ManifestOutput, fmt.Sprintf("%s.%s.kubepkg.yaml", kpkg.Name, kpkg.Namespace))
-			data, _ := yaml.Marshal(kpkg)
-			if err := os.WriteFile(f, data, os.ModePerm); err != nil {
-				return err
+			l.Info("blobs of %s@%s is imported.", kpkg.Name, kpkg.Spec.Version)
+
+			if s.Namespace != "" {
+				kpkg.Namespace = s.Namespace
 			}
-			l.Info("%s is writen.", f)
+
+			if s.ManifestOutput != "" {
+				f := filepath.Join(s.ManifestOutput, fmt.Sprintf("%s.%s.kubepkg.yaml", kpkg.Name, kpkg.Namespace))
+				data, _ := yaml.Marshal(kpkg)
+				if err := os.WriteFile(f, data, os.ModePerm); err != nil {
+					return err
+				}
+				l.Info("%s is writen.", f)
+			}
 		}
 
 		return nil
@@ -119,33 +130,42 @@ func (s *Importer) importToRemote(ctx context.Context, kubeAgentEndpoint string,
 		if err != nil {
 			return err
 		}
-
-		kp := &v1alpha1.KubePkg{}
-		if err := yaml.Unmarshal(specFileRaw, kp); err != nil {
-			return errors.Wrapf(err, "unmarshal %s failed", jsonOrYamlFile)
-		}
-
-		kpkg, err := clientagent.ImportKubePkg(ctx, kp)
+		kpkgs, err := kubepkg.LoadKubePkgs(specFileRaw)
 		if err != nil {
 			return err
 		}
-
-		l.Info("%s@%s is imported.", kpkg.Name, kpkg.Spec.Version)
+		if err := clientagent.ImportKubePkg(ctx, kpkgs...); err != nil {
+			return err
+		}
+		for _, kpkg := range kpkgs {
+			l.Info("%s@%s is imported.", kpkg.Name, kpkg.Spec.Version)
+		}
 		return nil
 	}
 
 	importTgz := func(tgzFilename string) error {
+		kpkgs, err := func() ([]*v1alpha1.KubePkg, error) {
+			tgzFile, err := os.Open(tgzFilename)
+			if err != nil {
+				return nil, err
+			}
+			defer tgzFile.Close()
+			return kubepkg.KubeTgzRange(ctx, tgzFile, nil)
+		}()
+		if err != nil {
+			return err
+		}
+
 		tgzFile, err := os.Open(tgzFilename)
 		if err != nil {
 			return err
 		}
-
-		kpkg, err := clientagent.ImportKubePkgTgz(ctx, tgzFile, s.Incremental, s.SkipBlobs)
-		if err != nil {
+		if err := clientagent.ImportKubePkgTgz(ctx, tgzFile, s.Incremental, s.SkipBlobs); err != nil {
 			return err
 		}
-
-		l.Info("%s@%s is imported.", kpkg.Name, kpkg.Spec.Version)
+		for _, kpkg := range kpkgs {
+			l.Info("%s@%s is imported.", kpkg.Name, kpkg.Spec.Version)
+		}
 		return nil
 	}
 

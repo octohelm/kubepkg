@@ -1,24 +1,35 @@
 import { useProxy } from "./state";
 import { FormControls } from "./FormControl";
 import { Subscribe, useStateSubject } from "@innoai-tech/reactutil";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  SxProps,
+} from "@mui/material";
 import type { FormSubject } from "@innoai-tech/form";
 import type { ReactNode } from "react";
 import { noop } from "@innoai-tech/lodash";
+import type { Theme } from "@mui/system";
 
 export interface DialogProps {
-  title: string,
-  action?: string | undefined
-  content?: ReactNode
+  title: string;
+  action?: string | undefined;
+  content?: ReactNode;
   onConfirm?: () => void;
+  sx?: SxProps<Theme>;
 }
 
 export const useDialog = ({
-                            title,
-                            content,
-                            action = "确定",
-                            onConfirm = noop
-                          }: DialogProps) => {
+  title,
+  content,
+  action = "确定",
+  sx = { "& .MuiDialog-paper": { width: "80%" } },
+  onConfirm = noop,
+}: DialogProps) => {
   const dialog$ = useStateSubject(false);
 
   return useProxy(dialog$, {
@@ -27,16 +38,11 @@ export const useDialog = ({
       <Subscribe value$={dialog$}>
         {(open) => {
           return (
-            <Dialog
-              sx={{ "& .MuiDialog-paper": { width: "80%" } }}
-              maxWidth="xs"
-              open={open}
-              onClose={() => dialog$.next((v) => !v)}
-            >
+            <Dialog sx={sx} open={open} onClose={() => dialog$.next((v) => !v)}>
               <Box
                 component="form"
                 sx={{
-                  "& .MuiFormControl-root": { mb: 2 }
+                  "& .MuiFormControl-root": { mb: 2 },
                 }}
                 autoComplete="off"
                 noValidate={true}
@@ -45,12 +51,8 @@ export const useDialog = ({
                   onConfirm();
                 }}
               >
-                <DialogTitle>
-                  {title}
-                </DialogTitle>
-                <DialogContent>
-                  {content}
-                </DialogContent>
+                <DialogTitle>{title}</DialogTitle>
+                <DialogContent>{content}</DialogContent>
                 <DialogActions>
                   <Button onClick={() => dialog$.next(false)}>取消</Button>
                   <Button type="submit">{action}</Button>
@@ -60,22 +62,20 @@ export const useDialog = ({
           );
         }}
       </Subscribe>
-    )
+    ),
   });
 };
 
-export const useDialogForm = <T extends object>(form$: FormSubject<T>, {
-  title,
-  action
-}: Pick<DialogProps, "title" | "action">) => {
+export const useDialogForm = <T extends object>(
+  form$: FormSubject<T>,
+  { title, action }: Pick<DialogProps, "title" | "action">
+) => {
   return useDialog({
     title,
     action,
-    content: (
-      <FormControls form$={form$} />
-    ),
+    content: <FormControls form$={form$} />,
     onConfirm: () => {
       form$.submit();
-    }
+    },
   });
 };

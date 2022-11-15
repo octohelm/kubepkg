@@ -3,9 +3,14 @@ package repository
 import (
 	"context"
 	"encoding/json"
-	"strings"
+	"time"
 
-	"github.com/davecgh/go-spew/spew"
+	"github.com/pkg/errors"
+
+	"github.com/octohelm/kubepkg/pkg/vault"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/kubepkg"
 	"github.com/octohelm/kubepkg/pkg/datatypes"
 
@@ -20,14 +25,16 @@ import (
 func NewGroupEnvDeploymentRepository(g *group.Env) *GroupEnvDeploymentRepository {
 	return &GroupEnvDeploymentRepository{
 		GroupEnv: g,
+		cipher:   SeedForGroupEnv(g).ToCipher(),
 	}
 }
 
 type GroupEnvDeploymentRepository struct {
 	GroupEnv *group.Env
+	cipher   vault.Cipher
 }
 
-func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymentID group.DeploymentID, deploymentSettingID group.DeploymentSettingID) (map[string]any, error) {
+func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymentID group.DeploymentID, deploymentSettingID group.DeploymentSettingID) (map[string]string, error) {
 	setting := &group.DeploymentSetting{}
 
 	err := dal.From(group.DeploymentSettingT).
@@ -42,23 +49,22 @@ func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymen
 		return nil, err
 	}
 
-	c := SeedForGroupEnv(r.GroupEnv).ToCipher()
-
-	jsonRaw, err := c.Decrypt(ctx, setting.EncryptedSetting)
+	jsonRaw, err := r.cipher.Decrypt(ctx, setting.EncryptedSetting)
 	if err != nil {
 		return nil, err
 	}
 
-	m := map[string]any{}
+	m := map[string]string{}
 	if err := json.Unmarshal(jsonRaw, &m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (r *GroupEnvDeploymentRepository) AddSetting(ctx context.Context, deploymentID group.DeploymentID, settings map[string]any) (*group.DeploymentSetting, error) {
-	c := SeedForGroupEnv(r.GroupEnv).ToCipher()
-
+func (r *GroupEnvDeploymentRepository) RecordSetting(ctx context.Context, deploymentID group.DeploymentID, settings map[string]string) (*group.DeploymentSetting, error) {
+	if settings == nil {
+		settings = map[string]string{}
+	}
 	data, err := json.Marshal(settings)
 	if err != nil {
 		return nil, err
@@ -68,7 +74,7 @@ func (r *GroupEnvDeploymentRepository) AddSetting(ctx context.Context, deploymen
 	ds.Digest = digest.FromBytes(data).String()
 	ds.DeploymentID = deploymentID
 
-	encrypted, err := c.Encrypt(ctx, data)
+	encrypted, err := r.cipher.Encrypt(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -94,12 +100,12 @@ func (r *GroupEnvDeploymentRepository) AddSetting(ctx context.Context, deploymen
 	return ds, nil
 }
 
-func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, deploymentID group.DeploymentID, kubepkgRef *kubepkg.Ref) error {
+func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, deploymentID group.DeploymentID, kubepkgRef *kubepkg.Ref) (*group.DeploymentHistory, error) {
 	deploymentHistory := &group.DeploymentHistory{}
 
 	id, err := idgen.FromContextAndCast[group.DeploymentHistoryID](ctx).ID()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	deploymentHistory.DeploymentHistoryID = id
 	deploymentHistory.DeploymentID = deploymentID
@@ -107,7 +113,7 @@ func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, dep
 	deploymentHistory.KubepkgRevisionID = kubepkgRef.KubepkgRevisionID
 	deploymentHistory.DeploymentSettingID = group.DeploymentSettingID(kubepkgRef.SettingID)
 
-	return dal.Tx(ctx, deploymentHistory, func(ctx context.Context) error {
+	if err := dal.Tx(ctx, deploymentHistory, func(ctx context.Context) error {
 		err := dal.Prepare(deploymentHistory).Save(ctx)
 		if err != nil {
 			return err
@@ -125,21 +131,133 @@ func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, dep
 				)),
 			),
 		).Save(ctx)
+	}); err != nil {
+		return nil, err
+	}
+	return deploymentHistory, nil
+}
+
+func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *datatypes.Pager) (*group.DeploymentDataList, error) {
+	if pager == nil {
+		pager = &datatypes.Pager{}
+	}
+
+	pager.SetDefaults()
+
+	tLatestDeployment := sqlbuilder.T(
+		"t_latest_deployment",
+		group.DeploymentHistoryT.DeploymentID,
+		group.DeploymentHistoryT.DeploymentHistoryID,
+	)
+
+	expr := dal.From(group.DeploymentT).
+		With(tLatestDeployment, func(table sqlbuilder.Table) sqlbuilder.SqlExpr {
+			return dal.
+				From(group.DeploymentHistoryT).
+				GroupBy(group.DeploymentHistoryT.DeploymentID).
+				Select(
+					group.DeploymentHistoryT.DeploymentID,
+					sqlbuilder.Max(group.DeploymentHistoryT.DeploymentHistoryID),
+				)
+		}).
+		Join(tLatestDeployment, group.DeploymentT.DeploymentID.V(
+			sqlbuilder.EqCol(sqlbuilder.CastCol[group.DeploymentID](tLatestDeployment.F(group.DeploymentHistoryT.DeploymentID.Name()))),
+		)).
+		Join(group.DeploymentHistoryT, group.DeploymentHistoryT.DeploymentHistoryID.V(
+			sqlbuilder.EqCol(sqlbuilder.CastCol[group.DeploymentHistoryID](tLatestDeployment.F(group.DeploymentHistoryT.DeploymentHistoryID.Name()))),
+		)).
+		Join(kubepkg.RevisionT, kubepkg.RevisionT.ID.V(
+			sqlbuilder.EqCol(group.DeploymentHistoryT.KubepkgRevisionID),
+		)).
+		Join(kubepkg.VersionT, kubepkg.VersionT.RevisionID.V(
+			sqlbuilder.EqCol(kubepkg.RevisionT.ID),
+		)).
+		FullJoin(group.DeploymentSettingT, group.DeploymentSettingT.DeploymentSettingID.V(
+			sqlbuilder.EqCol(group.DeploymentHistoryT.DeploymentSettingID),
+		)).
+		Select(
+			group.DeploymentT.DeploymentName,
+
+			group.DeploymentHistoryT.DeploymentID,
+			group.DeploymentHistoryT.DeploymentSettingID,
+			group.DeploymentHistoryT.CreatedAt,
+
+			group.DeploymentSettingT.EncryptedSetting,
+
+			kubepkg.RevisionT.ID,
+			kubepkg.RevisionT.Spec,
+
+			kubepkg.VersionT.Version,
+			kubepkg.VersionT.Channel,
+		)
+
+	ltr := datatypes.NewLister(func(kk *struct {
+		Deployment        group.Deployment
+		DeploymentHistory group.DeploymentHistory
+		DeploymentSetting group.DeploymentSetting
+		Revision          kubepkg.Revision
+		Version           kubepkg.Version
+	}) (*v1alpha1.KubePkg, error) {
+		k := &v1alpha1.KubePkg{}
+		k.SetGroupVersionKind(v1alpha1.SchemeGroupVersion.WithKind("KubePkg"))
+
+		k.Name = kk.Deployment.DeploymentName
+		k.Namespace = r.GroupEnv.Namespace
+
+		if k.Annotations == nil {
+			k.Annotations = map[string]string{}
+		}
+
+		k.CreationTimestamp = metav1.NewTime(time.Time(kk.DeploymentHistory.CreatedAt))
+
+		k.Annotations["kubepkg.innoai.tech/revision"] = kk.Revision.ID.String()
+		k.Annotations["kubepkg.innoai.tech/deploymentID"] = kk.DeploymentHistory.DeploymentID.String()
+		k.Annotations["kubepkg.innoai.tech/deploymentSettingID"] = kk.DeploymentHistory.DeploymentSettingID.String()
+
+		k.Spec.Version = kk.Version.Version
+
+		if err := json.Unmarshal(kk.Revision.Spec, &k.Spec); err != nil {
+			return nil, errors.Wrap(err, "KubePkg unmarshal to json failed")
+		}
+
+		if len(kk.DeploymentSetting.EncryptedSetting) > 0 {
+			data, err := r.cipher.Decrypt(ctx, kk.DeploymentSetting.EncryptedSetting)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := json.Unmarshal(data, &k.Spec.Config); err != nil {
+				return nil, errors.Wrap(err, "Setting unmarshal to json failed")
+			}
+		}
+
+		return k, nil
 	})
+
+	err := expr.
+		Limit(pager.Size).Offset(pager.Offset).
+		Where(group.DeploymentT.GroupEnvID.V(sqlbuilder.Eq(r.GroupEnv.EnvID))).
+		Scan(ltr).
+		Find(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &group.DeploymentDataList{
+		Data: ltr.List(),
+	}, nil
 }
 
 func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, deploymentID group.DeploymentID, pager *datatypes.Pager) ([]*v1alpha1.KubePkg, error) {
 	if pager == nil {
 		pager = &datatypes.Pager{}
 	}
+
 	pager.SetDefaults()
 
-	c := SeedForGroupEnv(r.GroupEnv).ToCipher()
-
 	ltr := datatypes.NewLister(func(kk *struct {
-		group.DeploymentHistory
 		Deployment        group.Deployment
-		DeploymentSetting group.DeploymentSetting
+		DeploymentHistory group.DeploymentHistory
 		Revision          kubepkg.Revision
 		Version           kubepkg.Version
 	}) (*v1alpha1.KubePkg, error) {
@@ -148,39 +266,37 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 
 		// FieldName to overwrite
 		k.Name = kk.Deployment.DeploymentName
+		k.Namespace = r.GroupEnv.Namespace
 
-		// FIXME consider remove this
-		// domain repository should not use other domain's model directly
 		if k.Annotations == nil {
 			k.Annotations = map[string]string{}
 		}
-		k.Annotations["kubepkg.innoai.tech/revision"] = kk.Revision.ID.String()
-		k.Spec.Version = kk.Version.Version + "+" + strings.ToLower(kk.Version.Channel.String())
-		if err := json.Unmarshal(kk.Revision.Manifests, &k.Spec.Manifests); err != nil {
+
+		k.CreationTimestamp = metav1.NewTime(time.Time(kk.DeploymentHistory.CreatedAt))
+
+		k.Annotations["kubepkg.innoai.tech/revision"] = kk.DeploymentHistory.KubepkgRevisionID.String()
+		k.Annotations["kubepkg.innoai.tech/deploymentID"] = kk.DeploymentHistory.DeploymentID.String()
+		k.Annotations["kubepkg.innoai.tech/deploymentSettingID"] = kk.DeploymentHistory.DeploymentSettingID.String()
+
+		k.Spec.Version = kk.Version.Version
+
+		if err := json.Unmarshal(kk.Revision.Spec, &k.Spec); err != nil {
 			return nil, err
 		}
-
-		if len(kk.DeploymentSetting.EncryptedSetting) > 0 {
-			jsonRaw, err := c.Decrypt(ctx, kk.DeploymentSetting.EncryptedSetting)
-			if err != nil {
-				return nil, err
-			}
-			spew.Dump(jsonRaw)
-		}
-
-		// TODO merge setting
 
 		return k, nil
 	})
 
 	err := dal.From(group.DeploymentHistoryT).
 		Select(
-			group.DeploymentHistoryT.CreatedAt,
 			group.DeploymentT.DeploymentName,
-			group.DeploymentSettingT.EncryptedSetting,
+
+			group.DeploymentHistoryT.CreatedAt,
+			group.DeploymentHistoryT.DeploymentID,
+			group.DeploymentHistoryT.DeploymentSettingID,
 
 			kubepkg.RevisionT.ID,
-			kubepkg.RevisionT.Manifests,
+			kubepkg.RevisionT.Spec,
 
 			kubepkg.VersionT.Version,
 			kubepkg.VersionT.Channel,
@@ -188,11 +304,6 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 		Join(group.DeploymentT, sqlbuilder.And(
 			group.DeploymentHistoryT.DeploymentID.V(sqlbuilder.Eq(deploymentID)),
 			group.DeploymentT.DeploymentID.V(sqlbuilder.EqCol(group.DeploymentHistoryT.DeploymentID)),
-		)).
-		Join(group.DeploymentSettingT, sqlbuilder.And(
-			group.DeploymentSettingT.DeploymentSettingID.V(
-				sqlbuilder.EqCol(group.DeploymentHistoryT.DeploymentSettingID),
-			),
 		)).
 		Join(kubepkg.RevisionT, sqlbuilder.And(
 			kubepkg.RevisionT.ID.V(
@@ -204,7 +315,7 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 				sqlbuilder.EqCol(kubepkg.RevisionT.ID),
 			),
 		)).
-		OrderBy(sqlbuilder.DescOrder(group.DeploymentHistoryT.CreatedAt)).
+		OrderBy(sqlbuilder.DescOrder(group.DeploymentHistoryT.DeploymentHistoryID)).
 		Limit(pager.Size).Offset(pager.Offset).
 		Scan(ltr).
 		Find(ctx)

@@ -1,31 +1,40 @@
 package kubepkg
 
-import (
-	"github.com/innoai-tech/runtime/cuepkg/kube"
-)
-
-#KubepkgOperator: kube.#App & {
-	serviceAccount: #KubepkgServiceAccount
+#DefaultNodeSelector: {
+	nodeSelector: {
+		"node-role.kubernetes.io/master": "true"
+	}
+	tolerations: [
+		{
+			key:      "node-role.kubernetes.io/master"
+			operator: "Exists"
+			effect:   "NoSchedule"
+		},
+	]
 }
 
-#ContainerRegistry: kube.#App & {
-	app: _
-	volumes: storage: #KubepkgStorage
-
-	services: "\(app.name)": {
-		clusterIP: *"10.68.0.255" | string
-	}
+#KubepkgOperator: spec: {
+	serviceAccount: #KubepkgServiceAccount
+	deploy: spec: template: spec: #DefaultNodeSelector
 }
 
-#KubepkgAgent: kube.#App & {
-	app: _
-
-	services: "\(app.name)": {
-		expose: {
-			type: "NodePort"
-		}
+#ContainerRegistry: spec: {
+	volumes: "~container-registry-storage": #KubepkgStorage
+	services: "#": {
+		//		clusterIP: *"10.68.0.255" | string
 	}
+	deploy: spec: template: spec: #DefaultNodeSelector
+}
 
-	volumes: storage: #KubepkgStorage
+#KubepkgAgent: spec: {
+	services: "#": {
+		expose: type: "NodePort"
+	}
+	config: {
+		KUBEPKG_AGENT_ID: "@configMap.cluster-info.id?"
+		KUBEPKG_PLATFORM: "@configMap.cluster-info.platforms?"
+	}
+	volumes: "~container-registry-storage": #KubepkgStorage
 	serviceAccount: #KubepkgServiceAccount
+	deploy: spec: template: spec: #DefaultNodeSelector
 }

@@ -23,6 +23,8 @@ func (v CustomResourceDefinition) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "ListKindType":
 			return []string{}, true
+		case "SpecType":
+			return []string{}, true
 		case "Plural":
 			return []string{}, true
 		case "ShortNames":

@@ -57,17 +57,32 @@ func (v Deployment) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{
 				"DeploymentName default is EnvName of Kubepkg",
 			}, true
-		case "KubepkgRel":
-			return []string{}, true
 		case "CreationUpdationTime":
 			return []string{}, true
+		case "KubepkgRel":
+			return []string{}, true
 
+		}
+		if doc, ok := runtimeDoc(v.CreationUpdationTime, names...); ok {
+			return doc, ok
 		}
 		if doc, ok := runtimeDoc(v.KubepkgRel, names...); ok {
 			return doc, ok
 		}
-		if doc, ok := runtimeDoc(v.CreationUpdationTime, names...); ok {
-			return doc, ok
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v DeploymentDataList) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Data":
+			return []string{}, true
+		case "Total":
+			return []string{}, true
+
 		}
 
 		return nil, false
@@ -134,6 +149,22 @@ func (v DeploymentSetting) RuntimeDoc(names ...string) ([]string, bool) {
 func (DeploymentSettingID) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
+func (v DeploymentWithKubePkg) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Deployment":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.Deployment, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v Env) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {

@@ -12,8 +12,10 @@ export default defineConfig({
     injectWebAppConfig(async (c, ctx) => {
       if (ctx.env !== "$") {
         await generateClients(join(c.root!, "client"), ctx, {
-          expose: "createRequest",
-          importPath: "./client",
+          requestCreator: {
+            importPath: "./client",
+            expose: "createRequest",
+          },
         });
       }
     }),

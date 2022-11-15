@@ -33,21 +33,9 @@ func (v ConfigMapReloadReconciler) RuntimeDoc(names ...string) ([]string, bool) 
 func (v HostOptions) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "InternalHost":
+		case "IngressGateway":
 			return []string{
-				"Cluster hostname or ip for internal access",
-			}, true
-		case "ExternalHost":
-			return []string{
-				"Cluster hostname or ip for external access",
-			}, true
-		case "EnableHttps":
-			return []string{
-				"https enabled or not",
-			}, true
-		case "EnableAutoInternalHost":
-			return []string{
-				"When enabled, all service http 80 will bind internal host",
+				"Cluster Ingress Gateway template",
 			}, true
 
 		}
@@ -61,6 +49,8 @@ func (v KubePkgApplyReconciler) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "Manager":
+			return []string{}, true
+		case "HostOptions":
 			return []string{}, true
 
 		}
@@ -121,24 +111,6 @@ func (v SecretReloadReconciler) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "Manager":
-			return []string{}, true
-
-		}
-		if doc, ok := runtimeDoc(v.Manager, names...); ok {
-			return doc, ok
-		}
-
-		return nil, false
-	}
-	return []string{}, true
-}
-
-func (v ServiceReconciler) RuntimeDoc(names ...string) ([]string, bool) {
-	if len(names) > 0 {
-		switch names[0] {
-		case "Manager":
-			return []string{}, true
-		case "HostOptions":
 			return []string{}, true
 
 		}

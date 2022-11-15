@@ -15,58 +15,59 @@ import { tap, filter } from "rxjs/operators";
 import { GroupRoleType, GroupUser } from "../client/dashboard";
 import { Scaffold, stringAvatar } from "../layout";
 import { useAccountAutocomplete } from "../account";
-import { AccessControl, CurrentUserProvider } from "../auth";
+import { AccessControl } from "../auth";
 import { map } from "@innoai-tech/lodash";
 import { GroupAccountProvider } from "./domain";
 
 const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
   const account$ = GroupAccountProvider.use$();
-  const user$ = CurrentUserProvider.use$();
 
   return (
     <>
       <ListItem
         secondaryAction={
-          <Select
-            value={user.roleType}
-            disabled={!user$.canAccess(account$.put$)}
-            size={"small"}
-            onChange={(evt) => {
-              const roleType = evt.target.value as typeof user.roleType;
+          <AccessControl op={account$.put$}>
+            {(ok) => (
+              <Select
+                value={user.roleType}
+                disabled={!ok}
+                size={"small"}
+                onChange={(evt) => {
+                  const roleType = evt.target.value as typeof user.roleType;
 
-              if ((roleType as any) === "-") {
-                account$.del$.next({
-                  groupName: account$.groupName,
-                  accountID: user.accountID,
-                });
-                return;
-              }
+                  if ((roleType as any) === "-") {
+                    account$.del$.next({
+                      groupName: account$.groupName,
+                      accountID: user.accountID,
+                    });
+                    return;
+                  }
 
-              account$.put$.next({
-                groupName: account$.groupName,
-                accountID: user.accountID,
-                body: {
-                  roleType,
-                },
-              });
-            }}
-          >
-            {[
-              ...map(GroupRoleType, (role) => (
-                <MenuItem key={role} value={role}>
-                  {role}
-                </MenuItem>
-              )),
-              ...(user$.canAccess(account$.del$)
-                ? [
-                    <Divider key={"--"} />,
-                    <MenuItem key={"-"} value={"-"}>
+                  account$.put$.next({
+                    groupName: account$.groupName,
+                    accountID: user.accountID,
+                    body: {
+                      roleType,
+                    },
+                  });
+                }}
+              >
+                {[
+                  ...map(GroupRoleType, (role) => (
+                    <MenuItem key={role} value={role}>
+                      {role}
+                    </MenuItem>
+                  )),
+                  <AccessControl key={"-"} op={account$.del$}>
+                    <Divider />,
+                    <MenuItem key={""} value={"-"}>
                       移除成员
-                    </MenuItem>,
-                  ]
-                : []),
-            ]}
-          </Select>
+                    </MenuItem>
+                  </AccessControl>,
+                ]}
+              </Select>
+            )}
+          </AccessControl>
         }
       >
         <ListItemAvatar>

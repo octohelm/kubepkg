@@ -38,14 +38,12 @@ func (f formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	l = l.WithValues(keyValues...)
 
 	switch entry.Level {
-	case logrus.TraceLevel:
-		l.Trace(entry.Message)
-	case logrus.DebugLevel:
+	case logrus.DebugLevel, logrus.TraceLevel:
 		l.Debug(entry.Message)
 	case logrus.InfoLevel:
 		l.Info(entry.Message)
 	case logrus.WarnLevel:
-		l.Info(entry.Message)
+		l.Warn(errors.New(entry.Message))
 	default:
 		if err, ok := entry.Data[logrus.ErrorKey]; ok {
 			if e, ok := err.(error); ok {

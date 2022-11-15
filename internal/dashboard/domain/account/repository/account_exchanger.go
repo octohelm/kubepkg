@@ -45,6 +45,11 @@ func (e AccountExchanger) Exchange(ctx context.Context, from string, user auth.U
 		}
 	}
 
+	total, err := dal.From(account.AccountT).Limit(1).Count(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := dal.Tx(ctx, vi, func(ctx context.Context) error {
 		u, err := e.PutUser(ctx, account.UserInfo{
 			Email:    user.Email(),
@@ -65,6 +70,14 @@ func (e AccountExchanger) Exchange(ctx context.Context, from string, user auth.U
 		return nil
 	}); err != nil {
 		return nil, err
+	}
+
+	if total == 0 {
+		return []string{
+			vi.AccountID.String(),
+			account.TYPE__USER.String(),
+			"ADMIN_INIT",
+		}, nil
 	}
 
 	return []string{

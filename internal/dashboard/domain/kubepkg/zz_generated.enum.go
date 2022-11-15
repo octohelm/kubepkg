@@ -74,7 +74,7 @@ func ParseChannelLabelString(label string) (Channel, error) {
 		return CHANNEL__BETA, nil
 	case "预览":
 		return CHANNEL__RC, nil
-	case "线上":
+	case "正式":
 		return CHANNEL__STABLE, nil
 
 	}
@@ -90,7 +90,7 @@ func (v Channel) Label() string {
 	case CHANNEL__RC:
 		return "预览"
 	case CHANNEL__STABLE:
-		return "线上"
+		return "正式"
 
 	}
 	return "UNKNOWN"

@@ -4,8 +4,11 @@ const APP_CONFIG = {
   API_DASHBOARD: api({
     openapi: "/api/kubepkg-dashboard",
   })(({ env }: AppContext) => {
+    if (env === "dev") {
+      return "https://kubepkg-dashboard---kubepkg.innoai.tech";
+    }
     if (env === "local") {
-      return "http://0.0.0.0:80";
+      return "http://0.0.0.0:8081";
     }
     return "";
   }),

@@ -3,6 +3,10 @@ package group
 import (
 	"context"
 
+	"github.com/octohelm/courier/pkg/expression"
+	authoperator "github.com/octohelm/kubepkg/internal/dashboard/apis/auth/operator"
+	"github.com/octohelm/kubepkg/pkg/rbac"
+
 	"github.com/octohelm/courier/pkg/courier"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/group/operator"
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/account"
@@ -15,6 +19,10 @@ import (
 func (PutGroupAccount) MiddleOperators() courier.MiddleOperators {
 	return courier.MiddleOperators{
 		&operator.ValidGroup{},
+		rbac.Need(expression.AnyOf(
+			authoperator.NeedAdminRole(group.ROLE_TYPE__MEMBER),
+			authoperator.NeedGroupRole(group.ROLE_TYPE__OWNER),
+		)),
 	}
 }
 

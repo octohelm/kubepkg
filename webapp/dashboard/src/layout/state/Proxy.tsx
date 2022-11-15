@@ -8,8 +8,7 @@ import {
   useMemo,
   useRef
 } from "react";
-import { from, merge, Observable } from "rxjs";
-import { mergeMap, tap } from "rxjs/operators";
+import { from, merge, Observable, mergeMap, tap, distinctUntilChanged } from "rxjs";
 
 export const useEpics = <D, T extends Observable<D>>(
   ob$: T,
@@ -23,6 +22,7 @@ export const useEpics = <D, T extends Observable<D>>(
     const sub = merge(epics.map((epic) => epic(ob$)))
       .pipe(
         mergeMap((output$) => from(output$)),
+        distinctUntilChanged((a, b) => a === b),
         tap((output) => {
           if (isFunction((ob$ as any).next)) {
             (ob$ as any).next(output);
@@ -47,9 +47,7 @@ export const useProxy = <T extends any,
   const s$ = useMemo(() => {
     return new Proxy(ob$, {
       get: (_, prop) => {
-        return (
-          extensionsRef.current[prop as string] || (ob$ as any)[prop]
-        );
+        return extensionsRef.current[prop as string] || (ob$ as any)[prop];
       }
     }) as S & E;
   }, [ob$]);

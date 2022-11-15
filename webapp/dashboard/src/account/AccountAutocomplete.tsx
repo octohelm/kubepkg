@@ -1,54 +1,22 @@
 import { useStateSubject, useRequest, Subscribe } from "@innoai-tech/reactutil";
 import {
-  alpha,
-  InputBase,
-  styled,
   Popover,
   CircularProgress,
   MenuList,
   MenuItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
-import { filter, map, tap, debounceTime } from "rxjs/operators";
-import { Search as Icon, Add } from "@mui/icons-material";
+import { filter, map, tap, debounceTime } from "rxjs";
+import { Search as SearchIconOutlined, Add } from "@mui/icons-material";
 import { AccountUser, listAccount } from "../client/dashboard";
 import { useEpics, useProxy } from "../layout";
 import { useRef } from "react";
-
-const Search = styled("label")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  marginLeft: 0,
-  width: "100%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
-}));
-
-const SearchIcon = styled("div")(({ theme }) => ({
-  padding: theme.spacing(1, 1),
-  height: "100%",
-  width: "3em",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    transition: theme.transitions.create("width"),
-    width: "100%"
-  },
-  color: "inherit",
-  flex: 1
-}));
+import { Search, SearchIcon, SearchInput } from "../layout/SearchInput";
 
 export const useAccountAutocomplete = ({
-                                         placeholder
-                                       }: {
+  placeholder,
+}: {
   placeholder?: string;
 }) => {
   const selected$ = useStateSubject("");
@@ -82,11 +50,11 @@ export const useAccountAutocomplete = ({
       return (
         <Search ref={anchorElRef}>
           <SearchIcon>
-            <Icon />
+            <SearchIconOutlined />
           </SearchIcon>
           <Subscribe value$={inputValue$}>
             {(value) => (
-              <StyledInputBase
+              <SearchInput
                 value={value}
                 ref={inputElRef}
                 placeholder={placeholder || ""}
@@ -115,7 +83,7 @@ export const useAccountAutocomplete = ({
                   anchorEl={anchorElRef.current}
                   anchorOrigin={{
                     vertical: "bottom",
-                    horizontal: "left"
+                    horizontal: "left",
                   }}
                   onClose={() => {
                     popper$.next(false);
@@ -125,8 +93,7 @@ export const useAccountAutocomplete = ({
                 >
                   <MenuList
                     style={{
-                      width:
-                      anchorElRef.current?.getBoundingClientRect().width
+                      width: anchorElRef.current?.getBoundingClientRect().width,
                     }}
                   >
                     <Subscribe value$={options$}>
@@ -140,6 +107,7 @@ export const useAccountAutocomplete = ({
                                 key={user.accountID}
                                 onClick={() => {
                                   selected$.next(user.accountID);
+                                  inputValue$.next("")
                                 }}
                               >
                                 <ListItemIcon>
@@ -161,6 +129,6 @@ export const useAccountAutocomplete = ({
           </Subscribe>
         </Search>
       );
-    }
+    },
   });
 };

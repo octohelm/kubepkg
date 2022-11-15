@@ -1,7 +1,7 @@
 import {
   useObservable,
   useObservableEffect,
-  useRequest
+  useRequest,
 } from "@innoai-tech/reactutil";
 import {
   Avatar,
@@ -12,20 +12,20 @@ import {
   ListItemAvatar,
   ListItemText,
   MenuItem,
-  Select
+  Select,
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
-import { map as rxMap, tap, ignoreElements, filter } from "rxjs/operators";
+import { map as rxMap, tap, ignoreElements, filter } from "rxjs";
 import {
   deleteAdminAccount,
   GroupRoleType,
   GroupUser,
   listAdminAccount,
-  putAdminAccount
+  putAdminAccount,
 } from "../client/dashboard";
 import { createSubject, Scaffold, stringAvatar } from "../layout";
 import { useAccountAutocomplete } from "./AccountAutocomplete";
-import { AccessControl, CurrentUserProvider } from "../auth";
+import { AccessControl } from "../auth";
 import { map } from "@innoai-tech/lodash";
 
 export const AdminAccountProvider = createSubject(({}, use) => {
@@ -33,10 +33,12 @@ export const AdminAccountProvider = createSubject(({}, use) => {
   const putAdminAccount$ = useRequest(putAdminAccount);
   const deleteAdminAccount$ = useRequest(deleteAdminAccount);
 
-  return use({} as typeof listAdminAccount.TRespData, {
+  return use(
+    {} as typeof listAdminAccount.TRespData,
+    {
       list$: listAccount$,
       del$: deleteAdminAccount$,
-      put$: putAdminAccount$
+      put$: putAdminAccount$,
     },
     (accounts$) =>
       accounts$.put$.pipe(
@@ -57,7 +59,6 @@ export const AdminAccountProvider = createSubject(({}, use) => {
 });
 
 const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
-  const user$ = CurrentUserProvider.use$();
   const account$ = AdminAccountProvider.use$();
 
   return (
@@ -69,8 +70,6 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
               value={user.roleType}
               size={"small"}
               onChange={(evt) => {
-                console.log("changed");
-
                 const roleType = evt.target.value as typeof user.roleType;
 
                 if (roleType === user.roleType) {
@@ -81,12 +80,12 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
                   account$.put$.next({
                     accountID: user.accountID,
                     body: {
-                      roleType
-                    }
+                      roleType,
+                    },
                   });
                 } else {
                   account$.del$.next({
-                    accountID: user.accountID
+                    accountID: user.accountID,
                   });
                 }
               }}
@@ -99,17 +98,15 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
                     </MenuItem>
                   )
                 ),
-                ...(user$.canAccess(account$.del$)
-                  ? [
-                    <Divider key={"--"} />,
-                    <MenuItem
-                      key={GroupRoleType.GUEST}
-                      value={GroupRoleType.GUEST}
-                    >
-                      移除管理员
-                    </MenuItem>
-                  ]
-                  : [])
+                <AccessControl key={"--"} op={account$.del$}>
+                  <Divider />,
+                  <MenuItem
+                    key={GroupRoleType.GUEST}
+                    value={GroupRoleType.GUEST}
+                  >
+                    移除管理员
+                  </MenuItem>
+                </AccessControl>,
               ]}
             </Select>
           </AccessControl>
@@ -157,34 +154,34 @@ const AdminAccountList = () => {
 export const AdminAdd = () => {
   const account$ = AdminAccountProvider.use$();
 
-  const accountSearch$ = useAccountAutocomplete({
-    placeholder: "查询并添加管理员"
+  const accountAutocomplete$ = useAccountAutocomplete({
+    placeholder: "查询并添加管理员",
   });
 
   useObservableEffect(
     () => [
       account$.put$.pipe(
         tap(() => {
-          accountSearch$.popper$.next(false);
+          accountAutocomplete$.popper$.next(false);
         })
       ),
-      accountSearch$.pipe(
+      accountAutocomplete$.pipe(
         filter((accountID) => !!accountID),
         tap((accountID) => {
           account$.put$.next({
             accountID,
             body: {
-              roleType: GroupRoleType.MEMBER
-            }
+              roleType: GroupRoleType.MEMBER,
+            },
           });
         })
-      )
+      ),
     ],
     []
   );
 
   return (
-    <AccessControl op={account$.put$}>{accountSearch$.render()}</AccessControl>
+    <AccessControl op={account$.put$}>{accountAutocomplete$.render()}</AccessControl>
   );
 };
 

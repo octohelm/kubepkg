@@ -8,15 +8,14 @@ import {
 } from "@mui/material";
 import { useEffect } from "react";
 import { useLocation } from "react-router";
-import { map } from "@innoai-tech/lodash";
+import { get, map } from "@innoai-tech/lodash";
 import { parseSearch } from "@innoai-tech/fetcher";
 
 import { listAuthProvider, authorize } from "../client/dashboard";
 
 const useAuthState = () => {
   const location = useLocation();
-  const redirectURI = parseSearch(location.search)["redirect_uri"];
-  return btoa((redirectURI || [])[0] || "");
+  return btoa(get(parseSearch(location.search), ["redirect_uri", 0], "/"));
 };
 
 export const LoginCard = () => {

@@ -3,9 +3,8 @@ package admin
 import (
 	"context"
 
-	"github.com/octohelm/kubepkg/internal/dashboard/domain/account"
-
 	"github.com/octohelm/courier/pkg/courierhttp"
+	"github.com/octohelm/kubepkg/internal/dashboard/domain/account"
 	accountrepository "github.com/octohelm/kubepkg/internal/dashboard/domain/account/repository"
 )
 

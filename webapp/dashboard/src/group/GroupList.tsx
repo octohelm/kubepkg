@@ -18,7 +18,7 @@ import { Fragment, useEffect } from "react";
 import { Group, listGroup } from "../client/dashboard";
 import { useGroupFormWithDialog } from "./GroupForm";
 import { Scaffold, stringAvatar } from "../layout";
-import { tap } from "rxjs/operators";
+import { tap } from "rxjs";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
 
@@ -79,7 +79,7 @@ const GroupList = () => {
   const listGroup$ = useRequest(listGroup);
 
   useEffect(() => {
-    listGroup$.next({});
+    listGroup$.next(undefined);
   }, []);
 
   const resp = useObservable(listGroup$);

@@ -1,12 +1,13 @@
 package manifest
 
 import (
-	"bytes"
 	"encoding/json"
+
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/yaml"
 )
 
 type Object = client.Object
@@ -41,11 +42,11 @@ func FromUnstructured[T any](o any) (*T, error) {
 		return target, nil
 	}
 
-	buf := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(buf).Encode(o); err != nil {
+	data, err := json.Marshal(o)
+	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(buf).Decode(target); err != nil {
+	if err := yaml.Unmarshal(data, target); err != nil {
 		return nil, err
 	}
 	return target, nil

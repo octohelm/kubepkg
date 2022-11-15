@@ -18,7 +18,9 @@ func (v Apply) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "KubepkgJSON":
-			return []string{}, true
+			return []string{
+				"KubePkg or KubePkgList json file",
+			}, true
 		case "Kubeconfig":
 			return []string{
 				"Paths to a kubeconfig. Only required if out-of-cluster.\"",
@@ -29,11 +31,11 @@ func (v Apply) RuntimeDoc(names ...string) ([]string, bool) {
 			}, true
 		case "Force":
 			return []string{
-				"Force overwrites ownership",
+				"overwrites ownership",
 			}, true
 		case "CreateNamespace":
 			return []string{
-				"BindKubepkg namespace if not exists",
+				"Create namespace if not exists",
 			}, true
 
 		}

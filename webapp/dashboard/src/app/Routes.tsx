@@ -3,6 +3,7 @@ import {
   WorkspacesOutlined,
   CloudOutlined,
   PeopleOutlined,
+  AppsOutlined,
 } from "@mui/icons-material";
 import { ClusterMain } from "../cluster";
 import {
@@ -11,10 +12,16 @@ import {
   GroupTitle,
   GroupAccountMain,
 } from "../group";
-import { GroupEnvMain, GroupEnvMenu } from "../group-env";
+import {
+  GroupEnvDeploymentMain,
+  GroupEnvMain,
+  GroupEnvMenu,
+} from "../group-env";
 import { Outlet } from "react-router-dom";
 import { AccountMain, AdminAccountMain } from "../account";
 import { GroupRobotMain } from "../group";
+import { KubePkgMain } from "../kubepkg";
+import { KubePkgVersionMain } from "../kubepkg/KubePkgVersion";
 
 export const groupRoutes = path("groups/:group")
   .root(true)
@@ -34,7 +41,14 @@ export const groupRoutes = path("groups/:group")
         path(":env")
           .title("环境")
           .menu(<GroupEnvMenu />)
-          .element(<Scaffold>env</Scaffold>)
+          .element(<GroupEnvDeploymentMain />)
+      ),
+    path("kubepkgs")
+      .title("应用")
+      .icon(<AppsOutlined />)
+      .children(
+        index().element(<KubePkgMain />),
+        path(":name").element(<KubePkgVersionMain />)
       ),
     path("members")
       .title("成员")

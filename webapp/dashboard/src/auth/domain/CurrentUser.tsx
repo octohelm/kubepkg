@@ -1,65 +1,51 @@
 import { currentPermissions, currentUser } from "../../client/dashboard";
-import { createDomain, useProxy } from "../../layout";
+import { createDomain } from "../../layout";
 import { useRequest } from "@innoai-tech/reactutil";
-import { create } from "@innoai-tech/form";
-import { map as rxMap } from "rxjs/operators";
+import { map as rxMap } from "rxjs";
 import { useEffect } from "react";
-import { has } from "@innoai-tech/lodash";
 
 export interface User {
+  permissions?: { [k: string]: any[] };
   accountID: string;
   accountType: string;
   nickname: string;
   adminRole: string;
-  permissions?: { [k: string]: any[] };
+  groupRoles: { [k: string]: any[] };
 }
-
-const canAccess = (operationID: string, user: User) => {
-  if (user.permissions) {
-    if (has(user.permissions || {}, operationID)) {
-      const exec = create(user.permissions[operationID]! as any)({
-        root: user,
-        schema: {}
-      });
-      return exec(0);
-    }
-    return true;
-  }
-  return false;
-};
 
 export const CurrentUserProvider = createDomain(({}, use) => {
   const currentUser$ = useRequest(currentUser);
   const currentPermissions$ = useRequest(currentPermissions);
 
-  const user$ = use("currentUser", {} as User, {
+  const user$ = use(
+    "currentUser",
+    {} as User,
+    {
       user$: currentUser$,
-      permissions$: currentPermissions$
+      permissions$: currentPermissions$,
     },
     (domain$) =>
       domain$.user$.pipe(
         rxMap((resp) => ({
           ...domain$.value,
-          ...resp.body
+          ...(resp.body as any),
         }))
       ),
     (domain$) =>
       domain$.permissions$.pipe(
         rxMap((resp) => ({
           ...domain$.value,
-          permissions: resp.body
+          permissions: resp.body,
         }))
       )
   );
 
   useEffect(() => {
-    user$.user$.next({});
-    user$.permissions$.next({});
+    user$.user$.next(undefined);
+    user$.permissions$.next(undefined);
   }, []);
 
-  return useProxy(user$, {
-    canAccess: (op: Op) => canAccess(op.operationID, user$.value)
-  });
+  return user$;
 });
 
 export interface Op {

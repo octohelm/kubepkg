@@ -6,7 +6,7 @@ import {
   useStateSubject,
 } from "@innoai-tech/reactutil";
 import { useMemo } from "react";
-import { tap } from "rxjs/operators";
+import { tap } from "rxjs";
 import { interval, merge } from "rxjs";
 import { Grid, IconButton, Paper, Stack, useMediaQuery } from "@mui/material";
 import { Sync } from "@mui/icons-material";

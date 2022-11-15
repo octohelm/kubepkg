@@ -1,3 +1,4 @@
+import { values } from "@innoai-tech/lodash";
 import { useStore$, Domain } from "@innoai-tech/reactutil";
 import { createContext, ReactNode, useContext, useMemo } from "react";
 import type { Observable } from "rxjs";
@@ -14,9 +15,49 @@ const useDomain$ = <T, E extends { [k: string]: any }>(
   return useProxy(domain$, extensions, ...epics);
 };
 
-export const createDomain = <T extends any,
+export const createProvider = <C extends any>(ctx: C) => {
+  const key = Symbol("domain");
+
+  const Context = createContext<{ [K: symbol]: C }>({ [key]: ctx });
+
+  const use = () => {
+    return useContext(Context)[key]!;
+  };
+
+  const Provider = ({
+    children,
+    value,
+  }: {
+    value: Partial<C>;
+    children: ReactNode;
+  }) => {
+    const parent = use();
+
+    const next = useMemo(
+      () => ({
+        ...(parent ? parent : {}),
+        ...value,
+      }),
+      [parent, ...values(value)]
+    );
+
+    return (
+      <Context.Provider value={{ [key]: next as any }}>
+        {children}
+      </Context.Provider>
+    );
+  };
+
+  Provider.use = use;
+
+  return Provider;
+};
+
+export const createDomain = <
+  T extends any,
   E extends { [k: string]: any },
-  TProps extends {}>(
+  TProps extends {}
+>(
   useProvider: (
     props: TProps,
     use: typeof useDomain$
@@ -27,14 +68,17 @@ export const createDomain = <T extends any,
   const C = createContext<{ [key]: ReturnType<typeof useProvider> }>({} as any);
 
   const Provider = ({
-                      children,
-                      ...props
-                    }: TProps & {
+    children,
+    ...props
+  }: TProps & {
     children: ReactNode;
   }) => {
     const domain$ = useProvider(props as any, useDomain$);
-
-    return <C.Provider value={{ [key]: domain$ }}>{children}</C.Provider>;
+    return (
+      <C.Provider key={domain$.name} value={{ [key]: domain$ }}>
+        {children}
+      </C.Provider>
+    );
   };
 
   Provider.use$ = (): ReturnType<typeof useProvider> => useContext(C)[key];

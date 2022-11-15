@@ -28,27 +28,50 @@ func (in *KubePkg) DeepCopyInto(out *KubePkg) {
 	out.TypeMeta = in.TypeMeta
 	out.ObjectMeta = *in.ObjectMeta.DeepCopy()
 	in.Spec.DeepCopyInto(&out.Spec)
-	in.Status.DeepCopyInto(&out.Status)
+	out.Status = in.Status
 
 }
-func (in *KubePkgSpec) DeepCopy() *KubePkgSpec {
+func (in *Spec) DeepCopy() *Spec {
 	if in == nil {
 		return nil
 	}
-	out := new(KubePkgSpec)
+	out := new(Spec)
 	in.DeepCopyInto(out)
 	return out
 }
 
-func (in *KubePkgSpec) DeepCopyInto(out *KubePkgSpec) {
+func (in *Spec) DeepCopyInto(out *Spec) {
 	out.Version = in.Version
-	if in.Images != nil {
-		i, o := &in.Images, &out.Images
-		*o = make(map[string]string, len(*i))
+	out.Deploy = in.Deploy
+	if in.Config != nil {
+		i, o := &in.Config, &out.Config
+		*o = make(map[string]EnvVarValueOrFrom, len(*i))
 		for key, val := range *i {
 			(*o)[key] = val
 		}
 	}
+	if in.Containers != nil {
+		i, o := &in.Containers, &out.Containers
+		*o = make(map[string]Container, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	if in.Volumes != nil {
+		i, o := &in.Volumes, &out.Volumes
+		*o = make(map[string]Volume, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	if in.Services != nil {
+		i, o := &in.Services, &out.Services
+		*o = make(map[string]Service, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.ServiceAccount = in.ServiceAccount
 	out.Manifests = in.Manifests.DeepCopy()
 
 }
@@ -62,39 +85,6 @@ func (in Manifests) DeepCopy() Manifests {
 }
 
 func (in Manifests) DeepCopyInto(out Manifests) {
-	for k := range in {
-		out[k] = in[k]
-	}
-}
-
-func (in *KubePkgStatus) DeepCopy() *KubePkgStatus {
-	if in == nil {
-		return nil
-	}
-	out := new(KubePkgStatus)
-	in.DeepCopyInto(out)
-	return out
-}
-
-func (in *KubePkgStatus) DeepCopyInto(out *KubePkgStatus) {
-	out.Statuses = in.Statuses.DeepCopy()
-	if in.Digests != nil {
-		i, o := &in.Digests, &out.Digests
-		*o = make([]DigestMeta, len(*i))
-		copy(*o, *i)
-	}
-
-}
-func (in Statuses) DeepCopy() Statuses {
-	if in == nil {
-		return nil
-	}
-	out := make(Statuses)
-	in.DeepCopyInto(out)
-	return out
-}
-
-func (in Statuses) DeepCopyInto(out Statuses) {
 	for k := range in {
 		out[k] = in[k]
 	}

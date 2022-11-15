@@ -1,22 +1,30 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { Link, Routes } from "react-router-dom";
-import { index, Main, NotificationProvider, NotificationSnackbar, path, Scaffold } from "../layout";
+import {
+  index,
+  Main,
+  NotificationProvider,
+  NotificationSnackbar,
+  path,
+  Scaffold,
+} from "../layout";
 import { loginRoutes } from "./login";
 import { adminRoutes, groupRoutes } from "./Routes";
 import { GroupCardList } from "../group";
 import { IconButtonWithTooltip } from "../layout";
 import { Build } from "@mui/icons-material";
 import { MustLogon } from "../auth";
+import { openapiRoutes } from "../openapi/routes";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#3f51b5"
+      main: "#3f51b5",
     },
     secondary: {
-      main: "#f50057"
-    }
-  }
+      main: "#f50057",
+    },
+  },
 });
 
 const mainRoutes = path("/")
@@ -52,7 +60,9 @@ export const App = () => {
       <CssBaseline />
       <NotificationProvider>
         <Routes>
-          ${loginRoutes}${mainRoutes}
+          {openapiRoutes}
+          {loginRoutes}
+          {mainRoutes}
         </Routes>
         <NotificationSnackbar />
       </NotificationProvider>

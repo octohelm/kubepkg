@@ -3,6 +3,15 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
+
+	"github.com/stretchr/objx"
+	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/labels"
+
+	corev1 "k8s.io/api/core/v1"
+
+	"github.com/octohelm/kubepkg/pkg/annotation"
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
@@ -16,6 +25,7 @@ import (
 
 type KubePkgStatusReconciler struct {
 	ctrl.Manager
+	HostOptions HostOptions
 }
 
 func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -31,11 +41,9 @@ func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	for i := range gvks {
 		u := &unstructured.Unstructured{}
 		u.SetGroupVersionKind(gvks[i])
-
 		if !IsSupportedGroupKind(u) {
 			continue
 		}
-
 		c = c.Owns(u, builder.OnlyMetadata)
 	}
 
@@ -43,7 +51,7 @@ func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
-	l := r.GetLogger().WithName("KubePkgStatus").WithValues("request", request.NamespacedName)
+	l := r.GetLogger().WithValues("Reconcile", "Status", "request", request.NamespacedName)
 
 	kpkg := &kubepkgv1alpha1.KubePkg{}
 
@@ -58,7 +66,11 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 
 	cc := r.GetClient()
 
-	statuses := map[string]any{}
+	specStatus := &kubepkgv1alpha1.Status{}
+
+	if len(r.HostOptions.IngressGateway) > 0 {
+		kubeutil.Annotate(kpkg, annotation.IngressGateway, strings.Join(r.HostOptions.IngressGateway, ","))
+	}
 
 	manifests, err := manifest.ExtractComplete(kpkg)
 	if err != nil {
@@ -66,18 +78,19 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 		return reconcile.Result{}, nil
 	}
 
-	for name := range manifests {
-		o := manifests[name]
+	for key := range manifests {
+		o := manifests[key]
+
 		// skip unsupported
 		if !IsSupportedGroupKind(o) {
-			statuses[name] = map[string]any{
+			specStatus.AppendResourceStatus(o.GetName(), o.GetObjectKind().GroupVersionKind(), map[string]any{
 				"status": "False",
 				"reason": "UnsupportedManifest",
-			}
+			})
 			continue
 		}
 
-		if err := r.syncManifestStatus(ctx, statuses, o, name); err != nil {
+		if err := r.collectManifestStatus(ctx, specStatus, o); err != nil {
 			return reconcile.Result{}, nil
 		}
 	}
@@ -88,7 +101,9 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 		}
 		return reconcile.Result{}, err
 	}
-	kpkg.Status.Statuses = statuses
+
+	kpkg.Status = specStatus
+
 	if err := cc.Status().Update(ctx, kpkg); err != nil {
 		l.Error(err, "update status err")
 		return reconcile.Result{}, nil
@@ -96,7 +111,7 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 	return reconcile.Result{}, nil
 }
 
-func (r *KubePkgStatusReconciler) syncManifestStatus(ctx context.Context, statuses map[string]any, o client.Object, name string) error {
+func (r *KubePkgStatusReconciler) collectManifestStatus(ctx context.Context, specStatus *kubepkgv1alpha1.Status, o client.Object) error {
 	gvk := o.GetObjectKind().GroupVersionKind()
 
 	live, err := kubeutil.NewForGroupVersionKind(gvk)
@@ -109,12 +124,71 @@ func (r *KubePkgStatusReconciler) syncManifestStatus(ctx context.Context, status
 	}
 
 	if u, ok := live.(*unstructured.Unstructured); ok {
-		if status, ok := u.Object["status"]; ok {
-			statuses[name] = status
-		} else {
-			statuses[name] = map[string]any{}
+		if gvk == corev1.SchemeGroupVersion.WithKind("ConfigMap") && strings.HasPrefix(u.GetName(), "endpoint-") {
+			if data, ok := u.Object["data"]; ok {
+				if endpoints, ok := data.(map[string]any); ok {
+					specStatus.Endpoint = map[string]string{}
+
+					for k := range endpoints {
+						if v, ok := endpoints[k].(string); ok {
+							specStatus.Endpoint[k] = v
+						}
+					}
+				}
+			}
 		}
+
+		manifestStatus := map[string]any{}
+
+		m := objx.Map(u.Object)
+
+		if v := m.Get("status"); v.IsObjxMap() {
+			manifestStatus = v.MSI()
+		}
+
+		if gvk.Group == appsv1.SchemeGroupVersion.Group {
+			if spec := m.Get("spec"); spec.IsObjxMap() {
+				if selector := spec.ObjxMap().Get("selector"); selector.IsObjxMap() {
+					if matchLabels := selector.ObjxMap().Get("matchLabels"); matchLabels.IsObjxMap() {
+						podLabels := map[string]string{}
+						for k, v := range matchLabels.ObjxMap() {
+							if value := v.(string); ok {
+								podLabels[k] = value
+							}
+						}
+						podStatuses, err := r.collectContainerStatus(ctx, o.GetNamespace(), podLabels, manifestStatus)
+						if err != nil {
+							return err
+						}
+						manifestStatus["podStatuses"] = podStatuses
+					}
+				}
+			}
+		}
+
+		specStatus.AppendResourceStatus(o.GetName(), gvk, manifestStatus)
 	}
 
 	return nil
+}
+
+func (r *KubePkgStatusReconciler) collectContainerStatus(ctx context.Context, namespace string, matchLabels map[string]string, status map[string]any) ([]corev1.PodStatus, error) {
+	podList := &corev1.PodList{}
+
+	if err := r.GetClient().List(
+		ctx,
+		podList,
+		client.InNamespace(namespace),
+		client.MatchingLabelsSelector{Selector: labels.SelectorFromSet(matchLabels)},
+	); err != nil {
+		return nil, err
+	}
+
+	podContainerStatuses := make([]corev1.PodStatus, len(podList.Items))
+
+	for i := range podList.Items {
+		podContainerStatuses[i] = podList.Items[i].Status
+	}
+
+	return podContainerStatuses, nil
 }

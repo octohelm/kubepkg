@@ -8,16 +8,16 @@ import {
   Toolbar,
   AppBar,
   Typography,
-  Button
+  Button,
 } from "@mui/material";
 import { Link, Outlet, useMatch, generatePath } from "react-router-dom";
 import { ScaffoldProps, ScaffoldProvider } from "./Scaffold";
 import { isEmpty } from "@innoai-tech/lodash";
 
 const GlobalDrawer = ({
-                        width,
-                        open = true
-                      }: {
+  width,
+  open = true,
+}: {
   width: number;
   open?: boolean;
 }) => {
@@ -31,7 +31,7 @@ const GlobalDrawer = ({
       sx={{
         width,
         flexShrink: 0,
-        ["& .MuiDrawer-paper"]: { width, boxSizing: "border-box" }
+        ["& .MuiDrawer-paper"]: { width, boxSizing: "border-box" },
       }}
     >
       <Toolbar />
@@ -73,7 +73,7 @@ const GlobalDrawer = ({
                     title={sub.title}
                     to={generatePath(sub.path, {
                       ...matched?.params,
-                      env: "test"
+                      env: "test",
                     })}
                   />
                 );

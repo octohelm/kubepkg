@@ -34,4 +34,8 @@ func (id ID) String() string {
 	return datatypes.SFID(id).String()
 }
 
-// TODO add Label for Kubepkg
+type KubepkgQueryParams struct {
+	Names []string `name:"name,omitempty" in:"query"`
+
+	datatypes.Pager
+}

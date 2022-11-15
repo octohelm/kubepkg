@@ -1,8 +1,9 @@
 import { createDomain } from "../../layout";
 import { getGroup, Group, putGroup } from "../../client/dashboard";
-import { map as rxMap } from "rxjs/operators";
+import { map as rxMap } from "rxjs";
 import { useRequest } from "@innoai-tech/reactutil";
-import { useEffect } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
+import { AccessControlProvider, createCanAccess } from "../../auth";
 
 export const GroupProvider = createDomain(
   ({ groupName }: { groupName: string }, use) => {
@@ -14,7 +15,7 @@ export const GroupProvider = createDomain(
       { name: groupName } as Group,
       {
         get$: getGroup$,
-        put$: putGroup$
+        put$: putGroup$,
       },
       (domain$) => domain$.get$.pipe(rxMap((resp) => resp.body)),
       (domain$) => domain$.put$.pipe(rxMap((resp) => resp.body))
@@ -27,3 +28,26 @@ export const GroupProvider = createDomain(
     return group$;
   }
 );
+
+export const GroupAccessControlProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const group$ = GroupProvider.use$();
+
+  const canAccessWithGroup = useMemo(
+    () => createCanAccess(group$.value.groupID),
+    [group$.value.groupID]
+  );
+
+  return (
+    <AccessControlProvider
+      value={{
+        canAccess: canAccessWithGroup,
+      }}
+    >
+      {children}
+    </AccessControlProvider>
+  );
+};

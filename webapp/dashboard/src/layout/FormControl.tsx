@@ -7,7 +7,7 @@ import {
   Input,
   InputLabel,
   MenuItem,
-  Select
+  Select,
 } from "@mui/material";
 import { createContext, useContext, useMemo, useId } from "react";
 import { Subscribe } from "@innoai-tech/reactutil";
@@ -16,7 +16,7 @@ import {
   InferSchema,
   FieldSubject,
   FormSubject,
-  Schema
+  Schema,
 } from "@innoai-tech/form";
 
 const FormContext = createContext<{ form$?: FormSubject<any> }>({});
@@ -59,9 +59,9 @@ const fieldKey = (name: string, parent = "") => {
 };
 
 const FormControlsFromSchema = ({
-                                  schema,
-                                  name
-                                }: {
+  schema,
+  name,
+}: {
   schema: Schema;
   name?: string;
 }) => {
@@ -159,9 +159,9 @@ const FormControlsFromSchema = ({
               }}
               {...(schema.type === "number"
                 ? {
-                  inputMode: "numeric",
-                  pattern: "[0-9]*"
-                }
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                  }
                 : {})}
             />
           );
@@ -191,8 +191,8 @@ const FormControlsFromSchema = ({
 };
 
 export const FormControls = <T extends object>({
-                                                 form$
-                                               }: {
+  form$,
+}: {
   form$: FormSubject<T>;
 }) => {
   return (
@@ -201,4 +201,3 @@ export const FormControls = <T extends object>({
     </FormContextProvider>
   );
 };
-

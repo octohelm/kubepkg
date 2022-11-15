@@ -24,7 +24,7 @@ export const AuthTokenPatcher = ({ children }: { children: ReactNode }) => {
       toHref: (requestConfig: RequestConfig<any>) => {
         set(
           requestConfig,
-          ["params", "authorization"],
+          ["params", "x-param-header-Authorization"],
           get(requestConfig, ["headers", "Authorization"])
         );
         return f.toHref(requestConfig);

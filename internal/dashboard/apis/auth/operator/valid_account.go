@@ -5,26 +5,21 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/octohelm/kubepkg/pkg/ioutil"
-
-	b "github.com/octohelm/storage/pkg/sqlbuilder"
-
-	"github.com/octohelm/kubepkg/pkg/ioutil/fp"
-
 	"github.com/octohelm/courier/pkg/expression"
 	"github.com/octohelm/courier/pkg/statuserror"
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/account"
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/group"
 	grouprepository "github.com/octohelm/kubepkg/internal/dashboard/domain/group/repository"
 	"github.com/octohelm/kubepkg/pkg/auth"
+	"github.com/octohelm/kubepkg/pkg/ioutil"
+	"github.com/octohelm/kubepkg/pkg/ioutil/fp"
 	"github.com/octohelm/kubepkg/pkg/signer"
+	b "github.com/octohelm/storage/pkg/sqlbuilder"
 )
 
 type ValidAccount struct {
 	// Bearer access_token
-	Authorization string `name:"Authorization,omitempty" in:"header"`
-	// Bearer access_token in query
-	AuthorizationInQuery string `name:"authorization,omitempty" in:"query"`
+	Authorization string `name:"Authorization" in:"header"`
 }
 
 func (c *ValidAccount) Output(ctx context.Context) (interface{}, error) {
@@ -32,11 +27,6 @@ func (c *ValidAccount) Output(ctx context.Context) (interface{}, error) {
 
 	if c.Authorization != "" {
 		a := auth.ParseAuthorization(c.Authorization)
-		accessToken = a.Get("Bearer")
-	}
-
-	if c.AuthorizationInQuery != "" {
-		a := auth.ParseAuthorization(c.AuthorizationInQuery)
 		accessToken = a.Get("Bearer")
 	}
 
@@ -58,8 +48,13 @@ func (c *ValidAccount) Output(ctx context.Context) (interface{}, error) {
 	a.AdminRole = group.ROLE_TYPE__GUEST
 	a.AccountType = account.TYPE__USER
 
-	if len(audience) > 1 {
-		a.AccountType, _ = account.ParseTypeFromString(audience[1])
+	for i, aud := range audience {
+		if i == 1 {
+			a.AccountType, _ = account.ParseTypeFromString(aud)
+		}
+		if aud == "ADMIN_INIT" {
+			a.AdminRole = group.ROLE_TYPE__OWNER
+		}
 	}
 
 	if a.AccountType == account.TYPE__USER {
@@ -78,8 +73,9 @@ func (c *ValidAccount) Output(ctx context.Context) (interface{}, error) {
 
 type Account struct {
 	account.User
-	AccountType account.Type   `json:"accountType"`
-	AdminRole   group.RoleType `json:"adminRole"`
+	AccountType account.Type                `json:"accountType"`
+	AdminRole   group.RoleType              `json:"adminRole"`
+	GroupRoles  map[group.ID]group.RoleType `json:"groupRoles,omitempty"`
 }
 
 func (a *Account) InjectContext(ctx context.Context) context.Context {

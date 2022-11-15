@@ -12,7 +12,7 @@ import (
 	_ "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// +gengo:client:openapi=http://0.0.0.0:36060/api/kubepkg-agent
+// +gengo:client:openapi=http://0.0.0.0:32060/api/kubepkg-agent
 type Client struct {
 	Endpoint string
 	c        *client.Client

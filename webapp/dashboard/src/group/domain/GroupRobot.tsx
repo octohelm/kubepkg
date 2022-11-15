@@ -4,7 +4,7 @@ import {
   createGroupRobot,
   deleteGroupAccount,
   listGroupRobot,
-  refreshGroupRobotToken
+  refreshGroupRobotToken,
 } from "../../client/dashboard";
 import { useRequest } from "@innoai-tech/reactutil";
 import { map as rxMap, ignoreElements, tap } from "rxjs/operators";
@@ -17,18 +17,20 @@ export const GroupRobotProvider = createSubject(({}, use) => {
   const token$ = useRequest(refreshGroupRobotToken);
   const deleteGroupRobot$ = useRequest(deleteGroupAccount);
 
-  return use({} as typeof listGroupRobot.TRespData, {
+  return use(
+    {} as typeof listGroupRobot.TRespData,
+    {
       groupName: group$.value.name,
       list$: listAccount$,
       create$: createGroupRobot$,
       del$: deleteGroupRobot$,
-      token$: token$
+      token$: token$,
     },
     (accounts$) =>
       accounts$.create$.pipe(
         tap(() => {
           accounts$.list$.next({
-            groupName: group$.value.name
+            groupName: group$.value.name,
           });
         }),
         ignoreElements()
@@ -37,7 +39,7 @@ export const GroupRobotProvider = createSubject(({}, use) => {
       accounts$.del$.pipe(
         tap(() => {
           accounts$.list$.next({
-            groupName: group$.value.name
+            groupName: group$.value.name,
           });
         }),
         ignoreElements()

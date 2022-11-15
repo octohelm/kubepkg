@@ -19,7 +19,7 @@ func (v ApplyKubePkg) RuntimeDoc(names ...string) ([]string, bool) {
 		switch names[0] {
 		case "KubePkg":
 			return []string{
-				"通过 Kubepkg.json 部署",
+				"通过 KubePkg.json 部署",
 			}, true
 		case "KubePkgTgz":
 			return []string{

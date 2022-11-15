@@ -230,7 +230,7 @@ func (l *logRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 			"cost", time.Since(started),
 			"status", resp.StatusCode,
 		).
-		Info("%s %s", req.Method, req.URL)
+		Debug("%s %s", req.Method, req.URL)
 
 	return resp, err
 }

@@ -3,11 +3,12 @@ package manifest
 import (
 	"bytes"
 	"fmt"
+	"sort"
+
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/stretchr/objx"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"sort"
 )
 
 type ObjectProcess = func(o Object) (Object, error)

@@ -7,13 +7,10 @@ import (
 )
 
 var CRDs = []*apiextensionsv1.CustomResourceDefinition{
-	CustomResourceDefinition(),
-}
-
-func CustomResourceDefinition() *apiextensionsv1.CustomResourceDefinition {
-	return kubeutil.ToCRD(&kubeutil.CustomResourceDefinition{
+	kubeutil.ToCRD(&kubeutil.CustomResourceDefinition{
 		GroupVersion: v1alpha1.SchemeGroupVersion,
 		KindType:     &v1alpha1.KubePkg{},
 		ListKindType: &v1alpha1.KubePkgList{},
-	})
+		SpecType:     &v1alpha1.Spec{},
+	}),
 }

@@ -3,16 +3,16 @@ package main
 import (
 	"context"
 
+	"sigs.k8s.io/yaml"
+
 	"github.com/go-courier/logr"
 	"github.com/innoai-tech/infra/pkg/cli"
-	"github.com/innoai-tech/infra/pkg/otel"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
 	"github.com/octohelm/kubepkg/pkg/ioutil"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
+	"github.com/octohelm/kubepkg/pkg/logutil"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 // BindKubepkg kubepkg.tgz from kubepkg manifest
 type Export struct {
 	cli.C
-	otel.Otel
+	logutil.Logger
 	Exporter
 }
 
@@ -52,12 +52,12 @@ func (s *Exporter) SetDefaults() {
 }
 
 func (s *Exporter) Run(ctx context.Context) error {
-	l := logr.FromContext(ctx)
-
-	kpkg, err := kubepkg.Load(s.KubepkgJSON)
+	kpkgs, err := kubepkg.Load(s.KubepkgJSON)
 	if err != nil {
 		return err
 	}
+
+	l := logr.FromContext(ctx)
 
 	c := containerregistry.Configuration{}
 
@@ -82,52 +82,53 @@ func (s *Exporter) Run(ctx context.Context) error {
 	}
 	defer tgz.Close()
 
-	kubepkg.AnnotationPlatforms(kpkg, s.Platform)
+	for i := range kpkgs {
+		kpkg := kpkgs[i]
 
-	if s.ForceResolve {
-		for k := range kpkg.Spec.Images {
-			kpkg.Spec.Images[k] = ""
+		kubepkg.AnnotationPlatforms(kpkg, s.Platform)
+
+		if s.ForceResolve {
+			for k := range kpkg.Status.Images {
+				kpkg.Status.Images[k] = ""
+			}
 		}
+
+		resolved, err := dr.Resolve(ctx, kpkg)
+		if err != nil {
+			return err
+		}
+
+		kpkgs[i] = resolved
 	}
 
-	resolved, err := dr.Resolve(ctx, kpkg)
+	d, err := p.KubeTgzTo(ctx, tgz, kpkgs...)
 	if err != nil {
 		return err
 	}
 
-	d, err := p.KubeTgzTo(ctx, resolved, tgz)
-	if err != nil {
-		return err
-	}
-
-	l.WithValues("digest", d).Info(
-		"%s generated.", s.Output,
-	)
+	l.WithValues("digest", d).Info("%s generated.", s.Output)
 
 	if s.ExtractManifestsYaml != "" {
-		manifestsYaml, err := ioutil.CreateOrOpen(s.ExtractManifestsYaml)
+		manifestsYamlFile, err := ioutil.CreateOrOpen(s.ExtractManifestsYaml)
 		if err != nil {
 			return errors.Wrapf(err, "open %s failed", s.ExtractManifestsYaml)
 		}
-		defer manifestsYaml.Close()
+		defer manifestsYamlFile.Close()
 
-		manifests, err := manifest.Extract(resolved.Spec.Manifests, func(o manifest.Object) (manifest.Object, error) {
-			o.SetNamespace(resolved.GetNamespace())
-			return o, nil
-		})
-		if err != nil {
-			return errors.Wrapf(err, "extract manifests failed: %s", s.ExtractManifestsYaml)
-		}
-
-		w := yaml.NewEncoder(manifestsYaml)
-		for _, m := range manifests {
-			if u, ok := m.(*unstructured.Unstructured); ok {
-				if err := w.Encode(u.Object); err != nil {
+		for i := range kpkgs {
+			manifests, err := manifest.ExtractComplete(kpkgs[i])
+			if err != nil {
+				return errors.Wrapf(err, "extract manifests failed: %s", s.ExtractManifestsYaml)
+			}
+			for _, m := range manifests {
+				data, err := yaml.Marshal(m)
+				if err != nil {
 					return errors.Wrapf(err, "encoding to yaml failed: %s", s.ExtractManifestsYaml)
 				}
+				_, _ = manifestsYamlFile.WriteString("---\n")
+				_, _ = manifestsYamlFile.Write(data)
 			}
 		}
-		_ = w.Close()
 	}
 
 	return nil

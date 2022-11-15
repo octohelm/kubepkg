@@ -3,9 +3,9 @@ package datatypes
 import (
 	"database/sql/driver"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/octohelm/storage/pkg/dal"
-
 	"github.com/octohelm/storage/pkg/datatypes"
 )
 

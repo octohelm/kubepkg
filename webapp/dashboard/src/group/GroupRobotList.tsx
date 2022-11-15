@@ -1,4 +1,9 @@
-import { Subscribe, useObservable, useRequest, useStateSubject } from "@innoai-tech/reactutil";
+import {
+  Subscribe,
+  useObservable,
+  useRequest,
+  useStateSubject,
+} from "@innoai-tech/reactutil";
 import {
   Avatar,
   Box,
@@ -8,12 +13,18 @@ import {
   ListItemAvatar,
   ListItemText,
   useTheme,
-  Typography
+  Typography,
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import type { GroupRobot } from "../client/dashboard";
-
-import { IconButtonWithTooltip, NotificationProvider, Scaffold, stringAvatar, useDialog, useProxy } from "../layout";
+import {
+  IconButtonWithTooltip,
+  NotificationProvider,
+  Scaffold,
+  stringAvatar,
+  useDialog,
+  useProxy,
+} from "../layout";
 import { AccessControl } from "../auth";
 import { useGroupRobotFormWithDialog } from "./GroupRobotForm";
 import { AddModerator, RefreshOutlined } from "@mui/icons-material";
@@ -21,7 +32,6 @@ import { GroupProvider, GroupRobotProvider } from "./domain";
 import { GroupRoleType, refreshGroupRobotToken } from "../client/dashboard";
 import { map as rxMap, tap } from "rxjs/operators";
 import copy from "copy-to-clipboard";
-
 
 const useGroupRobotTokenRefresh = () => {
   const notification$ = NotificationProvider.use$();
@@ -31,7 +41,7 @@ const useGroupRobotTokenRefresh = () => {
   const theme = useTheme();
 
   const token$ = useStateSubject<typeof refreshGroupRobotToken.TRespData>({
-    accessToken: "-"
+    accessToken: "-",
   } as any);
 
   const dialog$ = useDialog({
@@ -41,44 +51,46 @@ const useGroupRobotTokenRefresh = () => {
       <Box>
         <Subscribe value$={token$}>
           {(token) => (
-            <Box component={"pre"} onClick={() => {
-              copy(token.accessToken);
-              notification$.notify("已复制到剪贴板");
-            }} sx={{
-              backgroundColor: theme.palette.action.hover,
-              padding: theme.spacing(1, 1),
-              borderRadius: 1,
-              overflowY: "scroll"
-            }}>
-              <code>
-                {token.accessToken}
-              </code>
+            <Box
+              component={"pre"}
+              onClick={() => {
+                copy(token.accessToken);
+                notification$.notify("已复制到剪贴板");
+              }}
+              sx={{
+                backgroundColor: theme.palette.action.hover,
+                padding: theme.spacing(1, 1),
+                borderRadius: 1,
+                overflowY: "scroll",
+              }}
+            >
+              <code>{token.accessToken}</code>
             </Box>
           )}
         </Subscribe>
-        <Typography variant="caption">
-          请妥善保管
-        </Typography>
+        <Typography variant="caption">点击复制，请妥善保管</Typography>
       </Box>
-    )
+    ),
   });
 
-  return useProxy(token$, {
+  return useProxy(
+    token$,
+    {
       operationID: refreshGroupRobotToken$.operationID,
       refresh$: refreshGroupRobotToken$,
-      dialog$: dialog$
+      dialog$: dialog$,
     },
-    (token$) => token$.refresh$.pipe(
-      rxMap((resp) => ({
-        ...resp.body
-      })),
-      tap(() => {
-        token$.dialog$.next(true);
-      })
-    )
+    (token$) =>
+      token$.refresh$.pipe(
+        rxMap((resp) => ({
+          ...resp.body,
+        })),
+        tap(() => {
+          token$.dialog$.next(true);
+        })
+      )
   );
 };
-
 
 const GroupRobotListItem = ({ robot }: { robot: GroupRobot }) => {
   const token$ = useGroupRobotTokenRefresh();
@@ -99,8 +111,8 @@ const GroupRobotListItem = ({ robot }: { robot: GroupRobot }) => {
                   robotID: robot.accountID,
                   body: {
                     roleType: GroupRoleType.MEMBER,
-                    expiresIn: 30 * 24 * 60 * 60
-                  }
+                    expiresIn: 30 * 24 * 60 * 60,
+                  },
                 });
               }}
             >
@@ -130,7 +142,7 @@ const GroupRobotList = () => {
 
   useEffect(() => {
     robots$.list$.next({
-      groupName: robots$.groupName
+      groupName: robots$.groupName,
     });
   }, []);
 

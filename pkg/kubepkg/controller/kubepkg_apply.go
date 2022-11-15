@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/octohelm/kubepkg/pkg/annotation"
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
@@ -22,6 +24,7 @@ import (
 
 type KubePkgApplyReconciler struct {
 	ctrl.Manager
+	HostOptions HostOptions
 }
 
 func (r *KubePkgApplyReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -58,7 +61,7 @@ func (r *KubePkgApplyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
-	l := r.GetLogger().WithName("KubePkgApply").WithValues("request", request.NamespacedName)
+	l := r.GetLogger().WithValues("Reconcile", "Apply", "request", request.NamespacedName)
 
 	kpkg := &kubepkgv1alpha1.KubePkg{}
 
@@ -69,7 +72,11 @@ func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcil
 		return reconcile.Result{}, err
 	}
 
-	l.Info(fmt.Sprintf("%s.%s", kpkg.GetName(), kpkg.GetNamespace()))
+	l.Info(fmt.Sprintf("Applying %s.%s", kpkg.GetName(), kpkg.GetNamespace()))
+
+	if len(r.HostOptions.IngressGateway) > 0 {
+		kubeutil.Annotate(kpkg, annotation.IngressGateway, strings.Join(r.HostOptions.IngressGateway, ","))
+	}
 
 	manifests, err := manifest.ExtractComplete(kpkg)
 	if err != nil {
@@ -92,6 +99,7 @@ func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcil
 
 		if err := r.applyManifest(ctx, kpkg, o); err != nil {
 			l.Error(err, fmt.Sprintf("%s `%s`: apply sub-manifest failed", o.GetObjectKind().GroupVersionKind(), o.GetName()))
+			continue
 		}
 	}
 
@@ -111,7 +119,7 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 
 		for i := range cms.Items {
 			cm := cms.Items[i]
-			kubeutil.Annotate(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
+			AnnotateHash(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
 		}
 	}
 
@@ -127,7 +135,7 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 
 		for i := range ss.Items {
 			s := ss.Items[i]
-			kubeutil.Annotate(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
+			AnnotateHash(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
 		}
 	}
 

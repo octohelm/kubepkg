@@ -10,6 +10,14 @@ import (
 )
 
 func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&GetClusterStatus{}))
+}
+
+func (*GetClusterStatus) ResponseContent() any {
+	return &github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.InstanceStatus{}
+}
+
+func init() {
 	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&ListCluster{}))
 }
 

@@ -12,7 +12,7 @@ require (
 	github.com/go-courier/logr v0.1.0
 	github.com/go-courier/snowflakeid v1.2.1
 	github.com/go-logr/logr v1.2.3
-	github.com/go-rod/rod v0.108.1
+	github.com/go-rod/rod v0.112.2
 	github.com/google/uuid v1.3.0
 	github.com/innoai-tech/infra v0.0.0-20221201090415-074b71e88119
 	github.com/lestrrat-go/jwx/v2 v2.0.8
@@ -109,7 +109,7 @@ require (
 	github.com/spf13/cobra v1.6.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
-	github.com/ysmood/gson v0.7.1 // indirect
+	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.8.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.11.1 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect

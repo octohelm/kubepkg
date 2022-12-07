@@ -29,7 +29,7 @@ require (
 	github.com/stretchr/objx v0.5.0
 	golang.org/x/crypto v0.3.0
 	golang.org/x/exp v0.0.0-20221126150942-6ab00d035af9
-	golang.org/x/net v0.2.0
+	golang.org/x/net v0.3.0
 	golang.org/x/oauth2 v0.2.0
 	golang.org/x/sync v0.1.0
 	k8s.io/api v0.25.4
@@ -127,7 +127,7 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/term v0.2.0 // indirect
+	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/time v0.2.0 // indirect
 	golang.org/x/tools v0.3.0 // indirect

@@ -30,7 +30,7 @@ require (
 	golang.org/x/crypto v0.3.0
 	golang.org/x/exp v0.0.0-20221126150942-6ab00d035af9
 	golang.org/x/net v0.4.0
-	golang.org/x/oauth2 v0.2.0
+	golang.org/x/oauth2 v0.3.0
 	golang.org/x/sync v0.1.0
 	k8s.io/api v0.25.4
 	k8s.io/apiextensions-apiserver v0.25.4

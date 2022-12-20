@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	cuelang.org/go v0.5.0-beta.2
-	github.com/containerd/containerd v1.6.12
+	github.com/containerd/containerd v1.6.14
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/distribution/v3 v3.0.0-20221208165359-362910506bc2
@@ -29,6 +29,7 @@ require (
 	github.com/stretchr/objx v0.5.0
 	golang.org/x/crypto v0.4.0
 	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
+	golang.org/x/mod v0.7.0
 	golang.org/x/net v0.4.0
 	golang.org/x/oauth2 v0.3.0
 	golang.org/x/sync v0.1.0
@@ -125,7 +126,6 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect

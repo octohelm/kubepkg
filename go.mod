@@ -29,6 +29,7 @@ require (
 	github.com/stretchr/objx v0.5.0
 	golang.org/x/crypto v0.4.0
 	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
+	golang.org/x/mod v0.7.0
 	golang.org/x/net v0.4.0
 	golang.org/x/oauth2 v0.3.0
 	golang.org/x/sync v0.1.0
@@ -39,7 +40,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20221207184640-f3cff1453715
 	k8s.io/utils v0.0.0-20221128185143-99ec85e7a448
 	sigs.k8s.io/controller-runtime v0.13.1-0.20221212022533-c773bef2bc5b
-	sigs.k8s.io/controller-tools v0.10.0
+	sigs.k8s.io/controller-tools v0.11.1
 	sigs.k8s.io/yaml v1.3.0
 )
 
@@ -103,7 +104,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/onsi/gomega v1.24.1 // indirect
+	github.com/onsi/gomega v1.24.2 // indirect
 	github.com/prometheus/client_golang v1.14.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.38.0 // indirect
@@ -125,7 +126,6 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect

@@ -17,7 +17,7 @@ require (
 	github.com/innoai-tech/infra v0.0.0-20221212034039-a8a070f97cd3
 	github.com/lestrrat-go/jwx/v2 v2.0.8
 	github.com/mattn/go-colorable v0.1.13
-	github.com/mattn/go-isatty v0.0.16
+	github.com/mattn/go-isatty v0.0.17
 	github.com/octohelm/courier v0.0.0-20221228034543-51159a362189
 	github.com/octohelm/gengo v0.0.0-20221010061850-f63d97b13fe9
 	github.com/octohelm/storage v0.0.0-20221201105919-19381fedacbc

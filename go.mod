@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	cuelang.org/go v0.5.0-beta.2
-	github.com/containerd/containerd v1.6.14
+	github.com/containerd/containerd v1.6.15
 	github.com/coreos/go-oidc/v3 v3.5.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/distribution/v3 v3.0.0-20221208165359-362910506bc2

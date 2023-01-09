@@ -6,6 +6,7 @@ import { injectWebAppConfig } from "@innoai-tech/config/vite-plugin-inject-confi
 
 (process.env as any).APP_VERSION = "__VERSION__";
 
+// @ts-ignore
 export default defineConfig({
   plugins: [
     app("dashboard"),
@@ -14,18 +15,36 @@ export default defineConfig({
         await generateClients(join(c.root!, "client"), ctx, {
           requestCreator: {
             expose: "createRequest",
-            importPath: "./client",
+            importPath: "./client"
           },
-          includesRawOpenAPI: true,
+          includesRawOpenAPI: true
         });
       }
     }),
     presetReact({
       chunkGroups: {
-        core: /rollup|core-js|tslib|babel|scheduler|history|object-assign|hey-listen/,
-        utils: /date-fns|lodash|rxjs|filesize|buffer|copy-to-clipboard/,
-        ui: /react|react-router|emotion|mui|react-spring|innoai-tech/,
-      },
-    }),
-  ],
+        utils: [
+          "@innoai-tech/lodash",
+          "rxjs",
+          "date-fns",
+          "filesize",
+          "copy-to-clipboard"
+        ],
+        uikit: [
+          "react",
+          "react-dom",
+          "react-router",
+          "react-router-dom",
+          "react-spring",
+          "@innoai-tech/*"
+        ],
+        ui: ["@emotion/*", "@mui/*", "@monaco-editor/*"],
+        markdown: ["unified", "rehype-*"]
+      }
+    })
+    // visualizer({
+    //   emitFile: true,
+    //   filename: "stats.html"
+    // })
+  ]
 });

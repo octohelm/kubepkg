@@ -21,9 +21,23 @@ export default defineConfig({
     }),
     presetReact({
       chunkGroups: {
-        core: /babel|core-js|tslib|scheduler|history|object-assign|hey-listen|react|react-router/,
-        utils: /innoai-tech|date-fns|lodash|rxjs|filesize|buffer/,
-        styling: /emotion|react-spring|mui/,
+        utils: [
+          "date-fns",
+          "rxjs",
+          "filesize",
+          "lodash",
+          "lodash-es",
+          "@innoai-tech/lodash",
+        ],
+        uikit: [
+          "react",
+          "hey-listen",
+          "history",
+          "react-router",
+          "react-spring",
+          "@innoai-tech/*",
+        ],
+        ui: ["@emotion/*", "@mui/*"],
       },
     }),
   ],

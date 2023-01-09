@@ -531,11 +531,11 @@ export interface K8SIoApiCoreV1HttpGetAction {
   host?: string;
   httpHeaders?: Array<K8SIoApiCoreV1HttpHeader>;
   path?: string;
-  port: string;
+  port: number | string;
   scheme?: K8SIoApiCoreV1UriScheme;
 }
 
-export type UtilIntstrIntOrString = string;
+export type UtilIntstrIntOrString = number | string;
 
 export interface K8SIoApiCoreV1TcpSocketAction {
   host?: string;
@@ -4461,8 +4461,15 @@ export const RawOpenAPI = {
             "x-go-field-name": "Path",
           },
           port: {
-            type: "string",
-            format: "int-or-string",
+            anyOf: [
+              {
+                type: "integer",
+                format: "int32",
+              },
+              {
+                type: "string",
+              },
+            ],
             "x-go-field-name": "Port",
           },
           scheme: {
@@ -5093,8 +5100,15 @@ export const RawOpenAPI = {
         "x-go-vendor-type": "k8s.io/apimachinery/pkg/types.UID",
       },
       UtilIntstrIntOrString: {
-        type: "string",
-        format: "int-or-string",
+        anyOf: [
+          {
+            type: "integer",
+            format: "int32",
+          },
+          {
+            type: "string",
+          },
+        ],
       },
     },
   },

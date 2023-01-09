@@ -2,7 +2,7 @@ import { map, pick } from "@innoai-tech/lodash";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import { StateSubject, useObservable } from "@innoai-tech/reactutil";
 
-import { Editor } from "../layout";
+import { MonacoEditor } from "../layout";
 import { RawOpenAPI } from "../client/dashboard";
 import { useMemo } from "react";
 
@@ -24,23 +24,8 @@ export const KubePkgEditor = ({
   );
 
   return (
-    <Editor
-      height="70vh"
-      theme="vs-dark"
-      language="json"
-      path="x.kube.json"
-      value={jsonCode}
-      options={{
-        scrollBeyondLastLine: false,
-        minimap: { enabled: false },
-      }}
-      onChange={(value) => {
-        if (value) {
-          try {
-            kubepkg$.next(JSON.parse(value));
-          } catch (e) {}
-        }
-      }}
+    <MonacoEditor
+      sx={{ height: "70vh", width: "100%" }}
       beforeMount={(monaco) => {
         const schemas = map(RawOpenAPI.components.schemas, (s, k) => {
           return {
@@ -59,6 +44,21 @@ export const KubePkgEditor = ({
           validate: true,
           schemas: schemas,
         });
+      }}
+      options={{
+        scrollBeyondLastLine: false,
+        minimap: { enabled: false },
+        theme: "vs-dark",
+      }}
+      language={"json"}
+      path={"x.kube.json"}
+      value={jsonCode}
+      onChange={(value) => {
+        if (value) {
+          try {
+            kubepkg$.next(JSON.parse(value));
+          } catch (e) {}
+        }
       }}
     />
   );

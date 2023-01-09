@@ -121,6 +121,9 @@ lint.node:
 build.node:
 	pnpm exec turbo run build --force
 
+build.node.dashboard:
+	pnpm exec turbo run build --force --filter=@webapp/dashboard
+
 dev.agent:
 	pnpm exec turbo run dev --filter=@webapp/agent
 

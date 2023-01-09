@@ -1,14 +1,15 @@
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import {
   channel,
-  GroupEnvDeploymentsProvider, GroupProvider,
+  GroupEnvDeploymentsProvider,
+  GroupProvider,
   kubepkgName,
-  revision
+  revision,
 } from "../group";
 import {
   StateSubject,
   Subscribe,
-  useStateSubject
+  useStateSubject,
 } from "@innoai-tech/reactutil";
 import { useDialog, useEpics, useProxy } from "../layout";
 import { ignoreElements, map as rxMap, tap, filter as rxFilter } from "rxjs";
@@ -21,10 +22,10 @@ import { KubepkgChannel } from "../client/dashboard";
 import { omit } from "@innoai-tech/lodash";
 
 const KubepkgVersionUpgrade = ({
-                                 revision$,
-                                 kubepkg$,
-                                 channel$
-                               }: {
+  revision$,
+  kubepkg$,
+  channel$,
+}: {
   revision$: StateSubject<string>;
   channel$: StateSubject<KubepkgChannel>;
   kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>;
@@ -40,15 +41,15 @@ const KubepkgVersionUpgrade = ({
             ...kubepkg$.value.metadata,
             annotations: {
               ...(kubepkg$.value.metadata?.annotations || {}),
-              ...(resp.body.metadata?.annotations || {})
-            }
+              ...(resp.body.metadata?.annotations || {}),
+            },
           },
           spec: {
             version: resp.body.spec.version,
             deploy: resp.body.spec.deploy,
             config: kubepkg$.value.spec?.config || {},
-            ...omit(resp.body.spec, ["version", "deploy", "config"])
-          }
+            ...omit(resp.body.spec, ["version", "deploy", "config"]),
+          },
         };
       })
     )
@@ -62,7 +63,7 @@ const KubepkgVersionUpgrade = ({
             groupName: kubepkgVersion$.groupName,
             name: kubepkgVersion$.kubePkgName,
             channel: channel$.value,
-            revisionID: revision
+            revisionID: revision,
           });
         }
       }),
@@ -74,8 +75,8 @@ const KubepkgVersionUpgrade = ({
 };
 
 export const KubePkgEditorWithVersionList = ({
-                                               kubepkg$
-                                             }: {
+  kubepkg$,
+}: {
   kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>;
 }) => {
   const group$ = GroupProvider.use$();
@@ -85,12 +86,13 @@ export const KubePkgEditorWithVersionList = ({
   const revision$ = useStateSubject("");
 
   const kubePkgAutocomplete$ = useKubePkgAutocomplete({
-    groupName: group$.value.name
+    groupName: group$.value.name,
   });
 
-  useEpics(kubepkgNameInfo$,
-    (_) => kubePkgAutocomplete$
-      .pipe(
+  useEpics(
+    kubepkgNameInfo$,
+    (_) =>
+      kubePkgAutocomplete$.pipe(
         rxFilter(({ groupName }) => !!groupName),
         tap(() => {
           kubePkgAutocomplete$.popper$.next(false);
@@ -102,7 +104,7 @@ export const KubePkgEditorWithVersionList = ({
           const [groupName, kubePkgName] = kubepkgName(kubepkg).split("/");
           return {
             groupName: groupName || "",
-            kubePkgName: kubePkgName || ""
+            kubePkgName: kubePkgName || "",
           };
         })
       )
@@ -116,10 +118,11 @@ export const KubePkgEditorWithVersionList = ({
   return (
     <Stack direction="row" spacing={3}>
       <KubePkgEditor kubepkg$={kubepkg$} />
-      <Stack spacing={1} sx={{ width: "36%", height: "70vh", overflow: "hidden" }}>
-        <Box>
-          {kubePkgAutocomplete$.render()}
-        </Box>
+      <Stack
+        spacing={1}
+        sx={{ width: "36%", height: "70vh", overflow: "hidden" }}
+      >
+        <Box>{kubePkgAutocomplete$.render()}</Box>
         <Divider />
         <Subscribe value$={kubepkgNameInfo$}>
           {(info) =>
@@ -150,7 +153,9 @@ export const KubePkgEditorWithVersionList = ({
 export const useGroupEnvDeploymentFormWithDialog = (
   kubepkg?: ApisKubepkgV1Alpha1KubePkg
 ) => {
-  const kubepkg$ = useStateSubject(kubepkg || {} as ApisKubepkgV1Alpha1KubePkg);
+  const kubepkg$ = useStateSubject(
+    kubepkg || ({} as ApisKubepkgV1Alpha1KubePkg)
+  );
 
   const groupEnvDeployments$ = GroupEnvDeploymentsProvider.use$();
 
@@ -167,16 +172,16 @@ export const useGroupEnvDeploymentFormWithDialog = (
           groupEnvDeployments$.put$.next({
             groupName: groupEnvDeployments$.groupName,
             envName: groupEnvDeployments$.envName,
-            body: kubepkg$.value
+            body: kubepkg$.value,
           });
         }
-      }
+      },
     },
     () => groupEnvDeployments$.put$.pipe(rxMap(() => false))
   );
 
   return useProxy(groupEnvDeployments$, {
     operationID: groupEnvDeployments$.put$.operationID,
-    dialog$: dialog$
+    dialog$: dialog$,
   });
 };

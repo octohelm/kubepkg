@@ -13,7 +13,7 @@ import {
   sortBy,
 } from "@innoai-tech/lodash";
 import { Box, Stack, Tooltip, useTheme } from "@mui/material";
-import type { ReactNode } from "react";
+import { Fragment, ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { deRefs, isArraySchema, isObjectSchema } from "./deRefs";
 import { Markdown } from "./Markdown";
@@ -460,15 +460,22 @@ const SchemaRow = ({
           <Description desc={description} prefix={"// "} />
         </Box>
       )}
-      <Box
+      <Stack
         component={"span"}
+        direction={"row"}
         sx={{
-          display: "block",
           fontFamily: "monospace",
         }}
       >
-        {typeRenderer(displayClassName(schema), schema)}
-      </Box>
+        {map(schema.anyOf ? schema.anyOf : [schema], (s, i: number) => {
+          return (
+            <Fragment key={i}>
+              {i > 0 ? <Box sx={{ opacity: 0.6, mx: 1 }}>|</Box> : null}
+              {typeRenderer(displayClassName(s), s)}
+            </Fragment>
+          );
+        })}
+      </Stack>
     </Stack>
   );
 };

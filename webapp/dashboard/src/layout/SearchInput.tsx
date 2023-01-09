@@ -8,7 +8,7 @@ export const Search = styled("label")(({ theme }) => ({
   width: "100%",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
 }));
 
 export const SearchIcon = styled("div")(({ theme }) => ({
@@ -18,14 +18,14 @@ export const SearchIcon = styled("div")(({ theme }) => ({
   display: "flex",
   color: "inherit",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
 }));
 
 export const SearchInput = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     transition: theme.transitions.create("width"),
-    width: "100%"
+    width: "100%",
   },
   color: "inherit",
 }));

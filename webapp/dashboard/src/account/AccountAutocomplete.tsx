@@ -107,7 +107,7 @@ export const useAccountAutocomplete = ({
                                 key={user.accountID}
                                 onClick={() => {
                                   selected$.next(user.accountID);
-                                  inputValue$.next("")
+                                  inputValue$.next("");
                                 }}
                               >
                                 <ListItemIcon>

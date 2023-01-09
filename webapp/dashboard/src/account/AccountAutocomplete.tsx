@@ -5,7 +5,7 @@ import {
   MenuList,
   MenuItem,
   ListItemIcon,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import { filter, map, tap, debounceTime } from "rxjs";
 import { Search as SearchIconOutlined, Add } from "@mui/icons-material";
@@ -15,8 +15,8 @@ import { useRef } from "react";
 import { Search, SearchIcon, SearchInput } from "../layout/SearchInput";
 
 export const useAccountAutocomplete = ({
-  placeholder,
-}: {
+                                         placeholder
+                                       }: {
   placeholder?: string;
 }) => {
   const selected$ = useStateSubject("");
@@ -56,6 +56,7 @@ export const useAccountAutocomplete = ({
             {(value) => (
               <SearchInput
                 value={value}
+                sx={{ flex: 1 }}
                 ref={inputElRef}
                 placeholder={placeholder || ""}
                 onInput={(evt) => {
@@ -83,7 +84,7 @@ export const useAccountAutocomplete = ({
                   anchorEl={anchorElRef.current}
                   anchorOrigin={{
                     vertical: "bottom",
-                    horizontal: "left",
+                    horizontal: "left"
                   }}
                   onClose={() => {
                     popper$.next(false);
@@ -93,7 +94,7 @@ export const useAccountAutocomplete = ({
                 >
                   <MenuList
                     style={{
-                      width: anchorElRef.current?.getBoundingClientRect().width,
+                      width: anchorElRef.current?.getBoundingClientRect().width
                     }}
                   >
                     <Subscribe value$={options$}>
@@ -107,7 +108,7 @@ export const useAccountAutocomplete = ({
                                 key={user.accountID}
                                 onClick={() => {
                                   selected$.next(user.accountID);
-                                  inputValue$.next("")
+                                  inputValue$.next("");
                                 }}
                               >
                                 <ListItemIcon>
@@ -129,6 +130,6 @@ export const useAccountAutocomplete = ({
           </Subscribe>
         </Search>
       );
-    },
+    }
   });
 };

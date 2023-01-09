@@ -18,7 +18,7 @@ require (
 	github.com/lestrrat-go/jwx/v2 v2.0.8
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-isatty v0.0.17
-	github.com/octohelm/courier v0.0.0-20230105053430-4dcc55aab5fe
+	github.com/octohelm/courier v0.0.0-20230110034437-4f26125f8237
 	github.com/octohelm/gengo v0.0.0-20221010061850-f63d97b13fe9
 	github.com/octohelm/storage v0.0.0-20230103034019-3817a122e336
 	github.com/octohelm/x v0.0.0-20220811034253-019992077a5d

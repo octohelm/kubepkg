@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useOpenAPI } from "./OpenAPI";
 import { Box, Button, Stack } from "@mui/material";
 import { SchemaView } from "./SchemaView";
-import { Editor, useEpics } from "../layout";
+import { MonacoEditor, useEpics } from "../layout";
 import { Subscribe, useRequest, useStateSubject } from "@innoai-tech/reactutil";
 import { HttpRequest, HTTPResponse } from "./HTTPViews";
 import type { FetcherResponse, RequestConfig } from "@innoai-tech/fetcher";
@@ -95,15 +95,15 @@ export const RequestBuilder = ({ operation }: { operation: any }) => {
     >
       <Stack direction={"row"} spacing={2}>
         <Box sx={{ flex: 1 }}>
-          <Editor
-            height="400px"
-            theme="vs-dark"
-            language="json"
-            path={`${operation.operationID}.RequestParameter.json`}
+          <MonacoEditor
+            sx={{ height: "400px" }}
             options={{
               scrollBeyondLastLine: false,
               minimap: { enabled: false },
+              theme: "vs-dark",
             }}
+            language={"json"}
+            path={`${operation.operationID}.RequestParameter.json`}
             defaultValue={"{}"}
             onChange={(value) => {
               if (value) {

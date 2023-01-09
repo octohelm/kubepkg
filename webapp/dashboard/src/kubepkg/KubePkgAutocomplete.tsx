@@ -7,7 +7,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Select
+  Select,
 } from "@mui/material";
 import { filter, map as rxMap, tap, debounceTime } from "rxjs";
 import { Add } from "@mui/icons-material";
@@ -18,15 +18,15 @@ import { Search, SearchIcon, SearchInput } from "../layout/SearchInput";
 import { map } from "@innoai-tech/lodash";
 
 export const useKubePkgAutocomplete = ({
-                                         placeholder = "请输入 KubePkg 名称查询",
-                                         groupName
-                                       }: {
+  placeholder = "请输入 KubePkg 名称查询",
+  groupName,
+}: {
   placeholder?: string;
   groupName?: string;
 }) => {
   const selected$ = useStateSubject({
     groupName: groupName || "",
-    kubePkgName: ""
+    kubePkgName: "",
   });
   const inputValue$ = useStateSubject("");
   const popper$ = useStateSubject(false);
@@ -38,9 +38,7 @@ export const useKubePkgAutocomplete = ({
   const kubepkgList$ = useStateSubject([] as Kubepkg[]);
 
   useEpics(groupList$, () => {
-    return listGroup$.pipe(
-      rxMap((resp) => resp.body || [])
-    );
+    return listGroup$.pipe(rxMap((resp) => resp.body || []));
   });
 
   useEpics(
@@ -54,10 +52,12 @@ export const useKubePkgAutocomplete = ({
       inputValue$.pipe(
         filter((inputValue) => inputValue.length >= 2),
         debounceTime(300),
-        tap((inputValue) => listKubePkg$.next({
-          groupName: selected$.value.groupName,
-          name: [inputValue]
-        })),
+        tap((inputValue) =>
+          listKubePkg$.next({
+            groupName: selected$.value.groupName,
+            name: [inputValue],
+          })
+        ),
         rxMap(() => [])
       )
   );
@@ -84,7 +84,7 @@ export const useKubePkgAutocomplete = ({
                     onChange={(evt) => {
                       selected$.next({
                         groupName: evt.target.value,
-                        kubePkgName: ""
+                        kubePkgName: "",
                       });
                     }}
                   >
@@ -93,14 +93,17 @@ export const useKubePkgAutocomplete = ({
                         {g.name}
                       </MenuItem>
                     ))}
-
                   </Select>
                 )}
               </Subscribe>
-
             )}
           </Subscribe>
-          <Divider orientation="vertical" variant="middle" flexItem sx={{ mx: 2 }} />
+          <Divider
+            orientation="vertical"
+            variant="middle"
+            flexItem
+            sx={{ mx: 2 }}
+          />
           <Subscribe value$={selected$}>
             {(selected) => (
               <Subscribe value$={inputValue$}>
@@ -137,7 +140,7 @@ export const useKubePkgAutocomplete = ({
                   anchorEl={anchorElRef.current}
                   anchorOrigin={{
                     vertical: "bottom",
-                    horizontal: "left"
+                    horizontal: "left",
                   }}
                   onClose={() => {
                     popper$.next(false);
@@ -147,7 +150,7 @@ export const useKubePkgAutocomplete = ({
                 >
                   <MenuList
                     style={{
-                      width: anchorElRef.current?.getBoundingClientRect().width
+                      width: anchorElRef.current?.getBoundingClientRect().width,
                     }}
                   >
                     <Subscribe value$={kubepkgList$}>
@@ -162,7 +165,7 @@ export const useKubePkgAutocomplete = ({
                                 onClick={() => {
                                   selected$.next({
                                     groupName: kubepkg.group,
-                                    kubePkgName: kubepkg.name
+                                    kubePkgName: kubepkg.name,
                                   });
                                   inputValue$.next("");
                                 }}
@@ -186,6 +189,6 @@ export const useKubePkgAutocomplete = ({
           </Subscribe>
         </Search>
       );
-    }
+    },
   });
 };

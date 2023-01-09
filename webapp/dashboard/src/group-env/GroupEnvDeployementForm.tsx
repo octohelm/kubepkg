@@ -1,7 +1,8 @@
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import {
   channel,
-  GroupEnvDeploymentsProvider, GroupProvider,
+  GroupEnvDeploymentsProvider,
+  GroupProvider,
   kubepkgName,
   revision
 } from "../group";
@@ -88,9 +89,10 @@ export const KubePkgEditorWithVersionList = ({
     groupName: group$.value.name
   });
 
-  useEpics(kubepkgNameInfo$,
-    (_) => kubePkgAutocomplete$
-      .pipe(
+  useEpics(
+    kubepkgNameInfo$,
+    (_) =>
+      kubePkgAutocomplete$.pipe(
         rxFilter(({ groupName }) => !!groupName),
         tap(() => {
           kubePkgAutocomplete$.popper$.next(false);
@@ -115,11 +117,14 @@ export const KubePkgEditorWithVersionList = ({
 
   return (
     <Stack direction="row" spacing={3}>
-      <KubePkgEditor kubepkg$={kubepkg$} />
-      <Stack spacing={1} sx={{ width: "36%", height: "70vh", overflow: "hidden" }}>
-        <Box>
-          {kubePkgAutocomplete$.render()}
-        </Box>
+      <Box sx={{ flex: 1 }}>
+        <KubePkgEditor kubepkg$={kubepkg$} />
+      </Box>
+      <Stack
+        spacing={1}
+        sx={{ width: "36%", height: "70vh", overflow: "hidden" }}
+      >
+        <Box>{kubePkgAutocomplete$.render()}</Box>
         <Divider />
         <Subscribe value$={kubepkgNameInfo$}>
           {(info) =>
@@ -150,7 +155,9 @@ export const KubePkgEditorWithVersionList = ({
 export const useGroupEnvDeploymentFormWithDialog = (
   kubepkg?: ApisKubepkgV1Alpha1KubePkg
 ) => {
-  const kubepkg$ = useStateSubject(kubepkg || {} as ApisKubepkgV1Alpha1KubePkg);
+  const kubepkg$ = useStateSubject(
+    kubepkg || ({} as ApisKubepkgV1Alpha1KubePkg)
+  );
 
   const groupEnvDeployments$ = GroupEnvDeploymentsProvider.use$();
 

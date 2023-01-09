@@ -181,7 +181,9 @@ export const AdminAdd = () => {
   );
 
   return (
-    <AccessControl op={account$.put$}>{accountAutocomplete$.render()}</AccessControl>
+    <AccessControl op={account$.put$}>
+      {accountAutocomplete$.render()}
+    </AccessControl>
   );
 };
 

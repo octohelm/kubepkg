@@ -389,6 +389,8 @@ github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRW
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/octohelm/courier v0.0.0-20230105053430-4dcc55aab5fe h1:IDjE2BcfyuHSN4/K6VActUsuYQm6cydaiz3CJ79fOpU=
 github.com/octohelm/courier v0.0.0-20230105053430-4dcc55aab5fe/go.mod h1:70sPTvdFFY5Wr+Q84LebJGhGzZa3WxV83CoYePoQzvs=
+github.com/octohelm/courier v0.0.0-20230110034437-4f26125f8237 h1:tEd3RquSaE3FhPvwuLM+yE6l9PNt90i7BDLCK12OOpM=
+github.com/octohelm/courier v0.0.0-20230110034437-4f26125f8237/go.mod h1:70sPTvdFFY5Wr+Q84LebJGhGzZa3WxV83CoYePoQzvs=
 github.com/octohelm/gengo v0.0.0-20221010061850-f63d97b13fe9 h1:9H6udf86Fcq/xt+9A+PJ6JKN0tbtTjT70UP4gXAFVYE=
 github.com/octohelm/gengo v0.0.0-20221010061850-f63d97b13fe9/go.mod h1:iM/hgcAayXy/t16guwIBJ6zeBYISBUJpfTdlJuhuqxA=
 github.com/octohelm/storage v0.0.0-20230103034019-3817a122e336 h1:vhW9Q4/73H0eWS0GZh3q6OlAB/pelCnwsHgwg/2/mCM=

@@ -83,6 +83,7 @@ const KubePkgSearch = () => {
           <SearchInput
             placeholder={"请输入 KubePkg 名称查询"}
             value={value}
+            sx={{ flex: 1 }}
             onInput={(evt) => {
               inputValue$.next(
                 (evt.target as HTMLInputElement).value?.trim() || ""

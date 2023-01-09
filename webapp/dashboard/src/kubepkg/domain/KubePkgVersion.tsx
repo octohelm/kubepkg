@@ -2,7 +2,7 @@ import { createDomain } from "../../layout";
 import {
   deleteKubepkgVersion,
   getKubepkgRevision,
-  listKubepkgVersion
+  listKubepkgVersion,
 } from "../../client/dashboard";
 import { useRequest } from "@innoai-tech/reactutil";
 import { map as rxMap } from "rxjs";
@@ -26,7 +26,7 @@ export const GroupKubePkgVersionProvider = createDomain(
         kubePkgName: kubePkgName,
         list$: list$,
         del$: del$,
-        get$: get$
+        get$: get$,
       },
       (kubepkgs$) => kubepkgs$.list$.pipe(rxMap((resp) => resp.body)),
       (kubepkgs$) =>

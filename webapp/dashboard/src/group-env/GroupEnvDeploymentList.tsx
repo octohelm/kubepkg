@@ -11,7 +11,7 @@ import {
   Tooltip,
   Stack,
   Theme,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import {
   kubepkgName,
@@ -20,7 +20,7 @@ import {
   GroupEnvDeploymentsProvider,
   openAPISpecDoc,
   revision,
-  channel
+  channel,
 } from "../group";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
@@ -31,9 +31,9 @@ import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import { openAPISpecPath } from "../group";
 
 const InfoSpan = ({
-                    label,
-                    children
-                  }: {
+  label,
+  children,
+}: {
   label?: ReactNode;
   children: ReactNode;
 }) => {
@@ -46,7 +46,7 @@ const InfoSpan = ({
         fontSize: 10,
         lineHeight: 1.1,
         marginTop: 0.5,
-        marginBottom: 0.5
+        marginBottom: 0.5,
       }}
     >
       {label && (
@@ -57,7 +57,7 @@ const InfoSpan = ({
             opacity: 0.7,
             fontSize: "0.7em",
             lineHeight: 1.2,
-            paddingBottom: 0.2
+            paddingBottom: 0.2,
           }}
         >
           {label}
@@ -71,8 +71,8 @@ const InfoSpan = ({
 };
 
 const DeploymentEndpoints = ({
-                               kubepkg
-                             }: {
+  kubepkg,
+}: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
   if (kubepkg.status?.endpoint) {
@@ -110,9 +110,9 @@ const DeploymentEndpoints = ({
 };
 
 const ReasonMessage = ({
-                         reason,
-                         message
-                       }: {
+  reason,
+  message,
+}: {
   message: string;
   reason: string;
 }) => {
@@ -128,9 +128,9 @@ const ReasonMessage = ({
 };
 
 const ContainerStatuses = ({
-                             name,
-                             kubepkg
-                           }: {
+  name,
+  kubepkg,
+}: {
   name: string;
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
@@ -173,8 +173,8 @@ const ContainerStatuses = ({
 };
 
 export const SpecStatus = ({
-                             kubepkg
-                           }: {
+  kubepkg,
+}: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
   return (
@@ -228,7 +228,7 @@ const ConditionBox = ({ type, status }: { type: string; status: string }) => {
         borderRadius: "2px",
         color: "#fff",
         fontWeight: "bold",
-        backgroundColor: colorByConditionType(theme, type, status)
+        backgroundColor: colorByConditionType(theme, type, status),
       }}
     >
       {type[0]}
@@ -253,8 +253,8 @@ const statusOf = (r: any) => {
 };
 
 const DeploymentConditions = ({
-                                kubepkg
-                              }: {
+  kubepkg,
+}: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => (
   <InfoSpan>
@@ -329,8 +329,8 @@ const isLatestUpgrade = (kubepkg: ApisKubepkgV1Alpha1KubePkg): boolean =>
   (kubepkg as any)?.upgrade?.latest;
 
 const KubePkgHeading = ({
-                          kubepkg
-                        }: {
+  kubepkg,
+}: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
   const theme = useTheme();
@@ -344,7 +344,7 @@ const KubePkgHeading = ({
         fontFamily: "monospace",
         width: "100%",
         py: 0.5,
-        justifyContent: "space-between"
+        justifyContent: "space-between",
       }}
     >
       <Stack component={"span"} sx={{ position: "relative" }}>
@@ -357,7 +357,7 @@ const KubePkgHeading = ({
               fontSize: "0.6em",
               alignItems: "center",
               position: "absolute",
-              top: "-1em"
+              top: "-1em",
             }}
             spacing={1}
           >
@@ -380,7 +380,7 @@ const KubePkgHeading = ({
                     ? isLatestUpgrade(kubepkg)
                       ? theme.palette.success.main
                       : theme.palette.warning.main
-                    : "inherit"
+                    : "inherit",
                 }}
               >
                 {`${kubepkgName(kubepkg)}`}
@@ -396,7 +396,7 @@ const KubePkgHeading = ({
           component={"span"}
           sx={{
             display: "block",
-            fontWeight: "bold"
+            fontWeight: "bold",
           }}
         >
           {kubepkg.spec.deploy?.kind}/{kubepkg.metadata?.name}
@@ -410,7 +410,7 @@ const KubePkgHeading = ({
             fontSize: "0.5em",
             opacity: 0.5,
             top: "-1em",
-            right: 0
+            right: 0,
           }}
         >
           {`r${revision(kubepkg)}`}&nbsp;
@@ -421,7 +421,7 @@ const KubePkgHeading = ({
           component={"span"}
           sx={{
             fontWeight: "bold",
-            opacity: 0.5
+            opacity: 0.5,
           }}
         >
           {kubepkg.spec.version}
@@ -432,8 +432,8 @@ const KubePkgHeading = ({
 };
 
 export const GroupEnvDeploymentListItem = ({
-                                             kubepkg
-                                           }: {
+  kubepkg,
+}: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
   const form$ = useGroupEnvDeploymentFormWithDialog(kubepkg);
@@ -500,16 +500,16 @@ const toKubePkgList = (name: string, groupEnvDeployments: any) => {
         apiVersion: item.apiVersion,
         kind: item.kind,
         metadata: item.metadata,
-        spec: item.spec
+        spec: item.spec,
       })
-    )
+    ),
   };
 
   const file = new File(
     [JSON.stringify(list, null, 2)],
     `${name}.kubepkg.json`,
     {
-      type: "application/json"
+      type: "application/json",
     }
   );
 

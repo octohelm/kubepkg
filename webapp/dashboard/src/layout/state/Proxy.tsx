@@ -1,12 +1,12 @@
 import { isFunction } from "@innoai-tech/lodash";
-import { StateSubject, useStateSubject } from "@innoai-tech/reactutil";
+import { StateSubject, Subscribe, useStateSubject } from "@innoai-tech/reactutil";
 import {
   createContext,
   ReactNode,
   useContext,
   useEffect,
   useMemo,
-  useRef,
+  useRef
 } from "react";
 import {
   from,
@@ -14,8 +14,21 @@ import {
   Observable,
   mergeMap,
   tap,
-  distinctUntilChanged,
+  distinctUntilChanged
 } from "rxjs";
+
+export const RxFragment = ({ children }: { children: Observable<JSX.Element | null> | Array<Observable<JSX.Element | null>> }) => {
+  return (
+    <>
+      {([] as Array<Observable<JSX.Element | null>>).concat(children).map((node$, i) =>
+        (
+          <Subscribe value$={node$} key={i}>
+            {(node) => node ? node : null}
+          </Subscribe>
+        ))}
+    </>
+  );
+};
 
 export const useEpics = <D, T extends Observable<D>>(
   ob$: T,
@@ -43,9 +56,9 @@ export const useEpics = <D, T extends Observable<D>>(
 };
 
 export const Epics = <D, T extends Observable<D>>({
-  ob$,
-  epics,
-}: {
+                                                    ob$,
+                                                    epics
+                                                  }: {
   ob$: T;
   epics: Array<(subject$: T) => Observable<D>>;
 }) => {
@@ -53,11 +66,9 @@ export const Epics = <D, T extends Observable<D>>({
   return null;
 };
 
-export const useProxy = <
-  T extends any,
+export const useProxy = <T extends any,
   S extends Observable<T>,
-  E extends { [k: string]: any }
->(
+  E extends { [k: string]: any }>(
   ob$: S,
   extensions: E,
   ...epics: Array<(subject$: S & E) => Observable<T>>
@@ -68,7 +79,7 @@ export const useProxy = <
     return new Proxy(ob$, {
       get: (_, prop) => {
         return extensionsRef.current[prop as string] || (ob$ as any)[prop];
-      },
+      }
     }) as S & E;
   }, [ob$]);
 
@@ -85,11 +96,9 @@ const useSubject$ = <T, E extends { [k: string]: any }>(
   return useProxy(useStateSubject(initials), extensions, ...epics);
 };
 
-export const createSubject = <
-  T extends any,
+export const createSubject = <T extends any,
   E extends { [k: string]: any },
-  TProps extends {}
->(
+  TProps extends {}>(
   useProvider: (
     props: TProps,
     use: typeof useSubject$
@@ -100,9 +109,9 @@ export const createSubject = <
   const C = createContext<{ [key]: ReturnType<typeof useProvider> }>({} as any);
 
   const Provider = ({
-    children,
-    ...props
-  }: TProps & {
+                      children,
+                      ...props
+                    }: TProps & {
     children: ReactNode;
   }) => {
     const subject$ = useProvider(props as any, useSubject$);

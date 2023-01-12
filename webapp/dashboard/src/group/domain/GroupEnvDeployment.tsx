@@ -5,18 +5,16 @@ import {
   latestKubepkgs,
   listGroupEnvClusterDeployments,
   listGroupEnvDeployment,
-  putGroupEnvDeployment,
+  putGroupEnvDeployment
 } from "../../client/dashboard";
 import { useRequest } from "@innoai-tech/reactutil";
 import { ignoreElements, map as rxMap, merge, tap } from "rxjs";
 import { GroupEnvProvider } from "./GroupEnv";
-import { map, mapValues, reduce } from "@innoai-tech/lodash";
+import { map, mapValues, pick, reduce } from "@innoai-tech/lodash";
 import {
   channel,
   deploymentID,
-  deploymentSettingID,
-  kubepkgName,
-  revision,
+  kubepkgName
 } from "./util";
 import { useEffect } from "react";
 
@@ -37,17 +35,10 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
       groupName: groupEnv$.value.groupName,
       envName: groupEnv$.value.envName,
 
-      clusterList$: listGroupEnvClusterDeployments$,
-      list$: listGroupEnvDeployment$,
       latest$: latest$,
-
       put$: putGroupEnvDeployment$,
-
-      keyOf: (kpkg: ApisKubepkgV1Alpha1KubePkg): string => {
-        return [`d${revision(kpkg)}`, `s${deploymentSettingID(kpkg)}`].join(
-          "/"
-        );
-      },
+      list$: listGroupEnvDeployment$,
+      clusterList$: listGroupEnvClusterDeployments$
     },
     (groupEnvDeployments$) =>
       groupEnvDeployments$.clusterList$.pipe(
@@ -57,17 +48,22 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
             (ret, kpkg) => {
               const did = deploymentID(kpkg);
 
-              const current = groupEnvDeployments$.value[did];
+              const existed = groupEnvDeployments$.value[did];
 
-              return current
-                ? {
-                    ...ret,
-                    [did]: {
-                      ...current,
-                      status: kpkg.status,
-                    },
-                  }
-                : ret;
+              return {
+                ...ret,
+                [did]: existed ? {
+                  ...existed,
+                  status: kpkg.status
+                } : {
+                  apiVersion: kpkg.apiVersion,
+                  kind: kpkg.kind,
+                  metadata: pick(kpkg.metadata, ["name", "namespace", "labels", "annotations"]),
+                  spec: kpkg.spec,
+                  status: kpkg.status
+                  // TODO diff version for db and real cluster
+                }
+              };
             },
             groupEnvDeployments$.value
           );
@@ -86,8 +82,8 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
               return {
                 ...kpkg,
                 upgrade: {
-                  latest: s.version === kpkg.spec.version,
-                },
+                  latest: s.version === kpkg.spec.version
+                }
               };
             }
 
@@ -102,7 +98,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
             resp.body.data,
             (ret, kpkg) => ({
               ...ret,
-              [deploymentID(kpkg)]: kpkg,
+              [deploymentID(kpkg)]: kpkg
             }),
             {}
           )
@@ -112,7 +108,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
       groupEnvDeployments$.put$.pipe(
         rxMap((resp) => ({
           ...groupEnvDeployments$.value,
-          [deploymentID(resp.body)]: resp.body,
+          [deploymentID(resp.body)]: resp.body
         }))
       ),
 
@@ -124,9 +120,11 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
             (kpkg) => `${kubepkgName(kpkg)}@${channel(kpkg)}`
           );
 
-          groupEnvDeployments$.latest$.next({
-            names: kubepkgNames,
-          });
+          if (kubepkgNames.length > 0) {
+            groupEnvDeployments$.latest$.next({
+              names: kubepkgNames
+            });
+          }
         }),
         tap(() => {
           if (
@@ -135,7 +133,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
           ) {
             groupEnvDeployments$.clusterList$.next({
               groupName: groupEnvDeployments$.groupName,
-              envName: groupEnvDeployments$.envName,
+              envName: groupEnvDeployments$.envName
             });
           }
         }),
@@ -148,7 +146,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
       groupEnvDeployments$.list$.next({
         groupName: groupEnvDeployments$.groupName,
         envName: groupEnvDeployments$.envName,
-        size: -1,
+        size: -1
       });
 
     fetch();

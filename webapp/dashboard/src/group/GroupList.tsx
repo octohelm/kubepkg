@@ -1,8 +1,8 @@
 import {
-  useObservable,
+  useObservableState,
   useRequest,
   useStateSubject,
-  useObservableEffect,
+  useObservableEffect
 } from "@innoai-tech/reactutil";
 import { GroupAddOutlined, SettingsOutlined } from "@mui/icons-material";
 import {
@@ -12,12 +12,12 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { Group, listGroup } from "../client/dashboard";
 import { useGroupFormWithDialog } from "./GroupForm";
-import { Scaffold, stringAvatar } from "../layout";
+import { RxFragment, Scaffold, stringAvatar } from "../layout";
 import { tap } from "rxjs";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
@@ -28,20 +28,17 @@ const GroupListItem = ({ group: initialGroup }: { group: Group }) => {
   const form$ = useGroupFormWithDialog(initialGroup);
 
   useObservableEffect(
-    () => [
-      form$.post$.pipe(
-        tap((resp) => {
-          group$.next((group) => ({
-            ...group,
-            ...resp.body,
-          }));
-        })
-      ),
-    ],
-    []
+    () => form$.post$.pipe(
+      tap((resp) => {
+        group$.next((group) => ({
+          ...group,
+          ...resp.body
+        }));
+      })
+    )
   );
 
-  const group = useObservable(group$);
+  const group = useObservableState(group$);
 
   return (
     <>
@@ -55,7 +52,9 @@ const GroupListItem = ({ group: initialGroup }: { group: Group }) => {
             >
               <SettingsOutlined />
             </IconButtonWithTooltip>
-            {form$.dialog$.render()}
+            <RxFragment>
+              {form$.dialog$.elements$}
+            </RxFragment>
           </AccessControl>
         }
       >
@@ -82,7 +81,7 @@ const GroupList = () => {
     listGroup$.next(undefined);
   }, []);
 
-  const resp = useObservable(listGroup$);
+  const resp = useObservableState(listGroup$);
 
   if (!resp) {
     return null;
@@ -115,7 +114,9 @@ const GroupMainToolbar = () => {
       >
         <GroupAddOutlined />
       </IconButtonWithTooltip>
-      {form$.dialog$.render()}
+      <RxFragment>
+        {form$.dialog$.elements$}
+      </RxFragment>
     </AccessControl>
   );
 };

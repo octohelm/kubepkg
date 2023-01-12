@@ -28,6 +28,10 @@ type GroupEnvDeploymentService struct {
 	kubepkgRepo            *kubepkgrepository.KubepkgRepository
 }
 
+func (s *GroupEnvDeploymentService) ListKubePkgHistory(ctx context.Context, deploymentID group.DeploymentID, pager *datatypes.Pager) ([]*v1alpha1.KubePkg, error) {
+	return s.groupEnvDeploymentRepo.ListKubePkgHistory(ctx, deploymentID, pager)
+}
+
 func (s *GroupEnvDeploymentService) ListKubePkg(ctx context.Context, pager *datatypes.Pager) (*group.DeploymentDataList, error) {
 	return s.groupEnvDeploymentRepo.ListKubepkg(ctx, pager)
 }

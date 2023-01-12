@@ -8,7 +8,7 @@ import (
 // +gengo:table:register=T
 // +gengo:table:group=group
 // @def primary EnvID DeletedAt
-// @def unique_index i_env_name EnvID EnvName
+// @def unique_index i_env_name GroupID EnvName
 // @def index i_env_type EnvType
 // @def index i_bind_clusterID ClusterID
 // @def index i_created_at CreatedAt

@@ -1,8 +1,8 @@
 import {
   Subscribe,
-  useObservable,
+  useObservableState,
   useRequest,
-  useStateSubject,
+  useStateSubject
 } from "@innoai-tech/reactutil";
 import {
   Avatar,
@@ -13,17 +13,17 @@ import {
   ListItemAvatar,
   ListItemText,
   useTheme,
-  Typography,
+  Typography
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import type { GroupRobot } from "../client/dashboard";
 import {
   IconButtonWithTooltip,
-  NotificationProvider,
+  NotificationProvider, RxFragment,
   Scaffold,
   stringAvatar,
   useDialog,
-  useProxy,
+  useProxy
 } from "../layout";
 import { AccessControl } from "../auth";
 import { useGroupRobotFormWithDialog } from "./GroupRobotForm";
@@ -41,7 +41,7 @@ const useGroupRobotTokenRefresh = () => {
   const theme = useTheme();
 
   const token$ = useStateSubject<typeof refreshGroupRobotToken.TRespData>({
-    accessToken: "-",
+    accessToken: "-"
   } as any);
 
   const dialog$ = useDialog({
@@ -61,7 +61,7 @@ const useGroupRobotTokenRefresh = () => {
                 backgroundColor: theme.palette.action.hover,
                 padding: theme.spacing(1, 1),
                 borderRadius: 1,
-                overflowY: "scroll",
+                overflowY: "scroll"
               }}
             >
               <code>{token.accessToken}</code>
@@ -70,7 +70,7 @@ const useGroupRobotTokenRefresh = () => {
         </Subscribe>
         <Typography variant="caption">点击复制，请妥善保管</Typography>
       </Box>
-    ),
+    )
   });
 
   return useProxy(
@@ -78,12 +78,12 @@ const useGroupRobotTokenRefresh = () => {
     {
       operationID: refreshGroupRobotToken$.operationID,
       refresh$: refreshGroupRobotToken$,
-      dialog$: dialog$,
+      dialog$: dialog$
     },
     (token$) =>
       token$.refresh$.pipe(
         rxMap((resp) => ({
-          ...resp.body,
+          ...resp.body
         })),
         tap(() => {
           token$.dialog$.next(true);
@@ -101,7 +101,6 @@ const GroupRobotListItem = ({ robot }: { robot: GroupRobot }) => {
       <ListItem
         secondaryAction={
           <AccessControl op={token$}>
-            {token$.dialog$.render()}
             <IconButtonWithTooltip
               edge="end"
               label={token$.dialog$.title}
@@ -111,13 +110,16 @@ const GroupRobotListItem = ({ robot }: { robot: GroupRobot }) => {
                   robotID: robot.accountID,
                   body: {
                     roleType: GroupRoleType.MEMBER,
-                    expiresIn: 30 * 24 * 60 * 60,
-                  },
+                    expiresIn: 30 * 24 * 60 * 60
+                  }
                 });
               }}
             >
               <RefreshOutlined />
             </IconButtonWithTooltip>
+            <RxFragment>
+              {token$.dialog$.elements$}
+            </RxFragment>
           </AccessControl>
         }
       >
@@ -142,11 +144,11 @@ const GroupRobotList = () => {
 
   useEffect(() => {
     robots$.list$.next({
-      groupName: robots$.groupName,
+      groupName: robots$.groupName
     });
   }, []);
 
-  const accountDataList = useObservable(robots$);
+  const accountDataList = useObservableState(robots$);
 
   return (
     <List>
@@ -175,7 +177,9 @@ const GroupRobotMainToolbar = () => {
       >
         <AddModerator />
       </IconButtonWithTooltip>
-      {form$.dialog$.render()}
+      <RxFragment>
+        {form$.dialog$.elements$}
+      </RxFragment>
     </AccessControl>
   );
 };

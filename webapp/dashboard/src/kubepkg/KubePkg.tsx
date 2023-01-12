@@ -1,6 +1,6 @@
 import {
   Subscribe,
-  useObservable,
+  useObservableState,
   useStateSubject,
 } from "@innoai-tech/reactutil";
 import {
@@ -40,7 +40,7 @@ const GroupKubepkgListItem = ({ kubepkg }: { kubepkg: Kubepkg }) => {
 const GroupKubepkgList = () => {
   const kubepkg$ = GroupKubePkgProvider.use$();
 
-  const list = useObservable(kubepkg$);
+  const list = useObservableState(kubepkg$);
 
   return (
     <List>

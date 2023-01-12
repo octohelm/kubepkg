@@ -8,9 +8,9 @@ import (
 // +gengo:table:register=T
 // +gengo:table:group=group
 // @def primary DeploymentHistoryID
+// @def unique_index i_deployment_revision KubepkgRevisionID DeploymentSettingID
 // @def index i_deployment DeploymentID
 // @def index i_kubepkg KubepkgID
-// @def index i_kubepkg_revision KubepkgRevisionID
 // @def index i_updated_at CreatedAt
 type DeploymentHistory struct {
 	DeploymentID        DeploymentID        `db:"f_deployment_id" json:"deploymentID"`

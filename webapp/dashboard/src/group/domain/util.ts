@@ -23,6 +23,10 @@ export const deploymentID = (kubepkg: ApisKubepkgV1Alpha1KubePkg) => {
   );
 };
 
+export const deploymentRevision = (kpkg: ApisKubepkgV1Alpha1KubePkg) => {
+  return [`d${revision(kpkg)}`, `s${deploymentSettingID(kpkg)}`].join("+");
+};
+
 export const channel = (kubepkg: ApisKubepkgV1Alpha1KubePkg): string => {
   return get(
     kubepkg,

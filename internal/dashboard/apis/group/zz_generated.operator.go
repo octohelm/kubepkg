@@ -96,6 +96,14 @@ func (*ListGroupEnvDeployment) ResponseContent() any {
 }
 
 func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&ListGroupEnvDeploymentHistory{}))
+}
+
+func (*ListGroupEnvDeploymentHistory) ResponseContent() any {
+	return &[]*github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+}
+
+func init() {
 	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&ListGroupRobot{}))
 }
 

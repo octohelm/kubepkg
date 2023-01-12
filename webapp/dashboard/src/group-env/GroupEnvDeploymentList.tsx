@@ -1,17 +1,15 @@
 import { last, map, orderBy, values } from "@innoai-tech/lodash";
-import { useObservable } from "@innoai-tech/reactutil";
 import { Link as RouterLink } from "react-router-dom";
 import {
   List,
   ListItem,
   ListItemText,
-  ListItemAvatar,
   Link,
   Box,
   Tooltip,
   Stack,
   Theme,
-  useTheme,
+  useTheme
 } from "@mui/material";
 import {
   kubepkgName,
@@ -20,20 +18,23 @@ import {
   GroupEnvDeploymentsProvider,
   openAPISpecDoc,
   revision,
-  channel,
+  channel, deploymentRevision
 } from "../group";
-import { IconButtonWithTooltip } from "../layout";
-import { AccessControl } from "../auth";
-import { Download, EditOutlined } from "@mui/icons-material";
+import { IconButtonWithTooltip, RxFragment } from "../layout";
+import { Download } from "@mui/icons-material";
 import { useGroupEnvDeploymentFormWithDialog } from "./GroupEnvDeployementForm";
-import { Fragment, ReactNode, useMemo } from "react";
+import { Fragment, ReactNode } from "react";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import { openAPISpecPath } from "../group";
+import { useObservableState, useMemoObservable } from "@innoai-tech/reactutil";
+import { map as rxMap } from "rxjs";
+import { AccessControl } from "../auth";
+import { useGroupEnvDeploymentHistoryFormWithDialog } from "./GroupEnvDeploymentHistory";
 
 const InfoSpan = ({
-  label,
-  children,
-}: {
+                    label,
+                    children
+                  }: {
   label?: ReactNode;
   children: ReactNode;
 }) => {
@@ -46,7 +47,7 @@ const InfoSpan = ({
         fontSize: 10,
         lineHeight: 1.1,
         marginTop: 0.5,
-        marginBottom: 0.5,
+        marginBottom: 0.5
       }}
     >
       {label && (
@@ -57,7 +58,7 @@ const InfoSpan = ({
             opacity: 0.7,
             fontSize: "0.7em",
             lineHeight: 1.2,
-            paddingBottom: 0.2,
+            paddingBottom: 0.2
           }}
         >
           {label}
@@ -71,8 +72,8 @@ const InfoSpan = ({
 };
 
 const DeploymentEndpoints = ({
-  kubepkg,
-}: {
+                               kubepkg
+                             }: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
   if (kubepkg.status?.endpoint) {
@@ -110,9 +111,9 @@ const DeploymentEndpoints = ({
 };
 
 const ReasonMessage = ({
-  reason,
-  message,
-}: {
+                         reason,
+                         message
+                       }: {
   message: string;
   reason: string;
 }) => {
@@ -128,9 +129,9 @@ const ReasonMessage = ({
 };
 
 const ContainerStatuses = ({
-  name,
-  kubepkg,
-}: {
+                             name,
+                             kubepkg
+                           }: {
   name: string;
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
@@ -173,8 +174,8 @@ const ContainerStatuses = ({
 };
 
 export const SpecStatus = ({
-  kubepkg,
-}: {
+                             kubepkg
+                           }: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
   return (
@@ -228,7 +229,7 @@ const ConditionBox = ({ type, status }: { type: string; status: string }) => {
         borderRadius: "2px",
         color: "#fff",
         fontWeight: "bold",
-        backgroundColor: colorByConditionType(theme, type, status),
+        backgroundColor: colorByConditionType(theme, type, status)
       }}
     >
       {type[0]}
@@ -253,12 +254,12 @@ const statusOf = (r: any) => {
 };
 
 const DeploymentConditions = ({
-  kubepkg,
-}: {
+                                kubepkg
+                              }: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => (
   <InfoSpan>
-    <Stack spacing={0.5} sx={{ alignItems: "flex-end" }}>
+    <Stack component={"span"} spacing={0.5} sx={{ alignItems: "flex-end" }}>
       <Stack component={"span"} direction={"row"} spacing={0.5}>
         {map(
           orderBy(kubepkg.status?.resources, (r: any) => r.apiVersion),
@@ -284,7 +285,7 @@ const DeploymentConditions = ({
               const status = r.status;
 
               return (
-                <Stack key={i} spacing={0.5}>
+                <Stack component={"span"} key={i} spacing={0.5}>
                   <Stack component={"span"} spacing={0.5} direction={"row"}>
                     <Stack component={"span"} spacing={0.5}>
                       {map(status.podStatuses, (podStatus, i) => (
@@ -329,11 +330,12 @@ const isLatestUpgrade = (kubepkg: ApisKubepkgV1Alpha1KubePkg): boolean =>
   (kubepkg as any)?.upgrade?.latest;
 
 const KubePkgHeading = ({
-  kubepkg,
-}: {
+                          kubepkg
+                        }: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
-  const theme = useTheme();
+  const edit$ = useGroupEnvDeploymentFormWithDialog(kubepkg);
+  const history$ = useGroupEnvDeploymentHistoryFormWithDialog(kubepkg);
 
   return (
     <Stack
@@ -344,7 +346,7 @@ const KubePkgHeading = ({
         fontFamily: "monospace",
         width: "100%",
         py: 0.5,
-        justifyContent: "space-between",
+        justifyContent: "space-between"
       }}
     >
       <Stack component={"span"} sx={{ position: "relative" }}>
@@ -357,7 +359,7 @@ const KubePkgHeading = ({
               fontSize: "0.6em",
               alignItems: "center",
               position: "absolute",
-              top: "-1em",
+              top: "-1em"
             }}
             spacing={1}
           >
@@ -373,15 +375,19 @@ const KubePkgHeading = ({
             >
               <Box
                 component={"span"}
-                sx={{
-                  opacity: 0.8,
-                  fontWeight: "bold",
-                  color: canUpgrade(kubepkg)
-                    ? isLatestUpgrade(kubepkg)
-                      ? theme.palette.success.main
-                      : theme.palette.warning.main
-                    : "inherit",
-                }}
+                sx={[
+                  {
+                    opacity: 0.8,
+                    fontWeight: "bold"
+                  },
+                  (theme) => ({
+                    color: canUpgrade(kubepkg)
+                      ? isLatestUpgrade(kubepkg)
+                        ? theme.palette.success.main
+                        : theme.palette.warning.main
+                      : "inherit"
+                  })
+                ]}
               >
                 {`${kubepkgName(kubepkg)}`}
                 <Box component={"span"} sx={{ opacity: 0.5 }}>
@@ -392,15 +398,57 @@ const KubePkgHeading = ({
             </Tooltip>
           </Stack>
         </Box>
-        <Box
+        <Stack
           component={"span"}
+          direction="row"
+          spacing={1}
           sx={{
-            display: "block",
-            fontWeight: "bold",
-          }}
-        >
-          {kubepkg.spec.deploy?.kind}/{kubepkg.metadata?.name}
-        </Box>
+            alignItems: "center",
+            "&:hover small": {
+              visibility: "visible"
+            }
+          }}>
+          <Box
+            component={"span"}
+            sx={{
+              display: "block",
+              fontWeight: "bold"
+            }}
+          >
+            {kubepkg.spec.deploy?.kind}/{kubepkg.metadata?.name}
+          </Box>
+          <Stack component={"small"} direction="row" spacing={1} sx={{
+            visibility: "hidden",
+            opacity: 0.8,
+            fontSize: "0.8em",
+            "& a": {
+              color: "inherit"
+            }
+          }}>
+            <AccessControl op={edit$}>
+              <Link href={"#"} onClick={(e) => {
+                e.preventDefault();
+                edit$.dialog$.next(true);
+              }}>
+                编辑
+              </Link>
+              <RxFragment>
+                {edit$.dialog$.elements$}
+              </RxFragment>
+            </AccessControl>
+            <AccessControl op={history$}>
+              <Link href={"#"} onClick={(e) => {
+                e.preventDefault();
+                history$.dialog$.next(true);
+              }}>
+                历史部署
+              </Link>
+              <RxFragment>
+                {history$.dialog$.elements$}
+              </RxFragment>
+            </AccessControl>
+          </Stack>
+        </Stack>
       </Stack>
       <Stack component={"span"} sx={{ position: "relative" }}>
         <Box
@@ -410,7 +458,7 @@ const KubePkgHeading = ({
             fontSize: "0.5em",
             opacity: 0.5,
             top: "-1em",
-            right: 0,
+            right: 0
           }}
         >
           {`r${revision(kubepkg)}`}&nbsp;
@@ -422,6 +470,7 @@ const KubePkgHeading = ({
           sx={{
             fontWeight: "bold",
             opacity: 0.5,
+            textAlign: "right"
           }}
         >
           {kubepkg.spec.version}
@@ -432,12 +481,10 @@ const KubePkgHeading = ({
 };
 
 export const GroupEnvDeploymentListItem = ({
-  kubepkg,
-}: {
+                                             kubepkg
+                                           }: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
-  const form$ = useGroupEnvDeploymentFormWithDialog(kubepkg);
-
   const kubepkgName = kubepkg.metadata?.name || deploymentID(kubepkg);
   const spec = kubepkg.spec;
 
@@ -451,20 +498,6 @@ export const GroupEnvDeploymentListItem = ({
 
   return (
     <ListItem>
-      <AccessControl op={form$}>
-        <ListItemAvatar>
-          <IconButtonWithTooltip
-            edge="end"
-            label={form$.dialog$.title}
-            onClick={() => {
-              form$.dialog$.next(true);
-            }}
-          >
-            <EditOutlined />
-          </IconButtonWithTooltip>
-          {form$.dialog$.render()}
-        </ListItemAvatar>
-      </AccessControl>
       <ListItemText
         primary={
           <Stack spacing={1} component={"span"} direction={"row"}>
@@ -476,14 +509,16 @@ export const GroupEnvDeploymentListItem = ({
             >
               <KubePkgHeading kubepkg={kubepkg} />
             </Stack>
-            <DeploymentConditions kubepkg={kubepkg} />
           </Stack>
         }
         secondary={
-          <Box component={"span"} sx={{ display: "block" }}>
-            <DeploymentEndpoints kubepkg={kubepkg} />
-            <SpecStatus kubepkg={kubepkg} />
-          </Box>
+          <Stack spacing={1} component={"span"} direction={"row"}>
+            <Box component={"span"} sx={{ display: "block", flex: 1 }}>
+              <DeploymentEndpoints kubepkg={kubepkg} />
+              <SpecStatus kubepkg={kubepkg} />
+            </Box>
+            <DeploymentConditions kubepkg={kubepkg} />
+          </Stack>
         }
       />
     </ListItem>
@@ -500,16 +535,16 @@ const toKubePkgList = (name: string, groupEnvDeployments: any) => {
         apiVersion: item.apiVersion,
         kind: item.kind,
         metadata: item.metadata,
-        spec: item.spec,
+        spec: item.spec
       })
-    ),
+    )
   };
 
   const file = new File(
     [JSON.stringify(list, null, 2)],
     `${name}.kubepkg.json`,
     {
-      type: "application/json",
+      type: "application/json"
     }
   );
 
@@ -540,19 +575,17 @@ export const GroupEnvDeploymentExport = () => {
 export const GroupEnvDeploymentList = () => {
   const groupEnvDeployments$ = GroupEnvDeploymentsProvider.use$();
 
-  const groupEnvDeployments = useObservable(groupEnvDeployments$);
+  const sortedDeployments$ = useMemoObservable(() => groupEnvDeployments$.pipe(
+    rxMap((groupEnvDeployments) => orderBy(values(groupEnvDeployments || {}), (d) => d.spec.deploy?.kind))
+  ));
 
-  const deployments = useMemo(
-    () =>
-      orderBy(values(groupEnvDeployments || {}), (d) => d.spec.deploy?.kind),
-    [groupEnvDeployments]
-  );
+  const sortedDeployments = useObservableState(sortedDeployments$);
 
   return (
     <List>
-      {map(deployments, (kubepkg) => {
+      {map(sortedDeployments, (kubepkg) => {
         return (
-          <Fragment key={groupEnvDeployments$.keyOf(kubepkg)}>
+          <Fragment key={deploymentRevision(kubepkg)}>
             <GroupEnvDeploymentListItem kubepkg={kubepkg} />
           </Fragment>
         );

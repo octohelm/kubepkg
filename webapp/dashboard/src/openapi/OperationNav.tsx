@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { parseSearch, stringifySearch } from "@innoai-tech/fetcher";
-import { useObservable, useStateSubject } from "@innoai-tech/reactutil";
+import { useObservableState, useStateSubject } from "@innoai-tech/reactutil";
 import { useTheme } from "@mui/material";
 
 const StyledOperationDesc = ({
@@ -96,7 +96,7 @@ export const OperationNav = () => {
   const filterValue$ = useStateSubject("");
   const { operations } = useOpenAPI();
 
-  const filterValue = useObservable(filterValue$);
+  const filterValue = useObservableState(filterValue$);
 
   const groupedOperations = useMemo(() => {
     const finalOperations = filterValue

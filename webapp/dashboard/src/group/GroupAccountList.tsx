@@ -1,4 +1,4 @@
-import { useObservable, useObservableEffect } from "@innoai-tech/reactutil";
+import { useObservableState, useObservableEffect } from "@innoai-tech/reactutil";
 import {
   Avatar,
   Box,
@@ -8,7 +8,7 @@ import {
   ListItemAvatar,
   ListItemText,
   MenuItem,
-  Select,
+  Select
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { tap, filter } from "rxjs";
@@ -38,7 +38,7 @@ const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
                   if ((roleType as any) === "-") {
                     account$.del$.next({
                       groupName: account$.groupName,
-                      accountID: user.accountID,
+                      accountID: user.accountID
                     });
                     return;
                   }
@@ -47,8 +47,8 @@ const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
                     groupName: account$.groupName,
                     accountID: user.accountID,
                     body: {
-                      roleType,
-                    },
+                      roleType
+                    }
                   });
                 }}
               >
@@ -63,7 +63,7 @@ const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
                     <MenuItem key={""} value={"-"}>
                       移除成员
                     </MenuItem>
-                  </AccessControl>,
+                  </AccessControl>
                 ]}
               </Select>
             )}
@@ -91,11 +91,11 @@ const GroupAccountList = () => {
 
   useEffect(() => {
     account$.list$.next({
-      groupName: account$.groupName,
+      groupName: account$.groupName
     });
   }, []);
 
-  const accountDataList = useObservable(account$);
+  const accountDataList = useObservableState(account$);
 
   return (
     <List>
@@ -115,31 +115,27 @@ export const GroupAccountAdd = () => {
   const account$ = GroupAccountProvider.use$();
 
   const accountSearch$ = useAccountAutocomplete({
-    placeholder: "查询并添加成员",
+    placeholder: "查询并添加成员"
   });
 
-  useObservableEffect(
-    () => [
-      account$.put$.pipe(
-        tap(() => {
-          accountSearch$.popper$.next(false);
-        })
-      ),
-      accountSearch$.pipe(
-        filter((accountID) => !!accountID),
-        tap((accountID) => {
-          account$.put$.next({
-            groupName: account$.groupName,
-            accountID,
-            body: {
-              roleType: GroupRoleType.GUEST,
-            },
-          });
-        })
-      ),
-    ],
-    []
-  );
+  useObservableEffect(() => account$.put$.pipe(
+    tap(() => {
+      accountSearch$.popper$.next(false);
+    })
+  ));
+
+  useObservableEffect(() => accountSearch$.pipe(
+    filter((accountID) => !!accountID),
+    tap((accountID) => {
+      account$.put$.next({
+        groupName: account$.groupName,
+        accountID,
+        body: {
+          roleType: GroupRoleType.GUEST
+        }
+      });
+    })
+  ));
 
   return (
     <AccessControl op={account$.put$}>{accountSearch$.render()}</AccessControl>

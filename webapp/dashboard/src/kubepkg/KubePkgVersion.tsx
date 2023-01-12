@@ -9,14 +9,14 @@ import {
   MenuList,
   Stack,
   Tab,
-  Tabs,
+  Tabs
 } from "@mui/material";
 import {
   Subscribe,
   useStateSubject,
   useObservableEffect,
   useRequest,
-  StateSubject,
+  StateSubject
 } from "@innoai-tech/reactutil";
 import { stringifySearch, parseSearch } from "@innoai-tech/fetcher";
 import { get, map, values } from "@innoai-tech/lodash";
@@ -26,19 +26,19 @@ import {
   ApisKubepkgV1Alpha1KubePkg,
   KubepkgChannel,
   KubepkgVersionInfo,
-  putKubepkgVersion,
+  putKubepkgVersion
 } from "../client/dashboard";
 import { AccessControl } from "../auth";
-import { Scaffold, useDialog, useEpics, useMenu, useProxy } from "../layout";
+import { RxFragment, Scaffold, useDialog, useEpics, useMenu, useProxy } from "../layout";
 import { GroupKubePkgVersionProvider } from "./domain";
 import { KubePkgEditor } from "./KubePkgEditor";
 import { useEffect } from "react";
 import { MoreHoriz } from "@mui/icons-material";
 
 export const KubepkgVersionView = ({
-  versionInfo,
-  channel,
-}: {
+                                     versionInfo,
+                                     channel
+                                   }: {
   versionInfo: KubepkgVersionInfo;
   channel: KubepkgChannel;
 }) => {
@@ -55,7 +55,7 @@ export const KubepkgVersionView = ({
       groupName: kubepkgVersion$.groupName,
       name: kubepkgVersion$.kubePkgName,
       channel: channel,
-      revisionID: versionInfo.revisionID,
+      revisionID: versionInfo.revisionID
     });
   }, []);
 
@@ -69,7 +69,7 @@ export const useKubepkgVersionView = (
   return useDialog({
     title: `KubePkg ${versionInfo.version}`,
     sx: { "& .MuiDialog-paper": { maxWidth: "90vw", width: "90vw" } },
-    content: <KubepkgVersionView versionInfo={versionInfo} channel={channel} />,
+    content: <KubepkgVersionView versionInfo={versionInfo} channel={channel} />
   });
 };
 
@@ -96,7 +96,7 @@ export const useKubeVersionChannel = (
                     groupName: kubepkgVersion$.groupName,
                     name: kubepkgVersion$.kubePkgName,
                     channel: c,
-                    body: versionInfo,
+                    body: versionInfo
                   });
                 }}
               >
@@ -105,21 +105,21 @@ export const useKubeVersionChannel = (
             ) : null
           )}
         </MenuList>
-      ),
+      )
     },
     () => put$.pipe(rxMap(() => false))
   );
 
   return useProxy(put$, {
-    dialog$: dialog$,
+    dialog$: dialog$
   });
 };
 
 const GroupKubeVersionListItem = ({
-  channel,
-  versionInfo,
-  selectedRevision$,
-}: {
+                                    channel,
+                                    versionInfo,
+                                    selectedRevision$
+                                  }: {
   versionInfo: KubepkgVersionInfo;
   channel: KubepkgChannel;
   selectedRevision$?: StateSubject<string>;
@@ -128,7 +128,7 @@ const GroupKubeVersionListItem = ({
 
   const releaseToChannel$ = useKubeVersionChannel(versionInfo, channel);
 
-  const kubepkgView$ = useKubepkgVersionView(versionInfo, channel);
+  const kubepkgDialogView$ = useKubepkgVersionView(versionInfo, channel);
 
   const dialogForDelete$ = useDialog(
     {
@@ -139,9 +139,9 @@ const GroupKubeVersionListItem = ({
           groupName: kubepkgVersion$.groupName,
           name: kubepkgVersion$.kubePkgName,
           channel,
-          version: encodeURIComponent(versionInfo.version),
+          version: encodeURIComponent(versionInfo.version)
         });
-      },
+      }
     },
     () => kubepkgVersion$.del$.pipe(rxMap(() => false))
   );
@@ -157,7 +157,9 @@ const GroupKubeVersionListItem = ({
           >
             删除
           </MenuItem>
-          {dialogForDelete$.render()}
+          <RxFragment>
+            {dialogForDelete$.elements$}
+          </RxFragment>
         </AccessControl>
         <AccessControl op={releaseToChannel$}>
           <MenuItem
@@ -167,10 +169,12 @@ const GroupKubeVersionListItem = ({
           >
             发布到
           </MenuItem>
-          {releaseToChannel$.dialog$.render()}
+          <RxFragment>
+            {releaseToChannel$.dialog$.elements$}
+          </RxFragment>
         </AccessControl>
       </MenuList>
-    ),
+    )
   });
 
   return (
@@ -181,7 +185,7 @@ const GroupKubeVersionListItem = ({
             paddingLeft: 1,
             paddingRight: 1,
             paddingTop: 0.5,
-            paddingBottom: 0.5,
+            paddingBottom: 0.5
           }}
           selected={selectedRevision === versionInfo.revisionID}
         >
@@ -199,7 +203,7 @@ const GroupKubeVersionListItem = ({
                     sx={{
                       fontFamily: "monospace",
                       color: "inherit",
-                      textAlign: "left",
+                      textAlign: "left"
                     }}
                     onClick={(e) => {
                       e.preventDefault();
@@ -207,13 +211,17 @@ const GroupKubeVersionListItem = ({
                       if (!!selectedRevision$) {
                         selectedRevision$.next(versionInfo.revisionID);
                       } else {
-                        kubepkgView$.next(true);
+                        kubepkgDialogView$.next(true);
                       }
                     }}
                   >
                     {`${versionInfo.version}`}
                   </Link>
-                  {!selectedRevision$ && kubepkgView$.render()}
+                  {!selectedRevision$ &&
+                    <RxFragment>
+                      {kubepkgDialogView$.elements$}
+                    </RxFragment>
+                  }
                 </>
 
                 <>
@@ -235,27 +243,24 @@ const GroupKubeVersionListItem = ({
 };
 
 export const GroupKubepkgVersionList = ({
-  channel$,
-  selectedRevision$,
-}: {
+                                          channel$,
+                                          selectedRevision$
+                                        }: {
   channel$: StateSubject<KubepkgChannel>;
   selectedRevision$?: StateSubject<string>;
 }) => {
   const kubepkgVersion$ = GroupKubePkgVersionProvider.use$();
 
-  useObservableEffect(
-    () =>
-      channel$.pipe(
-        tap((channel) => {
-          kubepkgVersion$.list$.next({
-            groupName: kubepkgVersion$.groupName,
-            name: kubepkgVersion$.kubePkgName,
-            channel: channel,
-          });
-        })
-      ),
-    []
-  );
+  useObservableEffect(() =>
+    channel$.pipe(
+      tap((channel) => {
+        kubepkgVersion$.list$.next({
+          groupName: kubepkgVersion$.groupName,
+          name: kubepkgVersion$.kubePkgName,
+          channel: channel
+        });
+      })
+    ));
 
   return (
     <Subscribe value$={channel$}>
@@ -278,7 +283,7 @@ export const GroupKubepkgVersionList = ({
                   maxWidth: "600px",
                   height: "100%",
                   overflowY: "auto",
-                  overflowX: "none",
+                  overflowX: "none"
                 }}
               >
                 {list?.map((versionInfo) => (
@@ -319,7 +324,7 @@ export const KubePkgVersionMain = () => {
         tap((channel) => {
           nav(
             stringifySearch({
-              channel: channel,
+              channel: channel
             })
           );
         })

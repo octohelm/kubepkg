@@ -1,4 +1,4 @@
-import { useRequest, useObservable } from "@innoai-tech/reactutil";
+import { useRequest, useObservableState } from "@innoai-tech/reactutil";
 import {
   Card,
   CardActions,
@@ -27,7 +27,7 @@ export const LoginCard = () => {
     listAuthProvider$.next();
   }, []);
 
-  const resp = useObservable(listAuthProvider$);
+  const resp = useObservableState(listAuthProvider$);
 
   if (!resp) {
     return null;

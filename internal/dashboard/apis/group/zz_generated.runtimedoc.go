@@ -134,6 +134,24 @@ func (v ListGroupEnvDeployment) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v ListGroupEnvDeploymentHistory) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "DeploymentID":
+			return []string{}, true
+		case "Pager":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.Pager, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v ListGroupRobot) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {

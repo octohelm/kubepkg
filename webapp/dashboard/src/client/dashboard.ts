@@ -886,6 +886,35 @@ export const putGroupEnvDeployment = /*#__PURE__*/ createRequest<
   })
 );
 
+export type GroupDeploymentId = string;
+
+export const listGroupEnvDeploymentHistory = /*#__PURE__*/ createRequest<
+  {
+    groupName: string;
+    envName: string;
+    deploymentID: GroupDeploymentId;
+    size?: number;
+    offset?: number;
+  },
+  Array<ApisKubepkgV1Alpha1KubePkg>
+>(
+  "dashboard.ListGroupEnvDeploymentHistory",
+  ({
+    groupName: path_groupName,
+    envName: path_envName,
+    deploymentID: path_deploymentId,
+    size: query_size,
+    offset: query_offset,
+  }) => ({
+    method: "GET",
+    url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}/deployments/${path_deploymentId}/histories`,
+    params: {
+      size: query_size,
+      offset: query_offset,
+    },
+  })
+);
+
 export type KubepkgId = string;
 
 export interface Kubepkg extends DatatypesCreationUpdationDeletionTime {
@@ -2316,6 +2345,78 @@ export const RawOpenAPI = {
         },
       },
     },
+    "/api/kubepkg-dashboard/v0/groups/{groupName}/envs/{envName}/deployments/{deploymentID}/histories":
+      {
+        get: {
+          tags: ["group"],
+          operationId: "ListGroupEnvDeploymentHistory",
+          parameters: [
+            {
+              name: "Authorization",
+              in: "header",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "groupName",
+              in: "path",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "envName",
+              in: "path",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "deploymentID",
+              in: "path",
+              required: true,
+              schema: {
+                $ref: "#/components/schemas/GroupDeploymentId",
+              },
+            },
+            {
+              name: "size",
+              in: "query",
+              schema: {
+                type: "integer",
+                format: "int64",
+              },
+            },
+            {
+              name: "offset",
+              in: "query",
+              schema: {
+                type: "integer",
+                format: "int64",
+              },
+            },
+          ],
+          responses: {
+            "200": {
+              description: "",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: {
+                      $ref: "#/components/schemas/ApisKubepkgV1Alpha1KubePkg",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     "/api/kubepkg-dashboard/v0/groups/{groupName}/kubepkgs": {
       get: {
         tags: ["kubepkg"],
@@ -4175,6 +4276,9 @@ export const RawOpenAPI = {
           },
         },
         required: ["data"],
+      },
+      GroupDeploymentId: {
+        type: "string",
       },
       GroupEnv: {
         allOf: [

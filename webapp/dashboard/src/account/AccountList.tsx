@@ -1,4 +1,4 @@
-import { useObservable, useRequest } from "@innoai-tech/reactutil";
+import { useObservableState, useRequest } from "@innoai-tech/reactutil";
 import {
   Avatar,
   Box,
@@ -39,7 +39,7 @@ const AccountList = () => {
     listAccount$.next({});
   }, []);
 
-  const resp = useObservable(listAccount$);
+  const resp = useObservableState(listAccount$);
 
   if (!resp) {
     return null;

@@ -2,7 +2,7 @@ import { Subscribe } from "@innoai-tech/reactutil";
 import { Box, Stack } from "@mui/material";
 import { Link, LinkOff } from "@mui/icons-material";
 import { GroupEnvProvider } from "../group";
-import { IconButtonWithTooltip, useDialog, useEpics } from "../layout";
+import { IconButtonWithTooltip, RxFragment, useDialog, useEpics } from "../layout";
 import { AccessControl } from "../auth";
 import { map } from "rxjs";
 import { ClusterMenuList } from "../cluster";
@@ -21,11 +21,11 @@ export const useGroupEnvClusterBindDialog = () => {
           groupEnv$.bindCluster$.next({
             groupName: groupEnv$.value.groupName,
             envName: groupEnv$.value.envName,
-            clusterID: clusterID,
+            clusterID: clusterID
           })
         }
       />
-    ),
+    )
   });
 
   useEpics(dialog$, () => groupEnv$.bindCluster$.pipe(map(() => false)));
@@ -46,9 +46,9 @@ export const useGroupEnvClusterUnbindDialog = () => {
       groupEnv$.unbindCluster$.next({
         groupName: groupEnv$.value.groupName,
         envName: groupEnv$.value.envName,
-        clusterID: groupEnv$.value.cluster?.clusterID || "0",
+        clusterID: groupEnv$.value.cluster?.clusterID || "0"
       });
-    },
+    }
   });
 
   useEpics(dialog$, () => groupEnv$.unbindCluster$.pipe(map(() => false)));
@@ -78,7 +78,9 @@ export const GroupEnvCluster = () => {
                 >
                   <Link />
                 </IconButtonWithTooltip>
-                {bindDialog$.render()}
+                <RxFragment>
+                  {bindDialog$.elements$}
+                </RxFragment>
               </AccessControl>
             </Stack>
           );
@@ -97,7 +99,9 @@ export const GroupEnvCluster = () => {
               >
                 <LinkOff />
               </IconButtonWithTooltip>
-              {unbindDialog$.render()}
+              <RxFragment>
+                {unbindDialog$.elements$}
+              </RxFragment>
             </AccessControl>
           </Stack>
         );

@@ -115,7 +115,16 @@ func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, dep
 	deploymentHistory.DeploymentSettingID = group.DeploymentSettingID(kubepkgRef.SettingID)
 
 	if err := dal.Tx(ctx, deploymentHistory, func(ctx context.Context) error {
-		err := dal.Prepare(deploymentHistory).Save(ctx)
+		err := dal.Prepare(deploymentHistory).
+			OnConflict(group.DeploymentHistoryT.I.IDeploymentRevision).
+			DoUpdateSet(
+				group.DeploymentHistoryT.CreatedAt,
+			).
+			Returning(
+				group.DeploymentHistoryT.DeploymentID,
+			).
+			Scan(deploymentHistory).
+			Save(ctx)
 		if err != nil {
 			return err
 		}
@@ -271,14 +280,57 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 	if pager == nil {
 		pager = &datatypes.Pager{}
 	}
-
 	pager.SetDefaults()
+
+	expr := dal.From(group.DeploymentHistoryT).
+		Join(group.DeploymentT, sqlbuilder.And(
+			group.DeploymentT.DeploymentID.V(sqlbuilder.EqCol(group.DeploymentHistoryT.DeploymentID)),
+		)).
+		Join(kubepkg.RevisionT, kubepkg.RevisionT.ID.V(
+			sqlbuilder.EqCol(group.DeploymentHistoryT.KubepkgRevisionID),
+		)).
+		Join(kubepkg.KubepkgT, kubepkg.KubepkgT.ID.V(
+			sqlbuilder.EqCol(group.DeploymentHistoryT.KubepkgID),
+		)).
+		FullJoin(kubepkg.VersionT, sqlbuilder.And(
+			kubepkg.VersionT.KubepkgID.V(
+				sqlbuilder.EqCol(kubepkg.KubepkgT.ID),
+			),
+			kubepkg.VersionT.RevisionID.V(
+				sqlbuilder.EqCol(kubepkg.RevisionT.ID),
+			),
+		)).
+		FullJoin(group.DeploymentSettingT, group.DeploymentSettingT.DeploymentSettingID.V(
+			sqlbuilder.EqCol(group.DeploymentHistoryT.DeploymentSettingID),
+		)).
+		Select(
+			group.DeploymentT.DeploymentName,
+
+			group.DeploymentHistoryT.CreatedAt,
+			group.DeploymentHistoryT.DeploymentID,
+			group.DeploymentHistoryT.DeploymentSettingID,
+			group.DeploymentHistoryT.DeploymentHistoryID,
+			group.DeploymentHistoryT.KubepkgRevisionID,
+
+			group.DeploymentSettingT.EncryptedSetting,
+
+			kubepkg.RevisionT.ID,
+			kubepkg.RevisionT.Spec,
+
+			kubepkg.VersionT.Version,
+			kubepkg.VersionT.Channel,
+
+			kubepkg.KubepkgT.Group,
+			kubepkg.KubepkgT.Name,
+		)
 
 	ltr := datatypes.NewLister(func(kk *struct {
 		Deployment        group.Deployment
 		DeploymentHistory group.DeploymentHistory
+		DeploymentSetting group.DeploymentSetting
 		Revision          kubepkg.Revision
 		Version           kubepkg.Version
+		Kubepkg           kubepkg.Kubepkg
 	}) (*v1alpha1.KubePkg, error) {
 		k := &v1alpha1.KubePkg{}
 		k.SetGroupVersionKind(v1alpha1.SchemeGroupVersion.WithKind("KubePkg"))
@@ -296,45 +348,34 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 		k.Annotations["kubepkg.innoai.tech/revision"] = kk.DeploymentHistory.KubepkgRevisionID.String()
 		k.Annotations["kubepkg.innoai.tech/deploymentID"] = kk.DeploymentHistory.DeploymentID.String()
 		k.Annotations["kubepkg.innoai.tech/deploymentSettingID"] = kk.DeploymentHistory.DeploymentSettingID.String()
+		k.Annotations["kubepkg.innoai.tech/name"] = fmt.Sprintf("%s/%s", kk.Kubepkg.Group, kk.Kubepkg.Name)
+		k.Annotations["kubepkg.innoai.tech/channel"] = kk.Version.Channel.String()
 
 		k.Spec.Version = kk.Version.Version
 
 		if err := json.Unmarshal(kk.Revision.Spec, &k.Spec); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "KubePkg unmarshal to json failed")
+		}
+
+		if len(kk.DeploymentSetting.EncryptedSetting) > 0 {
+			data, err := r.cipher.Decrypt(ctx, kk.DeploymentSetting.EncryptedSetting)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := json.Unmarshal(data, &k.Spec.Config); err != nil {
+				return nil, errors.Wrap(err, "Setting unmarshal to json failed")
+			}
 		}
 
 		return k, nil
 	})
 
-	err := dal.From(group.DeploymentHistoryT).
-		Select(
-			group.DeploymentT.DeploymentName,
-
-			group.DeploymentHistoryT.CreatedAt,
-			group.DeploymentHistoryT.DeploymentID,
-			group.DeploymentHistoryT.DeploymentSettingID,
-
-			kubepkg.RevisionT.ID,
-			kubepkg.RevisionT.Spec,
-
-			kubepkg.VersionT.Version,
-			kubepkg.VersionT.Channel,
-		).
-		Join(group.DeploymentT, sqlbuilder.And(
+	err := expr.
+		Where(
 			group.DeploymentHistoryT.DeploymentID.V(sqlbuilder.Eq(deploymentID)),
-			group.DeploymentT.DeploymentID.V(sqlbuilder.EqCol(group.DeploymentHistoryT.DeploymentID)),
-		)).
-		Join(kubepkg.RevisionT, sqlbuilder.And(
-			kubepkg.RevisionT.ID.V(
-				sqlbuilder.EqCol(group.DeploymentHistoryT.KubepkgRevisionID),
-			),
-		)).
-		Join(kubepkg.VersionT, sqlbuilder.And(
-			kubepkg.VersionT.RevisionID.V(
-				sqlbuilder.EqCol(kubepkg.RevisionT.ID),
-			),
-		)).
-		OrderBy(sqlbuilder.DescOrder(group.DeploymentHistoryT.DeploymentHistoryID)).
+		).
+		OrderBy(sqlbuilder.DescOrder(group.DeploymentHistoryT.CreatedAt)).
 		Limit(pager.Size).Offset(pager.Offset).
 		Scan(ltr).
 		Find(ctx)

@@ -1,7 +1,7 @@
 import {
-  useObservable,
+  useObservableState,
   useObservableEffect,
-  useRequest,
+  useRequest
 } from "@innoai-tech/reactutil";
 import {
   Avatar,
@@ -12,7 +12,7 @@ import {
   ListItemAvatar,
   ListItemText,
   MenuItem,
-  Select,
+  Select
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { map as rxMap, tap, ignoreElements, filter } from "rxjs";
@@ -21,7 +21,7 @@ import {
   GroupRoleType,
   GroupUser,
   listAdminAccount,
-  putAdminAccount,
+  putAdminAccount
 } from "../client/dashboard";
 import { createSubject, Scaffold, stringAvatar } from "../layout";
 import { useAccountAutocomplete } from "./AccountAutocomplete";
@@ -38,7 +38,7 @@ export const AdminAccountProvider = createSubject(({}, use) => {
     {
       list$: listAccount$,
       del$: deleteAdminAccount$,
-      put$: putAdminAccount$,
+      put$: putAdminAccount$
     },
     (accounts$) =>
       accounts$.put$.pipe(
@@ -80,12 +80,12 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
                   account$.put$.next({
                     accountID: user.accountID,
                     body: {
-                      roleType,
-                    },
+                      roleType
+                    }
                   });
                 } else {
                   account$.del$.next({
-                    accountID: user.accountID,
+                    accountID: user.accountID
                   });
                 }
               }}
@@ -106,7 +106,7 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
                   >
                     移除管理员
                   </MenuItem>
-                </AccessControl>,
+                </AccessControl>
               ]}
             </Select>
           </AccessControl>
@@ -135,7 +135,7 @@ const AdminAccountList = () => {
     account$.list$.next({});
   }, []);
 
-  const accountDataList = useObservable(account$);
+  const accountDataList = useObservableState(account$);
 
   return (
     <List>
@@ -155,29 +155,26 @@ export const AdminAdd = () => {
   const account$ = AdminAccountProvider.use$();
 
   const accountAutocomplete$ = useAccountAutocomplete({
-    placeholder: "查询并添加管理员",
+    placeholder: "查询并添加管理员"
   });
 
-  useObservableEffect(
-    () => [
-      account$.put$.pipe(
-        tap(() => {
-          accountAutocomplete$.popper$.next(false);
-        })
-      ),
-      accountAutocomplete$.pipe(
-        filter((accountID) => !!accountID),
-        tap((accountID) => {
-          account$.put$.next({
-            accountID,
-            body: {
-              roleType: GroupRoleType.MEMBER,
-            },
-          });
-        })
-      ),
-    ],
-    []
+  useObservableEffect(() => account$.put$.pipe(
+    tap(() => {
+      accountAutocomplete$.popper$.next(false);
+    })
+  ));
+
+  useObservableEffect(() => accountAutocomplete$.pipe(
+      filter((accountID) => !!accountID),
+      tap((accountID) => {
+        account$.put$.next({
+          accountID,
+          body: {
+            roleType: GroupRoleType.MEMBER
+          }
+        });
+      })
+    )
   );
 
   return (

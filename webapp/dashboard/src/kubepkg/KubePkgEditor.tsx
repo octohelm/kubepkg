@@ -1,6 +1,6 @@
 import { map, pick } from "@innoai-tech/lodash";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
-import { StateSubject, useObservable } from "@innoai-tech/reactutil";
+import { StateSubject, useObservableState } from "@innoai-tech/reactutil";
 
 import { MonacoEditor } from "../layout";
 import { RawOpenAPI } from "../client/dashboard";
@@ -11,7 +11,7 @@ export const KubePkgEditor = ({
                               }: {
   kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>;
 }) => {
-  const kubepkg = useObservable(kubepkg$);
+  const kubepkg = useObservableState(kubepkg$);
 
   const jsonCode = useMemo(
     () =>
@@ -25,7 +25,7 @@ export const KubePkgEditor = ({
 
   return (
     <MonacoEditor
-      sx={{ height: "70vh", width: "100%"}}
+      sx={{ height: "70vh", width: "100%" }}
       beforeMount={(monaco) => {
         const schemas = map(RawOpenAPI.components.schemas, (s, k) => {
           return {

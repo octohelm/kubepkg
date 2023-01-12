@@ -1,4 +1,4 @@
-import { useObservable, useRequest } from "@innoai-tech/reactutil";
+import { useObservableState, useRequest } from "@innoai-tech/reactutil";
 import {
   Box,
   Button,
@@ -6,7 +6,7 @@ import {
   CardActions,
   CardContent,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -37,10 +37,10 @@ export const GroupCardList = () => {
   const listGroup$ = useRequest(listGroup);
 
   useEffect(() => {
-    listGroup$.next({});
+    listGroup$.next();
   }, []);
 
-  const resp = useObservable(listGroup$);
+  const resp = useObservableState(listGroup$);
 
   if (!resp) {
     return null;

@@ -13,42 +13,6 @@ import (
 	github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 )
 
-type DelKubePkg struct {
-	github_com_octohelm_courier_pkg_courierhttp.MethodDelete `path:"/api/kubepkg-agent/v1/kubepkgs/:name"`
-
-	Name string `name:"name" in:"path"`
-
-	Namespace string `name:"namespace,omitempty" in:"query"`
-}
-
-func (r *DelKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
-}
-
-func (r *DelKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {
-	return r.Do(ctx, metas...).Into(nil)
-}
-
-type GetKubePkgResponse = ApisKubepkgV1Alpha1KubePkg
-
-type GetKubePkg struct {
-	github_com_octohelm_courier_pkg_courierhttp.MethodGet `path:"/api/kubepkg-agent/v1/kubepkgs/:name"`
-
-	Name string `name:"name" in:"path"`
-
-	Namespace string `name:"namespace,omitempty" in:"query"`
-}
-
-func (r *GetKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
-}
-
-func (r *GetKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (*GetKubePkgResponse, github_com_octohelm_courier_pkg_courier.Metadata, error) {
-	var resp GetKubePkgResponse
-	meta, err := r.Do(ctx, metas...).Into(&resp)
-	return &resp, meta, err
-}
-
 type UploadBlob struct {
 	github_com_octohelm_courier_pkg_courierhttp.MethodPut `path:"/api/kubepkg-agent/v1/blobs"`
 
@@ -116,7 +80,41 @@ func (r *ApplyKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_
 	return r.Do(ctx, metas...).Into(nil)
 }
 
-type ApisKubepkgV1Alpha1KubePkg = github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg
+type GetKubePkgResponse = ApisKubepkgV1Alpha1KubePkg
+
+type GetKubePkg struct {
+	github_com_octohelm_courier_pkg_courierhttp.MethodGet `path:"/api/kubepkg-agent/v1/kubepkgs/:name"`
+
+	Name string `name:"name" in:"path"`
+
+	Namespace string `name:"namespace,omitempty" in:"query"`
+}
+
+func (r *GetKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
+	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+}
+
+func (r *GetKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (*GetKubePkgResponse, github_com_octohelm_courier_pkg_courier.Metadata, error) {
+	var resp GetKubePkgResponse
+	meta, err := r.Do(ctx, metas...).Into(&resp)
+	return &resp, meta, err
+}
+
+type DelKubePkg struct {
+	github_com_octohelm_courier_pkg_courierhttp.MethodDelete `path:"/api/kubepkg-agent/v1/kubepkgs/:name"`
+
+	Name string `name:"name" in:"path"`
+
+	Namespace string `name:"namespace,omitempty" in:"query"`
+}
+
+func (r *DelKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
+	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+}
+
+func (r *DelKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {
+	return r.Do(ctx, metas...).Into(nil)
+}
 
 type GithubComDistributionDistributionV3Descriptor struct {
 	Annotations map[string]string `json:"annotations,omitempty" name:"annotations,omitempty" `
@@ -131,6 +129,8 @@ type GithubComDistributionDistributionV3Descriptor struct {
 
 	Urls []string `json:"urls,omitempty" name:"urls,omitempty" `
 }
+
+type ApisKubepkgV1Alpha1KubePkg = github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg
 
 type GithubComOpencontainersGoDigestDigest string
 

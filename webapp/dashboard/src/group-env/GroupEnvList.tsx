@@ -1,11 +1,11 @@
 import {
-  useObservable,
+  useObservableState,
   useStateSubject,
-  useObservableEffect,
+  useObservableEffect
 } from "@innoai-tech/reactutil";
 import {
   AddCircleOutlineOutlined,
-  SettingsOutlined,
+  SettingsOutlined
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -14,7 +14,7 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import { Fragment, useMemo } from "react";
 import { useGroupEnvFormWithDialog } from "./GroupEnvForm";
@@ -22,7 +22,7 @@ import {
   Scaffold,
   IconButtonWithTooltip,
   stringAvatar,
-  ListItemLink,
+  ListItemLink, RxFragment
 } from "../layout";
 import { tap } from "rxjs";
 import { GroupEnvsProvider, GroupProvider } from "../group";
@@ -32,8 +32,8 @@ import { AccessControl } from "../auth";
 import { map, orderBy } from "@innoai-tech/lodash";
 
 const GroupEnvListItem = ({
-  groupEnv: initialGroupEnv,
-}: {
+                            groupEnv: initialGroupEnv
+                          }: {
   groupEnv: GroupEnv;
 }) => {
   const group$ = GroupProvider.use$();
@@ -41,20 +41,17 @@ const GroupEnvListItem = ({
   const form$ = useGroupEnvFormWithDialog(initialGroupEnv);
 
   useObservableEffect(
-    () => [
-      form$.post$.pipe(
-        tap((resp) => {
-          groupEnv$.next((group) => ({
-            ...group,
-            ...resp.body,
-          }));
-        })
-      ),
-    ],
-    []
+    () => form$.post$.pipe(
+      tap((resp) => {
+        groupEnv$.next((group) => ({
+          ...group,
+          ...resp.body
+        }));
+      })
+    )
   );
 
-  const groupEnv = useObservable(groupEnv$);
+  const groupEnv = useObservableState(groupEnv$);
 
   return (
     <ListItem
@@ -70,7 +67,9 @@ const GroupEnvListItem = ({
           >
             <SettingsOutlined />
           </IconButtonWithTooltip>
-          {form$.dialog$.render()}
+          <RxFragment>
+            {form$.dialog$.elements$}
+          </RxFragment>
         </AccessControl>
       }
     >
@@ -98,7 +97,7 @@ const GroupEnvListItem = ({
 const GroupEnvList = () => {
   const groupEnvs$ = GroupEnvsProvider.use$();
 
-  const groupEnvs = useObservable(groupEnvs$);
+  const groupEnvs = useObservableState(groupEnvs$);
 
   if (!groupEnvs) {
     return null;
@@ -131,14 +130,16 @@ const GroupMainToolbar = () => {
       >
         <AddCircleOutlineOutlined />
       </IconButtonWithTooltip>
-      {form$.dialog$.render()}
+      <RxFragment>
+        {form$.dialog$.elements$}
+      </RxFragment>
     </AccessControl>
   );
 };
 
 export const GroupEnvMenu = () => {
   const groupEnvs$ = GroupEnvsProvider.use$();
-  const groupEnvs = useObservable(groupEnvs$);
+  const groupEnvs = useObservableState(groupEnvs$);
 
   const envs = useMemo(
     () => orderBy(groupEnvs, (groupEnv) => groupEnv.envName),

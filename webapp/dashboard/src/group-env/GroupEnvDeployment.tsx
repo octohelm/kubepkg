@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import { GroupEnvDeploymentsProvider, GroupEnvProvider } from "../group";
-import { IconButtonWithTooltip, Scaffold } from "../layout";
+import { IconButtonWithTooltip, RxFragment, Scaffold } from "../layout";
 import {
   GroupEnvDeploymentExport,
   GroupEnvDeploymentList,
@@ -24,7 +24,9 @@ export const GroupEnvDeploymentMainToolbar = () => {
       >
         <AddCircleOutlineOutlined />
       </IconButtonWithTooltip>
-      {form$.dialog$.render()}
+      <RxFragment>
+        {form$.dialog$.elements$}
+      </RxFragment>
     </AccessControl>
   );
 };

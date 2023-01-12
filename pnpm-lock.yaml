@@ -95,10 +95,10 @@ importers:
       '@emotion/react': ^11.10.5
       '@fontsource/roboto': ^4.5.8
       '@innoai-tech/config': ^0.4.13
-      '@innoai-tech/fetcher': ^0.3.1
+      '@innoai-tech/fetcher': ^0.4.0
       '@innoai-tech/form': ^0.2.0
       '@innoai-tech/lodash': ^0.2.0
-      '@innoai-tech/reactutil': ^0.3.19
+      '@innoai-tech/reactutil': ^0.4.8
       '@monaco-editor/react': ^4.4.6
       '@mui/base': 5.0.0-alpha.112
       '@mui/icons-material': ^5.11.0
@@ -127,10 +127,10 @@ importers:
       '@emotion/react': 11.10.5_kzbn2opkn2327fwg5yzwzya5o4
       '@fontsource/roboto': 4.5.8
       '@innoai-tech/config': 0.4.13_@types+node@18.11.18
-      '@innoai-tech/fetcher': 0.3.1_rxjs@7.8.0
+      '@innoai-tech/fetcher': 0.4.0_rxjs@7.8.0
       '@innoai-tech/form': 0.2.0_rxjs@7.8.0
       '@innoai-tech/lodash': 0.2.0
-      '@innoai-tech/reactutil': 0.3.19_react@18.2.0+rxjs@7.8.0
+      '@innoai-tech/reactutil': 0.4.8_react@18.2.0+rxjs@7.8.0
       '@monaco-editor/react': 4.4.6_6vrjaj6ridxbohi43n7zt4gn7q
       '@mui/base': 5.0.0-alpha.112_ib3m5ricvtkl2cll7qpr2f6lvq
       '@mui/icons-material': 5.11.0_oiuuhmk4wjjpe4qb2sby7usney
@@ -844,6 +844,15 @@ packages:
       rxjs: 7.8.0
     dev: false
 
+  /@innoai-tech/fetcher/0.4.0_rxjs@7.8.0:
+    resolution: {integrity: sha512-rCgI0+WMM0e5mZvSj5iLlIuiYxc8jQp9ZFUXQ0hwZBBQeTCPRES5Q3mw7tjXdN6Yf/if5BNaPUvPcQM8Dep0Vw==, tarball: download/@innoai-tech/fetcher/0.4.0/eddd4fed598906703caf279f73ace9bac1181dbf}
+    peerDependencies:
+      rxjs: 7.x
+    dependencies:
+      '@innoai-tech/lodash': 0.2.0
+      rxjs: 7.8.0
+    dev: false
+
   /@innoai-tech/form/0.2.0_rxjs@7.8.0:
     resolution: {integrity: sha512-lSD4h3z8RnWYBKXWhRz5wDaqr6Yt9qdEeCllgefllOYBuHRSlEE0vrHB4o5VPwSido0201VX2DUWoIvtcVxQ9A==, tarball: download/@innoai-tech/form/0.2.0/133e41418bc4e42e1df13712dc34402ddb9d0ff8}
     peerDependencies:
@@ -903,6 +912,18 @@ packages:
       rxjs: 7.x
     dependencies:
       '@innoai-tech/fetcher': 0.3.1_rxjs@7.8.0
+      '@innoai-tech/lodash': 0.2.0
+      react: 18.2.0
+      rxjs: 7.8.0
+    dev: false
+
+  /@innoai-tech/reactutil/0.4.8_react@18.2.0+rxjs@7.8.0:
+    resolution: {integrity: sha512-vdTZ4GYbb/P45HTdM4hMZatk+/o2H++qwsf+KGYdwRklH+4WFX+FEKUg0AjV494TDBiOgf7PqBVmXdHKi58jOw==, tarball: download/@innoai-tech/reactutil/0.4.8/212958d014b226509678397e46a81aa821db9b43}
+    peerDependencies:
+      react: 18.x
+      rxjs: 7.x
+    dependencies:
+      '@innoai-tech/fetcher': 0.4.0_rxjs@7.8.0
       '@innoai-tech/lodash': 0.2.0
       react: 18.2.0
       rxjs: 7.8.0

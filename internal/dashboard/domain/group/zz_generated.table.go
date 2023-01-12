@@ -230,6 +230,15 @@ func (DeploymentHistory) Primary() []string {
 	}
 }
 
+func (DeploymentHistory) UniqueIndexes() github_com_octohelm_storage_pkg_sqlbuilder.Indexes {
+	return github_com_octohelm_storage_pkg_sqlbuilder.Indexes{
+		"i_deployment_revision": []string{
+			"KubepkgRevisionID",
+			"DeploymentSettingID",
+		},
+	}
+}
+
 func (DeploymentHistory) Indexes() github_com_octohelm_storage_pkg_sqlbuilder.Indexes {
 	return github_com_octohelm_storage_pkg_sqlbuilder.Indexes{
 		"i_deployment": []string{
@@ -237,9 +246,6 @@ func (DeploymentHistory) Indexes() github_com_octohelm_storage_pkg_sqlbuilder.In
 		},
 		"i_kubepkg": []string{
 			"KubepkgID",
-		},
-		"i_kubepkg_revision": []string{
-			"KubepkgRevisionID",
 		},
 		"i_updated_at": []string{
 			"CreatedAt",
@@ -295,7 +301,8 @@ type tableDeploymentHistory struct {
 }
 
 type indexNameOfDeploymentHistory struct {
-	Primary github_com_octohelm_storage_pkg_sqlbuilder.ColumnCollection
+	Primary             github_com_octohelm_storage_pkg_sqlbuilder.ColumnCollection
+	IDeploymentRevision github_com_octohelm_storage_pkg_sqlbuilder.ColumnCollection
 }
 
 var DeploymentHistoryT = &tableDeploymentHistory{
@@ -309,6 +316,10 @@ var DeploymentHistoryT = &tableDeploymentHistory{
 	I: indexNameOfDeploymentHistory{
 		Primary: github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&DeploymentHistory{}).Cols([]string{
 			"DeploymentHistoryID",
+		}...),
+		IDeploymentRevision: github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&DeploymentHistory{}).Cols([]string{
+			"KubepkgRevisionID",
+			"DeploymentSettingID",
 		}...),
 	},
 	table: github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&DeploymentHistory{}),
@@ -425,7 +436,7 @@ func (Env) Primary() []string {
 func (Env) UniqueIndexes() github_com_octohelm_storage_pkg_sqlbuilder.Indexes {
 	return github_com_octohelm_storage_pkg_sqlbuilder.Indexes{
 		"i_env_name": []string{
-			"EnvID",
+			"GroupID",
 			"EnvName",
 		},
 	}
@@ -524,7 +535,7 @@ var EnvT = &tableEnv{
 			"DeletedAt",
 		}...),
 		IEnvName: github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Env{}).Cols([]string{
-			"EnvID",
+			"GroupID",
 			"EnvName",
 		}...),
 	},

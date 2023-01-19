@@ -19,7 +19,7 @@
     "@innoai-tech/monobundle": "^0.5.2",
     "@innoai-tech/vite-presets": "^0.3.3",
     "core-js": "^3.27.1",
-    "esbuild": "^0.16.16",
+    "esbuild": "^0.17.3",
     "prettier": "^2.8.2",
     "rollup-plugin-visualizer": "^5.9.0",
     "tsx": "^3.12.1",

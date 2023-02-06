@@ -157,24 +157,26 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 	tLatestDeployment := sqlbuilder.T(
 		"t_latest_deployment",
 		group.DeploymentHistoryT.DeploymentID,
-		group.DeploymentHistoryT.DeploymentHistoryID,
+		group.DeploymentHistoryT.CreatedAt,
 	)
 
 	expr := dal.From(group.DeploymentT).
 		With(tLatestDeployment, func(table sqlbuilder.Table) sqlbuilder.SqlExpr {
 			return dal.
 				From(group.DeploymentHistoryT).
-				GroupBy(group.DeploymentHistoryT.DeploymentID).
+				GroupBy(
+					group.DeploymentHistoryT.DeploymentID,
+				).
 				Select(
 					group.DeploymentHistoryT.DeploymentID,
-					sqlbuilder.Max(group.DeploymentHistoryT.DeploymentHistoryID),
+					sqlbuilder.Max(group.DeploymentHistoryT.CreatedAt),
 				)
 		}).
 		Join(tLatestDeployment, group.DeploymentT.DeploymentID.V(
 			sqlbuilder.EqCol(sqlbuilder.CastCol[group.DeploymentID](tLatestDeployment.F(group.DeploymentHistoryT.DeploymentID.Name()))),
 		)).
-		Join(group.DeploymentHistoryT, group.DeploymentHistoryT.DeploymentHistoryID.V(
-			sqlbuilder.EqCol(sqlbuilder.CastCol[group.DeploymentHistoryID](tLatestDeployment.F(group.DeploymentHistoryT.DeploymentHistoryID.Name()))),
+		Join(group.DeploymentHistoryT, group.DeploymentHistoryT.CreatedAt.V(
+			sqlbuilder.EqCol(sqlbuilder.CastCol[datatypes.Timestamp](tLatestDeployment.F(group.DeploymentHistoryT.CreatedAt.Name()))),
 		)).
 		Join(kubepkg.RevisionT, kubepkg.RevisionT.ID.V(
 			sqlbuilder.EqCol(group.DeploymentHistoryT.KubepkgRevisionID),

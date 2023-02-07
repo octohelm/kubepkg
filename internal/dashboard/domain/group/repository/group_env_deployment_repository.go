@@ -191,6 +191,9 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 			kubepkg.VersionT.RevisionID.V(
 				sqlbuilder.EqCol(kubepkg.RevisionT.ID),
 			),
+			kubepkg.VersionT.Channel.V(
+				sqlbuilder.EqCol(group.DeploymentT.KubepkgChannel),
+			),
 		)).
 		FullJoin(group.DeploymentSettingT, group.DeploymentSettingT.DeploymentSettingID.V(
 			sqlbuilder.EqCol(group.DeploymentHistoryT.DeploymentSettingID),

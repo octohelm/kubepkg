@@ -250,17 +250,17 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 		k.Spec.Version = kk.Version.Version
 
 		if err := json.Unmarshal(kk.Revision.Spec, &k.Spec); err != nil {
-			return nil, errors.Wrap(err, "KubePkg unmarshal to json failed")
+			return nil, errors.Wrapf(err, "KubePkg %s unmarshal to json failed", kk.Kubepkg.ID)
 		}
 
-		if len(kk.DeploymentSetting.EncryptedSetting) > 0 {
+		if kk.DeploymentSetting.DeploymentSettingID != 0 && len(kk.DeploymentSetting.EncryptedSetting) > 0 {
 			data, err := r.cipher.Decrypt(ctx, kk.DeploymentSetting.EncryptedSetting)
 			if err != nil {
 				return nil, err
 			}
 
 			if err := json.Unmarshal(data, &k.Spec.Config); err != nil {
-				return nil, errors.Wrap(err, "Setting unmarshal to json failed")
+				return nil, errors.Wrapf(err, "Setting %s unmarshal to json failed", kk.DeploymentSetting.DeploymentSettingID)
 			}
 		}
 

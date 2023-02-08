@@ -168,6 +168,17 @@ func (scanner *jsonSchemaScanner) Visit(schema *apiextensionsv1.JSONSchemaProps)
 			}
 		}
 
+		if len(schema.AnyOf) == 2 {
+			data, _ := json.Marshal(schema.AnyOf)
+
+			if bytes.Equal(data, []byte(`[{"type":"integer","format":"int32"},{"type":"string"}]`)) {
+				schema.Type = ""
+				schema.Format = ""
+				schema.XIntOrString = true
+				schema.AnyOf = nil
+			}
+		}
+
 		if schema.Format == "int-or-string" {
 			schema.Type = ""
 			schema.Format = ""

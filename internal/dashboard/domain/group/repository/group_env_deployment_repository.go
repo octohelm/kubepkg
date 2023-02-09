@@ -108,16 +108,22 @@ func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, dep
 	if err != nil {
 		return nil, err
 	}
+
+	deploymentHistory.KubepkgRevisionID = kubepkgRef.KubepkgRevisionID
+	deploymentHistory.DeploymentSettingID = group.DeploymentSettingID(kubepkgRef.SettingID)
+
 	deploymentHistory.DeploymentHistoryID = id
 	deploymentHistory.DeploymentID = deploymentID
 	deploymentHistory.KubepkgID = kubepkgRef.KubepkgID
-	deploymentHistory.KubepkgRevisionID = kubepkgRef.KubepkgRevisionID
-	deploymentHistory.DeploymentSettingID = group.DeploymentSettingID(kubepkgRef.SettingID)
+
+	deploymentHistory.MarkCreatedAt()
 
 	if err := dal.Tx(ctx, deploymentHistory, func(ctx context.Context) error {
 		err := dal.Prepare(deploymentHistory).
 			OnConflict(group.DeploymentHistoryT.I.IDeploymentRevision).
 			DoUpdateSet(
+				// FIXME ugly here to order the latest
+				group.DeploymentHistoryT.DeploymentHistoryID,
 				group.DeploymentHistoryT.CreatedAt,
 			).
 			Returning(
@@ -136,6 +142,7 @@ func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, dep
 				group.DeploymentHistoryT.DeploymentHistoryID.V(dal.NotInSelect(
 					group.DeploymentHistoryT.DeploymentHistoryID,
 					dal.From(group.DeploymentHistoryT).
+						Where(group.DeploymentHistoryT.DeploymentID.V(sqlbuilder.Eq(deploymentID))).
 						OrderBy(sqlbuilder.DescOrder(group.DeploymentHistoryT.CreatedAt)).
 						Limit(10),
 				)),
@@ -157,7 +164,7 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 	tLatestDeployment := sqlbuilder.T(
 		"t_latest_deployment",
 		group.DeploymentHistoryT.DeploymentID,
-		group.DeploymentHistoryT.CreatedAt,
+		group.DeploymentHistoryT.DeploymentHistoryID,
 	)
 
 	expr := dal.From(group.DeploymentT).
@@ -169,14 +176,14 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 				).
 				Select(
 					group.DeploymentHistoryT.DeploymentID,
-					sqlbuilder.Max(group.DeploymentHistoryT.CreatedAt),
+					sqlbuilder.Max(group.DeploymentHistoryT.DeploymentHistoryID),
 				)
 		}).
 		Join(tLatestDeployment, group.DeploymentT.DeploymentID.V(
 			sqlbuilder.EqCol(sqlbuilder.CastCol[group.DeploymentID](tLatestDeployment.F(group.DeploymentHistoryT.DeploymentID.Name()))),
 		)).
-		Join(group.DeploymentHistoryT, group.DeploymentHistoryT.CreatedAt.V(
-			sqlbuilder.EqCol(sqlbuilder.CastCol[datatypes.Timestamp](tLatestDeployment.F(group.DeploymentHistoryT.CreatedAt.Name()))),
+		Join(group.DeploymentHistoryT, group.DeploymentHistoryT.DeploymentHistoryID.V(
+			sqlbuilder.EqCol(sqlbuilder.CastCol[group.DeploymentHistoryID](tLatestDeployment.F(group.DeploymentHistoryT.DeploymentHistoryID.Name()))),
 		)).
 		Join(kubepkg.RevisionT, kubepkg.RevisionT.ID.V(
 			sqlbuilder.EqCol(group.DeploymentHistoryT.KubepkgRevisionID),
@@ -253,14 +260,15 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 			return nil, errors.Wrapf(err, "KubePkg %s unmarshal to json failed", kk.Kubepkg.ID)
 		}
 
-		if kk.DeploymentSetting.DeploymentSettingID != 0 && len(kk.DeploymentSetting.EncryptedSetting) > 0 {
+		if len(kk.DeploymentSetting.EncryptedSetting) > 0 {
 			data, err := r.cipher.Decrypt(ctx, kk.DeploymentSetting.EncryptedSetting)
 			if err != nil {
 				return nil, err
 			}
 
 			if err := json.Unmarshal(data, &k.Spec.Config); err != nil {
-				return nil, errors.Wrapf(err, "Setting %s unmarshal to json failed", kk.DeploymentSetting.DeploymentSettingID)
+				e := errors.Wrapf(err, "d%s s%s unmarshal to json failed", kk.DeploymentHistory.DeploymentID, kk.DeploymentHistory.DeploymentSettingID)
+				return nil, e
 			}
 		}
 
@@ -380,7 +388,9 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 		Where(
 			group.DeploymentHistoryT.DeploymentID.V(sqlbuilder.Eq(deploymentID)),
 		).
-		OrderBy(sqlbuilder.DescOrder(group.DeploymentHistoryT.CreatedAt)).
+		OrderBy(
+			sqlbuilder.DescOrder(group.DeploymentHistoryT.DeploymentHistoryID),
+		).
 		Limit(pager.Size).Offset(pager.Offset).
 		Scan(ltr).
 		Find(ctx)

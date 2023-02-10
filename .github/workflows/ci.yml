@@ -14,17 +14,15 @@ jobs:
       DAGGER_LOG_FORMAT: plain
       GH_USERNAME: ${{ github.actor }}
       GH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-      GIT_SHA: ${{ github.sha }}
-      GIT_REF: ${{ github.ref }}
 
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v2
-      - run: curl -sSLf https://raw.githubusercontent.com/octohelm/dagger/main/install.sh | sudo sh
+      - run: curl -sSLf https://raw.githubusercontent.com/octohelm/wagon/main/install.sh | sudo sh
 
-      - run: dagger do webapp build
-      - run: dagger do go ship pushx
-      - run: dagger do go archive
+      - run: make build.webapp
+      - run: make ship
+      - run: make archive
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -33,11 +31,11 @@ jobs:
           prerelease: true
           automatic_release_tag: "latest"
           files: |
-            .build/output/*.tar.gz
+            .wagon/build/*.tar.gz
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           files: |
-            .build/output/*.tar.gz
+            .wagon/build/*.tar.gz

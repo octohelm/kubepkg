@@ -4,17 +4,12 @@ import (
 	"universe.dagger.io/docker"
 )
 
-#DefaultTag: "0.1.1"
+#DefaultTag: "main@sha256:254b71fd3e0f556ed7c8260c78a4b0a33b59f6a24293521a24553ed4c2b71359"
 
 #Run: {
 	tag: string | *#DefaultTag
 
-	_image: #Image & {
-		"tag": "\(tag)"
-	}
-
 	docker.#Run & {
-		input:   _image.output
 		workdir: "/build"
 	}
 }

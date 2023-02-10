@@ -34,7 +34,10 @@ import (
 		}
 	}
 
+	image: #Image & {}
+
 	run: #Run & {
+		input:  image.output
 		mounts: _caches & {
 			for p, f in _files {
 				"\(p)": core.#Mount & {

@@ -1,5 +1,6 @@
-dagger.io v0.3.0 
-github.com/innoai-tech/runtime v0.0.0-20220818093331-15da6617afd5 h1:MC6N92s5GmmzhWWy2/A8JZCTeapnBIP+0Yy0xjRDz94=
-k8s.io/api v0.24.3 h1:tt55QEmKd6L2k5DP6G/ZzdMQKvG5ro4H4teClqm0sTY=
-k8s.io/apimachinery v0.24.3 h1:hrFiNSA2cBZqllakVYyH/VyEh4B581bQRmqATJSeQTg=
-universe.dagger.io v0.3.0 
+dagger.io v0.0.0-20200202235959-8192eaad6fec 
+github.com/innoai-tech/runtime v0.0.0-20230209080541-136477a0d9c6 h1:J2dhd42DX9Jt3qmFMviGDEqKPV/Htv5d2xWUQ1cp2b4=
+k8s.io/api v0.25.4 h1:3YO8J4RtmG7elEgaWMb4HgmpS2CfY1QlaOz9nwB+ZSs=
+k8s.io/apimachinery v0.25.4 h1:CtXsuaitMESSu339tfhVXhQrPET+EiWnIY1rcurKnAc=
+universe.dagger.io v0.0.0-20200202235959-8192eaad6fec 
+wagon.octohelm.tech v0.0.0-20200202235959-61250fde8964 

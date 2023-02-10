@@ -24,7 +24,10 @@ import (
 		contents: json.Marshal(kubepkg)
 	}
 
-	#Run & {
+	image: #Image & {}
+
+	_run: #Run & {
+		input: image.output
 		mounts: {
 			"kubeconfig": core.#Mount & {
 				dest:     "/run/secrets/kubeconfig"

@@ -3,8 +3,7 @@ package main
 import (
 	"strings"
 
-	"dagger.io/dagger"
-	"github.com/innoai-tech/runtime/cuepkg/tool"
+	"wagon.octohelm.tech/core"
 	"github.com/innoai-tech/runtime/cuepkg/imagetool"
 	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
@@ -13,35 +12,39 @@ import (
 	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/component/kubepkg"
 )
 
-dagger.#Plan
-
-client: env: {
-	VERSION: string | *"dev"
-	GIT_SHA: string | *""
-	GIT_REF: string | *""
-
-	GOPROXY:   string | *""
-	GOPRIVATE: string | *""
-	GOSUMDB:   string | *""
-
-	GH_USERNAME: string | *""
-	GH_PASSWORD: dagger.#Secret
-
-	LINUX_MIRROR:                  string | *""
-	CONTAINER_REGISTRY_PULL_PROXY: string | *""
-
-	KUBEPKG_REMOTE_REGISTRY_ENDPOINT: _ | *""
-	KUBEPKG_REMOTE_REGISTRY_USERNAME: _ | *""
-	KUBEPKG_REMOTE_REGISTRY_PASSWORD: _ | *""
-
-	KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT: _ | *""
-	KUBEPKG_SIGN_PRIVATE_KEY:            _ | *""
-	KUBEPKG_DB_ENDPOINT:                 _ | *""
+pkg: {
+	version: core.#Version & {
+	}
 }
 
-actions: version: tool.#ResolveVersion & {
-	ref:     "\(client.env.GIT_REF)"
-	version: "\(client.env.VERSION)"
+client: core.#Client & {
+	env: {
+		GOPROXY:   string | *""
+		GOPRIVATE: string | *""
+		GOSUMDB:   string | *""
+
+		GH_USERNAME: string | *""
+		GH_PASSWORD: core.#Secret
+
+		LINUX_MIRROR:                  string | *""
+		CONTAINER_REGISTRY_PULL_PROXY: string | *""
+		NPM_REGISTRY_SERVER:           string | *""
+
+		KUBEPKG_REMOTE_REGISTRY_ENDPOINT: _ | *""
+		KUBEPKG_REMOTE_REGISTRY_USERNAME: _ | *""
+		KUBEPKG_REMOTE_REGISTRY_PASSWORD: _ | *""
+
+		KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT: _ | *""
+		KUBEPKG_SIGN_PRIVATE_KEY:            _ | *""
+		KUBEPKG_DB_ENDPOINT:                 _ | *""
+	}
+}
+
+setting: core.#Setting & {
+	registry: "ghcr.io": auth: {
+		username: client.env.GH_USERNAME
+		secret:   client.env.GH_PASSWORD
+	}
 }
 
 mirror: {
@@ -49,12 +52,6 @@ mirror: {
 	pull:  client.env.CONTAINER_REGISTRY_PULL_PROXY
 }
 
-auths: "ghcr.io": {
-	username: client.env.GH_USERNAME
-	secret:   client.env.GH_PASSWORD
-}
-
-client: filesystem: "cmd/kubepkg/webapp": write: contents: actions.webapp.build.output
 actions: webapp: node.#Project & {
 	source: {
 		path: "."
@@ -65,9 +62,14 @@ actions: webapp: node.#Project & {
 			"pnpm-*.yaml",
 			"*.json",
 		]
+		exclude: [
+			"node_modules",
+		]
 	}
 
-	env: "CI": "true"
+	env: {
+		"CI": "true"
+	}
 
 	build: {
 		outputs: {
@@ -77,7 +79,7 @@ actions: webapp: node.#Project & {
 		pre: [
 			"pnpm install",
 		]
-		script: "pnpm exec turbo run build"
+		script: "pnpm exec turbo run build --no-cache"
 		image: {
 			"mirror": mirror
 			"steps": [
@@ -96,7 +98,6 @@ actions: webapp: node.#Project & {
 	}
 }
 
-client: filesystem: ".build/output": write: contents: actions.go.archive.output
 actions: go: golang.#Project & {
 	source: {
 		path: "."
@@ -109,8 +110,7 @@ actions: go: golang.#Project & {
 		]
 	}
 
-	version:  actions.version.output
-	revision: client.env.GIT_SHA
+	version: pkg.version.output
 
 	goos: ["linux", "darwin"]
 	goarch: ["amd64", "arm64"]
@@ -118,7 +118,6 @@ actions: go: golang.#Project & {
 	ldflags: [
 		"-s -w",
 		"-X \(go.module)/pkg/version.version=\(go.version)",
-		"-X \(go.module)/pkg/version.revision=\(go.revision)",
 	]
 
 	env: {
@@ -135,6 +134,7 @@ actions: go: golang.#Project & {
 
 	ship: {
 		name: "\(strings.Replace(go.module, "github.com/", "ghcr.io/", -1))"
+		tag:  pkg.version.output
 		from: "gcr.io/distroless/static-debian11:debug"
 		config: {
 			workdir: "/"
@@ -144,12 +144,12 @@ actions: go: golang.#Project & {
 			cmd: ["serve", "registry"]
 		}
 	}
-	"auths":  auths
+
 	"mirror": mirror
 }
 
 actions: {
-	_version: "\(strings.TrimLeft(actions.go.ship.pushx.result, "\(actions.go.ship.name):"))"
+	_version: pkg.version.output
 
 	#Export: kubepkgcli.#Export & {
 		"run": tag: "\(_version)"
@@ -214,6 +214,3 @@ actions: {
 		}
 	}
 }
-
-client: filesystem: ".build/dashboard/arm64": write: contents: actions.dashboard.arm64.output
-client: filesystem: ".build/kubepkg/arm64": write: contents:   actions.kubepkg.arm64.output

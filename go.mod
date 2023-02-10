@@ -1,9 +1,9 @@
 module github.com/octohelm/kubepkg
 
-go 1.19
+go 1.20
 
 require (
-	cuelang.org/go v0.5.0-beta.2
+	cuelang.org/go v0.5.0-beta.1
 	github.com/containerd/containerd v1.6.15
 	github.com/coreos/go-oidc/v3 v3.5.0
 	github.com/davecgh/go-spew v1.1.1

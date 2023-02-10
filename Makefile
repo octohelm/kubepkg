@@ -1,7 +1,11 @@
-export GIT_SHA ?= $(shell git rev-parse HEAD)
-export GIT_REF ?= HEAD
-
 ARCH=$(shell go env GOARCH)
+
+WAGON = wagon
+
+DEBUG = 0
+ifeq ($(DEBUG),1)
+	WAGON := $(WAGON) --log-level=debug
+endif
 
 KUBECONFIG = ${HOME}/.kube/config
 KUBEPKG = go run ./cmd/kubepkg
@@ -131,16 +135,19 @@ dev.dashboard:
 	pnpm exec turbo run dev --filter=@webapp/dashboard
 
 build.webapp:
-	dagger do webapp
+	$(WAGON) do webapp build --output=cmd/kubepkg/webapp
 
 ship:
-	dagger do go ship pushx
+	$(WAGON) do go ship pushx
+
+archive:
+	$(WAGON) do --output=.wagon/build go archive
 
 kubetgz:
-	dagger do kubepkg $(ARCH)
+	$(WAGON) do kubepkg $(ARCH)
 
 kubetgz.dashboard:
-	dagger do dashboard $(ARCH)
+	$(WAGON) do dashboard $(ARCH)
 
 KUBEPKGTGZ=.build/kubepkg/$(ARCH)/images/kubepkg.$(ARCH).kube.tgz
 

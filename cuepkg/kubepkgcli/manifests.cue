@@ -9,9 +9,8 @@ import (
 	spec "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
 )
 
-#Apply: {
-	kubepkg:    spec.#KubePkg
-	kubeconfig: dagger.#Secret
+#Manifests: {
+	kubepkg: spec.#KubePkg
 
 	flags: [K=string]: string
 
@@ -32,11 +31,6 @@ import (
 	_run: #Run & {
 		input: image.output
 		mounts: {
-			"kubeconfig": core.#Mount & {
-				dest:     "/run/secrets/kubeconfig"
-				contents: kubeconfig
-			}
-
 			for p, f in _files {
 				"\(p)": core.#Mount & {
 					dest:     p
@@ -46,9 +40,8 @@ import (
 			}
 		}
 		command: {
-			name: "apply"
+			name: "manifests"
 			args: [
-				"--kubeconfig=/run/secrets/kubeconfig",
 				for _k, _v in flags {
 					"\(_k)=\(_v)"
 				},

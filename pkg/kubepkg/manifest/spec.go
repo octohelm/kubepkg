@@ -644,11 +644,25 @@ func toContainer(c v1alpha1.Container, name string, podTemplateSpec *corev1.PodT
 			volume.PersistentVolumeClaim.ClaimName = subResourceName(kpkg, n)
 		}
 
-		podTemplateSpec.Spec.Volumes = append(podTemplateSpec.Spec.Volumes, volume)
 		container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+
+		addToSpecVolume(podTemplateSpec, volume)
 	}
 
 	return container, nil
+}
+
+func addToSpecVolume(podTemplateSpec *corev1.PodTemplateSpec, volume corev1.Volume) {
+	added := false
+	for _, vol := range podTemplateSpec.Spec.Volumes {
+		if vol.Name == volume.Name {
+			added = true
+			break
+		}
+	}
+	if !added {
+		podTemplateSpec.Spec.Volumes = append(podTemplateSpec.Spec.Volumes, volume)
+	}
 }
 
 func volumesFrom(kpkg *v1alpha1.KubePkg) map[string]v1alpha1.Volume {

@@ -28,7 +28,7 @@ import (
 
 	image: #Image & {}
 
-	_run: #Run & {
+	#Run & {
 		input: image.output
 		mounts: {
 			for p, f in _files {
@@ -49,6 +49,4 @@ import (
 			]
 		}
 	}
-
-	output: _run.output
 }

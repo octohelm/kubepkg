@@ -22,6 +22,7 @@ import (
 	_files: [Path=string]: core.#WriteFile & {
 		input: dagger.#Scratch
 	}
+
 	_files: "/src/kubepkg.json": {
 		path:     "kubepkg.json"
 		contents: json.Marshal(_kubepkg.output)
@@ -29,7 +30,7 @@ import (
 
 	image: #Image & {}
 
-	_run: #Run & {
+	#Run & {
 		input: image.output
 		mounts: {
 			"kubeconfig": core.#Mount & {
@@ -56,6 +57,4 @@ import (
 			]
 		}
 	}
-
-	output: _run.output
 }

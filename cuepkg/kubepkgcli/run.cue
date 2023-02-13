@@ -4,7 +4,7 @@ import (
 	"universe.dagger.io/docker"
 )
 
-#DefaultTag: "main@sha256:254b71fd3e0f556ed7c8260c78a4b0a33b59f6a24293521a24553ed4c2b71359"
+#DefaultTag: "v0.2.1-0.20230213032121-85356f9fac43"
 
 #Run: {
 	tag: string | *#DefaultTag

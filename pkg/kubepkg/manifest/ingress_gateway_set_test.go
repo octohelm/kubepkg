@@ -14,11 +14,24 @@ func TestParseIngressGatewaySet(t *testing.T) {
 	}, ","))
 	testingutil.Expect(t, err, testingutil.Be[error](nil))
 
-	rules := p.
-		For("test", "default").
-		IngressRules(map[string]string{
-			"http": "/",
-		}, "public")
+	t.Run("should generate rule", func(t *testing.T) {
+		rules := p.
+			For("test", "default").
+			IngressRules(map[string]string{
+				"http": "/",
+			}, "public")
 
-	testingutil.Expect(t, len(rules), testingutil.Be(2))
+		testingutil.Expect(t, len(rules), testingutil.Be(2))
+	})
+
+	t.Run("should generate custom rule", func(t *testing.T) {
+		rules := p.
+			For("test", "default").
+			IngressRules(map[string]string{
+				"http": "/",
+			}, "internal+http://test.internal")
+
+		testingutil.Expect(t, rules[0].Host, testingutil.Be("test.internal"))
+	})
+
 }

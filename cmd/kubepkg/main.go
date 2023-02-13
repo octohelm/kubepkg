@@ -16,6 +16,6 @@ var Serve = cli.AddTo(App, &struct {
 
 func main() {
 	if err := cli.Execute(context.Background(), App, os.Args[1:]); err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 }

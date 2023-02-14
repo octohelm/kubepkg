@@ -1,6 +1,6 @@
 ARCH=$(shell go env GOARCH)
 
-WAGON = wagon
+WAGON = wagon -p wagon.cue
 
 DEBUG = 0
 ifeq ($(DEBUG),1)

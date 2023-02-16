@@ -77,7 +77,7 @@ type slogHandler struct {
 	attrs []slog.Attr
 }
 
-func (s *slogHandler) Enabled(level slog.Level) bool {
+func (s *slogHandler) Enabled(ctx context.Context, level slog.Level) bool {
 	return level >= s.lvl
 }
 

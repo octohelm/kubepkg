@@ -47,7 +47,11 @@ export const GroupCardList = () => {
   }
 
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack
+      direction="row"
+      spacing={0}
+      sx={{ flexWrap: "wrap", gap: 2 }}
+    >
       {resp.body?.map((group) => {
         return (
           <Fragment key={group.groupID}>

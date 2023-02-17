@@ -1,7 +1,7 @@
 package kubepkgcli
 
 import (
-	"universe.dagger.io/docker"
+	"wagon.octohelm.tech/docker"
 )
 
 #DefaultTag: "v0.2.1-0.20230213032121-85356f9fac43"
@@ -18,6 +18,6 @@ import (
 	tag: string | *#DefaultTag
 
 	docker.#Pull & {
-		source: "ghcr.io/octohelm/kubepkg:\(tag)"
+		source: _ | *"ghcr.io/octohelm/kubepkg:\(tag)"
 	}
 }

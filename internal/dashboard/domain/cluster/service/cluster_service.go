@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/octohelm/kubepkg/pkg/kubepkg/specutil"
+
 	agentclient "github.com/octohelm/kubepkg/internal/agent/client/agent"
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/cluster"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
@@ -70,7 +72,11 @@ func (c *ClusterService) Apply(ctx context.Context, kpkg *v1alpha1.KubePkg) erro
 		return err
 	}
 	apply := &agentclient.ApplyKubePkg{}
+
 	apply.ApisKubepkgV1Alpha1KubePkg = kpkg
+	if kpkgMerged, err := specutil.ApplyOverwrites(kpkg); err != nil {
+		apply.ApisKubepkgV1Alpha1KubePkg = kpkgMerged
+	}
 
 	if _, err := apply.Invoke(newCtx); err != nil {
 		return err

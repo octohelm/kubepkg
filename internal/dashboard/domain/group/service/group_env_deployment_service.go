@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 	_ "time/tzdata"
+
+	"github.com/octohelm/kubepkg/pkg/util"
 
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/group"
 	grouprepository "github.com/octohelm/kubepkg/internal/dashboard/domain/group/repository"
@@ -56,7 +59,7 @@ func (s *GroupEnvDeploymentService) PutKubePkg(ctx context.Context, pkg *v1alpha
 		return nil, err
 	}
 
-	deploymentSetting, err := s.groupEnvDeploymentRepo.RecordSetting(ctx, deployment.DeploymentID, kpkgRef.DefaultSettings)
+	deploymentSetting, err := s.groupEnvDeploymentRepo.RecordSetting(ctx, deployment.DeploymentID, kpkgRef.Overwrites)
 	if err != nil {
 		return nil, err
 	}
@@ -72,19 +75,12 @@ func (s *GroupEnvDeploymentService) PutKubePkg(ctx context.Context, pkg *v1alpha
 		kpkg.Annotations = map[string]string{}
 	}
 
-	kpkg.Spec.Config = map[string]v1alpha1.EnvVarValueOrFrom{}
+	overwritesData, _ := json.Marshal(kpkgRef.Overwrites)
+	kpkg.Annotations[kubepkg.AnnotationOverwrites] = util.BytesToString(overwritesData)
 
-	for k, v := range kpkgRef.DefaultSettings {
-		e := v1alpha1.EnvVarValueOrFrom{}
-		if err := e.UnmarshalText([]byte(v)); err != nil {
-			return nil, err
-		}
-		kpkg.Spec.Config[k] = e
-	}
-
-	kpkg.Annotations["kubepkg.innoai.tech/channel"] = deployment.KubepkgChannel.String()
-	kpkg.Annotations["kubepkg.innoai.tech/deploymentID"] = deploymentHistory.DeploymentID.String()
-	kpkg.Annotations["kubepkg.innoai.tech/deploymentSettingID"] = deploymentHistory.DeploymentSettingID.String()
+	kpkg.Annotations[kubepkg.AnnotationChannel] = deployment.KubepkgChannel.String()
+	kpkg.Annotations[kubepkg.AnnotationDeploymentID] = deploymentHistory.DeploymentID.String()
+	kpkg.Annotations[kubepkg.AnnotationDeploymentSettingID] = deploymentHistory.DeploymentSettingID.String()
 
 	return kpkg, nil
 }

@@ -2,12 +2,12 @@ import {
   useObservableState,
   useRequest,
   Subscribe,
-  useStateSubject
-} from "@innoai-tech/reactutil";
+  useStateSubject,
+} from "@nodepkg/state";
 import {
   AddToDriveOutlined,
   SettingsOutlined,
-  DriveFileRenameOutlineOutlined
+  DriveFileRenameOutlineOutlined,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -18,7 +18,7 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import {
@@ -26,10 +26,10 @@ import {
   ClusterInstanceStatus,
   ClusterNetType,
   getClusterStatus,
-  listCluster
+  listCluster,
 } from "../client/dashboard";
 import { useClusterFormWithDialog } from "./ClusterForm";
-import { RxFragment, Scaffold, stringAvatar, useEpics } from "../layout";
+import { Slot, Scaffold, stringAvatar, useEpics } from "../layout";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
 import { useClusterFormRenameWithDialog } from "./ClusterFormRename";
@@ -67,7 +67,7 @@ export const ClusterStatus = ({ cluster }: { cluster: Cluster }) => {
             color:
               status.ping == "-"
                 ? theme.palette.error.main
-                : theme.palette.success.main
+                : theme.palette.success.main,
           }}
         >
           {status.id} {status.ping}
@@ -90,14 +90,14 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
       clusterForm$.post$.pipe(
         map((resp) => ({
           ...cluster$.value,
-          ...resp.body
+          ...resp.body,
         }))
       ),
     (cluster$) =>
       clusterRenameForm$.post$.pipe(
         map((resp) => ({
           ...cluster$.value,
-          ...resp.body
+          ...resp.body,
         }))
       )
   );
@@ -115,9 +115,7 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
               >
                 <DriveFileRenameOutlineOutlined />
               </IconButtonWithTooltip>
-              <RxFragment>
-                {clusterRenameForm$.dialog$.elements$}
-              </RxFragment>
+              <Slot elem$={clusterRenameForm$.dialog$.elements$} />
             </AccessControl>
             <AccessControl op={clusterForm$}>
               <IconButtonWithTooltip
@@ -127,9 +125,7 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
               >
                 <SettingsOutlined />
               </IconButtonWithTooltip>
-              <RxFragment>
-                {clusterForm$.dialog$.elements$}
-              </RxFragment>
+              <Slot elem$={clusterForm$.dialog$.elements$} />
             </AccessControl>
           </>
         }
@@ -153,7 +149,7 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
                         sx={{
                           display: "inline-block",
                           fontFamily: "monospace",
-                          paddingRight: 1
+                          paddingRight: 1,
                         }}
                       >
                         {`${cluster.envType}/${cluster.name}`}
@@ -223,9 +219,7 @@ const ClusterMainToolbar = () => {
       >
         <AddToDriveOutlined />
       </IconButtonWithTooltip>
-      <RxFragment>
-        {clusterForm$.dialog$.elements$}
-      </RxFragment>
+      <Slot elem$={clusterForm$.dialog$.elements$} />
     </AccessControl>
   );
 };

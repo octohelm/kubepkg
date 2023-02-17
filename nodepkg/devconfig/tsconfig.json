@@ -1,0 +1,6 @@
+{
+  "extends": "@innoai-tech/devconfig/tsconfig.json",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": false
+  }
+}

@@ -1,4 +1,4 @@
-import { index, path, Scaffold } from "../layout";
+import { Scaffold } from "../layout";
 import {
   WorkspacesOutlined,
   CloudOutlined,
@@ -17,7 +17,7 @@ import {
   GroupEnvMain,
   GroupEnvMenu,
 } from "../group-env";
-import { Outlet } from "react-router-dom";
+import { index, Outlet, path } from "@nodepkg/router";
 import { AccountMain, AdminAccountMain } from "../account";
 import { GroupRobotMain } from "../group";
 import { KubePkgMain } from "../kubepkg";

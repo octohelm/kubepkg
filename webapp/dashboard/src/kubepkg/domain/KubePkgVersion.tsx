@@ -4,7 +4,7 @@ import {
   getKubepkgRevision,
   listKubepkgVersion,
 } from "../../client/dashboard";
-import { useRequest } from "@innoai-tech/reactutil";
+import { useRequest } from "@nodepkg/state";
 import { map as rxMap } from "rxjs";
 
 export interface KubepkgNameInfo {

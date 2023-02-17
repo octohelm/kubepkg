@@ -1,0 +1,50 @@
+{
+  "name": "@nodepkg/markdown",
+  "version": "0.0.0",
+  "monobundle": {
+    "build": {
+      "clean": true
+    },
+    "exports": {
+      ".": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "rehype-react": "^7.1.2",
+    "remark-parse": "^10.0.1",
+    "remark-rehype": "^10.1.0",
+    "unified": "^10.1.2"
+  },
+  "peerDependencies": {
+    "@innoai-tech/reactutil": "*",
+    "react": "18.x",
+    "rxjs": "^7.x"
+  },
+  "devDependencies": {
+    "@innoai-tech/reactutil": "^0.5.1",
+    "@types/react": "~18.0.28",
+    "react": "~18.2.0",
+    "rxjs": "~7.8.0"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.mjs"
+      }
+    }
+  },
+  "files": [
+    "*.mjs",
+    "*.d.ts"
+  ],
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "monobundle",
+    "test": "vitest --run --passWithNoTests",
+    "prepublishOnly": "pnpm run build",
+    "lint": "prettier --write ."
+  },
+  "type": "module"
+}

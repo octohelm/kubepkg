@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/octohelm/courier/pkg/statuserror"
+	"github.com/octohelm/kubepkg/pkg/util"
 	"github.com/pkg/errors"
 
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/kubepkg"
@@ -40,26 +41,21 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 	ref := &kubepkg.Ref{}
 
 	if k.Annotations != nil {
-		if c, ok := k.Annotations["kubepkg.innoai.tech/channel"]; ok {
-			_ = version.Channel.UnmarshalText([]byte(c))
-		}
-
-		if n, ok := k.Annotations["kubepkg.innoai.tech/name"]; ok {
+		if n, ok := k.Annotations[kubepkg.AnnotationName]; ok {
 			parts := strings.Split(n, "/")
 			if len(parts) == 2 {
 				kpkg.Group = parts[0]
 				kpkg.Name = parts[1]
 			}
 		}
-	}
 
-	if config := k.Spec.Config; config != nil {
-		ref.DefaultSettings = map[string]string{}
-		for k := range config {
-			vv, _ := config[k].MarshalText()
-			ref.DefaultSettings[k] = string(vv)
+		if c, ok := k.Annotations[kubepkg.AnnotationChannel]; ok {
+			_ = version.Channel.UnmarshalText([]byte(c))
 		}
-		k.Spec.Config = nil
+
+		if overwrites, ok := k.Annotations[kubepkg.AnnotationOverwrites]; ok {
+			_ = json.Unmarshal(util.StringToBytes(overwrites), &ref.Overwrites)
+		}
 	}
 
 	data, err := json.Marshal(k.Spec)
@@ -141,8 +137,8 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 		k.Annotations = map[string]string{}
 	}
 
-	k.Annotations["kubepkg.innoai.tech/name"] = fmt.Sprintf("%s/%s", kpkg.Group, kpkg.Name)
-	k.Annotations["kubepkg.innoai.tech/revision"] = revision.ID.String()
+	k.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kpkg.Group, kpkg.Name)
+	k.Annotations[kubepkg.AnnotationRevision] = revision.ID.String()
 	k.Spec.Version = version.Version
 
 	ref.KubepkgID = kpkg.ID
@@ -349,9 +345,9 @@ func (r *KubepkgRepository) Get(ctx context.Context, group string, name string, 
 			kk.Version.Channel = kubepkg.CHANNEL__DEV
 		}
 
-		k.Annotations["kubepkg.innoai.tech/revision"] = kk.Revision.ID.String()
-		k.Annotations["kubepkg.innoai.tech/name"] = fmt.Sprintf("%s/%s", kk.Kubepkg.Group, kk.Kubepkg.Name)
-		k.Annotations["kubepkg.innoai.tech/channel"] = kk.Version.Channel.String()
+		k.Annotations[kubepkg.AnnotationRevision] = kk.Revision.ID.String()
+		k.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kk.Kubepkg.Group, kk.Kubepkg.Name)
+		k.Annotations[kubepkg.AnnotationChannel] = kk.Version.Channel.String()
 
 		k.Spec.Version = kk.Version.Version
 

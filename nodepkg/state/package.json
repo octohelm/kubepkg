@@ -1,0 +1,46 @@
+{
+  "name": "@nodepkg/state",
+  "version": "0.0.0",
+  "monobundle": {
+    "build": {
+      "clean": true
+    },
+    "exports": {
+      ".": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@innoai-tech/lodash": "^0.2.0",
+    "@innoai-tech/reactutil": "^0.5.1"
+  },
+  "peerDependencies": {
+    "react": "18.x",
+    "rxjs": "^7.x"
+  },
+  "devDependencies": {
+    "@types/react": "~18.0.28",
+    "react": "~18.2.0",
+    "rxjs": "^7.8.0"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.mjs"
+      }
+    }
+  },
+  "files": [
+    "*.mjs",
+    "*.d.ts"
+  ],
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "monobundle",
+    "test": "vitest --run --passWithNoTests",
+    "prepublishOnly": "pnpm run build",
+    "lint": "prettier --write ."
+  },
+  "type": "module"
+}

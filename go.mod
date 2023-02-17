@@ -2,8 +2,10 @@ module github.com/octohelm/kubepkg
 
 go 1.20
 
+replace cuelang.org/go => cuelang.org/go v0.5.0-beta.1
+
 require (
-	cuelang.org/go v0.6.0-0.dev
+	cuelang.org/go v0.5.0-beta.1
 	github.com/containerd/containerd v1.6.17
 	github.com/coreos/go-oidc/v3 v3.5.0
 	github.com/davecgh/go-spew v1.1.1

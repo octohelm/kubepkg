@@ -3,7 +3,7 @@ import {
   useObservableState,
   useRequest,
   useStateSubject
-} from "@innoai-tech/reactutil";
+} from "@nodepkg/state";
 import {
   Avatar,
   Box,
@@ -19,7 +19,8 @@ import { Fragment, useEffect } from "react";
 import type { GroupRobot } from "../client/dashboard";
 import {
   IconButtonWithTooltip,
-  NotificationProvider, RxFragment,
+  NotificationProvider,
+  Slot,
   Scaffold,
   stringAvatar,
   useDialog,
@@ -117,9 +118,7 @@ const GroupRobotListItem = ({ robot }: { robot: GroupRobot }) => {
             >
               <RefreshOutlined />
             </IconButtonWithTooltip>
-            <RxFragment>
-              {token$.dialog$.elements$}
-            </RxFragment>
+            <Slot elem$={token$.dialog$.elements$} />
           </AccessControl>
         }
       >
@@ -177,9 +176,7 @@ const GroupRobotMainToolbar = () => {
       >
         <AddModerator />
       </IconButtonWithTooltip>
-      <RxFragment>
-        {form$.dialog$.elements$}
-      </RxFragment>
+      <Slot elem$={form$.dialog$.elements$} />
     </AccessControl>
   );
 };

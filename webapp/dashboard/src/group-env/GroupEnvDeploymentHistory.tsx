@@ -1,5 +1,9 @@
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
-import { deploymentID, deploymentRevision, GroupEnvDeploymentsProvider } from "../group";
+import {
+  deploymentID,
+  deploymentRevision,
+  GroupEnvDeploymentsProvider,
+} from "../group";
 import { map as rxMap, Observable, tap } from "rxjs";
 import { format, parseISO } from "date-fns";
 import {
@@ -8,33 +12,32 @@ import {
   useRequest,
   useObservableState,
   StateSubject,
-  Subscribe
-} from "@innoai-tech/reactutil";
+  Subscribe,
+} from "@nodepkg/state";
 import { listGroupEnvDeploymentHistory } from "../client/dashboard";
 import { List, ListItem, ListItemText } from "@mui/material";
 import { useGroupEnvDeploymentFormWithDialog } from "./GroupEnvDeployementForm";
 
 const GroupEnvDeploymentHistory = ({
-                                     kubepkg$,
-                                     deploymentID$
-                                   }: {
-  kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>,
-  deploymentID$: Observable<string>,
+  kubepkg$,
+  deploymentID$,
+}: {
+  kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>;
+  deploymentID$: Observable<string>;
 }) => {
-
   const groupEnvDeployments$ = GroupEnvDeploymentsProvider.use$();
   const listHistory$ = useRequest(listGroupEnvDeploymentHistory);
 
   useObservableEffect(() =>
-    deploymentID$
-      .pipe(
-        rxMap((deploymentID) => ({
-          groupName: groupEnvDeployments$.groupName,
-          envName: groupEnvDeployments$.envName,
-          deploymentID: deploymentID
-        })),
-        tap(listHistory$.next)
-      ));
+    deploymentID$.pipe(
+      rxMap((deploymentID) => ({
+        groupName: groupEnvDeployments$.groupName,
+        envName: groupEnvDeployments$.envName,
+        deploymentID: deploymentID,
+      })),
+      tap(listHistory$.next)
+    )
+  );
 
   const resp = useObservableState(listHistory$);
 
@@ -54,7 +57,11 @@ const GroupEnvDeploymentHistory = ({
                   primary={k.spec.version}
                   secondary={
                     <small>
-                      {k.metadata?.creationTimestamp && format(parseISO(k.metadata?.creationTimestamp), "yyyy-MM-dd HH:mm")}
+                      {k.metadata?.creationTimestamp &&
+                        format(
+                          parseISO(k.metadata?.creationTimestamp),
+                          "yyyy-MM-dd HH:mm"
+                        )}
                     </small>
                   }
                 />
@@ -67,12 +74,18 @@ const GroupEnvDeploymentHistory = ({
   );
 };
 
-export const useGroupEnvDeploymentHistoryFormWithDialog = (kubepkg: ApisKubepkgV1Alpha1KubePkg) => {
+export const useGroupEnvDeploymentHistoryFormWithDialog = (
+  kubepkg: ApisKubepkgV1Alpha1KubePkg
+) => {
   const deploymentID$ = useAsObservable(deploymentID(kubepkg));
 
-  return useGroupEnvDeploymentFormWithDialog(
-    kubepkg, {
-      title: () => "历史部署",
-      content: (kubepkg$) => <GroupEnvDeploymentHistory kubepkg$={kubepkg$} deploymentID$={deploymentID$} />
-    });
+  return useGroupEnvDeploymentFormWithDialog(kubepkg, {
+    title: () => "历史部署",
+    content: (kubepkg$) => (
+      <GroupEnvDeploymentHistory
+        kubepkg$={kubepkg$}
+        deploymentID$={deploymentID$}
+      />
+    ),
+  });
 };

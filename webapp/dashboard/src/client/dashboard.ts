@@ -846,6 +846,7 @@ export const listGroupEnvDeployment = /*#__PURE__*/ createRequest<
   {
     groupName: string;
     envName: string;
+    raw?: boolean;
     size?: number;
     offset?: number;
   },
@@ -855,12 +856,14 @@ export const listGroupEnvDeployment = /*#__PURE__*/ createRequest<
   ({
     groupName: path_groupName,
     envName: path_envName,
+    raw: query_raw,
     size: query_size,
     offset: query_offset,
   }) => ({
     method: "GET",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}/deployments`,
     params: {
+      raw: query_raw,
       size: query_size,
       offset: query_offset,
     },
@@ -2256,6 +2259,13 @@ export const RawOpenAPI = {
             required: true,
             schema: {
               type: "string",
+            },
+          },
+          {
+            name: "raw",
+            in: "query",
+            schema: {
+              type: "boolean",
             },
           },
           {

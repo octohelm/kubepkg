@@ -12,13 +12,17 @@ export default defineConfig({
     app("dashboard"),
     injectWebAppConfig(async (c, ctx) => {
       if (ctx.env !== "$") {
-        await generateClients(join(c.root!, "client"), ctx, {
-          requestCreator: {
-            expose: "createRequest",
-            importPath: "./client"
-          },
-          includesRawOpenAPI: true
-        });
+        try {
+          await generateClients(join(c.root!, "client"), ctx, {
+            requestCreator: {
+              expose: "createRequest",
+              importPath: "./client",
+            },
+            includesRawOpenAPI: true,
+          });
+        } catch (e) {
+          console.log(e);
+        }
       }
     }),
     presetReact({
@@ -28,7 +32,7 @@ export default defineConfig({
           "rxjs",
           "date-fns",
           "filesize",
-          "copy-to-clipboard"
+          "copy-to-clipboard",
         ],
         uikit: [
           "react",
@@ -36,15 +40,15 @@ export default defineConfig({
           "react-router",
           "react-router-dom",
           "react-spring",
-          "@innoai-tech/*"
+          "@innoai-tech/*",
         ],
         ui: ["@emotion/*", "@mui/*", "@monaco-editor/*"],
-        markdown: ["unified", "rehype-*"]
-      }
-    })
+        markdown: ["unified", "rehype-*"],
+      },
+    }),
     // visualizer({
     //   emitFile: true,
     //   filename: "stats.html"
     // })
-  ]
+  ],
 });

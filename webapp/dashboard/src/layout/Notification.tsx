@@ -1,6 +1,6 @@
-import { createSubject } from "./state";
+import { createSubject } from "@nodepkg/state";
 import { map } from "@innoai-tech/lodash";
-import { Subscribe } from "@innoai-tech/reactutil";
+import { Subscribe } from "@nodepkg/state";
 import { Snackbar } from "@mui/material";
 
 export const NotificationProvider = createSubject(({}, use) => {
@@ -14,6 +14,7 @@ export const NotificationProvider = createSubject(({}, use) => {
       n$.next((list) => list.filter((n) => n.id !== id));
     },
   });
+
   return n$;
 });
 

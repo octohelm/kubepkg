@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/octohelm/kubepkg/pkg/util"
+
 	"github.com/pkg/errors"
 
 	"github.com/octohelm/kubepkg/pkg/vault"
@@ -35,7 +37,7 @@ type GroupEnvDeploymentRepository struct {
 	cipher   vault.Cipher
 }
 
-func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymentID group.DeploymentID, deploymentSettingID group.DeploymentSettingID) (map[string]string, error) {
+func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymentID group.DeploymentID, deploymentSettingID group.DeploymentSettingID) (map[string]any, error) {
 	setting := &group.DeploymentSetting{}
 
 	err := dal.From(group.DeploymentSettingT).
@@ -55,16 +57,16 @@ func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymen
 		return nil, err
 	}
 
-	m := map[string]string{}
+	m := map[string]any{}
 	if err := json.Unmarshal(jsonRaw, &m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (r *GroupEnvDeploymentRepository) RecordSetting(ctx context.Context, deploymentID group.DeploymentID, settings map[string]string) (*group.DeploymentSetting, error) {
+func (r *GroupEnvDeploymentRepository) RecordSetting(ctx context.Context, deploymentID group.DeploymentID, settings map[string]any) (*group.DeploymentSetting, error) {
 	if settings == nil {
-		settings = map[string]string{}
+		settings = map[string]any{}
 	}
 	data, err := json.Marshal(settings)
 	if err != nil {
@@ -248,11 +250,11 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 			kk.Version.Channel = kubepkg.CHANNEL__DEV
 		}
 
-		k.Annotations["kubepkg.innoai.tech/deploymentID"] = kk.DeploymentHistory.DeploymentID.String()
-		k.Annotations["kubepkg.innoai.tech/deploymentSettingID"] = kk.DeploymentHistory.DeploymentSettingID.String()
-		k.Annotations["kubepkg.innoai.tech/revision"] = kk.Revision.ID.String()
-		k.Annotations["kubepkg.innoai.tech/name"] = fmt.Sprintf("%s/%s", kk.Kubepkg.Group, kk.Kubepkg.Name)
-		k.Annotations["kubepkg.innoai.tech/channel"] = kk.Version.Channel.String()
+		k.Annotations[kubepkg.AnnotationDeploymentID] = kk.DeploymentHistory.DeploymentID.String()
+		k.Annotations[kubepkg.AnnotationDeploymentSettingID] = kk.DeploymentHistory.DeploymentSettingID.String()
+		k.Annotations[kubepkg.AnnotationRevision] = kk.Revision.ID.String()
+		k.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kk.Kubepkg.Group, kk.Kubepkg.Name)
+		k.Annotations[kubepkg.AnnotationChannel] = kk.Version.Channel.String()
 
 		k.Spec.Version = kk.Version.Version
 
@@ -266,10 +268,11 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 				return nil, err
 			}
 
-			if err := json.Unmarshal(data, &k.Spec.Config); err != nil {
-				e := errors.Wrapf(err, "d%s s%s unmarshal to json failed", kk.DeploymentHistory.DeploymentID, kk.DeploymentHistory.DeploymentSettingID)
-				return nil, e
+			overwrites, err := tryToResolveOverwrites(data)
+			if err != nil {
+				return nil, err
 			}
+			k.Annotations[kubepkg.AnnotationOverwrites] = util.BytesToString(overwrites)
 		}
 
 		return k, nil
@@ -352,17 +355,17 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 		k.Name = kk.Deployment.DeploymentName
 		k.Namespace = r.GroupEnv.Namespace
 
+		k.CreationTimestamp = metav1.NewTime(time.Time(kk.DeploymentHistory.CreatedAt))
+
 		if k.Annotations == nil {
 			k.Annotations = map[string]string{}
 		}
 
-		k.CreationTimestamp = metav1.NewTime(time.Time(kk.DeploymentHistory.CreatedAt))
-
-		k.Annotations["kubepkg.innoai.tech/revision"] = kk.DeploymentHistory.KubepkgRevisionID.String()
-		k.Annotations["kubepkg.innoai.tech/deploymentID"] = kk.DeploymentHistory.DeploymentID.String()
-		k.Annotations["kubepkg.innoai.tech/deploymentSettingID"] = kk.DeploymentHistory.DeploymentSettingID.String()
-		k.Annotations["kubepkg.innoai.tech/name"] = fmt.Sprintf("%s/%s", kk.Kubepkg.Group, kk.Kubepkg.Name)
-		k.Annotations["kubepkg.innoai.tech/channel"] = kk.Version.Channel.String()
+		k.Annotations[kubepkg.AnnotationRevision] = kk.DeploymentHistory.KubepkgRevisionID.String()
+		k.Annotations[kubepkg.AnnotationDeploymentID] = kk.DeploymentHistory.DeploymentID.String()
+		k.Annotations[kubepkg.AnnotationDeploymentSettingID] = kk.DeploymentHistory.DeploymentSettingID.String()
+		k.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kk.Kubepkg.Group, kk.Kubepkg.Name)
+		k.Annotations[kubepkg.AnnotationChannel] = kk.Version.Channel.String()
 
 		k.Spec.Version = kk.Version.Version
 
@@ -376,9 +379,11 @@ func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, d
 				return nil, err
 			}
 
-			if err := json.Unmarshal(data, &k.Spec.Config); err != nil {
-				return nil, errors.Wrap(err, "Setting unmarshal to json failed")
+			overwrites, err := tryToResolveOverwrites(data)
+			if err != nil {
+				return nil, err
 			}
+			k.Annotations[kubepkg.AnnotationOverwrites] = util.BytesToString(overwrites)
 		}
 
 		return k, nil
@@ -430,4 +435,20 @@ func (r *GroupEnvDeploymentRepository) BindKubepkg(ctx context.Context, deployme
 	}
 
 	return d, nil
+}
+
+func tryToResolveOverwrites(data []byte) ([]byte, error) {
+	config := map[string]any{}
+
+	if err := json.Unmarshal(data, &config); err == nil {
+		if _, isOverwrites := config["spec"]; !isOverwrites {
+			return json.Marshal(map[string]any{
+				"spec": map[string]any{
+					"config": config,
+				},
+			})
+		}
+	}
+
+	return data, nil
 }

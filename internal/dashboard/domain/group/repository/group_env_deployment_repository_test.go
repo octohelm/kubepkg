@@ -55,7 +55,7 @@ func TestGroupEnvDeploymentRepository(t *testing.T) {
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 
 		t.Run("Then add setting", func(t *testing.T) {
-			settings := map[string]string{
+			settings := map[string]any{
 				"A": "1",
 			}
 
@@ -84,7 +84,7 @@ func TestGroupEnvDeploymentRepository(t *testing.T) {
 					testingutil.Expect(t, len(list.Data), testingutil.Be(1))
 
 					t.Run("update settings", func(t *testing.T) {
-						newSettings := map[string]string{
+						newSettings := map[string]any{
 							"A": "2",
 						}
 

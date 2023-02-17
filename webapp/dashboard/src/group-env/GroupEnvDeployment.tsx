@@ -1,9 +1,9 @@
-import { useParams } from "react-router";
+import { useParams } from "@nodepkg/router";
 import { GroupEnvDeploymentsProvider, GroupEnvProvider } from "../group";
-import { IconButtonWithTooltip, RxFragment, Scaffold } from "../layout";
+import { IconButtonWithTooltip, Slot, Scaffold } from "../layout";
 import {
   GroupEnvDeploymentExport,
-  GroupEnvDeploymentList,
+  GroupEnvDeploymentList
 } from "./GroupEnvDeploymentList";
 import { useGroupEnvDeploymentFormWithDialog } from "./GroupEnvDeployementForm";
 import { AccessControl } from "../auth";
@@ -24,9 +24,7 @@ export const GroupEnvDeploymentMainToolbar = () => {
       >
         <AddCircleOutlineOutlined />
       </IconButtonWithTooltip>
-      <RxFragment>
-        {form$.dialog$.elements$}
-      </RxFragment>
+      <Slot elem$={form$.dialog$.elements$} />
     </AccessControl>
   );
 };

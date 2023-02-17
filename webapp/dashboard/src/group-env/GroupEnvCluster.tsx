@@ -1,8 +1,13 @@
-import { Subscribe } from "@innoai-tech/reactutil";
+import { Subscribe } from "@nodepkg/state";
 import { Box, Stack } from "@mui/material";
 import { Link, LinkOff } from "@mui/icons-material";
 import { GroupEnvProvider } from "../group";
-import { IconButtonWithTooltip, RxFragment, useDialog, useEpics } from "../layout";
+import {
+  IconButtonWithTooltip,
+  Slot,
+  useDialog,
+  useEpics
+} from "../layout";
 import { AccessControl } from "../auth";
 import { map } from "rxjs";
 import { ClusterMenuList } from "../cluster";
@@ -61,10 +66,11 @@ export const GroupEnvCluster = () => {
   const bindDialog$ = useGroupEnvClusterBindDialog();
   const unbindDialog$ = useGroupEnvClusterUnbindDialog();
 
+
   return (
     <Subscribe value$={groupEnv$}>
       {(groupEnv) => {
-        if (!groupEnv.cluster) {
+        if (!(groupEnv?.cluster)) {
           return (
             <Stack direction={"row"} spacing={1} sx={{ alignItems: "center" }}>
               <Box sx={{ flex: 1 }} />
@@ -78,9 +84,7 @@ export const GroupEnvCluster = () => {
                 >
                   <Link />
                 </IconButtonWithTooltip>
-                <RxFragment>
-                  {bindDialog$.elements$}
-                </RxFragment>
+                <Slot elem$={bindDialog$.elements$} />
               </AccessControl>
             </Stack>
           );
@@ -99,9 +103,7 @@ export const GroupEnvCluster = () => {
               >
                 <LinkOff />
               </IconButtonWithTooltip>
-              <RxFragment>
-                {unbindDialog$.elements$}
-              </RxFragment>
+              <Slot elem$={unbindDialog$.elements$} />
             </AccessControl>
           </Stack>
         );

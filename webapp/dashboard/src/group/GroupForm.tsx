@@ -1,7 +1,7 @@
 import { GroupInfo, putGroup } from "../client/dashboard";
 import { tap, map as rxMap, ignoreElements } from "rxjs";
 import { useForm, fromErrorFields, useProxy, useDialogForm } from "../layout";
-import { useRequest } from "@innoai-tech/reactutil";
+import { useRequest } from "@nodepkg/state";
 import { string, required, match, objectOf } from "@innoai-tech/form";
 
 export const useGroupForm = (

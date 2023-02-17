@@ -1,6 +1,11 @@
-import { useLocation, useParams, useNavigate } from "react-router";
+import { useLocation, useParams, useNavigate } from "@nodepkg/router";
 import { parseSearch } from "@innoai-tech/fetcher";
-import { useObservableEffect, useAsObservable, useStateSubject, Subscribe } from "@innoai-tech/reactutil";
+import {
+  useObservableEffect,
+  useAsObservable,
+  useStateSubject,
+  Subscribe,
+} from "@nodepkg/state";
 import { combineLatest, filter, merge } from "rxjs";
 import { tap } from "rxjs";
 import { TokenProvider } from "./domain";
@@ -28,23 +33,22 @@ export const AuthorizeCallback = ({ name }: { name?: string }) => {
         tap(([apName, code]) => {
           token$.exchange$.next({
             name: apName,
-            body: { code }
+            body: { code },
           });
         })
       ),
-      token$.exchange$.pipe(
-        tap(() => nav(redirectURI))
-      ),
+      token$.exchange$.pipe(tap(() => nav(redirectURI))),
       token$.exchange$.error$.pipe(
         tap((errResp) => {
           error$.next(JSON.stringify(errResp.body, null));
         })
       )
-    ));
+    )
+  );
 
   return (
     <Subscribe value$={error$}>
-      {(err) => !!err ? <span>{err}</span> : null}
+      {(err) => (!!err ? <span>{err}</span> : null)}
     </Subscribe>
   );
 };

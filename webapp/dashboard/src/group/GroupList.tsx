@@ -2,8 +2,8 @@ import {
   useObservableState,
   useRequest,
   useStateSubject,
-  useObservableEffect
-} from "@innoai-tech/reactutil";
+  useObservableEffect,
+} from "@nodepkg/state";
 import { GroupAddOutlined, SettingsOutlined } from "@mui/icons-material";
 import {
   Avatar,
@@ -12,12 +12,12 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { Group, listGroup } from "../client/dashboard";
 import { useGroupFormWithDialog } from "./GroupForm";
-import { RxFragment, Scaffold, stringAvatar } from "../layout";
+import { Slot, Scaffold, stringAvatar } from "../layout";
 import { tap } from "rxjs";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
@@ -27,12 +27,12 @@ const GroupListItem = ({ group: initialGroup }: { group: Group }) => {
 
   const form$ = useGroupFormWithDialog(initialGroup);
 
-  useObservableEffect(
-    () => form$.post$.pipe(
+  useObservableEffect(() =>
+    form$.post$.pipe(
       tap((resp) => {
         group$.next((group) => ({
           ...group,
-          ...resp.body
+          ...resp.body,
         }));
       })
     )
@@ -52,9 +52,7 @@ const GroupListItem = ({ group: initialGroup }: { group: Group }) => {
             >
               <SettingsOutlined />
             </IconButtonWithTooltip>
-            <RxFragment>
-              {form$.dialog$.elements$}
-            </RxFragment>
+            <Slot elem$={form$.dialog$.elements$} />
           </AccessControl>
         }
       >
@@ -114,9 +112,7 @@ const GroupMainToolbar = () => {
       >
         <GroupAddOutlined />
       </IconButtonWithTooltip>
-      <RxFragment>
-        {form$.dialog$.elements$}
-      </RxFragment>
+      <Slot elem$={form$.dialog$.elements$} />
     </AccessControl>
   );
 };

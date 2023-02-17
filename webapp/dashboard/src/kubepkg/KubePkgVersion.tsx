@@ -1,5 +1,6 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "@nodepkg/router";
 import {
+  Box,
   IconButton,
   Link,
   List,
@@ -9,18 +10,22 @@ import {
   MenuList,
   Stack,
   Tab,
-  Tabs
+  Tabs,
+  Divider
 } from "@mui/material";
 import {
+  Slot,
   Subscribe,
   useStateSubject,
   useObservableEffect,
+  useAsObservable,
   useRequest,
-  StateSubject
-} from "@innoai-tech/reactutil";
+  StateSubject,
+  useMemoObservable
+} from "@nodepkg/state";
 import { stringifySearch, parseSearch } from "@innoai-tech/fetcher";
 import { get, map, values } from "@innoai-tech/lodash";
-import { map as rxMap, tap } from "rxjs";
+import { combineLatest, filter, map as rxMap, merge, tap } from "rxjs";
 
 import {
   ApisKubepkgV1Alpha1KubePkg,
@@ -29,48 +34,46 @@ import {
   putKubepkgVersion
 } from "../client/dashboard";
 import { AccessControl } from "../auth";
-import { RxFragment, Scaffold, useDialog, useEpics, useMenu, useProxy } from "../layout";
+import { Scaffold, useDialog, useMenu, useProxy } from "../layout";
 import { GroupKubePkgVersionProvider } from "./domain";
 import { KubePkgEditor } from "./KubePkgEditor";
-import { useEffect } from "react";
 import { MoreHoriz } from "@mui/icons-material";
 
 export const KubepkgVersionView = ({
-                                     versionInfo,
+                                     revisionID,
                                      channel
                                    }: {
-  versionInfo: KubepkgVersionInfo;
   channel: KubepkgChannel;
+  revisionID: string;
 }) => {
+  const channel$ = useAsObservable(channel);
+  const revisionID$ = useAsObservable(revisionID);
+
   const kubepkgVersion$ = GroupKubePkgVersionProvider.use$();
 
   const kubepkg$ = useStateSubject({} as ApisKubepkgV1Alpha1KubePkg);
 
-  useEpics(kubepkg$, () =>
-    kubepkgVersion$.get$.pipe(rxMap((resp) => resp.body))
+  useObservableEffect(() =>
+    merge(
+      kubepkgVersion$.get$.pipe(
+        rxMap((resp) => resp.body),
+        tap(kubepkg$.next)
+      ),
+      combineLatest(channel$, revisionID$).pipe(
+        filter(([_, revisionID]) => !!revisionID),
+        tap(([channel, revisionID]) => {
+          kubepkgVersion$.get$.next({
+            groupName: kubepkgVersion$.groupName,
+            name: kubepkgVersion$.kubePkgName,
+            channel: channel,
+            revisionID: revisionID
+          });
+        })
+      )
+    )
   );
 
-  useEffect(() => {
-    kubepkgVersion$.get$.next({
-      groupName: kubepkgVersion$.groupName,
-      name: kubepkgVersion$.kubePkgName,
-      channel: channel,
-      revisionID: versionInfo.revisionID
-    });
-  }, []);
-
   return <KubePkgEditor kubepkg$={kubepkg$} />;
-};
-
-export const useKubepkgVersionView = (
-  versionInfo: KubepkgVersionInfo,
-  channel: KubepkgChannel
-) => {
-  return useDialog({
-    title: `KubePkg ${versionInfo.version}`,
-    sx: { "& .MuiDialog-paper": { maxWidth: "90vw", width: "90vw" } },
-    content: <KubepkgVersionView versionInfo={versionInfo} channel={channel} />
-  });
 };
 
 export const useKubeVersionChannel = (
@@ -125,10 +128,7 @@ const GroupKubeVersionListItem = ({
   selectedRevision$?: StateSubject<string>;
 }) => {
   const kubepkgVersion$ = GroupKubePkgVersionProvider.use$();
-
   const releaseToChannel$ = useKubeVersionChannel(versionInfo, channel);
-
-  const kubepkgDialogView$ = useKubepkgVersionView(versionInfo, channel);
 
   const dialogForDelete$ = useDialog(
     {
@@ -157,9 +157,7 @@ const GroupKubeVersionListItem = ({
           >
             删除
           </MenuItem>
-          <RxFragment>
-            {dialogForDelete$.elements$}
-          </RxFragment>
+          <Slot elem$={dialogForDelete$.elements$} />
         </AccessControl>
         <AccessControl op={releaseToChannel$}>
           <MenuItem
@@ -169,9 +167,7 @@ const GroupKubeVersionListItem = ({
           >
             发布到
           </MenuItem>
-          <RxFragment>
-            {releaseToChannel$.dialog$.elements$}
-          </RxFragment>
+          <Slot elem$={releaseToChannel$.dialog$.elements$} />
         </AccessControl>
       </MenuList>
     )
@@ -210,20 +206,12 @@ const GroupKubeVersionListItem = ({
 
                       if (!!selectedRevision$) {
                         selectedRevision$.next(versionInfo.revisionID);
-                      } else {
-                        kubepkgDialogView$.next(true);
                       }
                     }}
                   >
                     {`${versionInfo.version}`}
                   </Link>
-                  {!selectedRevision$ &&
-                    <RxFragment>
-                      {kubepkgDialogView$.elements$}
-                    </RxFragment>
-                  }
                 </>
-
                 <>
                   <IconButton
                     ref={menu$.anchorRef}
@@ -231,7 +219,7 @@ const GroupKubeVersionListItem = ({
                   >
                     <MoreHoriz />
                   </IconButton>
-                  {menu$.render()}
+                  <Slot elem$={menu$.elements$} />
                 </>
               </Stack>
             }
@@ -260,54 +248,63 @@ export const GroupKubepkgVersionList = ({
           channel: channel
         });
       })
-    ));
+    )
+  );
+
+  const versionListElements$ = useMemoObservable(() =>
+    combineLatest(kubepkgVersion$, channel$).pipe(
+      rxMap(([list, channel]) => (
+        <List
+          sx={{
+            maxWidth: "600px",
+            height: "100%",
+            overflowY: "auto",
+            overflowX: "none"
+          }}
+        >
+          {list?.map((versionInfo) => (
+            <GroupKubeVersionListItem
+              key={versionInfo.revisionID}
+              selectedRevision$={selectedRevision$}
+              versionInfo={versionInfo}
+              channel={channel}
+            />
+          ))}
+        </List>
+      ))
+    )
+  );
+
+  const channelSwitchElements$ = useMemoObservable(() =>
+    channel$.pipe(
+      rxMap((channel) => (
+        <Tabs
+          variant="scrollable"
+          scrollButtons={false}
+          value={values(KubepkgChannel).indexOf(channel)}
+          onChange={(_: any, i: number) =>
+            channel$.next(values(KubepkgChannel)[i]!)
+          }
+        >
+          {map(KubepkgChannel, (c) => (
+            <Tab key={c} label={c} />
+          ))}
+        </Tabs>
+      ))
+    )
+  );
 
   return (
-    <Subscribe value$={channel$}>
-      {(channel) => (
-        <>
-          <Tabs
-            value={values(KubepkgChannel).indexOf(channel)}
-            onChange={(_: any, i: number) =>
-              channel$.next(values(KubepkgChannel)[i]!)
-            }
-          >
-            {map(KubepkgChannel, (c) => (
-              <Tab key={c} label={c} />
-            ))}
-          </Tabs>
-          <Subscribe value$={kubepkgVersion$}>
-            {(list) => (
-              <List
-                sx={{
-                  maxWidth: "600px",
-                  height: "100%",
-                  overflowY: "auto",
-                  overflowX: "none"
-                }}
-              >
-                {list?.map((versionInfo) => (
-                  <GroupKubeVersionListItem
-                    key={versionInfo.revisionID}
-                    selectedRevision$={selectedRevision$}
-                    versionInfo={versionInfo}
-                    channel={channel}
-                  />
-                ))}
-              </List>
-            )}
-          </Subscribe>
-        </>
-      )}
-    </Subscribe>
+    <>
+      <Slot elem$={channelSwitchElements$} />
+      <Slot elem$={versionListElements$} />
+    </>
   );
 };
 
-export const KubePkgVersionMain = () => {
-  const params = useParams() as any;
-  const location = useLocation();
-
+export const KubepkgVersionPreview = () => {
   const nav = useNavigate();
+  const location = useLocation();
 
   const channel$ = useStateSubject(
     () =>
@@ -317,28 +314,62 @@ export const KubePkgVersionMain = () => {
         KubepkgChannel.DEV
       ) as KubepkgChannel
   );
+  const selectedRevision$ = useStateSubject(() =>
+    get(parseSearch(location.search), ["revision", 0], "")
+  );
 
-  useObservableEffect(
-    () =>
-      channel$.pipe(
-        tap((channel) => {
-          nav(
-            stringifySearch({
-              channel: channel
-            })
-          );
-        })
-      ),
-    []
+  useObservableEffect(() =>
+    combineLatest([channel$, selectedRevision$]).pipe(
+      tap(([channel, revision]) => {
+        nav(
+          stringifySearch({
+            channel,
+            revision
+          })
+        );
+      })
+    )
+  );
+
+  const revisionView$ = useMemoObservable(() =>
+    combineLatest([selectedRevision$, channel$]).pipe(
+      rxMap(([revisionID, channel]) => {
+        return <KubepkgVersionView revisionID={revisionID} channel={channel} />;
+      })
+    )
   );
 
   return (
+    <Stack
+      direction={"row"}
+      spacing={2}
+      sx={{ width: "100%", height: "100%", overflow: "hidden" }}
+    >
+
+      <Box sx={{ flex: 1, overflow: "auto" }}>
+        <Slot elem$={revisionView$} />
+      </Box>
+      <Divider orientation={"vertical"} />
+      <Box sx={{ width: "30%" }}>
+        <GroupKubepkgVersionList
+          channel$={channel$}
+          selectedRevision$={selectedRevision$}
+        />
+      </Box>
+    </Stack>
+  );
+};
+
+export const KubePkgVersionMain = () => {
+  const params = useParams<{ group: string; name: string }>();
+
+  return (
     <GroupKubePkgVersionProvider
-      groupName={params.group}
-      kubePkgName={params.name}
+      groupName={params.group!}
+      kubePkgName={params.name!}
     >
       <Scaffold>
-        <GroupKubepkgVersionList channel$={channel$} />
+        <KubepkgVersionPreview />
       </Scaffold>
     </GroupKubePkgVersionProvider>
   );

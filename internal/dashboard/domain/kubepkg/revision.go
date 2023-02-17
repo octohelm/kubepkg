@@ -53,7 +53,7 @@ type Ref struct {
 	KubepkgID         ID
 	KubepkgRevisionID RevisionID
 	SettingID         uint64
-	DefaultSettings   map[string]string
+	Overwrites        map[string]any
 }
 
 func (r Ref) WithSettingID(settingID uint64) *Ref {

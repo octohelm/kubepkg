@@ -3,6 +3,8 @@ package group
 import (
 	"context"
 
+	"github.com/octohelm/kubepkg/pkg/kubepkg/specutil"
+
 	"github.com/octohelm/courier/pkg/expression"
 	authoperator "github.com/octohelm/kubepkg/internal/dashboard/apis/auth/operator"
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/group"
@@ -28,11 +30,29 @@ func (ListGroupEnvDeployment) MiddleOperators() courier.MiddleOperators {
 
 type ListGroupEnvDeployment struct {
 	courierhttp.MethodGet `path:"/deployments"`
+	Raw                   bool `name:"raw,omitempty" in:"query"`
 	datatypes.Pager
 }
 
 func (p *ListGroupEnvDeployment) Output(ctx context.Context) (any, error) {
 	groupEnv := operator.GroupEnvContext.From(ctx)
 	s := groupservice.NewGroupEnvDeploymentService(groupEnv.Group, &groupEnv.Env)
-	return s.ListKubePkg(ctx, &p.Pager)
+
+	list, err := s.ListKubePkg(ctx, &p.Pager)
+	if err != nil {
+		return nil, err
+	}
+
+	if p.Raw {
+		return list, nil
+	}
+
+	for i := range list.Data {
+		kpkg, err := specutil.ApplyOverwrites(list.Data[i])
+		if err == nil {
+			list.Data[i] = kpkg
+		}
+	}
+
+	return list, nil
 }

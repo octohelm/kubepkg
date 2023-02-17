@@ -87,10 +87,16 @@ func (s *IngressGatewaySet) Endpoints() map[string]string {
 	}
 
 	for _, gt := range s.gateways {
-		if gt.Https {
-			endpoints[gt.Name] = "https://" + s.hostFor(&gt)
+		host := s.hostFor(&gt)
+
+		if host == "" {
+			endpoints[gt.Name] = ""
 		} else {
-			endpoints[gt.Name] = "http://" + s.hostFor(&gt)
+			if gt.Https {
+				endpoints[gt.Name] = "https://" + host
+			} else {
+				endpoints[gt.Name] = "http://" + host
+			}
 		}
 	}
 

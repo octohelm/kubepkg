@@ -2,7 +2,7 @@ import {
   Subscribe,
   useObservableState,
   useStateSubject,
-} from "@innoai-tech/reactutil";
+} from "@nodepkg/state";
 import {
   Box,
   CircularProgress,
@@ -14,7 +14,7 @@ import { Fragment } from "react";
 import { Scaffold, useEpics } from "../layout";
 import { GroupKubePkgProvider } from "./domain";
 import type { Kubepkg } from "../client/dashboard";
-import { Link } from "react-router-dom";
+import { Link } from "@nodepkg/router";
 import { Search, SearchIcon, SearchInput } from "../layout/SearchInput";
 import { SearchOutlined } from "@mui/icons-material";
 import { ignoreElements, tap } from "rxjs";

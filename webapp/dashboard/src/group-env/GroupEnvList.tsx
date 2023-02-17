@@ -2,7 +2,7 @@ import {
   useObservableState,
   useStateSubject,
   useObservableEffect
-} from "@innoai-tech/reactutil";
+} from "@nodepkg/state";
 import {
   AddCircleOutlineOutlined,
   SettingsOutlined
@@ -22,12 +22,13 @@ import {
   Scaffold,
   IconButtonWithTooltip,
   stringAvatar,
-  ListItemLink, RxFragment
+  ListItemLink,
+  Slot
 } from "../layout";
 import { tap } from "rxjs";
 import { GroupEnvsProvider, GroupProvider } from "../group";
 import type { GroupEnv } from "../client/dashboard";
-import { Link } from "react-router-dom";
+import { Link } from "@nodepkg/router";
 import { AccessControl } from "../auth";
 import { map, orderBy } from "@innoai-tech/lodash";
 
@@ -40,8 +41,8 @@ const GroupEnvListItem = ({
   const groupEnv$ = useStateSubject(initialGroupEnv);
   const form$ = useGroupEnvFormWithDialog(initialGroupEnv);
 
-  useObservableEffect(
-    () => form$.post$.pipe(
+  useObservableEffect(() =>
+    form$.post$.pipe(
       tap((resp) => {
         groupEnv$.next((group) => ({
           ...group,
@@ -67,9 +68,7 @@ const GroupEnvListItem = ({
           >
             <SettingsOutlined />
           </IconButtonWithTooltip>
-          <RxFragment>
-            {form$.dialog$.elements$}
-          </RxFragment>
+          <Slot elem$={form$.dialog$.elements$} />
         </AccessControl>
       }
     >
@@ -130,9 +129,7 @@ const GroupMainToolbar = () => {
       >
         <AddCircleOutlineOutlined />
       </IconButtonWithTooltip>
-      <RxFragment>
-        {form$.dialog$.elements$}
-      </RxFragment>
+      <Slot elem$={form$.dialog$.elements$} />
     </AccessControl>
   );
 };

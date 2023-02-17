@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet } from "@nodepkg/router";
 import { TokenProvider } from "./domain";
 
 export const MustLogout = ({ children }: { children?: ReactNode }) => {

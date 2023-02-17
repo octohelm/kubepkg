@@ -1,5 +1,5 @@
 import { last, map, orderBy, values } from "@innoai-tech/lodash";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "@nodepkg/router";
 import {
   List,
   ListItem,
@@ -18,15 +18,16 @@ import {
   GroupEnvDeploymentsProvider,
   openAPISpecDoc,
   revision,
-  channel, deploymentRevision
+  channel,
+  deploymentRevision
 } from "../group";
-import { IconButtonWithTooltip, RxFragment } from "../layout";
+import { IconButtonWithTooltip, Slot } from "../layout";
 import { Download } from "@mui/icons-material";
 import { useGroupEnvDeploymentFormWithDialog } from "./GroupEnvDeployementForm";
 import { Fragment, ReactNode } from "react";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import { openAPISpecPath } from "../group";
-import { useObservableState, useMemoObservable } from "@innoai-tech/reactutil";
+import { useObservableState, useMemoObservable } from "@nodepkg/state";
 import { map as rxMap } from "rxjs";
 import { AccessControl } from "../auth";
 import { useGroupEnvDeploymentHistoryFormWithDialog } from "./GroupEnvDeploymentHistory";
@@ -407,7 +408,8 @@ const KubePkgHeading = ({
             "&:hover small": {
               visibility: "visible"
             }
-          }}>
+          }}
+        >
           <Box
             component={"span"}
             sx={{
@@ -417,35 +419,42 @@ const KubePkgHeading = ({
           >
             {kubepkg.spec.deploy?.kind}/{kubepkg.metadata?.name}
           </Box>
-          <Stack component={"small"} direction="row" spacing={1} sx={{
-            visibility: "hidden",
-            opacity: 0.8,
-            fontSize: "0.8em",
-            "& a": {
-              color: "inherit"
-            }
-          }}>
+          <Stack
+            component={"small"}
+            direction="row"
+            spacing={1}
+            sx={{
+              visibility: "hidden",
+              opacity: 0.8,
+              fontSize: "0.8em",
+              "& a": {
+                color: "inherit"
+              }
+            }}
+          >
             <AccessControl op={edit$}>
-              <Link href={"#"} onClick={(e) => {
-                e.preventDefault();
-                edit$.dialog$.next(true);
-              }}>
+              <Link
+                href={"#"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  edit$.dialog$.next(true);
+                }}
+              >
                 编辑
               </Link>
-              <RxFragment>
-                {edit$.dialog$.elements$}
-              </RxFragment>
+              <Slot elem$={edit$.dialog$.elements$} />
             </AccessControl>
             <AccessControl op={history$}>
-              <Link href={"#"} onClick={(e) => {
-                e.preventDefault();
-                history$.dialog$.next(true);
-              }}>
+              <Link
+                href={"#"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  history$.dialog$.next(true);
+                }}
+              >
                 历史部署
               </Link>
-              <RxFragment>
-                {history$.dialog$.elements$}
-              </RxFragment>
+              <Slot elem$={history$.dialog$.elements$} />
             </AccessControl>
           </Stack>
         </Stack>
@@ -525,35 +534,6 @@ export const GroupEnvDeploymentListItem = ({
   );
 };
 
-const toKubePkgList = (name: string, groupEnvDeployments: any) => {
-  const list = {
-    apiVersion: "octohelm.tech/v1alpha1",
-    kind: "KubePkgList",
-    items: map(
-      orderBy(values(groupEnvDeployments || {}), (d) => d.spec.deploy?.kind),
-      (item) => ({
-        apiVersion: item.apiVersion,
-        kind: item.kind,
-        metadata: item.metadata,
-        spec: item.spec
-      })
-    )
-  };
-
-  const file = new File(
-    [JSON.stringify(list, null, 2)],
-    `${name}.kubepkg.json`,
-    {
-      type: "application/json"
-    }
-  );
-
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(file);
-  a.download = `${name}.kubepkg.json`;
-  a.click();
-};
-
 export const GroupEnvDeploymentExport = () => {
   const groupEnvDeployments$ = GroupEnvDeploymentsProvider.use$();
 
@@ -561,10 +541,12 @@ export const GroupEnvDeploymentExport = () => {
     <IconButtonWithTooltip
       label={"导出配置"}
       onClick={() => {
-        toKubePkgList(
-          `${groupEnvDeployments$.envName}.${groupEnvDeployments$.groupName}`,
-          groupEnvDeployments$.value
-        );
+        window.open(groupEnvDeployments$.list$.toHref({
+          groupName: groupEnvDeployments$.groupName,
+          envName: groupEnvDeployments$.envName,
+          size: -1,
+          raw: false
+        }), "_blank");
       }}
     >
       <Download />
@@ -575,9 +557,19 @@ export const GroupEnvDeploymentExport = () => {
 export const GroupEnvDeploymentList = () => {
   const groupEnvDeployments$ = GroupEnvDeploymentsProvider.use$();
 
-  const sortedDeployments$ = useMemoObservable(() => groupEnvDeployments$.pipe(
-    rxMap((groupEnvDeployments) => orderBy(values(groupEnvDeployments || {}), (d) => d.spec.deploy?.kind))
-  ));
+  const sortedDeployments$ = useMemoObservable(() =>
+    groupEnvDeployments$.pipe(
+      rxMap((groupEnvDeployments) =>
+        orderBy(
+          values(groupEnvDeployments || {}),
+          [
+            (d) => d.spec.deploy?.kind,
+            (d) => d.metadata?.name
+          ]
+        )
+      )
+    )
+  );
 
   const sortedDeployments = useObservableState(sortedDeployments$);
 

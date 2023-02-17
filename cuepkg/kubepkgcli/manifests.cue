@@ -3,8 +3,7 @@ package kubepkgcli
 import (
 	"encoding/json"
 
-	"dagger.io/dagger"
-	"dagger.io/dagger/core"
+	"wagon.octohelm.tech/core"
 
 	spec "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
 )
@@ -19,8 +18,8 @@ import (
 	}
 
 	_files: [Path=string]: core.#WriteFile & {
-		input: dagger.#Scratch
 	}
+
 	_files: "/src/kubepkg.json": {
 		path:     "kubepkg.json"
 		contents: json.Marshal(_kubepkg.output)

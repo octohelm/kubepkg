@@ -7,9 +7,9 @@ import {
   paramsSerializer,
   transformRequestBody,
 } from "@innoai-tech/fetcher";
-import { FetcherProvider, StoreProvider } from "@innoai-tech/reactutil";
+import { FetcherProvider, StoreProvider } from "@nodepkg/state";
 import conf from "./config";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "@nodepkg/router";
 import { TokenProvider } from "./auth";
 
 const root = createRoot(document.getElementById("root") as any);

@@ -7,16 +7,16 @@ import {
   Input,
   InputLabel,
   MenuItem,
-  Select,
+  Select
 } from "@mui/material";
 import { createContext, useContext, useMemo, useId } from "react";
-import { Subscribe } from "@innoai-tech/reactutil";
+import { Subscribe } from "@nodepkg/state";
 import {
   SchemaBuilder,
   InferSchema,
   FieldSubject,
   FormSubject,
-  Schema,
+  Schema
 } from "@innoai-tech/form";
 
 const FormContext = createContext<{ form$?: FormSubject<any> }>({});
@@ -59,9 +59,9 @@ const fieldKey = (name: string, parent = "") => {
 };
 
 const FormControlsFromSchema = ({
-  schema,
-  name,
-}: {
+                                  schema,
+                                  name
+                                }: {
   schema: Schema;
   name?: string;
 }) => {
@@ -97,10 +97,10 @@ const FormControlsFromSchema = ({
         {(fieldState) => (
           <FormControlLabel
             control={<Checkbox />}
-            value={fieldState.value}
+            value={fieldState?.value}
             label={schema.label}
             onChange={() => {
-              field$.next(!fieldState.value);
+              field$.next(!fieldState?.value);
             }}
           />
         )}
@@ -111,7 +111,12 @@ const FormControlsFromSchema = ({
   if (schema.type === "string" || schema.type === "number") {
     return (
       <Subscribe value$={field$}>
-        {({ visited, value, error }) => {
+        {(field) => {
+          if (!field) {
+            return null;
+          }
+          const { visited, value, error } = field;
+
           const validate = field$.validate;
 
           const isRequired = validate?.args.some((e) => e.type === "required");
@@ -159,9 +164,9 @@ const FormControlsFromSchema = ({
               }}
               {...(schema.type === "number"
                 ? {
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
-                  }
+                  inputMode: "numeric",
+                  pattern: "[0-9]*"
+                }
                 : {})}
             />
           );
@@ -191,8 +196,8 @@ const FormControlsFromSchema = ({
 };
 
 export const FormControls = <T extends object>({
-  form$,
-}: {
+                                                 form$
+                                               }: {
   form$: FormSubject<T>;
 }) => {
   return (

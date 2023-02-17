@@ -2,16 +2,13 @@ package kubepkgcli
 
 import (
 	"encoding/json"
-
-	"dagger.io/dagger"
-	"dagger.io/dagger/core"
-
+	"wagon.octohelm.tech/core"
 	spec "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
 )
 
 #Apply: {
 	kubepkg:    spec.#KubePkg
-	kubeconfig: dagger.#Secret
+	kubeconfig: core.#Secret
 
 	flags: [K=string]: string
 
@@ -20,7 +17,6 @@ import (
 	}
 
 	_files: [Path=string]: core.#WriteFile & {
-		input: dagger.#Scratch
 	}
 
 	_files: "/src/kubepkg.json": {

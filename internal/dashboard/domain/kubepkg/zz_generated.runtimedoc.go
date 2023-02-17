@@ -75,7 +75,7 @@ func (v Ref) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "SettingID":
 			return []string{}, true
-		case "DefaultSettings":
+		case "Overwrites":
 			return []string{}, true
 
 		}

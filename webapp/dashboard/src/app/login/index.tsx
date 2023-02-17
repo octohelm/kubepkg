@@ -1,5 +1,5 @@
 import { Container } from "@mui/material";
-import { Route } from "react-router-dom";
+import { Route } from "@nodepkg/router";
 import { AuthorizeCallback, LoginCard, MustLogout } from "../../auth";
 
 const LoginPage = () => (

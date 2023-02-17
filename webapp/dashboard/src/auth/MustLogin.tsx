@@ -1,7 +1,7 @@
 import { AuthTokenPatcher } from "./TokenPatcher";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from "@nodepkg/router";
 import { ReactNode, useRef } from "react";
-import { useObservableEffect } from "@innoai-tech/reactutil";
+import { useObservableEffect } from "@nodepkg/state";
 import { tap } from "rxjs";
 import { stringifySearch } from "@innoai-tech/fetcher";
 import { CurrentUserProvider, Op, TokenProvider, User } from "./domain";
@@ -16,11 +16,11 @@ export const createCanAccess =
         const exec = create(user.permissions[operationID]! as any)({
           root: groupID
             ? {
-              ...user,
-              groupRole: get(user.groupRoles, [groupID])
-            }
+                ...user,
+                groupRole: get(user.groupRoles, [groupID]),
+              }
             : user,
-          schema: {}
+          schema: {},
         });
         return !!exec(0);
       }
@@ -30,13 +30,13 @@ export const createCanAccess =
   };
 
 export const AccessControlProvider = createProvider({
-  canAccess: createCanAccess()
+  canAccess: createCanAccess(),
 });
 
 export const AccessControl = ({
-                                op,
-                                children
-                              }: {
+  op,
+  children,
+}: {
   op: Op;
   children: ReactNode | ((ok: boolean) => ReactNode);
 }) => {
@@ -66,15 +66,16 @@ export const MustLogon = ({ children }: { children?: ReactNode }) => {
         if (!token$.validateToken(token?.accessToken)) {
           nav(
             `/login${stringifySearch({
-              redirect_uri: `${locationRef.current.pathname}${locationRef.current.search}`
+              redirect_uri: `${locationRef.current.pathname}${locationRef.current.search}`,
             })}`,
             {
-              replace: true
+              replace: true,
             }
           );
         }
       })
-    ));
+    )
+  );
 
   if (token$.validateToken(token$.value?.accessToken)) {
     return (

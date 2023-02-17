@@ -19,14 +19,9 @@ pkg: {
 
 client: core.#Client & {
 	env: {
-		GOPROXY:   string | *""
-		GOPRIVATE: string | *""
-		GOSUMDB:   string | *""
-
 		GH_USERNAME: string | *""
 		GH_PASSWORD: core.#Secret
 
-		LINUX_MIRROR:                  string | *""
 		CONTAINER_REGISTRY_PULL_PROXY: string | *""
 		NPM_REGISTRY_SERVER:           string | *""
 
@@ -45,11 +40,6 @@ setting: core.#Setting & {
 		username: client.env.GH_USERNAME
 		secret:   client.env.GH_PASSWORD
 	}
-}
-
-mirror: {
-	linux: client.env.LINUX_MIRROR
-	pull:  client.env.CONTAINER_REGISTRY_PULL_PROXY
 }
 
 actions: webapp: node.#Project & {
@@ -81,7 +71,6 @@ actions: webapp: node.#Project & {
 		]
 		script: "pnpm exec turbo run build --no-cache"
 		image: {
-			"mirror": mirror
 			"steps": [
 				node.#ConfigPrivateRegistry & {
 					scope: "@innoai-tech"
@@ -120,12 +109,6 @@ actions: go: golang.#Project & {
 		"-X \(go.module)/pkg/version.version=\(go.version)",
 	]
 
-	env: {
-		GOPROXY:   client.env.GOPROXY
-		GOPRIVATE: client.env.GOPRIVATE
-		GOSUMDB:   client.env.GOSUMDB
-	}
-
 	build: {
 		pre: [
 			"go mod download",
@@ -144,8 +127,6 @@ actions: go: golang.#Project & {
 			cmd: ["serve", "registry"]
 		}
 	}
-
-	"mirror": mirror
 }
 
 actions: {
@@ -202,9 +183,9 @@ actions: {
 							spec: {
 								version: "\(_version)"
 								config: {
-									"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "@secret.container-registry/endpoint?"
-									"KUBEPKG_REMOTE_REGISTRY_USERNAME": "@secret.container-registry/username?"
-									"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "@secret.container-registry/password?"
+									"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "@secret/container-registry/endpoint?"
+									"KUBEPKG_REMOTE_REGISTRY_USERNAME": "@secret/container-registry/username?"
+									"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "@secret/container-registry/password?"
 								}
 							}
 						},

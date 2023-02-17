@@ -7,15 +7,11 @@ import {
   listGroupEnvDeployment,
   putGroupEnvDeployment
 } from "../../client/dashboard";
-import { useRequest } from "@innoai-tech/reactutil";
+import { useRequest } from "@nodepkg/state";
 import { ignoreElements, map as rxMap, merge, tap } from "rxjs";
 import { GroupEnvProvider } from "./GroupEnv";
 import { map, mapValues, pick, reduce } from "@innoai-tech/lodash";
-import {
-  channel,
-  deploymentID,
-  kubepkgName
-} from "./util";
+import { channel, deploymentID, kubepkgName } from "./util";
 import { useEffect } from "react";
 
 export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
@@ -24,9 +20,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
   const putGroupEnvDeployment$ = useRequest(putGroupEnvDeployment);
   const listGroupEnvDeployment$ = useRequest(listGroupEnvDeployment);
   const latest$ = useRequest(latestKubepkgs);
-  const listGroupEnvClusterDeployments$ = useRequest(
-    listGroupEnvClusterDeployments
-  );
+  const listGroupEnvClusterDeployments$ = useRequest(listGroupEnvClusterDeployments);
 
   const groupEnvDeployments$ = use(
     `groups/${groupEnv$.value.groupName}/envs/${groupEnv$.value.envName}/deployments?`,
@@ -52,17 +46,24 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
 
               return {
                 ...ret,
-                [did]: existed ? {
-                  ...existed,
-                  status: kpkg.status
-                } : {
-                  apiVersion: kpkg.apiVersion,
-                  kind: kpkg.kind,
-                  metadata: pick(kpkg.metadata, ["name", "namespace", "labels", "annotations"]),
-                  spec: kpkg.spec,
-                  status: kpkg.status
-                  // TODO diff version for db and real cluster
-                }
+                [did]: existed
+                  ? {
+                    ...existed,
+                    status: kpkg.status
+                  }
+                  : {
+                    apiVersion: kpkg.apiVersion,
+                    kind: kpkg.kind,
+                    metadata: pick(kpkg.metadata, [
+                      "name",
+                      "namespace",
+                      "labels",
+                      "annotations"
+                    ]),
+                    spec: kpkg.spec,
+                    status: kpkg.status
+                    // TODO diff version for db and real cluster
+                  }
               };
             },
             groupEnvDeployments$.value
@@ -146,6 +147,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
       groupEnvDeployments$.list$.next({
         groupName: groupEnvDeployments$.groupName,
         envName: groupEnvDeployments$.envName,
+        raw: true,
         size: -1
       });
 

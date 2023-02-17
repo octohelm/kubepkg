@@ -1,18 +1,18 @@
-import { useObservableState } from "@innoai-tech/reactutil";
+import { useObservableState } from "@nodepkg/state";
 import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import type { ReactNode } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } from "@nodepkg/router";
 import { stringAvatar } from "../layout";
 import {
   GroupProvider,
   GroupEnvsProvider,
-  GroupAccessControlProvider
+  GroupAccessControlProvider,
 } from "./domain";
 
 export const GroupTitle = () => {
   const group$ = GroupProvider.use$();
 
-  const group = useObservableState(group$);
+  const group = useObservableState(group$)!;
 
   return (
     <ListItem component={Link} button={true} to={`/groups/${group.name}`}>
@@ -25,9 +25,9 @@ export const GroupTitle = () => {
 };
 
 export const GlobalGroupProvider = ({
-                                      groupName,
-                                      children
-                                    }: {
+  groupName,
+  children,
+}: {
   groupName?: string;
   children: ReactNode;
 }) => {

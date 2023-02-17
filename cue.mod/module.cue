@@ -1,11 +1,9 @@
 module: "github.com/octohelm/kubepkg"
 
 require: {
-	"dagger.io":                      "v0.3.0"
-	"github.com/innoai-tech/runtime": "v0.0.0-20230209080541-136477a0d9c6"
+	"github.com/innoai-tech/runtime": "v0.0.0-20230301034018-d0f9cf039113"
 	"k8s.io/api":                     "v0.25.4"
 	"k8s.io/apimachinery":            "v0.25.4"
-	"universe.dagger.io":             "v0.3.0"
 	"wagon.octohelm.tech":            "v0.0.0-20200202235959-e64a70c55ed2"
 }
 

@@ -9,18 +9,28 @@ import {
 import {
   StateSubject,
   Subscribe,
+  useMemoObservable,
   useObservableEffect,
   useStateSubject
-} from "@innoai-tech/reactutil";
-import { useDialog, useEpics, useProxy } from "../layout";
+} from "@nodepkg/state";
+import { DialogProps, useEpics, useProxy } from "../layout";
 import { map as rxMap, tap, filter as rxFilter, merge } from "rxjs";
 import { KubePkgEditor, useKubePkgAutocomplete } from "../kubepkg";
 import type { KubepkgNameInfo } from "../kubepkg/domain";
-import { Box, Divider, Stack } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  Stack
+} from "@mui/material";
 import { GroupKubePkgVersionProvider } from "../kubepkg/domain";
 import { GroupKubepkgVersionList } from "../kubepkg/KubePkgVersion";
 import { KubepkgChannel } from "../client/dashboard";
 import { last, omit } from "@innoai-tech/lodash";
+import { Close } from "@mui/icons-material";
 
 const KubepkgVersionUpgrade = ({
                                  revision$,
@@ -48,25 +58,27 @@ const KubepkgVersionUpgrade = ({
       ),
       kubepkgVersion$.get$.pipe(
         tap((resp) => {
-            kubepkg$.next({
-              ...resp.body,
-              metadata: {
-                ...kubepkg$.value.metadata,
-                name: kubepkg$.value.metadata?.name || last(kubepkgName(resp.body).split("/")) || "",
-                annotations: {
-                  ...(kubepkg$.value.metadata?.annotations || {}),
-                  ...(resp.body.metadata?.annotations || {})
-                }
-              },
-              spec: {
-                version: resp.body.spec.version,
-                deploy: resp.body.spec.deploy,
-                config: kubepkg$.value.spec?.config || {},
-                ...omit(resp.body.spec, ["version", "deploy", "config"])
+          kubepkg$.next({
+            ...resp.body,
+            metadata: {
+              ...kubepkg$.value.metadata,
+              name:
+                kubepkg$.value.metadata?.name ||
+                last(kubepkgName(resp.body).split("/")) ||
+                "",
+              annotations: {
+                ...(kubepkg$.value.metadata?.annotations || {}),
+                ...(resp.body.metadata?.annotations || {})
               }
-            });
-          }
-        )
+            },
+            spec: {
+              version: resp.body.spec.version,
+              deploy: resp.body.spec.deploy,
+              config: kubepkg$.value.spec?.config || {},
+              ...omit(resp.body.spec, ["version", "deploy", "config"])
+            }
+          });
+        })
       )
     )
   );
@@ -117,9 +129,7 @@ export const KubePkgEditorWithVersionList = ({
 
   return (
     <>
-      <Box>
-        {kubePkgAutocomplete$.render()}
-      </Box>
+      <Box>{kubePkgAutocomplete$.render()}</Box>
       <Divider />
       <Subscribe value$={kubepkgNameInfo$}>
         {(info) =>
@@ -146,12 +156,47 @@ export const KubePkgEditorWithVersionList = ({
   );
 };
 
+export const useDialog = ({
+                            title,
+                            content,
+                            sx = { "& .MuiDialog-paper": { width: "80%" } }
+                          }: DialogProps) => {
+  const dialog$ = useStateSubject(false);
+
+  const dialogElement$ = useMemoObservable(() => dialog$.pipe(
+    rxMap((open) => (
+      <Dialog sx={sx} open={open} onClose={() => dialog$.next((v) => !v)}>
+        <DialogTitle>
+          {title}
+          <IconButton
+            aria-label="close"
+            onClick={() => dialog$.next((v) => !v)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500]
+            }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {content}
+        </DialogContent>
+      </Dialog>
+    ))
+  ));
+
+  return useProxy(dialog$, {
+    title: title,
+    elements$: dialogElement$
+  });
+};
+
 export const useGroupEnvDeploymentFormWithDialog = (
   kubepkg?: ApisKubepkgV1Alpha1KubePkg,
-  {
-    content,
-    title
-  } = {
+  { content, title } = {
     content: (kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>) => (
       <KubePkgEditorWithVersionList kubepkg$={kubepkg$} />
     ),
@@ -166,33 +211,39 @@ export const useGroupEnvDeploymentFormWithDialog = (
 
   const action = kubepkg ? "更新" : "新建";
 
-  const dialog$ = useDialog(
-    {
-      title: title(action),
-      action: `${action}`,
-      sx: { "& .MuiDialog-paper": { maxWidth: "96vw", width: "96vw" } },
-      content: <Stack direction="row" spacing={3}>
-        <Box sx={{ flex: 1 }}>
-          <KubePkgEditor kubepkg$={kubepkg$} />
-        </Box>
-        <Stack
-          spacing={1}
-          sx={{ width: "36%", height: "70vh", overflow: "hidden" }}
-        >
-          {content(kubepkg$)}
-        </Stack>
-      </Stack>,
-      onConfirm: () => {
-        if (kubepkg$.value) {
-          groupEnvDeployments$.put$.next({
-            groupName: groupEnvDeployments$.groupName,
-            envName: groupEnvDeployments$.envName,
-            body: kubepkg$.value
-          });
-        }
+  const dialog$ = useDialog({
+    title: title(action),
+    action: `${action}`,
+    sx: {
+      "& .MuiDialog-paper": {
+        maxWidth: "98vw",
+        width: "98vw",
+        overflow: "hidden"
       }
     },
-    () => groupEnvDeployments$.put$.pipe(rxMap(() => false))
+    content: (
+      <Stack direction="row" spacing={2} sx={{ height: "80vh" }}>
+        <Box sx={{ width: "64vw", overflow: "auto" }}>
+          <KubePkgEditor
+            kubepkg$={kubepkg$}
+            onSubmit={(kubepkg) => {
+              groupEnvDeployments$.put$.next({
+                groupName: groupEnvDeployments$.groupName,
+                envName: groupEnvDeployments$.envName,
+                body: kubepkg
+              });
+            }}
+          />
+        </Box>
+        <Stack spacing={1} sx={{ flex: 1, overflow: "auto" }}>
+          {content(kubepkg$)}
+        </Stack>
+      </Stack>
+    )
+  });
+
+  useObservableEffect(() =>
+    groupEnvDeployments$.put$.pipe(tap(() => dialog$.next(false)))
   );
 
   return useProxy(groupEnvDeployments$, {

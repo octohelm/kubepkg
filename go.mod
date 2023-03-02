@@ -14,7 +14,7 @@ require (
 	github.com/go-courier/logr v0.1.1
 	github.com/go-courier/snowflakeid v1.2.1
 	github.com/go-logr/logr v1.2.3
-	github.com/go-rod/rod v0.112.2
+	github.com/go-rod/rod v0.112.6
 	github.com/google/uuid v1.3.0
 	github.com/innoai-tech/infra v0.0.0-20230209064224-7873d371b0ba
 	github.com/lestrrat-go/jwx/v2 v2.0.8

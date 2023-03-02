@@ -1,5 +1,6 @@
+import { startsWith } from "@innoai-tech/lodash";
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import { Link as RouterLink, useMatch } from "@nodepkg/router";
+import { Link as RouterLink, useLocation, useMatch } from "@nodepkg/router";
 
 export interface ListItemLinkProps {
   icon?: JSX.Element;
@@ -10,7 +11,9 @@ export interface ListItemLinkProps {
 export const ListItemLink = (props: ListItemLinkProps) => {
   const { icon, title, to } = props;
 
-  const matched = useMatch(to);
+  const location = useLocation();
+
+  const matched = useMatch(to) || startsWith(location.pathname, to);
 
   if (icon) {
     return (
@@ -27,7 +30,7 @@ export const ListItemLink = (props: ListItemLinkProps) => {
   }
 
   return (
-    <ListItem component={RouterLink} to={to} selected={!!matched}>
+    <ListItem component={RouterLink} to={to} selected={!!matched} >
       <ListItemIcon />
       <ListItemText secondary={title} />
     </ListItem>

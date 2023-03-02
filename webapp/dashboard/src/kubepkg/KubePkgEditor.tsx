@@ -1,4 +1,4 @@
-import { isEmpty, omit, pick, pickBy, startsWith } from "@innoai-tech/lodash";
+import { isEmpty, mapValues, omit, pick, pickBy, startsWith } from "@innoai-tech/lodash";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import {
   StateSubject,
@@ -80,6 +80,12 @@ export const KubePkgEditor = ({
       },
       (ref) => get(RawOpenAPI, ref.split("/").slice(1), {}),
       (schema) => {
+        if (schema.type == "object") {
+          return omit(schema, ["required"]);
+        }
+        return schema;
+      },
+      (schema) => {
         if (schema.type === "object") {
           switch (get(schema, "x-go-field-name")) {
             case "ObjectMeta": {
@@ -90,25 +96,21 @@ export const KubePkgEditor = ({
             }
             case "Spec": {
               if (overwritesMode) {
+                const configProps = mapValues(kubepkg.spec.config ?? {}, (_) => ({ "type": "string" }));
+
                 return {
                   type: "object",
                   properties: {
                     ...omit(schema.properties, ["version"]),
                     config: {
-                      // FIXME
-                      type: "object"
+                      type: "object",
+                      properties: configProps
                     }
                   }
                 };
               }
             }
           }
-        }
-        return schema;
-      },
-      (schema) => {
-        if (schema.type == "object") {
-          return omit(schema, ["required"]);
         }
         return schema;
       }
@@ -121,7 +123,7 @@ export const KubePkgEditor = ({
       properties: pick(schema.properties, ["metadata", "spec"]),
       additionalProperties: false
     };
-  }, [overwritesMode]);
+  }, [kubepkg, overwritesMode]);
 
   return (
     <Stack direction={"column"} spacing={2} sx={{ height: "100%", overflow: "hidden" }}>

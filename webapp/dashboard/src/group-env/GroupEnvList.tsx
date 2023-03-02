@@ -144,7 +144,7 @@ export const GroupEnvMenu = () => {
   );
 
   return (
-    <List>
+    <List dense>
       {map(envs, (groupEnv) => {
         return (
           <ListItemLink

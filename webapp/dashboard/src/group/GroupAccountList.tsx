@@ -1,6 +1,6 @@
 import {
   useObservableState,
-  useObservableEffect,
+  useObservableEffect
 } from "@nodepkg/state";
 import {
   Avatar,
@@ -11,7 +11,7 @@ import {
   ListItemAvatar,
   ListItemText,
   MenuItem,
-  Select,
+  Select
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { tap, filter } from "rxjs";
@@ -41,7 +41,7 @@ const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
                   if ((roleType as any) === "-") {
                     account$.del$.next({
                       groupName: account$.groupName,
-                      accountID: user.accountID,
+                      accountID: user.accountID
                     });
                     return;
                   }
@@ -50,8 +50,8 @@ const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
                     groupName: account$.groupName,
                     accountID: user.accountID,
                     body: {
-                      roleType,
-                    },
+                      roleType
+                    }
                   });
                 }}
               >
@@ -62,11 +62,11 @@ const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
                     </MenuItem>
                   )),
                   <AccessControl key={"-"} op={account$.del$}>
-                    <Divider />,
+                    <Divider />
                     <MenuItem key={""} value={"-"}>
                       移除成员
                     </MenuItem>
-                  </AccessControl>,
+                  </AccessControl>
                 ]}
               </Select>
             )}
@@ -94,7 +94,7 @@ const GroupAccountList = () => {
 
   useEffect(() => {
     account$.list$.next({
-      groupName: account$.groupName,
+      groupName: account$.groupName
     });
   }, []);
 
@@ -118,7 +118,7 @@ export const GroupAccountAdd = () => {
   const account$ = GroupAccountProvider.use$();
 
   const accountSearch$ = useAccountAutocomplete({
-    placeholder: "查询并添加成员",
+    placeholder: "查询并添加成员"
   });
 
   useObservableEffect(() =>
@@ -137,8 +137,8 @@ export const GroupAccountAdd = () => {
           groupName: account$.groupName,
           accountID,
           body: {
-            roleType: GroupRoleType.GUEST,
-          },
+            roleType: GroupRoleType.GUEST
+          }
         });
       })
     )

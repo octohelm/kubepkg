@@ -44,8 +44,6 @@ const GlobalDrawer = ({
         }
       }}
     >
-      {/*<Toolbar />*/}
-      {/*<Divider />*/}
       {r.meta.title && (
         <>
           <List>{r.meta.title}</List>
@@ -60,6 +58,7 @@ const GlobalDrawer = ({
                 key={item.path}
                 icon={item.icon}
                 title={item.title}
+                strict={false}
                 to={generatePath(item.path, matched?.params)}
               />
             );
@@ -71,6 +70,7 @@ const GlobalDrawer = ({
                 icon={item.icon}
                 title={item.title}
                 to={generatePath(item.path, matched?.params)}
+                strict
               />
               {item.children.map((sub, i) => {
                 if (sub.menu) {

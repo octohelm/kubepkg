@@ -20,25 +20,26 @@ import {
 } from "@nodepkg/codemirror";
 import { get } from "@innoai-tech/lodash";
 import { useMemo } from "react";
-import { Box, Divider, Stack } from "@mui/material";
+import { Box, Button, Divider, Stack, Tooltip } from "@mui/material";
 import { firstValueFrom, tap } from "rxjs";
 import { RawOpenAPI } from "../client/dashboard";
 import { SchemaVisitor } from "./utils";
-import { IconButtonWithTooltip } from "../layout";
-import { Publish } from "@mui/icons-material";
+import { PublishOutlined } from "@mui/icons-material";
 
 const annotationKubepkgOverwrites = "kubepkg.innoai.tech/overwrites";
 
 export const KubePkgEditor = ({
                                 kubepkg$,
+                                overwrites,
                                 onSubmit
                               }: {
+  overwrites: boolean,
   kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>;
   onSubmit?: (kubepkg: ApisKubepkgV1Alpha1KubePkg) => void
 }) => {
   const kubepkg = useObservableState(kubepkg$);
 
-  const [overwritesMode, jsonCode, overwritesCode] = useMemo(() => {
+  const [hasTemplate, jsonCode, overwritesCode] = useMemo(() => {
     const filtered = pick(kubepkg, ["apiVersion", "kind", "metadata", "spec"]);
 
     return [
@@ -80,7 +81,7 @@ export const KubePkgEditor = ({
       },
       (ref) => get(RawOpenAPI, ref.split("/").slice(1), {}),
       (schema) => {
-        if (schema.type == "object") {
+        if ((overwrites || hasTemplate) && schema.type == "object") {
           return omit(schema, ["required"]);
         }
         return schema;
@@ -95,7 +96,7 @@ export const KubePkgEditor = ({
               };
             }
             case "Spec": {
-              if (overwritesMode) {
+              if (overwrites) {
                 const configProps = mapValues(kubepkg.spec.config ?? {}, (_) => ({ "type": "string" }));
 
                 return {
@@ -123,7 +124,7 @@ export const KubePkgEditor = ({
       properties: pick(schema.properties, ["metadata", "spec"]),
       additionalProperties: false
     };
-  }, [kubepkg, overwritesMode]);
+  }, [kubepkg, hasTemplate, overwrites]);
 
   return (
     <Stack direction={"column"} spacing={2} sx={{ height: "100%", overflow: "hidden" }}>
@@ -137,7 +138,7 @@ export const KubePkgEditor = ({
           />
         </EditorContextProvider>
       </Box>
-      {overwritesMode && (
+      {hasTemplate && (
         <>
           <Divider />
           <Box sx={{ height: "32vh" }}>
@@ -231,15 +232,18 @@ const TemplateOverwrites = ({
       <EditorContainer />
       {onSubmit && (
         <Box sx={{ position: "absolute", bottom: 0, right: 0 }}>
-          <IconButtonWithTooltip
-            title={`提交 ${p.os.mac ? "Cmd" : "Ctrl"}+Enter`}
-            onClick={async () => {
-              const view = await firstValueFrom(editorContext.view$);
-              view && execute(view);
-            }}
-          >
-            <Publish />
-          </IconButtonWithTooltip>
+          <Tooltip title={`${p.os.mac ? "Cmd" : "Ctrl"}+Enter`}>
+            <Button
+              variant="contained"
+              startIcon={<PublishOutlined />}
+              onClick={async () => {
+                const view = await firstValueFrom(editorContext.view$);
+                view && execute(view);
+              }}
+            >
+              提交
+            </Button>
+          </Tooltip>
         </Box>
       )}
     </>

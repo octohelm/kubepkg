@@ -225,6 +225,7 @@ export const useGroupEnvDeploymentFormWithDialog = (
       <Stack direction="row" spacing={2} sx={{ height: "80vh" }}>
         <Box sx={{ width: "64vw", overflow: "auto" }}>
           <KubePkgEditor
+            overwrites={!!kubepkg}
             kubepkg$={kubepkg$}
             onSubmit={(kubepkg) => {
               groupEnvDeployments$.put$.next({

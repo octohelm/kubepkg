@@ -1,4 +1,9 @@
-import { useStateSubject, useRequest, Subscribe } from "@nodepkg/state";
+import {
+  useStateSubject,
+  useObservableEffect,
+  useRequest,
+  Subscribe
+} from "@nodepkg/state";
 import {
   Popover,
   CircularProgress,
@@ -7,59 +12,67 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Select,
+  Select
 } from "@mui/material";
-import { filter, map as rxMap, tap, debounceTime } from "rxjs";
+import { filter, map as rxMap, tap, debounceTime, merge } from "rxjs";
 import { Add } from "@mui/icons-material";
-import { Group, Kubepkg, listGroup, listKubepkg } from "../client/dashboard";
-import { useEpics, useProxy } from "../layout";
+import {
+  Group,
+  GroupType,
+  Kubepkg,
+  listGroup,
+  listKubepkg
+} from "../client/dashboard";
+import { useProxy } from "../layout";
 import { useEffect, useRef } from "react";
 import { Search, SearchIcon, SearchInput } from "../layout/SearchInput";
 import { map } from "@innoai-tech/lodash";
 
 export const useKubePkgAutocomplete = ({
-  placeholder = "请输入 KubePkg 名称查询",
-  groupName,
-}: {
+                                         placeholder = "请输入 KubePkg 名称查询",
+                                         groupName
+                                       }: {
   placeholder?: string;
   groupName?: string;
 }) => {
   const selected$ = useStateSubject({
     groupName: groupName || "",
-    kubePkgName: "",
+    kubePkgName: ""
   });
   const inputValue$ = useStateSubject("");
   const popper$ = useStateSubject(false);
 
   const listGroup$ = useRequest(listGroup);
-  const listKubePkg$ = useRequest(listKubepkg);
+  const listKubepkg$ = useRequest(listKubepkg);
 
   const groupList$ = useStateSubject([] as Group[]);
   const kubepkgList$ = useStateSubject([] as Kubepkg[]);
 
-  useEpics(groupList$, () => {
-    return listGroup$.pipe(rxMap((resp) => resp.body || []));
-  });
-
-  useEpics(
-    kubepkgList$,
-    (_) =>
-      listKubePkg$.pipe(
-        rxMap((resp) => resp.body || []),
-        tap(() => popper$.next(true))
+  useObservableEffect(() =>
+    merge(
+      listGroup$.pipe(
+        rxMap((resp) =>
+          (resp.body || []).filter((g) => g.type == GroupType.DEVELOP)
+        ),
+        tap((list) => groupList$.next(list))
       ),
-    (_) =>
       inputValue$.pipe(
         filter((inputValue) => inputValue.length >= 2),
         debounceTime(300),
         tap((inputValue) =>
-          listKubePkg$.next({
+          listKubepkg$.next({
             groupName: selected$.value.groupName,
-            name: [inputValue],
+            name: [inputValue]
           })
         ),
-        rxMap(() => [])
+        tap(() => kubepkgList$.next([]))
+      ),
+      listKubepkg$.pipe(
+        rxMap((resp) => resp.body || []),
+        tap((list) => kubepkgList$.next(list)),
+        tap(() => popper$.next(true))
       )
+    )
   );
 
   useEffect(() => {
@@ -84,7 +97,7 @@ export const useKubePkgAutocomplete = ({
                     onChange={(evt) => {
                       selected$.next({
                         groupName: evt.target.value,
-                        kubePkgName: "",
+                        kubePkgName: ""
                       });
                     }}
                   >
@@ -123,7 +136,7 @@ export const useKubePkgAutocomplete = ({
               </Subscribe>
             )}
           </Subscribe>
-          <Subscribe value$={listKubePkg$.requesting$}>
+          <Subscribe value$={listKubepkg$.requesting$}>
             {(requesting) =>
               requesting ? (
                 <SearchIcon>
@@ -140,7 +153,7 @@ export const useKubePkgAutocomplete = ({
                   anchorEl={anchorElRef.current}
                   anchorOrigin={{
                     vertical: "bottom",
-                    horizontal: "left",
+                    horizontal: "left"
                   }}
                   onClose={() => {
                     popper$.next(false);
@@ -150,7 +163,7 @@ export const useKubePkgAutocomplete = ({
                 >
                   <MenuList
                     style={{
-                      width: anchorElRef.current?.getBoundingClientRect().width,
+                      width: anchorElRef.current?.getBoundingClientRect().width
                     }}
                   >
                     <Subscribe value$={kubepkgList$}>
@@ -165,7 +178,7 @@ export const useKubePkgAutocomplete = ({
                                 onClick={() => {
                                   selected$.next({
                                     groupName: kubepkg.group,
-                                    kubePkgName: kubepkg.name,
+                                    kubePkgName: kubepkg.name
                                   });
                                   inputValue$.next("");
                                 }}
@@ -189,6 +202,6 @@ export const useKubePkgAutocomplete = ({
           </Subscribe>
         </Search>
       );
-    },
+    }
   });
 };

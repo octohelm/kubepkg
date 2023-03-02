@@ -81,7 +81,7 @@ func TestGroupEnvDeploymentRepository(t *testing.T) {
 				t.Run("then could be list", func(t *testing.T) {
 					list, err := repo.ListKubepkg(ctx, nil)
 					testingutil.Expect(t, err, testingutil.Be[error](nil))
-					testingutil.Expect(t, len(list.Data), testingutil.Be(1))
+					testingutil.Expect(t, len(list.Items), testingutil.Be(1))
 
 					t.Run("update settings", func(t *testing.T) {
 						newSettings := map[string]any{
@@ -101,7 +101,7 @@ func TestGroupEnvDeploymentRepository(t *testing.T) {
 							historyList, err := repo.ListKubePkgHistory(ctx, settingV2.DeploymentID, nil)
 							testingutil.Expect(t, err, testingutil.Be[error](nil))
 							testingutil.Expect(t, len(historyList), testingutil.Be(2))
-							testingutil.Expect(t, listV2.Data[0].Annotations, testingutil.Equal(historyList[0].Annotations))
+							testingutil.Expect(t, listV2.Items[0].Annotations, testingutil.Equal(historyList[0].Annotations))
 						})
 					})
 				})

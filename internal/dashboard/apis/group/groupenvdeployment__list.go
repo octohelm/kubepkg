@@ -47,10 +47,10 @@ func (p *ListGroupEnvDeployment) Output(ctx context.Context) (any, error) {
 		return list, nil
 	}
 
-	for i := range list.Data {
-		kpkg, err := specutil.ApplyOverwrites(list.Data[i])
+	for i := range list.Items {
+		kpkg, err := specutil.ApplyOverwrites(&list.Items[i])
 		if err == nil {
-			list.Data[i] = kpkg
+			list.Items[i] = *kpkg
 		}
 	}
 

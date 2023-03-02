@@ -35,7 +35,7 @@ func (s *GroupEnvDeploymentService) ListKubePkgHistory(ctx context.Context, depl
 	return s.groupEnvDeploymentRepo.ListKubePkgHistory(ctx, deploymentID, pager)
 }
 
-func (s *GroupEnvDeploymentService) ListKubePkg(ctx context.Context, pager *datatypes.Pager) (*group.DeploymentDataList, error) {
+func (s *GroupEnvDeploymentService) ListKubePkg(ctx context.Context, pager *datatypes.Pager) (*v1alpha1.KubePkgList, error) {
 	return s.groupEnvDeploymentRepo.ListKubepkg(ctx, pager)
 }
 

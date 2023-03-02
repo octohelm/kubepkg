@@ -96,7 +96,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
       groupEnvDeployments$.list$.pipe(
         rxMap((resp) =>
           reduce(
-            resp.body.data,
+            resp.body.items,
             (ret, kpkg) => ({
               ...ret,
               [deploymentID(kpkg)]: kpkg

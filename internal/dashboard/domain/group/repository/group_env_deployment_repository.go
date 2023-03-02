@@ -156,7 +156,7 @@ func (r *GroupEnvDeploymentRepository) RecordDeployment(ctx context.Context, dep
 	return deploymentHistory, nil
 }
 
-func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *datatypes.Pager) (*group.DeploymentDataList, error) {
+func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *datatypes.Pager) (*v1alpha1.KubePkgList, error) {
 	if pager == nil {
 		pager = &datatypes.Pager{}
 	}
@@ -287,9 +287,17 @@ func (r *GroupEnvDeploymentRepository) ListKubepkg(ctx context.Context, pager *d
 		return nil, err
 	}
 
-	return &group.DeploymentDataList{
-		Data: ltr.List(),
-	}, nil
+	items := ltr.List()
+	list := &v1alpha1.KubePkgList{
+		Items: make([]v1alpha1.KubePkg, len(items)),
+	}
+	list.SetGroupVersionKind(v1alpha1.SchemeGroupVersion.WithKind("KubePkgList"))
+
+	for i := range items {
+		list.Items[i] = *items[i]
+	}
+
+	return list, nil
 }
 
 func (r *GroupEnvDeploymentRepository) ListKubePkgHistory(ctx context.Context, deploymentID group.DeploymentID, pager *datatypes.Pager) ([]*v1alpha1.KubePkg, error) {

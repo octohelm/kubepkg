@@ -5,7 +5,28 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+# [0.3.0](https://github.com/octohelm/kubepkg/compare/v0.2.0...v0.3.0)
+
+### Bug Fixes
+
+* **fix(webapp/dashboard):** entry with gap ([d4a24ef](https://github.com/octohelm/kubepkg/commit/d4a24ef897992ed4b488e938ba67ef624c7d87f8))
+* **fix** spec volume must be unique ([85356f9](https://github.com/octohelm/kubepkg/commit/85356f9fac43981fcc2a70f46dd02960d8d12fb5))
+* **fix(dashboard):** deployment history recording fix ([640b496](https://github.com/octohelm/kubepkg/commit/640b4968efec32c4924e9575814741cb26719b7c))
+* **fix(dashboard):** setting decoded should skip empty setting ([cb2c10c](https://github.com/octohelm/kubepkg/commit/cb2c10c6088c3a3eba5183047adc109220dd5652))
+* **fix(operator):** crd schema fix ([e3c3135](https://github.com/octohelm/kubepkg/commit/e3c31357015652077a94a410b420f62f3c4a0a3a))
+* **fix** should match channel ([e2dd14a](https://github.com/octohelm/kubepkg/commit/e2dd14a729c7f9a0d1ad73453a355c1a37970ad3))
+* **fix** ListKubepkg should use latest created ([53a7ed0](https://github.com/octohelm/kubepkg/commit/53a7ed0f933ede9c63cd1f1e964670a6867164cb))
+* **fix** MonacoEditor should use npm package ([7dba11c](https://github.com/octohelm/kubepkg/commit/7dba11c747f3eb9afafbd080aa2b39a3dd49fafe))
+
+
+### Features
+
+* **feat(dashboard):** deployment history ([754f5d3](https://github.com/octohelm/kubepkg/commit/754f5d32268da05dcd91eec6553938a08935ac7c))
+
+
+
 # [0.1.3](https://github.com/octohelm/kubepkg/compare/v0.1.2...v0.1.3)
+
 
 
 # [0.1.2](https://github.com/octohelm/kubepkg/compare/v0.1.1...v0.1.2)

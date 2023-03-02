@@ -11,12 +11,12 @@ export const IconButtonWithTooltip = forwardRef(
     D extends React.ElementType = IconButtonTypeMap["defaultComponent"],
     P extends {} = {}
   >(
-    { label, children, ...props }: IconButtonProps<D, P & { label: string }>,
+    { title, children, ...props }: IconButtonProps<D, P & { title: string }>,
     ref: any
   ) => {
     return (
-      <Tooltip title={label}>
-        <IconButton ref={ref} size="normal" aria-label={label} {...props}>
+      <Tooltip title={title}>
+        <IconButton ref={ref} size="normal" aria-label={title} {...props}>
           {children}
         </IconButton>
       </Tooltip>

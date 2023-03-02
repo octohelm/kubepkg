@@ -104,7 +104,7 @@ const GroupRobotListItem = ({ robot }: { robot: GroupRobot }) => {
           <AccessControl op={token$}>
             <IconButtonWithTooltip
               edge="end"
-              label={token$.dialog$.title}
+              title={token$.dialog$.title}
               onClick={() => {
                 token$.refresh$.next({
                   groupName: group$.value.name,
@@ -169,7 +169,7 @@ const GroupRobotMainToolbar = () => {
   return (
     <AccessControl op={form$}>
       <IconButtonWithTooltip
-        label={form$.dialog$.title}
+        title={form$.dialog$.title}
         size="large"
         color={"inherit"}
         onClick={() => form$.dialog$.next(true)}

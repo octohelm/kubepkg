@@ -4,6 +4,7 @@ export * from "./FormControl";
 export * from "./Dialog";
 export * from "./Menu";
 export * from "./Button";
+export * from "./Label";
 export * from "./Avatar";
 export * from "./Scaffold";
 export * from "./Notification";

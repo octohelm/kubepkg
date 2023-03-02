@@ -283,8 +283,14 @@ export const getClusterStatus = /*#__PURE__*/ createRequest<
   url: `/api/kubepkg-dashboard/v0/clusters/${path_name}/status`,
 }));
 
+export enum GroupType {
+  DEVELOP = "DEVELOP",
+  DEPLOYMENT = "DEPLOYMENT",
+}
+
 export interface GroupInfo {
   desc?: string;
+  type: keyof typeof GroupType;
 }
 
 export interface Group
@@ -301,6 +307,16 @@ export const listGroup = /*#__PURE__*/ createRequest<void, Array<Group>>(
     url: "/api/kubepkg-dashboard/v0/groups",
   })
 );
+
+export const delGroup = /*#__PURE__*/ createRequest<
+  {
+    groupName: string;
+  },
+  null
+>("dashboard.DelGroup", ({ groupName: path_groupName }) => ({
+  method: "DELETE",
+  url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}`,
+}));
 
 export const getGroup = /*#__PURE__*/ createRequest<
   {
@@ -837,9 +853,16 @@ export const bindGroupEnvCluster = /*#__PURE__*/ createRequest<
   })
 );
 
-export interface GroupDeploymentDataList {
-  data: Array<ApisKubepkgV1Alpha1KubePkg>;
-  total?: number;
+export interface ApisMetaV1ListMeta {
+  continue?: string;
+  remainingItemCount?: number;
+  resourceVersion?: string;
+  selfLink?: string;
+}
+
+export interface ApisKubepkgV1Alpha1KubePkgList extends ApisMetaV1TypeMeta {
+  items: Array<ApisKubepkgV1Alpha1KubePkg>;
+  metadata?: ApisMetaV1ListMeta;
 }
 
 export const listGroupEnvDeployment = /*#__PURE__*/ createRequest<
@@ -850,7 +873,7 @@ export const listGroupEnvDeployment = /*#__PURE__*/ createRequest<
     size?: number;
     offset?: number;
   },
-  GroupDeploymentDataList
+  ApisKubepkgV1Alpha1KubePkgList
 >(
   "dashboard.ListGroupEnvDeployment",
   ({
@@ -1713,6 +1736,33 @@ export const RawOpenAPI = {
       },
     },
     "/api/kubepkg-dashboard/v0/groups/{groupName}": {
+      delete: {
+        tags: ["group"],
+        operationId: "DelGroup",
+        parameters: [
+          {
+            name: "Authorization",
+            in: "header",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+          {
+            name: "groupName",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "",
+          },
+        },
+      },
       get: {
         tags: ["group"],
         operationId: "GetGroup",
@@ -2291,7 +2341,7 @@ export const RawOpenAPI = {
             content: {
               "application/json": {
                 schema: {
-                  $ref: "#/components/schemas/GroupDeploymentDataList",
+                  $ref: "#/components/schemas/ApisKubepkgV1Alpha1KubePkgList",
                 },
               },
             },
@@ -3455,6 +3505,37 @@ export const RawOpenAPI = {
         "x-go-vendor-type":
           "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.KubePkg",
       },
+      ApisKubepkgV1Alpha1KubePkgList: {
+        allOf: [
+          {
+            $ref: "#/components/schemas/ApisMetaV1TypeMeta",
+          },
+          {
+            type: "object",
+            properties: {
+              items: {
+                type: "array",
+                items: {
+                  $ref: "#/components/schemas/ApisKubepkgV1Alpha1KubePkg",
+                },
+                "x-go-field-name": "Items",
+              },
+              metadata: {
+                allOf: [
+                  {
+                    $ref: "#/components/schemas/ApisMetaV1ListMeta",
+                  },
+                ],
+                "x-go-field-name": "ListMeta",
+              },
+            },
+            required: ["items"],
+          },
+        ],
+        description: "KubePkgList",
+        "x-go-vendor-type":
+          "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.KubePkgList",
+      },
       ApisKubepkgV1Alpha1Manifests: {
         type: "object",
         additionalProperties: {},
@@ -3723,6 +3804,31 @@ export const RawOpenAPI = {
       ApisMetaV1FieldsV1: {
         type: "object",
         "x-go-vendor-type": "k8s.io/apimachinery/pkg/apis/meta/v1.FieldsV1",
+      },
+      ApisMetaV1ListMeta: {
+        type: "object",
+        properties: {
+          continue: {
+            type: "string",
+            "x-go-field-name": "Continue",
+          },
+          remainingItemCount: {
+            type: "integer",
+            format: "int64",
+            nullable: true,
+            "x-go-field-name": "RemainingItemCount",
+            "x-go-star-level": 1,
+          },
+          resourceVersion: {
+            type: "string",
+            "x-go-field-name": "ResourceVersion",
+          },
+          selfLink: {
+            type: "string",
+            "x-go-field-name": "SelfLink",
+          },
+        },
+        "x-go-vendor-type": "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta",
       },
       ApisMetaV1ManagedFieldsEntry: {
         type: "object",
@@ -4269,24 +4375,6 @@ export const RawOpenAPI = {
           },
         ],
       },
-      GroupDeploymentDataList: {
-        type: "object",
-        properties: {
-          data: {
-            type: "array",
-            items: {
-              $ref: "#/components/schemas/ApisKubepkgV1Alpha1KubePkg",
-            },
-            "x-go-field-name": "Data",
-          },
-          total: {
-            type: "integer",
-            format: "int32",
-            "x-go-field-name": "Total",
-          },
-        },
-        required: ["data"],
-      },
       GroupDeploymentId: {
         type: "string",
       },
@@ -4400,7 +4488,17 @@ export const RawOpenAPI = {
             description: "组织描述",
             "x-go-field-name": "Desc",
           },
+          type: {
+            allOf: [
+              {
+                $ref: "#/components/schemas/GroupType",
+              },
+            ],
+            description: "组织类型",
+            "x-go-field-name": "Type",
+          },
         },
+        required: ["type"],
       },
       GroupRefreshGroupRobotTokenData: {
         allOf: [
@@ -4470,6 +4568,11 @@ export const RawOpenAPI = {
         type: "string",
         enum: ["OWNER", "ADMIN", "MEMBER", "GUEST"],
         "x-enum-labels": ["拥有者", "管理员", "成员", "访问者"],
+      },
+      GroupType: {
+        type: "string",
+        enum: ["DEVELOP", "DEPLOYMENT"],
+        "x-enum-labels": ["研发", "交付组"],
       },
       GroupUser: {
         allOf: [

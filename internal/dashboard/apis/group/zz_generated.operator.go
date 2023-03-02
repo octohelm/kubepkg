@@ -30,6 +30,14 @@ func (*CreateGroupRobot) ResponseContent() any {
 }
 
 func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&DelGroup{}))
+}
+
+func (*DelGroup) ResponseContent() any {
+	return nil
+}
+
+func init() {
 	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&DeleteGroupAccount{}))
 }
 
@@ -92,7 +100,7 @@ func init() {
 }
 
 func (*ListGroupEnvDeployment) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.DeploymentDataList{}
+	return &github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkgList{}
 }
 
 func init() {

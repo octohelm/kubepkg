@@ -613,6 +613,7 @@ type tableGroup struct {
 	table     github_com_octohelm_storage_pkg_sqlbuilder.Table
 	ID        github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[ID]
 	Name      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
+	Type      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[Type]
 	Desc      github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[string]
 	CreatedAt github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.Timestamp]
 	UpdatedAt github_com_octohelm_storage_pkg_sqlbuilder.TypedColumn[github_com_octohelm_storage_pkg_datatypes.Timestamp]
@@ -627,6 +628,7 @@ type indexNameOfGroup struct {
 var GroupT = &tableGroup{
 	ID:        github_com_octohelm_storage_pkg_sqlbuilder.CastCol[ID](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Group{}).F("ID")),
 	Name:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Group{}).F("Name")),
+	Type:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[Type](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Group{}).F("Type")),
 	Desc:      github_com_octohelm_storage_pkg_sqlbuilder.CastCol[string](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Group{}).F("Desc")),
 	CreatedAt: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.Timestamp](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Group{}).F("CreatedAt")),
 	UpdatedAt: github_com_octohelm_storage_pkg_sqlbuilder.CastCol[github_com_octohelm_storage_pkg_datatypes.Timestamp](github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Group{}).F("UpdatedAt")),

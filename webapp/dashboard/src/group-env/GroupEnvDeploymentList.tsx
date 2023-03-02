@@ -539,7 +539,7 @@ export const GroupEnvDeploymentExport = () => {
 
   return (
     <IconButtonWithTooltip
-      label={"导出配置"}
+      title={"导出配置"}
       onClick={() => {
         window.open(groupEnvDeployments$.list$.toHref({
           groupName: groupEnvDeployments$.groupName,

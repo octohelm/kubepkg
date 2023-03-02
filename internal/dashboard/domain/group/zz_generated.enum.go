@@ -207,3 +207,93 @@ func (v *RoleType) Scan(src any) error {
 	*v = RoleType(i)
 	return nil
 }
+
+var InvalidType = github_com_pkg_errors.New("invalid Type")
+
+func (Type) EnumValues() []any {
+	return []any{
+		TYPE__DEVELOP, TYPE__DEPLOYMENT,
+	}
+}
+func (v Type) MarshalText() ([]byte, error) {
+	str := v.String()
+	if str == "UNKNOWN" {
+		return nil, InvalidType
+	}
+	return []byte(str), nil
+}
+
+func (v *Type) UnmarshalText(data []byte) error {
+	vv, err := ParseTypeFromString(string(bytes.ToUpper(data)))
+	if err != nil {
+		return err
+	}
+	*v = vv
+	return nil
+}
+
+func ParseTypeFromString(s string) (Type, error) {
+	switch s {
+	case "DEVELOP":
+		return TYPE__DEVELOP, nil
+	case "DEPLOYMENT":
+		return TYPE__DEPLOYMENT, nil
+
+	}
+	return TYPE_UNKNOWN, InvalidType
+}
+
+func (v Type) String() string {
+	switch v {
+	case TYPE__DEVELOP:
+		return "DEVELOP"
+	case TYPE__DEPLOYMENT:
+		return "DEPLOYMENT"
+
+	}
+	return "UNKNOWN"
+}
+
+func ParseTypeLabelString(label string) (Type, error) {
+	switch label {
+	case "研发":
+		return TYPE__DEVELOP, nil
+	case "交付组":
+		return TYPE__DEPLOYMENT, nil
+
+	}
+	return TYPE_UNKNOWN, InvalidType
+}
+
+func (v Type) Label() string {
+	switch v {
+	case TYPE__DEVELOP:
+		return "研发"
+	case TYPE__DEPLOYMENT:
+		return "交付组"
+
+	}
+	return "UNKNOWN"
+}
+
+func (v Type) Value() (database_sql_driver.Value, error) {
+	offset := 0
+	if o, ok := any(v).(github_com_octohelm_storage_pkg_enumeration.DriverValueOffset); ok {
+		offset = o.Offset()
+	}
+	return int64(v) + int64(offset), nil
+}
+
+func (v *Type) Scan(src any) error {
+	offset := 0
+	if o, ok := any(v).(github_com_octohelm_storage_pkg_enumeration.DriverValueOffset); ok {
+		offset = o.Offset()
+	}
+
+	i, err := github_com_octohelm_storage_pkg_enumeration.ScanIntEnumStringer(src, offset)
+	if err != nil {
+		return err
+	}
+	*v = Type(i)
+	return nil
+}

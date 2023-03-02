@@ -110,7 +110,7 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
             <AccessControl op={clusterRenameForm$}>
               <IconButtonWithTooltip
                 edge="end"
-                label="重命名"
+                title="重命名"
                 onClick={() => clusterRenameForm$.dialog$.next(true)}
               >
                 <DriveFileRenameOutlineOutlined />
@@ -120,7 +120,7 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
             <AccessControl op={clusterForm$}>
               <IconButtonWithTooltip
                 edge="end"
-                label="设置"
+                title="设置"
                 onClick={() => clusterForm$.dialog$.next(true)}
               >
                 <SettingsOutlined />
@@ -212,7 +212,7 @@ const ClusterMainToolbar = () => {
   return (
     <AccessControl op={clusterForm$}>
       <IconButtonWithTooltip
-        label={"创建集群"}
+        title={"创建集群"}
         size="large"
         color="inherit"
         onClick={() => clusterForm$.dialog$.next(true)}

@@ -79,7 +79,7 @@ export const GroupEnvCluster = () => {
               </Box>
               <AccessControl op={groupEnv$.bindCluster$}>
                 <IconButtonWithTooltip
-                  label="关联集群"
+                  title="关联集群"
                   onClick={() => bindDialog$.next(true)}
                 >
                   <Link />
@@ -98,7 +98,7 @@ export const GroupEnvCluster = () => {
             </Box>
             <AccessControl op={groupEnv$.unbindCluster$}>
               <IconButtonWithTooltip
-                label="解绑集群"
+                title="解绑集群"
                 onClick={() => unbindDialog$.next(true)}
               >
                 <LinkOff />

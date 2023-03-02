@@ -20,9 +20,20 @@ type Group struct {
 }
 
 type Info struct {
+	// 组织类型
+	Type Type `db:"f_group_type,default=1" json:"type"`
 	// 组织描述
 	Desc string `db:"f_group_desc,default=''" json:"desc,omitempty"`
 }
+
+// +gengo:enum
+type Type uint8
+
+const (
+	TYPE_UNKNOWN     Type = iota
+	TYPE__DEVELOP         // 研发
+	TYPE__DEPLOYMENT      // 交付组
+)
 
 type ID uint64
 

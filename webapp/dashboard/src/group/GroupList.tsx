@@ -1,75 +1,73 @@
 import {
   useObservableState,
+  useMemoObservable,
   useRequest,
   useStateSubject,
-  useObservableEffect,
+  useObservableEffect
 } from "@nodepkg/state";
-import { GroupAddOutlined, SettingsOutlined } from "@mui/icons-material";
+import { DeleteOutlined, GroupAddOutlined, SettingsOutlined } from "@mui/icons-material";
 import {
-  Avatar,
-  Box,
-  Divider,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
+  Stack
 } from "@mui/material";
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { Group, listGroup } from "../client/dashboard";
-import { useGroupFormWithDialog } from "./GroupForm";
-import { Slot, Scaffold, stringAvatar } from "../layout";
-import { tap } from "rxjs";
+import { useGroupDelDialog, useGroupPutDialog } from "./GroupForm";
+import { Slot, Scaffold } from "../layout";
+import { map, merge, tap } from "rxjs";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
+import { GroupCard } from "./GroupCard";
+import { isEmpty } from "@innoai-tech/lodash";
 
-const GroupListItem = ({ group: initialGroup }: { group: Group }) => {
+const GroupSettings = ({ group: initialGroup }: { group: Group }) => {
   const group$ = useStateSubject(initialGroup);
 
-  const form$ = useGroupFormWithDialog(initialGroup);
+  const put$ = useGroupPutDialog(initialGroup);
+  const del$ = useGroupDelDialog({ groupName: initialGroup.name });
 
-  useObservableEffect(() =>
-    form$.post$.pipe(
+  useObservableEffect(() => merge(
+    del$.pipe(tap(() => {
+      group$.next({} as any);
+    })),
+    put$.pipe(
       tap((resp) => {
         group$.next((group) => ({
           ...group,
-          ...resp.body,
+          ...resp.body
         }));
       })
     )
-  );
+  ));
 
-  const group = useObservableState(group$);
-
-  return (
-    <>
-      <ListItem
-        secondaryAction={
-          <AccessControl op={form$}>
+  const groupElements$ = useMemoObservable(() => group$.pipe(map((group) => isEmpty(group) ? null : (
+    <GroupCard
+      group={group}
+      actions={(
+        <>
+          <AccessControl op={put$}>
             <IconButtonWithTooltip
-              edge="end"
-              label="设置"
-              onClick={() => form$.dialog$.next(true)}
+              title="设置"
+              onClick={() => put$.dialog$.next(true)}
             >
               <SettingsOutlined />
             </IconButtonWithTooltip>
-            <Slot elem$={form$.dialog$.elements$} />
+            <Slot elem$={put$.dialog$.elements$} />
           </AccessControl>
-        }
-      >
-        <ListItemAvatar>
-          <Avatar variant="rounded">{stringAvatar(group.name)}</Avatar>
-        </ListItemAvatar>
-        <ListItemText
-          primary={<Box>{`${group.name}`}</Box>}
-          secondary={
-            <Box component="span" sx={{ display: "inline" }}>
-              {group.desc}
-            </Box>
-          }
-        />
-      </ListItem>
-    </>
-  );
+          <AccessControl op={del$}>
+            <IconButtonWithTooltip
+              title="删除"
+              onClick={() => del$.dialog$.next(true)}
+            >
+              <DeleteOutlined />
+            </IconButtonWithTooltip>
+            <Slot elem$={del$.dialog$.elements$} />
+          </AccessControl>
+        </>
+      )}
+    />
+  ))));
+
+  return <Slot elem$={groupElements$} />;
 };
 
 const GroupList = () => {
@@ -86,26 +84,26 @@ const GroupList = () => {
   }
 
   return (
-    <List>
-      {resp.body?.map((group, i) => {
+    <Stack direction={"row"} spacing={0} sx={{ flexWrap: "wrap", gap: 2 }}>
+      {resp.body?.map((group) => {
         return (
-          <Fragment key={group.groupID}>
-            {i > 0 && <Divider component="li" />}
-            <GroupListItem group={group} />
-          </Fragment>
+          <GroupSettings
+            key={group.groupID}
+            group={group}
+          />
         );
       })}
-    </List>
+    </Stack>
   );
 };
 
 const GroupMainToolbar = () => {
-  const form$ = useGroupFormWithDialog();
+  const form$ = useGroupPutDialog();
 
   return (
     <AccessControl op={form$}>
       <IconButtonWithTooltip
-        label={"创建组织"}
+        title={"创建组织"}
         size="large"
         color={"inherit"}
         onClick={() => form$.dialog$.next(true)}

@@ -301,6 +301,10 @@ func (ID) RuntimeDoc(names ...string) ([]string, bool) {
 func (v Info) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
+		case "Type":
+			return []string{
+				"组织类型",
+			}, true
 		case "Desc":
 			return []string{
 				"组织描述",
@@ -398,6 +402,9 @@ func (v RoleInfo) RuntimeDoc(names ...string) ([]string, bool) {
 }
 
 func (RoleType) RuntimeDoc(names ...string) ([]string, bool) {
+	return []string{}, true
+}
+func (Type) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 func (v User) RuntimeDoc(names ...string) ([]string, bool) {

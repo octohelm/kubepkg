@@ -232,7 +232,7 @@ const TemplateOverwrites = ({
       {onSubmit && (
         <Box sx={{ position: "absolute", bottom: 0, right: 0 }}>
           <IconButtonWithTooltip
-            label={`提交 ${p.os.mac ? "Cmd" : "Ctrl"}+Enter`}
+            title={`提交 ${p.os.mac ? "Cmd" : "Ctrl"}+Enter`}
             onClick={async () => {
               const view = await firstValueFrom(editorContext.view$);
               view && execute(view);

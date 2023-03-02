@@ -40,6 +40,7 @@ func (GroupRepository) Put(ctx context.Context, name string, info group.Info) (*
 		OnConflict(group.GroupT.I.IGroupName).
 		DoUpdateSet(
 			group.GroupT.Desc,
+			group.GroupT.Type,
 		).
 		Returning(
 			group.GroupT.ID,
@@ -78,6 +79,7 @@ func (GroupRepository) List(ctx context.Context, where sqlbuilder.SqlExpr) ([]*g
 
 	err := dal.From(group.GroupT).
 		Where(where).
+		OrderBy(sqlbuilder.AscOrder(group.GroupT.Name)).
 		Scan(dal.Recv(func(g *group.Group) error {
 			list = append(list, g)
 			return nil

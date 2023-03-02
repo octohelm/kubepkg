@@ -60,7 +60,7 @@ const GroupEnvListItem = ({
         <AccessControl op={form$}>
           <IconButtonWithTooltip
             edge="end"
-            label="设置"
+            title="设置"
             onClick={(e: any) => {
               e.stopPropagation();
               form$.dialog$.next(true);
@@ -122,7 +122,7 @@ const GroupMainToolbar = () => {
   return (
     <AccessControl op={form$}>
       <IconButtonWithTooltip
-        label={"创建环境"}
+        title={"创建环境"}
         size="large"
         color="inherit"
         onClick={() => form$.dialog$.next(true)}

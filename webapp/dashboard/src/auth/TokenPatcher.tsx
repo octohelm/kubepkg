@@ -1,9 +1,8 @@
 import { applyRequestInterceptors, RequestConfig } from "@innoai-tech/fetcher";
-import { get, has, set } from "@innoai-tech/lodash";
+import { has, set } from "@innoai-tech/lodash";
 import { FetcherProvider, useFetcher } from "@nodepkg/state";
 import { useMemo, ReactNode } from "react";
 import { TokenProvider } from "./domain";
-
 
 const AuthorizationInQuery = "x-param-header-Authorization";
 

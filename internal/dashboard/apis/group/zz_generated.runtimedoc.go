@@ -43,6 +43,19 @@ func (v CreateGroupRobot) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v DelGroup) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "GroupName":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v DeleteGroupAccount) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -121,6 +134,8 @@ func (v ListGroupEnvClusterDeployments) RuntimeDoc(names ...string) ([]string, b
 func (v ListGroupEnvDeployment) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
+		case "Raw":
+			return []string{}, true
 		case "Pager":
 			return []string{}, true
 

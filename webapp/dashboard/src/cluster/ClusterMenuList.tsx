@@ -38,7 +38,7 @@ export const ClusterMenuList = ({
               secondaryAction={
                 <IconButtonWithTooltip
                   edge="end"
-                  label="选择集群"
+                  title="选择集群"
                   onClick={() => onSelect(cluster.clusterID)}
                 >
                   <AddCircleOutlined />

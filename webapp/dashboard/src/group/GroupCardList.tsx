@@ -1,37 +1,9 @@
 import { useObservableState, useRequest } from "@nodepkg/state";
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Stack,
-  Typography,
-} from "@mui/material";
 import { Fragment, useEffect } from "react";
-import { Link } from "@nodepkg/router";
-import { Group, listGroup } from "../client/dashboard";
-
-export const GroupCard = ({ group }: { group: Group }) => {
-  return (
-    <Card sx={{ minWidth: 280 }}>
-      <CardContent>
-        <Typography gutterBottom={true} variant="h5" component="div">
-          {group.name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {group.desc}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Box flex={1} />
-        <Button component={Link} to={`/groups/${group.name}`}>
-          访问
-        </Button>
-      </CardActions>
-    </Card>
-  );
-};
+import { GroupType, listGroup } from "../client/dashboard";
+import { map } from "@innoai-tech/lodash";
+import { GroupCard } from "./GroupCard";
+import { Stack } from "@mui/material";
 
 export const GroupCardList = () => {
   const listGroup$ = useRequest(listGroup);
@@ -47,12 +19,18 @@ export const GroupCardList = () => {
   }
 
   return (
-    <Stack direction="row" spacing={0} sx={{ flexWrap: "wrap", gap: 2 }}>
-      {resp.body?.map((group) => {
+    <Stack direction={"column"} spacing={2}>
+      {map([GroupType.DEVELOP, GroupType.DEPLOYMENT], (groupType) => {
         return (
-          <Fragment key={group.groupID}>
-            <GroupCard group={group} />
-          </Fragment>
+          <Stack key={groupType} direction="row" spacing={0} sx={{ flexWrap: "wrap", gap: 2 }}>
+            {resp.body?.filter((group) => group.type == groupType).map((group) => {
+              return (
+                <Fragment key={group.groupID}>
+                  <GroupCard group={group} />
+                </Fragment>
+              );
+            })}
+          </Stack>
         );
       })}
     </Stack>

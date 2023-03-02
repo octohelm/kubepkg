@@ -17,7 +17,7 @@ export const GroupEnvDeploymentMainToolbar = () => {
   return (
     <AccessControl op={form$}>
       <IconButtonWithTooltip
-        label={"创建 KubePkg"}
+        title={"创建 KubePkg"}
         size="large"
         color="inherit"
         onClick={() => form$.dialog$.next(true)}

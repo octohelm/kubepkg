@@ -308,12 +308,12 @@ export const listGroup = /*#__PURE__*/ createRequest<void, Array<Group>>(
   })
 );
 
-export const delGroup = /*#__PURE__*/ createRequest<
+export const deleteGroup = /*#__PURE__*/ createRequest<
   {
     groupName: string;
   },
   null
->("dashboard.DelGroup", ({ groupName: path_groupName }) => ({
+>("dashboard.DeleteGroup", ({ groupName: path_groupName }) => ({
   method: "DELETE",
   url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}`,
 }));
@@ -446,6 +446,20 @@ export const listGroupEnv = /*#__PURE__*/ createRequest<
   method: "GET",
   url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs`,
 }));
+
+export const deleteGroupEnv = /*#__PURE__*/ createRequest<
+  {
+    groupName: string;
+    envName: string;
+  },
+  null
+>(
+  "dashboard.DeleteGroupEnv",
+  ({ groupName: path_groupName, envName: path_envName }) => ({
+    method: "DELETE",
+    url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}`,
+  })
+);
 
 export const putGroupEnv = /*#__PURE__*/ createRequest<
   {
@@ -1738,7 +1752,7 @@ export const RawOpenAPI = {
     "/api/kubepkg-dashboard/v0/groups/{groupName}": {
       delete: {
         tags: ["group"],
-        operationId: "DelGroup",
+        operationId: "DeleteGroup",
         parameters: [
           {
             name: "Authorization",
@@ -2061,6 +2075,41 @@ export const RawOpenAPI = {
       },
     },
     "/api/kubepkg-dashboard/v0/groups/{groupName}/envs/{envName}": {
+      delete: {
+        tags: ["group"],
+        operationId: "DeleteGroupEnv",
+        parameters: [
+          {
+            name: "Authorization",
+            in: "header",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+          {
+            name: "groupName",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+          {
+            name: "envName",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "",
+          },
+        },
+      },
       put: {
         tags: ["group"],
         operationId: "PutGroupEnv",

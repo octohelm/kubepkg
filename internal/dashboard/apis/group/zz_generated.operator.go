@@ -30,10 +30,10 @@ func (*CreateGroupRobot) ResponseContent() any {
 }
 
 func init() {
-	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&DelGroup{}))
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&DeleteGroup{}))
 }
 
-func (*DelGroup) ResponseContent() any {
+func (*DeleteGroup) ResponseContent() any {
 	return nil
 }
 
@@ -42,6 +42,14 @@ func init() {
 }
 
 func (*DeleteGroupAccount) ResponseContent() any {
+	return nil
+}
+
+func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&DeleteGroupEnv{}))
+}
+
+func (*DeleteGroupEnv) ResponseContent() any {
 	return nil
 }
 

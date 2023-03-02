@@ -9,15 +9,17 @@ import {
   Typography
 } from "@mui/material";
 import { Link } from "@nodepkg/router";
-import { Group, GroupType } from "../client/dashboard";
+import { GroupEnv, GroupEnvType } from "../client/dashboard";
 import { OpenInNew } from "@mui/icons-material";
 import type { ReactNode } from "react";
 
-export const GroupCard = ({
-                            group,
-                            actions
-                          }: {
-  group: Group;
+export const GroupEnvCard = ({
+                               groupName,
+                               groupEnv,
+                               actions
+                             }: {
+  groupName: string
+  groupEnv: GroupEnv;
   actions?: ReactNode;
 }) => {
   return (
@@ -26,25 +28,25 @@ export const GroupCard = ({
         title={
           <Box sx={{ fontSize: "0.6em" }}>
             <Chip
-              label={group.type}
-              color={group.type === GroupType.DEPLOYMENT ? "error" : "primary"}
+              label={groupEnv.envType}
+              color={groupEnv.envType === GroupEnvType.ONLINE ? "error" : "primary"}
               size="small"
               variant="outlined"
             />
           </Box>
         }
         action={
-          <IconButton component={Link} to={`/groups/${group.name}`}>
+          <IconButton component={Link} to={`/groups/${groupName}/envs/${groupEnv.envName}`}>
             <OpenInNew />
           </IconButton>
         }
       />
       <CardContent>
         <Typography gutterBottom={true} variant="h5">
-          {group.name}
+          {groupEnv.envName}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {group.desc}&nbsp;
+          {groupEnv.desc}&nbsp;
         </Typography>
       </CardContent>
       {actions && <CardActions disableSpacing>

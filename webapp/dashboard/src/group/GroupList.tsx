@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useEffect } from "react";
 import { Group, listGroup } from "../client/dashboard";
-import { useGroupDelDialog, useGroupPutDialog } from "./GroupForm";
+import { useGroupDelDialog, useGroupPutDialog } from "./GroupActions";
 import { Slot, Scaffold } from "../layout";
 import { map, merge, tap } from "rxjs";
 import { IconButtonWithTooltip } from "../layout";

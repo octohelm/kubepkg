@@ -2,6 +2,10 @@ package operator
 
 import (
 	"context"
+	"net/http"
+
+	"github.com/octohelm/courier/pkg/statuserror"
+	"github.com/octohelm/storage/pkg/dberr"
 
 	"github.com/octohelm/courier/pkg/courierhttp"
 	"github.com/octohelm/courier/pkg/expression"
@@ -21,6 +25,9 @@ type ValidGroup struct {
 func (p *ValidGroup) Output(ctx context.Context) (any, error) {
 	g, err := grouprepository.NewGroupRepository().Get(ctx, p.GroupName)
 	if err != nil {
+		if dberr.IsErrNotFound(err) {
+			return nil, statuserror.Wrap(err, http.StatusNotFound, "GroupNotFound", "组织不存在")
+		}
 		return nil, err
 	}
 

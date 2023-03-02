@@ -158,6 +158,7 @@ func (repo *GroupEnvRepository) List(ctx context.Context, where sqlbuilder.SqlEx
 			group.EnvT.GroupID.V(sqlbuilder.Eq(repo.Group.ID)),
 			where,
 		)).
+		OrderBy(sqlbuilder.AscOrder(group.EnvT.EnvName)).
 		Scan(dal.Recv(func(v *group.EnvWithCluster) error {
 			list = append(list, v)
 			if v.ClusterID != 0 {

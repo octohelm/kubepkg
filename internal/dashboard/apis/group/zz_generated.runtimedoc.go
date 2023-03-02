@@ -43,7 +43,7 @@ func (v CreateGroupRobot) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
-func (v DelGroup) RuntimeDoc(names ...string) ([]string, bool) {
+func (v DeleteGroup) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "GroupName":
@@ -60,6 +60,19 @@ func (v DeleteGroupAccount) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "AccountID":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v DeleteGroupEnv) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "EnvName":
 			return []string{}, true
 
 		}

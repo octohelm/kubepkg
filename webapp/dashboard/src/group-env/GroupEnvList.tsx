@@ -5,44 +5,41 @@ import {
 } from "@nodepkg/state";
 import {
   AddCircleOutlineOutlined,
+  DeleteOutlined,
   SettingsOutlined
 } from "@mui/icons-material";
 import {
-  Avatar,
-  Box,
-  Divider,
   List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText
+  Stack
 } from "@mui/material";
-import { Fragment, useMemo } from "react";
-import { useGroupEnvFormWithDialog } from "./GroupEnvForm";
+import { useMemo } from "react";
+import { useGroupEnvDelDialog, useGroupEnvPutDialog } from "./GroupEnvActions";
 import {
   Scaffold,
   IconButtonWithTooltip,
-  stringAvatar,
   ListItemLink,
   Slot
 } from "../layout";
 import { tap } from "rxjs";
 import { GroupEnvsProvider, GroupProvider } from "../group";
 import type { GroupEnv } from "../client/dashboard";
-import { Link } from "@nodepkg/router";
 import { AccessControl } from "../auth";
 import { map, orderBy } from "@innoai-tech/lodash";
+import { GroupEnvCard } from "./GroupEnvCard";
 
-const GroupEnvListItem = ({
+const GroupEnvSettings = ({
                             groupEnv: initialGroupEnv
                           }: {
   groupEnv: GroupEnv;
 }) => {
   const group$ = GroupProvider.use$();
   const groupEnv$ = useStateSubject(initialGroupEnv);
-  const form$ = useGroupEnvFormWithDialog(initialGroupEnv);
+
+  const put$ = useGroupEnvPutDialog(initialGroupEnv);
+  const del$ = useGroupEnvDelDialog({ groupName: group$.value.name, envName: initialGroupEnv.envName });
 
   useObservableEffect(() =>
-    form$.post$.pipe(
+    put$.pipe(
       tap((resp) => {
         groupEnv$.next((group) => ({
           ...group,
@@ -55,41 +52,38 @@ const GroupEnvListItem = ({
   const groupEnv = useObservableState(groupEnv$);
 
   return (
-    <ListItem
-      secondaryAction={
-        <AccessControl op={form$}>
-          <IconButtonWithTooltip
-            edge="end"
-            title="设置"
-            onClick={(e: any) => {
-              e.stopPropagation();
-              form$.dialog$.next(true);
-            }}
-          >
-            <SettingsOutlined />
-          </IconButtonWithTooltip>
-          <Slot elem$={form$.dialog$.elements$} />
-        </AccessControl>
-      }
-    >
-      <Box
-        sx={{ color: "inherit", textDecoration: "none" }}
-        component={Link}
-        to={`/groups/${group$.value.name}/envs/${groupEnv.envName}`}
-      >
-        <ListItemAvatar>
-          <Avatar variant="rounded">{stringAvatar(groupEnv.envName)}</Avatar>
-        </ListItemAvatar>
-      </Box>
-      <ListItemText
-        primary={<Box>{`${groupEnv.envName}`}</Box>}
-        secondary={
-          <Box component="span" sx={{ display: "inline" }}>
-            {groupEnv.desc}
-          </Box>
-        }
-      />
-    </ListItem>
+    <GroupEnvCard
+      groupName={group$.value.name}
+      groupEnv={groupEnv}
+      actions={(
+        <>
+          <AccessControl op={put$}>
+            <IconButtonWithTooltip
+              title="设置"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                put$.dialog$.next(true);
+              }}
+            >
+              <SettingsOutlined />
+            </IconButtonWithTooltip>
+            <Slot elem$={put$.dialog$.elements$} />
+          </AccessControl>
+          <AccessControl op={del$}>
+            <IconButtonWithTooltip
+              title="删除"
+              onClick={(e: any) => {
+                e.stopPropagation();
+                del$.dialog$.next(true);
+              }}
+            >
+              <DeleteOutlined />
+            </IconButtonWithTooltip>
+            <Slot elem$={del$.dialog$.elements$} />
+          </AccessControl>
+        </>
+      )}
+    />
   );
 };
 
@@ -103,34 +97,39 @@ const GroupEnvList = () => {
   }
 
   return (
-    <List>
-      {groupEnvs.map((groupEnv, i) => {
+    <Stack direction="row" spacing={0} sx={{ flexWrap: "wrap", gap: 2 }}>
+      {groupEnvs.map((groupEnv) => {
         return (
-          <Fragment key={groupEnv.envID}>
-            {i > 0 && <Divider component="li" />}
-            <GroupEnvListItem groupEnv={groupEnv} />
-          </Fragment>
+          <GroupEnvSettings key={groupEnv.envID} groupEnv={groupEnv} />
         );
       })}
-    </List>
+    </Stack>
   );
 };
 
 const GroupMainToolbar = () => {
-  const form$ = useGroupEnvFormWithDialog();
+  const put$ = useGroupEnvPutDialog();
 
   return (
-    <AccessControl op={form$}>
+    <AccessControl op={put$}>
       <IconButtonWithTooltip
         title={"创建环境"}
         size="large"
         color="inherit"
-        onClick={() => form$.dialog$.next(true)}
+        onClick={() => put$.dialog$.next(true)}
       >
         <AddCircleOutlineOutlined />
       </IconButtonWithTooltip>
-      <Slot elem$={form$.dialog$.elements$} />
+      <Slot elem$={put$.dialog$.elements$} />
     </AccessControl>
+  );
+};
+
+export const GroupEnvMain = () => {
+  return (
+    <Scaffold toolbar={<GroupMainToolbar />}>
+      <GroupEnvList />
+    </Scaffold>
   );
 };
 
@@ -155,13 +154,5 @@ export const GroupEnvMenu = () => {
         );
       })}
     </List>
-  );
-};
-
-export const GroupEnvMain = () => {
-  return (
-    <Scaffold toolbar={<GroupMainToolbar />}>
-      <GroupEnvList />
-    </Scaffold>
   );
 };

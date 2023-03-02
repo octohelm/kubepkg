@@ -1,4 +1,4 @@
-import { delGroup, GroupInfo, GroupType, putGroup } from "../client/dashboard";
+import { deleteGroup, GroupInfo, GroupType, putGroup } from "../client/dashboard";
 import { tap, map as rxMap, merge } from "rxjs";
 import { useForm, fromErrorFields, useProxy, useDialogForm, useDialog } from "../layout";
 import { useObservableEffect, useRequest } from "@nodepkg/state";
@@ -73,7 +73,7 @@ export const useGroupPutDialog = (
 
 
 export const useGroupDelDialog = ({ groupName }: { groupName: string }) => {
-  const del$ = useRequest(delGroup);
+  const del$ = useRequest(deleteGroup);
 
   const dialog$ = useDialog({
     title: "确认删除组织",

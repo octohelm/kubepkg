@@ -2,7 +2,7 @@ import {
   useObservableState,
   useStateSubject,
   useObservableEffect
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import {
   AddCircleOutlineOutlined,
   DeleteOutlined,

@@ -1,7 +1,7 @@
 import {
   useObservableState,
   useObservableEffect
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import {
   Avatar,
   Box,

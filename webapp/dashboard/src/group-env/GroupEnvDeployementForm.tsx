@@ -12,7 +12,7 @@ import {
   useMemoObservable,
   useObservableEffect,
   useStateSubject
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import { DialogProps, useEpics, useProxy } from "../layout";
 import { map as rxMap, tap, filter as rxFilter, merge } from "rxjs";
 import { KubePkgEditor, useKubePkgAutocomplete } from "../kubepkg";

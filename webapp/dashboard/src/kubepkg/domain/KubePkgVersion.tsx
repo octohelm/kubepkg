@@ -4,7 +4,7 @@ import {
   getKubepkgRevision,
   listKubepkgVersion,
 } from "../../client/dashboard";
-import { useRequest } from "@nodepkg/state";
+import { useRequest } from "@nodepkg/runtime";
 import { map as rxMap } from "rxjs";
 
 export interface KubepkgNameInfo {

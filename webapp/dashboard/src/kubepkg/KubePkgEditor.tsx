@@ -5,8 +5,8 @@ import {
   useObservableState,
   useAsObservable,
   useObservableEffect,
-  usePlatform
-} from "@nodepkg/state";
+  PlatformProvider
+} from "@nodepkg/runtime";
 import {
   diagnosticCount,
   EditorContainer,
@@ -175,7 +175,7 @@ const TemplateOverwrites = ({
 }) => {
   useJSONEditor(schema);
 
-  const p = usePlatform();
+  const p = PlatformProvider.use();
 
   const { execute } = useMemo(
     () => ({

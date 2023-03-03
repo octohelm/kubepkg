@@ -1,6 +1,6 @@
 import { applyRequestInterceptors, RequestConfig } from "@innoai-tech/fetcher";
 import { has, set } from "@innoai-tech/lodash";
-import { FetcherProvider, useFetcher } from "@nodepkg/state";
+import { FetcherProvider, useFetcher } from "@nodepkg/runtime";
 import { useMemo, ReactNode } from "react";
 import { TokenProvider } from "./domain";
 

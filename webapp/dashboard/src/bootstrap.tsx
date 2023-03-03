@@ -7,7 +7,7 @@ import {
   paramsSerializer,
   transformRequestBody,
 } from "@innoai-tech/fetcher";
-import { FetcherProvider, StoreProvider } from "@nodepkg/state";
+import { FetcherProvider, StoreProvider } from "@nodepkg/runtime";
 import conf from "./config";
 import { BrowserRouter } from "@nodepkg/router";
 import { TokenProvider } from "./auth";

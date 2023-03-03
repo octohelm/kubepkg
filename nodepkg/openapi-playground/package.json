@@ -17,17 +17,14 @@
     "@mui/material": "^5.11.11",
     "@nodepkg/codemirror": "workspace:*",
     "@nodepkg/markdown": "workspace:*",
-    "@nodepkg/state": "workspace:*"
+    "@nodepkg/runtime": "workspace:*"
   },
   "peerDependencies": {
     "react": "18.x",
     "rxjs": "^7.x"
   },
   "devDependencies": {
-    "@innoai-tech/fetcher": "^0.4.0",
-    "@types/react": "~18.0.28",
-    "react": "~18.2.0",
-    "rxjs": "^7.8.0"
+    "@types/react": "~18.0.28"
   },
   "exports": {
     ".": {

@@ -1,7 +1,7 @@
 import { deleteGroup, GroupInfo, GroupType, putGroup } from "../client/dashboard";
 import { tap, map as rxMap, merge } from "rxjs";
 import { useForm, fromErrorFields, useProxy, useDialogForm, useDialog } from "../layout";
-import { useObservableEffect, useRequest } from "@nodepkg/state";
+import { useObservableEffect, useRequest } from "@nodepkg/runtime";
 import {
   string,
   required,

@@ -14,7 +14,7 @@ import {
 import { Box, useTheme, SxProps, Theme } from "@mui/material";
 import { createContext, Fragment, ReactNode, useContext } from "react";
 import { isArraySchema, isObjectSchema } from "./utils";
-import { createProvider } from "@nodepkg/state";
+import { createProvider } from "@nodepkg/runtime";
 import { Markdown } from "@nodepkg/markdown";
 import type { StateSubject } from "@innoai-tech/reactutil";
 

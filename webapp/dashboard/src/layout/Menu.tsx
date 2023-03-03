@@ -1,7 +1,7 @@
 import {
   StateSubject,
   useStateSubject
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import {
   ClickAwayListener,
   Grow,
@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useRef } from "react";
 import { map, Observable } from "rxjs";
-import { useProxy } from "@nodepkg/state";
+import { useProxy } from "@nodepkg/runtime";
 
 export const useMenu = (
   {

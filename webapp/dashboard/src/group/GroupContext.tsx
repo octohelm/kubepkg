@@ -1,4 +1,4 @@
-import { useObservableState } from "@nodepkg/state";
+import { useObservableState } from "@nodepkg/runtime";
 import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import type { ReactNode } from "react";
 import { useParams, Link } from "@nodepkg/router";

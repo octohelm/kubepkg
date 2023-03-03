@@ -27,7 +27,7 @@ import { useGroupEnvDeploymentFormWithDialog } from "./GroupEnvDeployementForm";
 import { Fragment, ReactNode } from "react";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import { openAPISpecPath } from "../group";
-import { useObservableState, useMemoObservable } from "@nodepkg/state";
+import { useObservableState, useMemoObservable } from "@nodepkg/runtime";
 import { map as rxMap } from "rxjs";
 import { AccessControl } from "../auth";
 import { useGroupEnvDeploymentHistoryFormWithDialog } from "./GroupEnvDeploymentHistory";

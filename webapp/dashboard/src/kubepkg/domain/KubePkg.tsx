@@ -1,7 +1,7 @@
 import { createDomain } from "../../layout";
 import { GroupProvider } from "../../group";
 import { listKubepkg } from "../../client/dashboard";
-import { useRequest } from "@nodepkg/state";
+import { useRequest } from "@nodepkg/runtime";
 import { map as rxMap } from "rxjs";
 
 export const GroupKubePkgProvider = createDomain(({}, use) => {

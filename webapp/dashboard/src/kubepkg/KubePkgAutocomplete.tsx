@@ -3,7 +3,7 @@ import {
   useObservableEffect,
   useRequest,
   Subscribe
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import {
   Popover,
   CircularProgress,

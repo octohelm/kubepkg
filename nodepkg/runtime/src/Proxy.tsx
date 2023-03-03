@@ -2,7 +2,7 @@ import { isFunction } from "@innoai-tech/lodash";
 import {
   StateSubject,
   useStateSubject,
-  useObservableEffect,
+  useObservableEffect
 } from "@innoai-tech/reactutil";
 import { createContext, ReactNode, useContext, useMemo, useRef } from "react";
 import {
@@ -11,9 +11,12 @@ import {
   Observable,
   mergeMap,
   tap,
-  distinctUntilChanged,
+  distinctUntilChanged
 } from "rxjs";
 
+/**
+ * @deprecated
+ */
 export const useEpics = <D, T extends Observable<D>>(
   ob$: T,
   ...epics: Array<(subject$: T) => Observable<D>>
@@ -36,9 +39,9 @@ export const useEpics = <D, T extends Observable<D>>(
 };
 
 export const Epics = <D, T extends Observable<D>>({
-  ob$,
-  epics,
-}: {
+                                                    ob$,
+                                                    epics
+                                                  }: {
   ob$: T;
   epics: Array<(subject$: T) => Observable<D>>;
 }) => {
@@ -46,6 +49,9 @@ export const Epics = <D, T extends Observable<D>>({
   return null;
 };
 
+/**
+ * @deprecated
+ */
 export const useProxy = <
   T extends any,
   S extends Observable<T>,
@@ -61,7 +67,7 @@ export const useProxy = <
     return new Proxy(ob$, {
       get: (_, prop) => {
         return extensionsRef.current[prop as string] || (ob$ as any)[prop];
-      },
+      }
     }) as S & E;
   }, [ob$]);
 
@@ -70,6 +76,9 @@ export const useProxy = <
   return s$;
 };
 
+/**
+ * @deprecated
+ */
 const useSubject$ = <T, E extends { [k: string]: any }>(
   initials: T,
   extensions: E,
@@ -93,9 +102,9 @@ export const createSubject = <
   const C = createContext<{ [key]: ReturnType<typeof useProvider> }>({} as any);
 
   const Provider = ({
-    children,
-    ...props
-  }: TProps & {
+                      children,
+                      ...props
+                    }: TProps & {
     children: ReactNode;
   }) => {
     const subject$ = useProvider(props as any, useSubject$);

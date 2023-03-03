@@ -5,7 +5,7 @@ import {
   useAsObservable,
   useStateSubject,
   Subscribe,
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import { combineLatest, filter, merge } from "rxjs";
 import { tap } from "rxjs";
 import { TokenProvider } from "./domain";

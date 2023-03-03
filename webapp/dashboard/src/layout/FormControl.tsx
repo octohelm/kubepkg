@@ -10,7 +10,7 @@ import {
   Select
 } from "@mui/material";
 import { createContext, useContext, useMemo, useId } from "react";
-import { Subscribe } from "@nodepkg/state";
+import { Subscribe } from "@nodepkg/runtime";
 import {
   SchemaBuilder,
   InferSchema,

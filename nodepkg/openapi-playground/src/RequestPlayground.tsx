@@ -60,7 +60,7 @@ import { compilePath, getHeadContentType, pickValuesIn } from "./http";
 import type { FetcherResponse, RequestConfig } from "@innoai-tech/fetcher";
 import { HttpRequest, HTTPResponse } from "./HTTPViews";
 import { Markdown } from "@nodepkg/markdown";
-import { usePlatform } from "@nodepkg/state";
+import { PlatformProvider } from "@nodepkg/runtime";
 
 export const IconButtonWithTooltip = forwardRef(
   <
@@ -312,7 +312,7 @@ const Playground = ({ schema }: { schema: any }) => {
 };
 
 const Tips = () => {
-  const p = usePlatform();
+  const p = PlatformProvider.use();
 
   return (
     <Box sx={{ padding: 2, fontSize: 14 }}>
@@ -344,7 +344,7 @@ const RequestSubmit = ({
   request$: ReturnType<typeof useRequest>;
 }) => {
   const ctx = EditorContextProvider.use();
-  const p = usePlatform();
+  const p = PlatformProvider.use();
 
   const { execute } = useMemo(
     () => ({

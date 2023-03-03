@@ -2,7 +2,7 @@ import {
   Subscribe,
   useObservableState,
   useStateSubject,
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import {
   Box,
   CircularProgress,

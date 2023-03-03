@@ -22,7 +22,7 @@ import {
   useRequest,
   StateSubject,
   useMemoObservable
-} from "@nodepkg/state";
+} from "@nodepkg/runtime";
 import { stringifySearch, parseSearch } from "@innoai-tech/fetcher";
 import { get, map, values } from "@innoai-tech/lodash";
 import { combineLatest, filter, map as rxMap, merge, tap } from "rxjs";

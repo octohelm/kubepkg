@@ -27,7 +27,7 @@ import {
   of,
   switchMap
 } from "rxjs";
-import { createProvider, tapEffect } from "@nodepkg/state";
+import { createProvider, tapEffect } from "@nodepkg/runtime";
 import { useObservableEffect } from "@innoai-tech/reactutil";
 
 export const EditorContextProvider = createProvider(

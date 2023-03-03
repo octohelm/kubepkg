@@ -1,7 +1,7 @@
 import { AuthTokenPatcher } from "./TokenPatcher";
 import { Outlet, useLocation, useNavigate } from "@nodepkg/router";
 import { ReactNode, useRef } from "react";
-import { useObservableEffect } from "@nodepkg/state";
+import { useObservableEffect } from "@nodepkg/runtime";
 import { tap } from "rxjs";
 import { stringifySearch } from "@innoai-tech/fetcher";
 import { CurrentUserProvider, Op, TokenProvider, User } from "./domain";

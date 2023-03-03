@@ -121,7 +121,7 @@ export const KubePkgEditor = ({
 
     return {
       type: "object",
-      properties: pick(schema.properties, ["metadata", "spec"]),
+      properties: pick(schema.properties, ["metadata", "spec", "apiVersion", "kind"]),
       additionalProperties: false
     };
   }, [kubepkg, hasTemplate, overwrites]);

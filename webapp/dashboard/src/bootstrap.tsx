@@ -5,9 +5,9 @@ import {
   applyRequestInterceptors,
   createFetcher,
   paramsSerializer,
-  transformRequestBody,
+  transformRequestBody
 } from "@innoai-tech/fetcher";
-import { FetcherProvider, StoreProvider } from "@nodepkg/runtime";
+import { FetcherProvider, PlatformProvider, StoreProvider } from "@nodepkg/runtime";
 import conf from "./config";
 import { BrowserRouter } from "@nodepkg/router";
 import { TokenProvider } from "./auth";
@@ -56,12 +56,15 @@ const Bootstrap = ({ children }: { children: ReactNode }) => {
   );
 
   return (
+
     <BrowserRouter basename={basename}>
-      <FetcherProvider fetcher={fetcher}>
-        <StoreProvider name={c.name}>
-          <TokenProvider>{children}</TokenProvider>
-        </StoreProvider>
-      </FetcherProvider>
+      <PlatformProvider>
+        <FetcherProvider fetcher={fetcher}>
+          <StoreProvider name={c.name}>
+            <TokenProvider>{children}</TokenProvider>
+          </StoreProvider>
+        </FetcherProvider>
+      </PlatformProvider>
     </BrowserRouter>
   );
 };

@@ -3,6 +3,9 @@ package specutil
 import (
 	"testing"
 
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 	testingx "github.com/octohelm/x/testing"
@@ -22,7 +25,7 @@ func TestApplyOverwrites(t *testing.T) {
 			AnnotationOverwrites: `{
 	"spec": {
 		"config": {
-			"X": "x!"
+			"X": "merged"
 		}
 	}
 }
@@ -31,7 +34,7 @@ func TestApplyOverwrites(t *testing.T) {
 
 		k, err := ApplyOverwrites(kpkg2)
 		testingx.Expect(t, err, testingx.Be[error](nil))
-		testingx.Expect(t, k.Spec.Config["X"].Value, testingx.Be("x!"))
+		testingx.Expect(t, k.Spec.Config["X"].Value, testingx.Be("merged"))
 	})
 
 	t.Run("Should merge spec.deploy.spec", func(t *testing.T) {
@@ -56,6 +59,62 @@ func TestApplyOverwrites(t *testing.T) {
 			"replicas": float64(1),
 			"strategy": map[string]any{
 				"type": "Recreate",
+			},
+		}))
+	})
+
+	t.Run("Should merge spec.containers", func(t *testing.T) {
+		kpkg.Annotations = map[string]string{
+			AnnotationOverwrites: `{
+	"spec": {
+		"containers": {
+			"web": {
+				"resources": {
+				  "limits": {
+					"aliyun.com/gpu-mem": "3",
+					"cpu": "2",
+					"memory": "4000Mi"
+				  },
+				  "requests": {
+					"aliyun.com/gpu-mem": "3",
+					"cpu": "100m",
+					"memory": "100Mi"
+				  }
+				}
+			}
+		}
+	}
+}
+`,
+		}
+
+		k, err := ApplyOverwrites(kpkg)
+		testingx.Expect(t, err, testingx.Be[error](nil))
+
+		testingx.Expect(t, k.Spec.Containers["web"], testingx.Equal(v1alpha1.Container{
+			Image: v1alpha1.Image{
+				Name:       "docker.io/library/nginx",
+				Tag:        "alpine",
+				PullPolicy: v1.PullIfNotPresent,
+				Platforms: []string{
+					"linux/amd64",
+					"linux/arm64",
+				},
+			},
+			Ports: map[string]int32{
+				"http": 80,
+			},
+			Resources: &v1.ResourceRequirements{
+				Limits: map[v1.ResourceName]resource.Quantity{
+					"aliyun.com/gpu-mem": resource.MustParse("3"),
+					"cpu":                resource.MustParse("2"),
+					"memory":             resource.MustParse("4000Mi"),
+				},
+				Requests: map[v1.ResourceName]resource.Quantity{
+					"aliyun.com/gpu-mem": resource.MustParse("3"),
+					"cpu":                resource.MustParse("100m"),
+					"memory":             resource.MustParse("100Mi"),
+				},
 			},
 		}))
 	})

@@ -1,0 +1,4506 @@
+{
+  "allOf": [
+    {
+      "$ref": "#/definitions/TypeMeta"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ObjectMeta"
+            },
+            {
+              "x-go-field-name": "ObjectMeta"
+            }
+          ]
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Spec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Status"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Status"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "spec"
+      ]
+    }
+  ],
+  "description": "KubePkg",
+  "definitions": {
+    "Affinity": {
+      "type": "object",
+      "properties": {
+        "nodeAffinity": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/NodeAffinity"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "NodeAffinity"
+        },
+        "podAffinity": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodAffinity"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PodAffinity"
+        },
+        "podAntiAffinity": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodAntiAffinity"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PodAntiAffinity"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.Affinity"
+    },
+    "Capabilities": {
+      "type": "object",
+      "properties": {
+        "add": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capability"
+          },
+          "x-go-field-name": "Add"
+        },
+        "drop": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capability"
+          },
+          "x-go-field-name": "Drop"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.Capabilities"
+    },
+    "Capability": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.Capability"
+    },
+    "ClaimSource": {
+      "type": "object",
+      "properties": {
+        "resourceClaimName": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "ResourceClaimName",
+          "x-go-star-level": 1
+        },
+        "resourceClaimTemplateName": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "ResourceClaimTemplateName",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.ClaimSource"
+    },
+    "CompletionMode": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/batch/v1.CompletionMode"
+    },
+    "ConcurrencyPolicy": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/batch/v1.ConcurrencyPolicy"
+    },
+    "ConditionStatus": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.ConditionStatus"
+    },
+    "ConfigMapVolumeSource": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/LocalObjectReference"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "defaultMode": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true,
+              "x-go-field-name": "DefaultMode",
+              "x-go-star-level": 1
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/KeyToPath"
+              },
+              "x-go-field-name": "Items"
+            },
+            "optional": {
+              "type": "boolean",
+              "nullable": true,
+              "x-go-field-name": "Optional",
+              "x-go-star-level": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.ConfigMapVolumeSource"
+    },
+    "Container": {
+      "type": "object",
+      "properties": {
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Args"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Command"
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/EnvVarValueOrFrom"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Env"
+        },
+        "image": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Image"
+            },
+            {
+              "x-go-field-name": "Image"
+            }
+          ]
+        },
+        "lifecycle": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Lifecycle"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Lifecycle"
+        },
+        "livenessProbe": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Probe"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "LivenessProbe"
+        },
+        "ports": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "description": "Ports: [PortName]: ContainerPort",
+          "x-go-field-name": "Ports"
+        },
+        "readinessProbe": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Probe"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "ReadinessProbe"
+        },
+        "resources": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceRequirements"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Resources"
+        },
+        "securityContext": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/SecurityContext"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "SecurityContext"
+        },
+        "startupProbe": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Probe"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "StartupProbe"
+        },
+        "stdin": {
+          "type": "boolean",
+          "x-go-field-name": "Stdin"
+        },
+        "stdinOnce": {
+          "type": "boolean",
+          "x-go-field-name": "StdinOnce"
+        },
+        "terminationMessagePath": {
+          "type": "string",
+          "x-go-field-name": "TerminationMessagePath"
+        },
+        "terminationMessagePolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/TerminationMessagePolicy"
+            },
+            {
+              "x-go-field-name": "TerminationMessagePolicy"
+            }
+          ]
+        },
+        "tty": {
+          "type": "boolean",
+          "x-go-field-name": "TTY"
+        },
+        "workingDir": {
+          "type": "string",
+          "x-go-field-name": "WorkingDir"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "image"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.Container"
+    },
+    "CronJobSpec": {
+      "type": "object",
+      "properties": {
+        "concurrencyPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ConcurrencyPolicy"
+            },
+            {
+              "description": "Specifies how to treat concurrent executions of a Job. Valid values are: - \"Allow\" (default): allows CronJobs to run concurrently; - \"Forbid\": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - \"Replace\": cancels currently running job and replaces it with a new one",
+              "x-go-field-name": "ConcurrencyPolicy"
+            }
+          ]
+        },
+        "failedJobsHistoryLimit": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "FailedJobsHistoryLimit",
+          "x-go-star-level": 1
+        },
+        "jobTemplate": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/JobTemplateSpec"
+            },
+            {
+              "description": "Specifies the job that will be created when executing a CronJob.",
+              "x-go-field-name": "JobTemplate"
+            }
+          ]
+        },
+        "schedule": {
+          "type": "string",
+          "x-go-field-name": "Schedule"
+        },
+        "startingDeadlineSeconds": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "StartingDeadlineSeconds",
+          "x-go-star-level": 1
+        },
+        "successfulJobsHistoryLimit": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "SuccessfulJobsHistoryLimit",
+          "x-go-star-level": 1
+        },
+        "suspend": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "Suspend",
+          "x-go-star-level": 1
+        },
+        "timeZone": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "TimeZone",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "schedule",
+        "jobTemplate"
+      ],
+      "x-go-vendor-type": "k8s.io/api/batch/v1.CronJobSpec"
+    },
+    "DNSPolicy": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.DNSPolicy"
+    },
+    "DaemonSetSpec": {
+      "type": "object",
+      "properties": {
+        "minReadySeconds": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "MinReadySeconds"
+        },
+        "revisionHistoryLimit": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "RevisionHistoryLimit",
+          "x-go-star-level": 1
+        },
+        "selector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Selector"
+        },
+        "template": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodTemplateSpec"
+            },
+            {
+              "description": "An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
+              "x-go-field-name": "Template"
+            }
+          ]
+        },
+        "updateStrategy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DaemonSetUpdateStrategy"
+            },
+            {
+              "description": "An update strategy to replace existing DaemonSet pods with new pods.",
+              "x-go-field-name": "UpdateStrategy"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "selector",
+        "template"
+      ],
+      "x-go-vendor-type": "k8s.io/api/apps/v1.DaemonSetSpec"
+    },
+    "DaemonSetUpdateStrategy": {
+      "type": "object",
+      "properties": {
+        "rollingUpdate": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/RollingUpdateDaemonSet"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "RollingUpdate"
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DaemonSetUpdateStrategyType"
+            },
+            {
+              "description": "Type of daemon set update. Can be \"RollingUpdate\" or \"OnDelete\". Default is RollingUpdate.",
+              "x-go-field-name": "Type"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/apps/v1.DaemonSetUpdateStrategy"
+    },
+    "DaemonSetUpdateStrategyType": {
+      "type": "string",
+      "enum": [
+        "RollingUpdate",
+        "OnDelete"
+      ],
+      "x-go-vendor-type": "k8s.io/api/apps/v1.DaemonSetUpdateStrategyType"
+    },
+    "Deploy": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "StatefulSet"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{StatefulSet}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/StatefulSetSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployStatefulSet"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "Job"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{Job}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JobSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployJob"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "CronJob"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{CronJob}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/CronJobSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployCronJob"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "Secret"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{Secret}"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeploySecret"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "ConfigMap"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{ConfigMap}"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployConfigMap"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "Deployment"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{Deployment}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeploymentSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDeployment"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "DaemonSet"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{DaemonSet}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DaemonSetSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDaemonSet"
+        }
+      ],
+      "discriminator": {
+        "propertyName": "kind"
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "DeployConfigMap": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ConfigMap"
+          ],
+          "x-go-field-name": "Kind",
+          "x-tag-validate": "@string{ConfigMap}"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployConfigMap"
+    },
+    "DeployCronJob": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "CronJob"
+          ],
+          "x-go-field-name": "Kind",
+          "x-tag-validate": "@string{CronJob}"
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/CronJobSpec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployCronJob"
+    },
+    "DeployDaemonSet": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "DaemonSet"
+          ],
+          "x-go-field-name": "Kind",
+          "x-tag-validate": "@string{DaemonSet}"
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DaemonSetSpec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDaemonSet"
+    },
+    "DeployDeployment": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Deployment"
+          ],
+          "x-go-field-name": "Kind",
+          "x-tag-validate": "@string{Deployment}"
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DeploymentSpec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDeployment"
+    },
+    "DeployJob": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Job"
+          ],
+          "x-go-field-name": "Kind",
+          "x-tag-validate": "@string{Job}"
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/JobSpec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployJob"
+    },
+    "DeploySecret": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Secret"
+          ],
+          "x-go-field-name": "Kind",
+          "x-tag-validate": "@string{Secret}"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeploySecret"
+    },
+    "DeployStatefulSet": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "StatefulSet"
+          ],
+          "x-go-field-name": "Kind",
+          "x-tag-validate": "@string{StatefulSet}"
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/StatefulSetSpec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployStatefulSet"
+    },
+    "DeploymentSpec": {
+      "type": "object",
+      "properties": {
+        "minReadySeconds": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "MinReadySeconds"
+        },
+        "paused": {
+          "type": "boolean",
+          "x-go-field-name": "Paused"
+        },
+        "progressDeadlineSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "ProgressDeadlineSeconds",
+          "x-go-star-level": 1
+        },
+        "replicas": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "Replicas",
+          "x-go-star-level": 1
+        },
+        "revisionHistoryLimit": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "RevisionHistoryLimit",
+          "x-go-star-level": 1
+        },
+        "selector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Selector"
+        },
+        "strategy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DeploymentStrategy"
+            },
+            {
+              "description": "The deployment strategy to use to replace existing pods with new ones.",
+              "x-go-field-name": "Strategy"
+            }
+          ]
+        },
+        "template": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodTemplateSpec"
+            },
+            {
+              "description": "Template describes the pods that will be created.",
+              "x-go-field-name": "Template"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "selector",
+        "template"
+      ],
+      "x-go-vendor-type": "k8s.io/api/apps/v1.DeploymentSpec"
+    },
+    "DeploymentStrategy": {
+      "type": "object",
+      "properties": {
+        "rollingUpdate": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/RollingUpdateDeployment"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "RollingUpdate"
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DeploymentStrategyType"
+            },
+            {
+              "description": "Type of deployment. Can be \"Recreate\" or \"RollingUpdate\". Default is RollingUpdate.",
+              "x-go-field-name": "Type"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/apps/v1.DeploymentStrategy"
+    },
+    "DeploymentStrategyType": {
+      "type": "string",
+      "enum": [
+        "Recreate",
+        "RollingUpdate"
+      ],
+      "x-go-vendor-type": "k8s.io/api/apps/v1.DeploymentStrategyType"
+    },
+    "DigestMeta": {
+      "type": "object",
+      "properties": {
+        "digest": {
+          "type": "string",
+          "x-go-field-name": "Digest"
+        },
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "platform": {
+          "type": "string",
+          "x-go-field-name": "Platform"
+        },
+        "size": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/FileSize"
+            },
+            {
+              "x-go-field-name": "Size"
+            }
+          ]
+        },
+        "tag": {
+          "type": "string",
+          "x-go-field-name": "Tag"
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DigestMetaType"
+            },
+            {
+              "x-go-field-name": "Type"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "digest",
+        "name",
+        "size"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DigestMeta"
+    },
+    "DigestMetaType": {
+      "type": "string",
+      "enum": [
+        "blob",
+        "manifest"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DigestMetaType"
+    },
+    "EnvVarValueOrFrom": {
+      "type": "string",
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.EnvVarValueOrFrom"
+    },
+    "ExecAction": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Command"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.ExecAction"
+    },
+    "Expose": {
+      "type": "object",
+      "properties": {
+        "gateway": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Gateway"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type NodePort | Ingress",
+          "x-go-field-name": "Type"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.Expose"
+    },
+    "FileSize": {
+      "type": "integer",
+      "format": "int64",
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.FileSize"
+    },
+    "GRPCAction": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "Port"
+        },
+        "service": {
+          "type": "string",
+          "x-go-field-name": "Service",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "port",
+        "service"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.GRPCAction"
+    },
+    "HTTPGetAction": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "x-go-field-name": "Host"
+        },
+        "httpHeaders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HTTPHeader"
+          },
+          "x-go-field-name": "HTTPHeaders"
+        },
+        "path": {
+          "type": "string",
+          "x-go-field-name": "Path"
+        },
+        "port": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IntOrString"
+            },
+            {
+              "description": "Name or number of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.",
+              "x-go-field-name": "Port"
+            }
+          ]
+        },
+        "scheme": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/URIScheme"
+            },
+            {
+              "description": "Scheme to use for connecting to the host. Defaults to HTTP.",
+              "x-go-field-name": "Scheme"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "port"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.HTTPGetAction"
+    },
+    "HTTPHeader": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "value": {
+          "type": "string",
+          "x-go-field-name": "Value"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.HTTPHeader"
+    },
+    "HostAlias": {
+      "type": "object",
+      "properties": {
+        "hostnames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Hostnames"
+        },
+        "ip": {
+          "type": "string",
+          "x-go-field-name": "IP"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.HostAlias"
+    },
+    "Image": {
+      "type": "object",
+      "properties": {
+        "digest": {
+          "type": "string",
+          "x-go-field-name": "Digest"
+        },
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Platforms"
+        },
+        "pullPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PullPolicy"
+            },
+            {
+              "x-go-field-name": "PullPolicy"
+            }
+          ]
+        },
+        "tag": {
+          "type": "string",
+          "x-go-field-name": "Tag"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.Image"
+    },
+    "IntOrString": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "format": "int32"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "JobSpec": {
+      "type": "object",
+      "properties": {
+        "activeDeadlineSeconds": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "ActiveDeadlineSeconds",
+          "x-go-star-level": 1
+        },
+        "backoffLimit": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "BackoffLimit",
+          "x-go-star-level": 1
+        },
+        "completionMode": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/CompletionMode"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "CompletionMode"
+        },
+        "completions": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "Completions",
+          "x-go-star-level": 1
+        },
+        "manualSelector": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "ManualSelector",
+          "x-go-star-level": 1
+        },
+        "parallelism": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "Parallelism",
+          "x-go-star-level": 1
+        },
+        "podFailurePolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodFailurePolicy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PodFailurePolicy"
+        },
+        "selector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Selector"
+        },
+        "suspend": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "Suspend",
+          "x-go-star-level": 1
+        },
+        "template": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodTemplateSpec"
+            },
+            {
+              "description": "Describes the pod that will be created when executing a job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
+              "x-go-field-name": "Template"
+            }
+          ]
+        },
+        "ttlSecondsAfterFinished": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "TTLSecondsAfterFinished",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "template"
+      ],
+      "x-go-vendor-type": "k8s.io/api/batch/v1.JobSpec"
+    },
+    "JobTemplateSpec": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ObjectMeta"
+            },
+            {
+              "description": "Standard object's metadata of the jobs created from this template. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+              "x-go-field-name": "ObjectMeta"
+            }
+          ]
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/JobSpec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/batch/v1.JobTemplateSpec"
+    },
+    "KeyToPath": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "x-go-field-name": "Key"
+        },
+        "mode": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "Mode",
+          "x-go-star-level": 1
+        },
+        "path": {
+          "type": "string",
+          "x-go-field-name": "Path"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "path"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.KeyToPath"
+    },
+    "LabelSelector": {
+      "type": "object",
+      "properties": {
+        "matchExpressions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LabelSelectorRequirement"
+          },
+          "x-go-field-name": "MatchExpressions"
+        },
+        "matchLabels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "MatchLabels"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"
+    },
+    "LabelSelectorOperator": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorOperator"
+    },
+    "LabelSelectorRequirement": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "x-go-field-name": "Key"
+        },
+        "operator": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelectorOperator"
+            },
+            {
+              "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+              "x-go-field-name": "Operator"
+            }
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Values"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "operator"
+      ],
+      "x-go-vendor-type": "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"
+    },
+    "Lifecycle": {
+      "type": "object",
+      "properties": {
+        "postStart": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LifecycleHandler"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PostStart"
+        },
+        "preStop": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LifecycleHandler"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PreStop"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.Lifecycle"
+    },
+    "LifecycleHandler": {
+      "type": "object",
+      "properties": {
+        "exec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ExecAction"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Exec"
+        },
+        "httpGet": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/HTTPGetAction"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "HTTPGet"
+        },
+        "tcpSocket": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/TCPSocketAction"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "TCPSocket"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.LifecycleHandler"
+    },
+    "LocalObjectReference": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.LocalObjectReference"
+    },
+    "Manifests": {
+      "type": "object",
+      "additionalProperties": {},
+      "propertyNames": {
+        "type": "string"
+      },
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.Manifests"
+    },
+    "NodeAffinity": {
+      "type": "object",
+      "properties": {
+        "preferredDuringSchedulingIgnoredDuringExecution": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PreferredSchedulingTerm"
+          },
+          "x-go-field-name": "PreferredDuringSchedulingIgnoredDuringExecution"
+        },
+        "requiredDuringSchedulingIgnoredDuringExecution": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/NodeSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "RequiredDuringSchedulingIgnoredDuringExecution"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.NodeAffinity"
+    },
+    "NodeInclusionPolicy": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.NodeInclusionPolicy"
+    },
+    "NodeSelector": {
+      "type": "object",
+      "properties": {
+        "nodeSelectorTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NodeSelectorTerm"
+          },
+          "x-go-field-name": "NodeSelectorTerms"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "nodeSelectorTerms"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.NodeSelector"
+    },
+    "NodeSelectorOperator": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.NodeSelectorOperator"
+    },
+    "NodeSelectorRequirement": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "x-go-field-name": "Key"
+        },
+        "operator": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/NodeSelectorOperator"
+            },
+            {
+              "description": "Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+              "x-go-field-name": "Operator"
+            }
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Values"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "operator"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.NodeSelectorRequirement"
+    },
+    "NodeSelectorTerm": {
+      "type": "object",
+      "properties": {
+        "matchExpressions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NodeSelectorRequirement"
+          },
+          "x-go-field-name": "MatchExpressions"
+        },
+        "matchFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NodeSelectorRequirement"
+          },
+          "x-go-field-name": "MatchFields"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.NodeSelectorTerm"
+    },
+    "OSName": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.OSName"
+    },
+    "ObjectMeta": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Annotations"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Labels"
+        },
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "namespace": {
+          "type": "string",
+          "x-go-field-name": "Namespace"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"
+    },
+    "PersistentVolumeAccessMode": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeAccessMode"
+    },
+    "PersistentVolumeClaim": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/TypeMeta"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ObjectMeta"
+                },
+                {
+                  "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+                  "x-go-field-name": "ObjectMeta"
+                }
+              ]
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PersistentVolumeClaimSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            },
+            "status": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PersistentVolumeClaimStatus"
+                },
+                {
+                  "description": "status represents the current information/status of a persistent volume claim. Read-only. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims",
+                  "x-go-field-name": "Status"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaim"
+    },
+    "PersistentVolumeClaimCondition": {
+      "type": "object",
+      "properties": {
+        "lastProbeTime": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Time"
+            },
+            {
+              "description": "lastProbeTime is the time we probed the condition.",
+              "x-go-field-name": "LastProbeTime"
+            }
+          ]
+        },
+        "lastTransitionTime": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Time"
+            },
+            {
+              "description": "lastTransitionTime is the time the condition transitioned from one status to another.",
+              "x-go-field-name": "LastTransitionTime"
+            }
+          ]
+        },
+        "message": {
+          "type": "string",
+          "x-go-field-name": "Message"
+        },
+        "reason": {
+          "type": "string",
+          "x-go-field-name": "Reason"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ConditionStatus"
+            },
+            {
+              "x-go-field-name": "Status"
+            }
+          ]
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PersistentVolumeClaimConditionType"
+            },
+            {
+              "x-go-field-name": "Type"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "status"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimCondition"
+    },
+    "PersistentVolumeClaimConditionType": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimConditionType"
+    },
+    "PersistentVolumeClaimPhase": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimPhase"
+    },
+    "PersistentVolumeClaimResizeStatus": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimResizeStatus"
+    },
+    "PersistentVolumeClaimRetentionPolicyType": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/apps/v1.PersistentVolumeClaimRetentionPolicyType"
+    },
+    "PersistentVolumeClaimSpec": {
+      "type": "object",
+      "properties": {
+        "accessModes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersistentVolumeAccessMode"
+          },
+          "x-go-field-name": "AccessModes"
+        },
+        "dataSource": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/TypedLocalObjectReference"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "DataSource"
+        },
+        "dataSourceRef": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/TypedObjectReference"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "DataSourceRef"
+        },
+        "resources": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceRequirements"
+            },
+            {
+              "description": "resources represents the minimum resources the volume should have. If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements that are lower than previous value but must still be higher than capacity recorded in the status field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources",
+              "x-go-field-name": "Resources"
+            }
+          ]
+        },
+        "selector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Selector"
+        },
+        "storageClassName": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "StorageClassName",
+          "x-go-star-level": 1
+        },
+        "volumeMode": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PersistentVolumeMode"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "VolumeMode"
+        },
+        "volumeName": {
+          "type": "string",
+          "x-go-field-name": "VolumeName"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimSpec"
+    },
+    "PersistentVolumeClaimStatus": {
+      "type": "object",
+      "properties": {
+        "accessModes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersistentVolumeAccessMode"
+          },
+          "x-go-field-name": "AccessModes"
+        },
+        "allocatedResources": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceList"
+            },
+            {
+              "description": "allocatedResources is the storage resource within AllocatedResources tracks the capacity allocated to a PVC. It may be larger than the actual capacity when a volume expansion operation is requested. For storage quota, the larger value from allocatedResources and PVC.spec.resources is used. If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation. If a volume expansion capacity request is lowered, allocatedResources is only lowered if there are no expansion operations in progress and if the actual volume capacity is equal or lower than the requested capacity. This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.",
+              "x-go-field-name": "AllocatedResources"
+            }
+          ]
+        },
+        "capacity": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceList"
+            },
+            {
+              "description": "capacity represents the actual resources of the underlying volume.",
+              "x-go-field-name": "Capacity"
+            }
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersistentVolumeClaimCondition"
+          },
+          "x-go-field-name": "Conditions"
+        },
+        "phase": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PersistentVolumeClaimPhase"
+            },
+            {
+              "description": "phase represents the current phase of PersistentVolumeClaim.",
+              "x-go-field-name": "Phase"
+            }
+          ]
+        },
+        "resizeStatus": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PersistentVolumeClaimResizeStatus"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "ResizeStatus"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimStatus"
+    },
+    "PersistentVolumeClaimVolumeSource": {
+      "type": "object",
+      "properties": {
+        "claimName": {
+          "type": "string",
+          "x-go-field-name": "ClaimName"
+        },
+        "readOnly": {
+          "type": "boolean",
+          "description": "else volumeMounts",
+          "x-go-field-name": "ReadOnly"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "claimName"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimVolumeSource"
+    },
+    "PersistentVolumeMode": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeMode"
+    },
+    "PodAffinity": {
+      "type": "object",
+      "properties": {
+        "preferredDuringSchedulingIgnoredDuringExecution": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/WeightedPodAffinityTerm"
+          },
+          "x-go-field-name": "PreferredDuringSchedulingIgnoredDuringExecution"
+        },
+        "requiredDuringSchedulingIgnoredDuringExecution": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodAffinityTerm"
+          },
+          "x-go-field-name": "RequiredDuringSchedulingIgnoredDuringExecution"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodAffinity"
+    },
+    "PodAffinityTerm": {
+      "type": "object",
+      "properties": {
+        "labelSelector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "LabelSelector"
+        },
+        "namespaceSelector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "NamespaceSelector"
+        },
+        "namespaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Namespaces"
+        },
+        "topologyKey": {
+          "type": "string",
+          "x-go-field-name": "TopologyKey"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "topologyKey"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodAffinityTerm"
+    },
+    "PodAntiAffinity": {
+      "type": "object",
+      "properties": {
+        "preferredDuringSchedulingIgnoredDuringExecution": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/WeightedPodAffinityTerm"
+          },
+          "x-go-field-name": "PreferredDuringSchedulingIgnoredDuringExecution"
+        },
+        "requiredDuringSchedulingIgnoredDuringExecution": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodAffinityTerm"
+          },
+          "x-go-field-name": "RequiredDuringSchedulingIgnoredDuringExecution"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodAntiAffinity"
+    },
+    "PodConditionType": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodConditionType"
+    },
+    "PodDNSConfig": {
+      "type": "object",
+      "properties": {
+        "nameservers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Nameservers"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodDNSConfigOption"
+          },
+          "x-go-field-name": "Options"
+        },
+        "searches": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Searches"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodDNSConfig"
+    },
+    "PodDNSConfigOption": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "value": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "Value",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodDNSConfigOption"
+    },
+    "PodFSGroupChangePolicy": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodFSGroupChangePolicy"
+    },
+    "PodFailurePolicy": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodFailurePolicyRule"
+          },
+          "x-go-field-name": "Rules"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "rules"
+      ],
+      "x-go-vendor-type": "k8s.io/api/batch/v1.PodFailurePolicy"
+    },
+    "PodFailurePolicyAction": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/batch/v1.PodFailurePolicyAction"
+    },
+    "PodFailurePolicyOnExitCodesOperator": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/batch/v1.PodFailurePolicyOnExitCodesOperator"
+    },
+    "PodFailurePolicyOnExitCodesRequirement": {
+      "type": "object",
+      "properties": {
+        "containerName": {
+          "type": "string",
+          "x-go-field-name": "ContainerName",
+          "x-go-star-level": 1
+        },
+        "operator": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodFailurePolicyOnExitCodesOperator"
+            },
+            {
+              "description": "Represents the relationship between the container exit code(s) and the specified values. Containers completed with success (exit code 0) are excluded from the requirement check. Possible values are: - In: the requirement is satisfied if at least one container exit code\n  (might be multiple if there are multiple containers not restricted\n  by the 'containerName' field) is in the set of specified values.\n- NotIn: the requirement is satisfied if at least one container exit code\n  (might be multiple if there are multiple containers not restricted\n  by the 'containerName' field) is not in the set of specified values.\nAdditional values are considered to be added in the future. Clients should react to an unknown operator by assuming the requirement is not satisfied.",
+              "x-go-field-name": "Operator"
+            }
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "x-go-field-name": "Values"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "containerName",
+        "operator",
+        "values"
+      ],
+      "x-go-vendor-type": "k8s.io/api/batch/v1.PodFailurePolicyOnExitCodesRequirement"
+    },
+    "PodFailurePolicyOnPodConditionsPattern": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ConditionStatus"
+            },
+            {
+              "description": "Specifies the required Pod condition status. To match a pod condition it is required that the specified status equals the pod condition status. Defaults to True.",
+              "x-go-field-name": "Status"
+            }
+          ]
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodConditionType"
+            },
+            {
+              "description": "Specifies the required Pod condition type. To match a pod condition it is required that specified type equals the pod condition type.",
+              "x-go-field-name": "Type"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "status"
+      ],
+      "x-go-vendor-type": "k8s.io/api/batch/v1.PodFailurePolicyOnPodConditionsPattern"
+    },
+    "PodFailurePolicyRule": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodFailurePolicyAction"
+            },
+            {
+              "description": "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are: - FailJob: indicates that the pod's job is marked as Failed and all\n  running pods are terminated.\n- Ignore: indicates that the counter towards the .backoffLimit is not\n  incremented and a replacement pod is created.\n- Count: indicates that the pod is handled in the default way - the\n  counter towards the .backoffLimit is incremented.\nAdditional values are considered to be added in the future. Clients should react to an unknown action by skipping the rule.",
+              "x-go-field-name": "Action"
+            }
+          ]
+        },
+        "onExitCodes": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodFailurePolicyOnExitCodesRequirement"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "OnExitCodes"
+        },
+        "onPodConditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodFailurePolicyOnPodConditionsPattern"
+          },
+          "x-go-field-name": "OnPodConditions"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "onExitCodes",
+        "onPodConditions"
+      ],
+      "x-go-vendor-type": "k8s.io/api/batch/v1.PodFailurePolicyRule"
+    },
+    "PodManagementPolicyType": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/apps/v1.PodManagementPolicyType"
+    },
+    "PodOS": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/OSName"
+            },
+            {
+              "description": "Name is the name of the operating system. The currently supported values are linux and windows. Additional value may be defined in future and can be one of: https://github.com/opencontainers/runtime-spec/blob/master/config.md#platform-specific-configuration Clients should expect to handle additional values and treat unrecognized values in this field as os: null",
+              "x-go-field-name": "Name"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodOS"
+    },
+    "PodReadinessGate": {
+      "type": "object",
+      "properties": {
+        "conditionType": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodConditionType"
+            },
+            {
+              "description": "ConditionType refers to a condition in the pod's condition list with matching type.",
+              "x-go-field-name": "ConditionType"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "conditionType"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodReadinessGate"
+    },
+    "PodResourceClaim": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "source": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ClaimSource"
+            },
+            {
+              "description": "Source describes where to find the ResourceClaim.",
+              "x-go-field-name": "Source"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodResourceClaim"
+    },
+    "PodSchedulingGate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodSchedulingGate"
+    },
+    "PodSecurityContext": {
+      "type": "object",
+      "properties": {
+        "fsGroup": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "FSGroup",
+          "x-go-star-level": 1
+        },
+        "fsGroupChangePolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodFSGroupChangePolicy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "FSGroupChangePolicy"
+        },
+        "runAsGroup": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "RunAsGroup",
+          "x-go-star-level": 1
+        },
+        "runAsNonRoot": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "RunAsNonRoot",
+          "x-go-star-level": 1
+        },
+        "runAsUser": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "RunAsUser",
+          "x-go-star-level": 1
+        },
+        "seLinuxOptions": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/SELinuxOptions"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "SELinuxOptions"
+        },
+        "seccompProfile": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/SeccompProfile"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "SeccompProfile"
+        },
+        "supplementalGroups": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "x-go-field-name": "SupplementalGroups"
+        },
+        "sysctls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Sysctl"
+          },
+          "x-go-field-name": "Sysctls"
+        },
+        "windowsOptions": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/WindowsSecurityContextOptions"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "WindowsOptions"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodSecurityContext"
+    },
+    "PodSpec": {
+      "type": "object",
+      "properties": {
+        "activeDeadlineSeconds": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "ActiveDeadlineSeconds",
+          "x-go-star-level": 1
+        },
+        "affinity": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Affinity"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Affinity"
+        },
+        "automountServiceAccountToken": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "AutomountServiceAccountToken",
+          "x-go-star-level": 1
+        },
+        "dnsConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodDNSConfig"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "DNSConfig"
+        },
+        "dnsPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DNSPolicy"
+            },
+            {
+              "description": "Set DNS policy for the pod. Defaults to \"ClusterFirst\". Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'. DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy. To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'.",
+              "x-go-field-name": "DNSPolicy"
+            }
+          ]
+        },
+        "enableServiceLinks": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "EnableServiceLinks",
+          "x-go-star-level": 1
+        },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HostAlias"
+          },
+          "x-go-field-name": "HostAliases"
+        },
+        "hostIPC": {
+          "type": "boolean",
+          "x-go-field-name": "HostIPC"
+        },
+        "hostNetwork": {
+          "type": "boolean",
+          "x-go-field-name": "HostNetwork"
+        },
+        "hostPID": {
+          "type": "boolean",
+          "x-go-field-name": "HostPID"
+        },
+        "hostUsers": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "HostUsers",
+          "x-go-star-level": 1
+        },
+        "hostname": {
+          "type": "string",
+          "x-go-field-name": "Hostname"
+        },
+        "imagePullSecrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LocalObjectReference"
+          },
+          "x-go-field-name": "ImagePullSecrets"
+        },
+        "nodeName": {
+          "type": "string",
+          "x-go-field-name": "NodeName"
+        },
+        "nodeSelector": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "NodeSelector"
+        },
+        "os": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodOS"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "OS"
+        },
+        "overhead": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceList"
+            },
+            {
+              "description": "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md",
+              "x-go-field-name": "Overhead"
+            }
+          ]
+        },
+        "preemptionPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PreemptionPolicy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PreemptionPolicy"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "Priority",
+          "x-go-star-level": 1
+        },
+        "priorityClassName": {
+          "type": "string",
+          "x-go-field-name": "PriorityClassName"
+        },
+        "readinessGates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodReadinessGate"
+          },
+          "x-go-field-name": "ReadinessGates"
+        },
+        "resourceClaims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodResourceClaim"
+          },
+          "x-go-field-name": "ResourceClaims"
+        },
+        "restartPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/RestartPolicy"
+            },
+            {
+              "description": "Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy",
+              "x-go-field-name": "RestartPolicy"
+            }
+          ]
+        },
+        "runtimeClassName": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "RuntimeClassName",
+          "x-go-star-level": 1
+        },
+        "schedulerName": {
+          "type": "string",
+          "x-go-field-name": "SchedulerName"
+        },
+        "schedulingGates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PodSchedulingGate"
+          },
+          "x-go-field-name": "SchedulingGates"
+        },
+        "securityContext": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodSecurityContext"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "SecurityContext"
+        },
+        "serviceAccount": {
+          "type": "string",
+          "x-go-field-name": "DeprecatedServiceAccount"
+        },
+        "serviceAccountName": {
+          "type": "string",
+          "x-go-field-name": "ServiceAccountName"
+        },
+        "setHostnameAsFQDN": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "SetHostnameAsFQDN",
+          "x-go-star-level": 1
+        },
+        "shareProcessNamespace": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "ShareProcessNamespace",
+          "x-go-star-level": 1
+        },
+        "subdomain": {
+          "type": "string",
+          "x-go-field-name": "Subdomain"
+        },
+        "terminationGracePeriodSeconds": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "TerminationGracePeriodSeconds",
+          "x-go-star-level": 1
+        },
+        "tolerations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Toleration"
+          },
+          "x-go-field-name": "Tolerations"
+        },
+        "topologySpreadConstraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TopologySpreadConstraint"
+          },
+          "x-go-field-name": "TopologySpreadConstraints"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodSpec"
+    },
+    "PodTemplateSpec": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ObjectMeta"
+            },
+            {
+              "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+              "x-go-field-name": "ObjectMeta"
+            }
+          ]
+        },
+        "spec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodSpec"
+            },
+            {
+              "x-go-field-name": "Spec"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.PodTemplateSpec"
+    },
+    "PolicyRule": {
+      "type": "object",
+      "properties": {
+        "apiGroups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "APIGroups"
+        },
+        "nonResourceURLs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "NonResourceURLs"
+        },
+        "resourceNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "ResourceNames"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Resources"
+        },
+        "verbs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "Verbs"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "verbs"
+      ],
+      "x-go-vendor-type": "k8s.io/api/rbac/v1.PolicyRule"
+    },
+    "PreemptionPolicy": {
+      "type": "string",
+      "enum": [
+        "Never",
+        "PreemptLowerPriority"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PreemptionPolicy"
+    },
+    "PreferredSchedulingTerm": {
+      "type": "object",
+      "properties": {
+        "preference": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/NodeSelectorTerm"
+            },
+            {
+              "description": "A node selector term, associated with the corresponding weight.",
+              "x-go-field-name": "Preference"
+            }
+          ]
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "Weight"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "weight",
+        "preference"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.PreferredSchedulingTerm"
+    },
+    "Probe": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProbeHandler"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "failureThreshold": {
+              "type": "integer",
+              "format": "int32",
+              "x-go-field-name": "FailureThreshold"
+            },
+            "initialDelaySeconds": {
+              "type": "integer",
+              "format": "int32",
+              "x-go-field-name": "InitialDelaySeconds"
+            },
+            "periodSeconds": {
+              "type": "integer",
+              "format": "int32",
+              "x-go-field-name": "PeriodSeconds"
+            },
+            "successThreshold": {
+              "type": "integer",
+              "format": "int32",
+              "x-go-field-name": "SuccessThreshold"
+            },
+            "terminationGracePeriodSeconds": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true,
+              "x-go-field-name": "TerminationGracePeriodSeconds",
+              "x-go-star-level": 1
+            },
+            "timeoutSeconds": {
+              "type": "integer",
+              "format": "int32",
+              "x-go-field-name": "TimeoutSeconds"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.Probe"
+    },
+    "ProbeHandler": {
+      "type": "object",
+      "properties": {
+        "exec": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ExecAction"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Exec"
+        },
+        "grpc": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/GRPCAction"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "GRPC"
+        },
+        "httpGet": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/HTTPGetAction"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "HTTPGet"
+        },
+        "tcpSocket": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/TCPSocketAction"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "TCPSocket"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.ProbeHandler"
+    },
+    "ProcMountType": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.ProcMountType"
+    },
+    "PullPolicy": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.PullPolicy"
+    },
+    "Quantity": {
+      "type": "string"
+    },
+    "ResourceClaim": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.ResourceClaim"
+    },
+    "ResourceList": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/Quantity"
+      },
+      "propertyNames": {
+        "$ref": "#/definitions/ResourceName"
+      },
+      "x-go-vendor-type": "k8s.io/api/core/v1.ResourceList"
+    },
+    "ResourceName": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.ResourceName"
+    },
+    "ResourceRequirements": {
+      "type": "object",
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourceClaim"
+          },
+          "x-go-field-name": "Claims"
+        },
+        "limits": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceList"
+            },
+            {
+              "description": "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+              "x-go-field-name": "Limits"
+            }
+          ]
+        },
+        "requests": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceList"
+            },
+            {
+              "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+              "x-go-field-name": "Requests"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.ResourceRequirements"
+    },
+    "RestartPolicy": {
+      "type": "string",
+      "enum": [
+        "Always",
+        "OnFailure",
+        "Never"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.RestartPolicy"
+    },
+    "RollingUpdateDaemonSet": {
+      "type": "object",
+      "properties": {
+        "maxSurge": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IntOrString"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "MaxSurge"
+        },
+        "maxUnavailable": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IntOrString"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "MaxUnavailable"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/apps/v1.RollingUpdateDaemonSet"
+    },
+    "RollingUpdateDeployment": {
+      "type": "object",
+      "properties": {
+        "maxSurge": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IntOrString"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "MaxSurge"
+        },
+        "maxUnavailable": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IntOrString"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "MaxUnavailable"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/apps/v1.RollingUpdateDeployment"
+    },
+    "RollingUpdateStatefulSetStrategy": {
+      "type": "object",
+      "properties": {
+        "maxUnavailable": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IntOrString"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "MaxUnavailable"
+        },
+        "partition": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "Partition",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/apps/v1.RollingUpdateStatefulSetStrategy"
+    },
+    "SELinuxOptions": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "x-go-field-name": "Level"
+        },
+        "role": {
+          "type": "string",
+          "x-go-field-name": "Role"
+        },
+        "type": {
+          "type": "string",
+          "x-go-field-name": "Type"
+        },
+        "user": {
+          "type": "string",
+          "x-go-field-name": "User"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.SELinuxOptions"
+    },
+    "ScopeType": {
+      "type": "string",
+      "enum": [
+        "Cluster",
+        "Namespace"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.ScopeType"
+    },
+    "SeccompProfile": {
+      "type": "object",
+      "properties": {
+        "localhostProfile": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "LocalhostProfile",
+          "x-go-star-level": 1
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/SeccompProfileType"
+            },
+            {
+              "description": "type indicates which kind of seccomp profile will be applied. Valid options are:\n\nLocalhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied.",
+              "x-go-field-name": "Type"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.SeccompProfile"
+    },
+    "SeccompProfileType": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.SeccompProfileType"
+    },
+    "SecretVolumeSource": {
+      "type": "object",
+      "properties": {
+        "defaultMode": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "DefaultMode",
+          "x-go-star-level": 1
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyToPath"
+          },
+          "x-go-field-name": "Items"
+        },
+        "optional": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "Optional",
+          "x-go-star-level": 1
+        },
+        "secretName": {
+          "type": "string",
+          "x-go-field-name": "SecretName"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.SecretVolumeSource"
+    },
+    "SecurityContext": {
+      "type": "object",
+      "properties": {
+        "allowPrivilegeEscalation": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "AllowPrivilegeEscalation",
+          "x-go-star-level": 1
+        },
+        "capabilities": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Capabilities"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Capabilities"
+        },
+        "privileged": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "Privileged",
+          "x-go-star-level": 1
+        },
+        "procMount": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ProcMountType"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "ProcMount"
+        },
+        "readOnlyRootFilesystem": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "ReadOnlyRootFilesystem",
+          "x-go-star-level": 1
+        },
+        "runAsGroup": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "RunAsGroup",
+          "x-go-star-level": 1
+        },
+        "runAsNonRoot": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "RunAsNonRoot",
+          "x-go-star-level": 1
+        },
+        "runAsUser": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "RunAsUser",
+          "x-go-star-level": 1
+        },
+        "seLinuxOptions": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/SELinuxOptions"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "SELinuxOptions"
+        },
+        "seccompProfile": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/SeccompProfile"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "SeccompProfile"
+        },
+        "windowsOptions": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/WindowsSecurityContextOptions"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "WindowsOptions"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.SecurityContext"
+    },
+    "Service": {
+      "type": "object",
+      "properties": {
+        "clusterIP": {
+          "type": "string",
+          "x-go-field-name": "ClusterIP"
+        },
+        "expose": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Expose"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Expose"
+        },
+        "paths": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "description": "Paths [PortName]BashPath",
+          "x-go-field-name": "Paths"
+        },
+        "ports": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "description": "Ports [PortName]servicePort",
+          "x-go-field-name": "Ports"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.Service"
+    },
+    "ServiceAccount": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PolicyRule"
+          },
+          "x-go-field-name": "Rules"
+        },
+        "scope": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ScopeType"
+            },
+            {
+              "x-go-field-name": "Scope"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "rules"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.ServiceAccount"
+    },
+    "Spec": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/EnvVarValueOrFrom"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Config"
+        },
+        "containers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Container"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Containers"
+        },
+        "deploy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Deploy"
+            },
+            {
+              "x-go-field-name": "Deploy"
+            }
+          ]
+        },
+        "manifests": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Manifests"
+            },
+            {
+              "x-go-field-name": "Manifests"
+            }
+          ]
+        },
+        "serviceAccount": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ServiceAccount"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "ServiceAccount"
+        },
+        "services": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Service"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Services"
+        },
+        "version": {
+          "type": "string",
+          "x-go-field-name": "Version"
+        },
+        "volumes": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Volume"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Volumes"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "version"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.Spec"
+    },
+    "SpecData": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Data"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "data"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.SpecData"
+    },
+    "StatefulSetOrdinals": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "Start"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "start"
+      ],
+      "x-go-vendor-type": "k8s.io/api/apps/v1.StatefulSetOrdinals"
+    },
+    "StatefulSetPersistentVolumeClaimRetentionPolicy": {
+      "type": "object",
+      "properties": {
+        "whenDeleted": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PersistentVolumeClaimRetentionPolicyType"
+            },
+            {
+              "description": "WhenDeleted specifies what happens to PVCs created from StatefulSet VolumeClaimTemplates when the StatefulSet is deleted. The default policy of `Retain` causes PVCs to not be affected by StatefulSet deletion. The `Delete` policy causes those PVCs to be deleted.",
+              "x-go-field-name": "WhenDeleted"
+            }
+          ]
+        },
+        "whenScaled": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PersistentVolumeClaimRetentionPolicyType"
+            },
+            {
+              "description": "WhenScaled specifies what happens to PVCs created from StatefulSet VolumeClaimTemplates when the StatefulSet is scaled down. The default policy of `Retain` causes PVCs to not be affected by a scaledown. The `Delete` policy causes the associated PVCs for any excess pods above the replica count to be deleted.",
+              "x-go-field-name": "WhenScaled"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/apps/v1.StatefulSetPersistentVolumeClaimRetentionPolicy"
+    },
+    "StatefulSetSpec": {
+      "type": "object",
+      "properties": {
+        "minReadySeconds": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "MinReadySeconds"
+        },
+        "ordinals": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/StatefulSetOrdinals"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Ordinals"
+        },
+        "persistentVolumeClaimRetentionPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/StatefulSetPersistentVolumeClaimRetentionPolicy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PersistentVolumeClaimRetentionPolicy"
+        },
+        "podManagementPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodManagementPolicyType"
+            },
+            {
+              "description": "podManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down. The default policy is `OrderedReady`, where pods are created in increasing order (pod-0, then pod-1, etc) and the controller will wait until each pod is ready before continuing. When scaling down, the pods are removed in the opposite order. The alternative policy is `Parallel` which will create pods in parallel to match the desired scale without waiting, and on scale down will delete all pods at once.",
+              "x-go-field-name": "PodManagementPolicy"
+            }
+          ]
+        },
+        "replicas": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "Replicas",
+          "x-go-star-level": 1
+        },
+        "revisionHistoryLimit": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "RevisionHistoryLimit",
+          "x-go-star-level": 1
+        },
+        "selector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "Selector"
+        },
+        "serviceName": {
+          "type": "string",
+          "x-go-field-name": "ServiceName"
+        },
+        "template": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodTemplateSpec"
+            },
+            {
+              "description": "template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. Each pod will be named with the format \u003cstatefulsetname\u003e-\u003cpodindex\u003e. For example, a pod in a StatefulSet named \"web\" with index number \"3\" would be named \"web-3\".",
+              "x-go-field-name": "Template"
+            }
+          ]
+        },
+        "updateStrategy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/StatefulSetUpdateStrategy"
+            },
+            {
+              "description": "updateStrategy indicates the StatefulSetUpdateStrategy that will be employed to update Pods in the StatefulSet when a revision is made to Template.",
+              "x-go-field-name": "UpdateStrategy"
+            }
+          ]
+        },
+        "volumeClaimTemplates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersistentVolumeClaim"
+          },
+          "x-go-field-name": "VolumeClaimTemplates"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "selector",
+        "template",
+        "serviceName"
+      ],
+      "x-go-vendor-type": "k8s.io/api/apps/v1.StatefulSetSpec"
+    },
+    "StatefulSetUpdateStrategy": {
+      "type": "object",
+      "properties": {
+        "rollingUpdate": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/RollingUpdateStatefulSetStrategy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "RollingUpdate"
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/StatefulSetUpdateStrategyType"
+            },
+            {
+              "description": "Type indicates the type of the StatefulSetUpdateStrategy. Default is RollingUpdate.",
+              "x-go-field-name": "Type"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/apps/v1.StatefulSetUpdateStrategy"
+    },
+    "StatefulSetUpdateStrategyType": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/apps/v1.StatefulSetUpdateStrategyType"
+    },
+    "Status": {
+      "type": "object",
+      "properties": {
+        "digests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DigestMeta"
+          },
+          "x-go-field-name": "Digests"
+        },
+        "endpoint": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Endpoint"
+        },
+        "images": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "x-go-field-name": "Images"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "x-go-field-name": "Resources"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.Status"
+    },
+    "Sysctl": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "value": {
+          "type": "string",
+          "x-go-field-name": "Value"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.Sysctl"
+    },
+    "TCPSocketAction": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "x-go-field-name": "Host"
+        },
+        "port": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IntOrString"
+            },
+            {
+              "description": "Number or name of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.",
+              "x-go-field-name": "Port"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "port"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.TCPSocketAction"
+    },
+    "TaintEffect": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.TaintEffect"
+    },
+    "TerminationMessagePolicy": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.TerminationMessagePolicy"
+    },
+    "Time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Toleration": {
+      "type": "object",
+      "properties": {
+        "effect": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/TaintEffect"
+            },
+            {
+              "description": "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+              "x-go-field-name": "Effect"
+            }
+          ]
+        },
+        "key": {
+          "type": "string",
+          "x-go-field-name": "Key"
+        },
+        "operator": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/TolerationOperator"
+            },
+            {
+              "description": "Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.",
+              "x-go-field-name": "Operator"
+            }
+          ]
+        },
+        "tolerationSeconds": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": true,
+          "x-go-field-name": "TolerationSeconds",
+          "x-go-star-level": 1
+        },
+        "value": {
+          "type": "string",
+          "x-go-field-name": "Value"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.Toleration"
+    },
+    "TolerationOperator": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.TolerationOperator"
+    },
+    "TopologySpreadConstraint": {
+      "type": "object",
+      "properties": {
+        "labelSelector": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LabelSelector"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "LabelSelector"
+        },
+        "matchLabelKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-field-name": "MatchLabelKeys"
+        },
+        "maxSkew": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "MaxSkew"
+        },
+        "minDomains": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "MinDomains",
+          "x-go-star-level": 1
+        },
+        "nodeAffinityPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/NodeInclusionPolicy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "NodeAffinityPolicy"
+        },
+        "nodeTaintsPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/NodeInclusionPolicy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "NodeTaintsPolicy"
+        },
+        "topologyKey": {
+          "type": "string",
+          "x-go-field-name": "TopologyKey"
+        },
+        "whenUnsatisfiable": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/UnsatisfiableConstraintAction"
+            },
+            {
+              "description": "WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it. - ScheduleAnyway tells the scheduler to schedule the pod in any location,\n  but giving higher precedence to topologies that would help reduce the\n  skew.\nA constraint is considered \"Unsatisfiable\" for an incoming pod if and only if every possible node assignment for that pod would violate \"MaxSkew\" on some topology. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: ",
+              "x-go-field-name": "WhenUnsatisfiable"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "maxSkew",
+        "topologyKey",
+        "whenUnsatisfiable"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.TopologySpreadConstraint"
+    },
+    "TypeMeta": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "x-go-field-name": "APIVersion"
+        },
+        "kind": {
+          "type": "string",
+          "x-go-field-name": "Kind"
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta"
+    },
+    "TypedLocalObjectReference": {
+      "type": "object",
+      "properties": {
+        "apiGroup": {
+          "type": "string",
+          "x-go-field-name": "APIGroup",
+          "x-go-star-level": 1
+        },
+        "kind": {
+          "type": "string",
+          "x-go-field-name": "Kind"
+        },
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "apiGroup",
+        "kind",
+        "name"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.TypedLocalObjectReference"
+    },
+    "TypedObjectReference": {
+      "type": "object",
+      "properties": {
+        "apiGroup": {
+          "type": "string",
+          "x-go-field-name": "APIGroup",
+          "x-go-star-level": 1
+        },
+        "kind": {
+          "type": "string",
+          "x-go-field-name": "Kind"
+        },
+        "name": {
+          "type": "string",
+          "x-go-field-name": "Name"
+        },
+        "namespace": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "Namespace",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "apiGroup",
+        "kind",
+        "name"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.TypedObjectReference"
+    },
+    "URIScheme": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.URIScheme"
+    },
+    "UnsatisfiableConstraintAction": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.UnsatisfiableConstraintAction"
+    },
+    "Volume": {
+      "type": "object",
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/VolumeMount"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "opt": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/SecretVolumeSource"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Opt"
+                },
+                "spec": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/SpecData"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Spec"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "Secret"
+                  ],
+                  "x-go-field-name": "Type",
+                  "x-tag-validate": "@string{Secret}"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "type"
+              ]
+            }
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeSecret"
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/VolumeMount"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "opt": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/ConfigMapVolumeSource"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Opt"
+                },
+                "spec": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/SpecData"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Spec"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "ConfigMap"
+                  ],
+                  "x-go-field-name": "Type",
+                  "x-tag-validate": "@string{ConfigMap}"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "type"
+              ]
+            }
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeConfigMap"
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/VolumeMount"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "opt": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/PersistentVolumeClaimVolumeSource"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Opt"
+                },
+                "spec": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/PersistentVolumeClaimSpec"
+                    },
+                    {
+                      "x-go-field-name": "Spec"
+                    }
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "PersistentVolumeClaim"
+                  ],
+                  "x-go-field-name": "Type",
+                  "x-tag-validate": "@string{PersistentVolumeClaim}"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "spec"
+              ]
+            }
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumePersistentVolumeClaim"
+        }
+      ],
+      "discriminator": {
+        "propertyName": "type"
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "VolumeConfigMap": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/VolumeMount"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "opt": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ConfigMapVolumeSource"
+                },
+                {
+                  "nullable": true,
+                  "x-go-star-level": 1
+                }
+              ],
+              "x-go-field-name": "Opt"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SpecData"
+                },
+                {
+                  "nullable": true,
+                  "x-go-star-level": 1
+                }
+              ],
+              "x-go-field-name": "Spec"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "ConfigMap"
+              ],
+              "x-go-field-name": "Type",
+              "x-tag-validate": "@string{ConfigMap}"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        }
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeConfigMap"
+    },
+    "VolumeMount": {
+      "type": "object",
+      "properties": {
+        "mountPath": {
+          "type": "string",
+          "x-go-field-name": "MountPath"
+        },
+        "optional": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "Optional",
+          "x-go-star-level": 1
+        },
+        "prefix": {
+          "type": "string",
+          "description": "Prefix mountPath == export, use as envFrom",
+          "x-go-field-name": "Prefix"
+        },
+        "readOnly": {
+          "type": "boolean",
+          "description": "else volumeMounts",
+          "x-go-field-name": "ReadOnly"
+        },
+        "subPath": {
+          "type": "string",
+          "x-go-field-name": "SubPath"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "mountPath"
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeMount"
+    },
+    "VolumePersistentVolumeClaim": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/VolumeMount"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "opt": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PersistentVolumeClaimVolumeSource"
+                },
+                {
+                  "nullable": true,
+                  "x-go-star-level": 1
+                }
+              ],
+              "x-go-field-name": "Opt"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PersistentVolumeClaimSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "PersistentVolumeClaim"
+              ],
+              "x-go-field-name": "Type",
+              "x-tag-validate": "@string{PersistentVolumeClaim}"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "spec"
+          ]
+        }
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumePersistentVolumeClaim"
+    },
+    "VolumeSecret": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/VolumeMount"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "opt": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SecretVolumeSource"
+                },
+                {
+                  "nullable": true,
+                  "x-go-star-level": 1
+                }
+              ],
+              "x-go-field-name": "Opt"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SpecData"
+                },
+                {
+                  "nullable": true,
+                  "x-go-star-level": 1
+                }
+              ],
+              "x-go-field-name": "Spec"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "Secret"
+              ],
+              "x-go-field-name": "Type",
+              "x-tag-validate": "@string{Secret}"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        }
+      ],
+      "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeSecret"
+    },
+    "WeightedPodAffinityTerm": {
+      "type": "object",
+      "properties": {
+        "podAffinityTerm": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodAffinityTerm"
+            },
+            {
+              "description": "Required. A pod affinity term, associated with the corresponding weight.",
+              "x-go-field-name": "PodAffinityTerm"
+            }
+          ]
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-field-name": "Weight"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "weight",
+        "podAffinityTerm"
+      ],
+      "x-go-vendor-type": "k8s.io/api/core/v1.WeightedPodAffinityTerm"
+    },
+    "WindowsSecurityContextOptions": {
+      "type": "object",
+      "properties": {
+        "gmsaCredentialSpec": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "GMSACredentialSpec",
+          "x-go-star-level": 1
+        },
+        "gmsaCredentialSpecName": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "GMSACredentialSpecName",
+          "x-go-star-level": 1
+        },
+        "hostProcess": {
+          "type": "boolean",
+          "nullable": true,
+          "x-go-field-name": "HostProcess",
+          "x-go-star-level": 1
+        },
+        "runAsUserName": {
+          "type": "string",
+          "nullable": true,
+          "x-go-field-name": "RunAsUserName",
+          "x-go-star-level": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-go-vendor-type": "k8s.io/api/core/v1.WindowsSecurityContextOptions"
+    }
+  },
+  "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.KubePkg"
+}

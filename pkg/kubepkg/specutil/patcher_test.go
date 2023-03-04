@@ -3,6 +3,9 @@ package specutil
 import (
 	"testing"
 
+	"github.com/octohelm/x/ptr"
+	appsv1 "k8s.io/api/apps/v1"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -55,10 +58,13 @@ func TestApplyOverwrites(t *testing.T) {
 
 		k, err := ApplyOverwrites(kpkg)
 		testingx.Expect(t, err, testingx.Be[error](nil))
-		testingx.Expect(t, k.Spec.Deploy.Spec, testingx.Equal(v1alpha1.SpecObject{
-			"replicas": float64(1),
-			"strategy": map[string]any{
-				"type": "Recreate",
+		testingx.Expect(t, k.Spec.Deploy.Deployer, testingx.Equal[any](&v1alpha1.DeployDeployment{
+			Kind: v1alpha1.DeployKindDeployment,
+			Spec: appsv1.DeploymentSpec{
+				Replicas: ptr.Ptr(int32(1)),
+				Strategy: appsv1.DeploymentStrategy{
+					Type: "Recreate",
+				},
 			},
 		}))
 	})

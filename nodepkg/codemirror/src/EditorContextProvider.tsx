@@ -1,23 +1,3 @@
-import {
-  bracketMatching,
-  closeBrackets,
-  closeBracketsKeymap,
-  defaultKeymap,
-  EditorView,
-  foldGutter,
-  foldKeymap,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  highlightSpecialChars,
-  keymap,
-  lineNumbers,
-  lintGutter,
-  lintKeymap,
-  Extension,
-  history,
-  historyKeymap,
-  EditorState
-} from "./codemirror";
 import { useEffect, useRef } from "react";
 import {
   BehaviorSubject,
@@ -29,6 +9,12 @@ import {
 } from "rxjs";
 import { createProvider, tapEffect } from "@nodepkg/runtime";
 import { useObservableEffect } from "@innoai-tech/reactutil";
+import { EditorState, Extension } from "@codemirror/state";
+import { lintGutter, lintKeymap } from "@codemirror/lint";
+import { EditorView, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers } from "@codemirror/view";
+import { bracketMatching, foldGutter, foldKeymap } from "@codemirror/language";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 
 export const EditorContextProvider = createProvider(
   ({ doc }: { doc?: string }) => {

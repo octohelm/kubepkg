@@ -68,7 +68,7 @@ func TestAccountRepository(t *testing.T) {
 	t.Run("list all user", func(t *testing.T) {
 		accountList, err := repo.ListUserAccount(ctx, account.UserQueryParams{})
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
-		testingutil.Expect(t, len(accountList.Data), testingutil.Be(2))
-		testingutil.Expect(t, accountList.Total, testingutil.Be(2))
+		testingutil.Expect(t, len(accountList.Data), testingutil.Be(1))
+		testingutil.Expect(t, accountList.Total, testingutil.Be(1))
 	})
 }

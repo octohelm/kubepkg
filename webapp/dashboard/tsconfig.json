@@ -1,6 +1,11 @@
 {
-  "extends": "@innoai-tech/devconfig/tsconfig.json",
+  "extends": "@nodepkg/devconfig/tsconfig.json",
   "compilerOptions": {
-    "exactOptionalPropertyTypes": false
+    "baseUrl": ".",
+    "paths": {
+      "@nodepkg/*": [
+        "../../nodepkg/*/src/index.ts"
+      ],
+    }
   }
 }

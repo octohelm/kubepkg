@@ -4,11 +4,6 @@ DON'T EDIT THIS FILE
 */
 package v1alpha1
 
-func (DeployKind) EnumValues() []any {
-	return []any{
-		DeployKindConfigMap, DeployKindCronJob, DeployKindDaemonSet, DeployKindDeployment, DeployKindJob, DeployKindSecret, DeployKindStatefulSet,
-	}
-}
 func (DigestMetaType) EnumValues() []any {
 	return []any{
 		DigestMetaBlob, DigestMetaManifest,

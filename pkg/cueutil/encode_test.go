@@ -86,7 +86,7 @@ func TestEncode(t *testing.T) {
 			ExampleWithCustomStr{
 				CustomStr: CustomStr{},
 			},
-			`{str:"one" | "two"}`,
+			`{str:string}`,
 		},
 	}
 

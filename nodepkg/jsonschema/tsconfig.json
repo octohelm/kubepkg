@@ -1,0 +1,3 @@
+{
+  "extends": "@nodepkg/devconfig/tsconfig.json"
+}

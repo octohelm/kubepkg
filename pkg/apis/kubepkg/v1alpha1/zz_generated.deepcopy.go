@@ -42,7 +42,7 @@ func (in *Spec) DeepCopy() *Spec {
 
 func (in *Spec) DeepCopyInto(out *Spec) {
 	out.Version = in.Version
-	out.Deploy = in.Deploy
+	in.Deploy.DeepCopyInto(&out.Deploy)
 	if in.Config != nil {
 		i, o := &in.Config, &out.Config
 		*o = make(map[string]EnvVarValueOrFrom, len(*i))
@@ -73,6 +73,19 @@ func (in *Spec) DeepCopyInto(out *Spec) {
 	}
 	out.ServiceAccount = in.ServiceAccount
 	out.Manifests = in.Manifests.DeepCopy()
+
+}
+func (in *Deploy) DeepCopy() *Deploy {
+	if in == nil {
+		return nil
+	}
+	out := new(Deploy)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *Deploy) DeepCopyInto(out *Deploy) {
+	out.Deployer = in.Deployer
 
 }
 func (in Manifests) DeepCopy() Manifests {

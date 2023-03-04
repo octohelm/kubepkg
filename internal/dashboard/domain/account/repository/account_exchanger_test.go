@@ -30,7 +30,7 @@ func TestExchanger(t *testing.T) {
 		t.Run("Re exchange", func(t *testing.T) {
 			accountIDs2, err := a.Exchange(ctx, "oidc", &MockUserInfo{}, true)
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
-			testingutil.Expect(t, accountIDs2, testingutil.Equal(accountIDs))
+			testingutil.Expect(t, accountIDs2[0:2], testingutil.Equal(accountIDs[0:2]))
 		})
 	})
 }

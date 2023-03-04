@@ -22,12 +22,12 @@ func (*ApplyKubePkg) ResponseErrors() []error {
 	return []error{
 		&(github_com_octohelm_courier_pkg_statuserror.StatusErr{
 			Code: 400,
-			Key:  "ReadKubePkgTgzFailed",
-			Msg:  "ReadKubePkgTgzFailed",
-		}), &(github_com_octohelm_courier_pkg_statuserror.StatusErr{
-			Code: 400,
 			Key:  "NoRequestBody",
 			Msg:  "NoRequestBody",
+		}), &(github_com_octohelm_courier_pkg_statuserror.StatusErr{
+			Code: 400,
+			Key:  "ReadKubePkgTgzFailed",
+			Msg:  "ReadKubePkgTgzFailed",
 		}),
 	}
 }

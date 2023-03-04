@@ -1,4 +1,2 @@
 github.com/innoai-tech/runtime v0.0.0-20230301034018-d0f9cf039113 h1:+7EMEnNP3i+le/nZ7lbx8+Ta8IBcOVyzwKscE37lAYU=
-k8s.io/api v0.25.4 h1:3YO8J4RtmG7elEgaWMb4HgmpS2CfY1QlaOz9nwB+ZSs=
-k8s.io/apimachinery v0.25.4 h1:CtXsuaitMESSu339tfhVXhQrPET+EiWnIY1rcurKnAc=
 wagon.octohelm.tech v0.0.0-20200202235959-3d91e2e3161f 

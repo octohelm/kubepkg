@@ -20,9 +20,6 @@ test:
 install:
 	go install ./cmd/kubepkg
 
-gen.kubepkg:
-	cuem gen -i=go -o ./cuepkg/kubepkg ./pkg/apis/kubepkg/v1alpha1
-
 k.k8s: gen.kubepkg
 	$(KUBEPKG) serve operator --dump-k8s
 	$(KUBEPKG) serve registry --dump-k8s

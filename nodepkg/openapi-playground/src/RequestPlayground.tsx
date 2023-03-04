@@ -36,7 +36,7 @@ import {
   reduce,
   toPairs,
   keys,
-  take
+  startsWith
 } from "@innoai-tech/lodash";
 import {
   RequestSchemaProvider,
@@ -51,11 +51,18 @@ import {
   EditorView,
   forceLinting,
   diagnosticCount,
-  selectionSetAt,
-  SchemaLSP,
+  selectionAt,
   EditorContainer
 } from "@nodepkg/codemirror";
-import { cleanupSchema } from "./utils";
+import {
+  JSONSchema,
+  LSP,
+  SchemaObjectType,
+  SchemaRefType,
+  SchemaType,
+  SchemaUnionType
+} from "@nodepkg/jsonschema";
+import { SchemaVisitor } from "./SchemaVisitor";
 import { compilePath, getHeadContentType, pickValuesIn } from "./http";
 import type { FetcherResponse, RequestConfig } from "@innoai-tech/fetcher";
 import { HttpRequest, HTTPResponse } from "./HTTPViews";
@@ -95,8 +102,8 @@ export const RequestPlayground = () => {
   const openapi = useOpenAPI();
 
   const schema = useMemo(() => {
-    return cleanupSchema({
-      anyOf: map(openapi.operations, (operation, k) => ({
+    const schema = {
+      oneOf: map(openapi.operations, (operation, k) => ({
         properties: {
           [k]: {
             $ref: `#/definitions/${k}`,
@@ -108,7 +115,6 @@ export const RequestPlayground = () => {
         type: "object"
       })),
       definitions: {
-        ...openapi.components.schemas,
         ...mapValues(openapi.operations, (operation) => {
           const parameters = [
             ...(operation.parameters || []),
@@ -131,13 +137,13 @@ export const RequestPlayground = () => {
             map(filter(parameters, by), (p) => p.name);
 
           return {
-            "x-id": operation.operationId,
             type: "object",
             description: [operation.summary, operation.description]
               .filter((v) => v)
               .join("\n\n"),
             "x-method": operation.method.toUpperCase(),
             "x-path": operation.path,
+            "x-id": operation.operationId,
             required: pickNamesBy((p) => p.required),
             additionalProperties: false,
             properties: {
@@ -152,7 +158,7 @@ export const RequestPlayground = () => {
                 }),
                 {}
               ),
-              "__responses": {
+              __responses: {
                 type: "object",
                 description: "请求返回",
                 properties: mapValues(operation.responses, ({ content }) => {
@@ -172,7 +178,26 @@ export const RequestPlayground = () => {
           };
         })
       }
-    });
+    };
+
+    return SchemaVisitor.create(schema, (ref, v) => {
+      const parts = ref.slice(2).split("/");
+      const id = last(parts)!;
+
+      if (startsWith(ref, "#/definitions/")) {
+        schema.definitions[id] = v.process(schema.definitions[id]);
+
+        return {
+          $ref: ref
+        };
+      }
+
+      schema.definitions[id] = v.process(get(openapi, parts, {}));
+
+      return {
+        $ref: `#/definitions/${last(parts)!}`
+      };
+    }).simplify();
   }, [openapi]);
 
   return (
@@ -187,7 +212,7 @@ const Playground = ({ schema }: { schema: any }) => {
 
   useJSONEditor(schema);
 
-  const schemaBreadcrumbs$ = useStateSubject([schema]);
+  const schemaBreadcrumbs$ = useStateSubject<SchemaType[]>([]);
 
   const request$ = useRequest(((o: any) => {
     const operationID = keys(o)[0]!;
@@ -203,7 +228,7 @@ const Playground = ({ schema }: { schema: any }) => {
         pickValuesIn("path", operation.parameters, inputs)
       )}`,
       params: pickValuesIn("query", operation.parameters, inputs),
-      headers: pickValuesIn("headers", operation.parameters, inputs),
+      headers: pickValuesIn("header", operation.parameters, inputs),
       body: inputs.body
     };
 
@@ -330,7 +355,7 @@ const Tips = () => {
 
 快捷键
 * \`${p.os.mac ? "CMD" : "Ctrl"} + Enter\`：发起请求
-* \`Shirt + Space\`：自动补全提示
+* \`Shirt + Space\`：代码补全提示
 
                     `}
       </Markdown>
@@ -394,37 +419,40 @@ export const Documents = ({
                             schema,
                             schemaBreadcrumbs$
                           }: {
-  schema: any;
-  schemaBreadcrumbs$: StateSubject<any[]>;
+  schema: JSONSchema;
+  schemaBreadcrumbs$: StateSubject<SchemaType[]>;
 }) => {
-  const selectionSet$ = useStateSubject([] as string[]);
+  const instancePath$ = useStateSubject([] as string[]);
+
+  const lsp = useMemo(() => new LSP(schema), [schema]);
 
   useObservableEffect(() => {
-    const lsp = new SchemaLSP(schema);
-
-    return selectionSet$.pipe(
+    return instancePath$.pipe(
       distinctUntilChanged(isEqual),
-      rxMap((selection) => {
-        let schemaBreadcrumbs = lsp.resolve(selection);
-        if (schemaBreadcrumbs.length === 1) {
-          return schemaBreadcrumbs;
+      rxMap((instancePath) => {
+        let s = lsp.schemaAt(instancePath);
+        while (
+          s &&
+          !(
+            s.underlying instanceof SchemaObjectType ||
+            s.underlying instanceof SchemaUnionType
+          )
+          ) {
+          s = s.parent ?? null;
         }
-        if (last(schemaBreadcrumbs)?.type !== "object") {
-          schemaBreadcrumbs = take(
-            schemaBreadcrumbs,
-            schemaBreadcrumbs.length - 1
-          );
-        }
-        return schemaBreadcrumbs;
+        let schemaBreadcrumbs = s?.parents.filter(
+          (p) => !(p.underlying instanceof SchemaRefType)
+        );
+        return schemaBreadcrumbs ?? [];
       }),
       tap(schemaBreadcrumbs$)
     );
-  }, [schema]);
+  }, [lsp]);
 
   useExtension(() =>
     EditorView.updateListener.of((u) => {
-      selectionSet$.next(
-        selectionSetAt(u.state, u.state.selection.main.head).selection
+      instancePath$.next(
+        selectionAt(u.state, u.state.selection.main.head).instancePath
       );
     })
   );
@@ -439,7 +467,7 @@ export const Documents = ({
       <Subscribe value$={schemaBreadcrumbs$}>
         {(schemaBreadcrumbs) => (
           <RequestSchemaProvider
-            rootSchema={schema}
+            lsp={lsp}
             schemaBreadcrumbs$={schemaBreadcrumbs$}
           >
             <Stack
@@ -451,23 +479,26 @@ export const Documents = ({
                 px: 1
               }}
             >
-              {map(schemaBreadcrumbs, (schema, i) => (
-                <Stack direction={"row"} alignItems={"center"} key={i}>
-                  {i > 0 && <Box sx={{ opacity: 0.5, mx: 1 }}>/</Box>}
-                  <TypeLink
-                    sx={{
-                      opacity: i < schemaBreadcrumbs.length - 1 ? 0.5 : 1
-                    }}
-                    onClick={() =>
-                      schemaBreadcrumbs$.next((schemaBreadcrumbs) =>
-                        schemaBreadcrumbs.slice(0, i + 1)
-                      )
-                    }
-                  >
-                    {schema["x-id"] || "#"}
-                  </TypeLink>
-                </Stack>
-              ))}
+              {map(
+                schemaBreadcrumbs.filter((s) => !(s instanceof SchemaRefType)),
+                (schema, i) => (
+                  <Stack direction={"row"} alignItems={"center"} key={i}>
+                    {i > 0 && <Box sx={{ opacity: 0.5, mx: 1 }}>/</Box>}
+                    <TypeLink
+                      sx={{
+                        opacity: i < schemaBreadcrumbs.length - 1 ? 0.5 : 1
+                      }}
+                      onClick={() =>
+                        schemaBreadcrumbs$.next((schemaBreadcrumbs) =>
+                          schemaBreadcrumbs.slice(0, i + 1)
+                        )
+                      }
+                    >
+                      {schema.meta("x-id") || "#"}
+                    </TypeLink>
+                  </Stack>
+                )
+              )}
             </Stack>
             <Box
               sx={{

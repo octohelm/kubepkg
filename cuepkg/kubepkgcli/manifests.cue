@@ -5,7 +5,7 @@ import (
 
 	"wagon.octohelm.tech/core"
 
-	spec "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
+	spec "github.com/octohelm/kubepkg/cuepkg/kubepkg"
 )
 
 #Manifests: {

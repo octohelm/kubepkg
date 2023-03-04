@@ -1,9 +1,5 @@
-import {
-  tags,
-  syntaxHighlighting,
-  HighlightStyle,
-  defaultHighlightStyle
-} from "./codemirror";
+import { defaultHighlightStyle, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { tags } from "@lezer/highlight";
 import { Box, useTheme, alpha } from "@mui/material";
 import { useEditorView, useExtension } from "./EditorContextProvider";
 

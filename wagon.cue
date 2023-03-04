@@ -7,7 +7,7 @@ import (
 	"github.com/innoai-tech/runtime/cuepkg/imagetool"
 	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
-	kubepkg "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
+	"github.com/octohelm/kubepkg/cuepkg/kubepkg"
 	"github.com/octohelm/kubepkg/cuepkg/kubepkgcli"
 	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/component/kubepkg"
 )

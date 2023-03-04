@@ -46,7 +46,8 @@ flowchart BT
 
 ## `kubepkg.airgap.tgz`
 
-kubepkg.json & [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md)
+* `kubepkg.json`: KubePkg CRD json
+* [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md)
 
 ```
 kubepkg.json # must be first of all
@@ -55,29 +56,4 @@ blobs/ # blob contents
     <hash>
 index.json # oci image layout required
 oci-layout # oci image layout required    
-```
-
-### `kubepkg.yaml` or `kubepkg.json`
-
-```typescript
-interface KubePkg {
-  apiVersion: "octohelm.tech/v1alpha1"
-  kind: "KubePkg"
-  metadata: {
-    name: string
-  }
-  spec: {
-    // semver for upgrade checking
-    version: string
-    // manifests of k8s
-    manifests: {
-      // "<metadata.name>.<kind>.<apiGroup>"
-      [key: string]: {
-        apiVersion: string,
-        kind: string,
-        [x: string]: any
-      }
-    }
-  }
-}
 ```

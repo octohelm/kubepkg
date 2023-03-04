@@ -16,9 +16,9 @@ export default defineConfig({
           await generateClients(join(c.root!, "client"), ctx, {
             requestCreator: {
               expose: "createRequest",
-              importPath: "./client",
+              importPath: "./client"
             },
-            includesRawOpenAPI: true,
+            includesRawOpenAPI: true
           });
         } catch (e) {
           console.log(e);
@@ -32,7 +32,7 @@ export default defineConfig({
           "rxjs",
           "date-fns",
           "filesize",
-          "copy-to-clipboard",
+          "copy-to-clipboard"
         ],
         uikit: [
           "react",
@@ -40,15 +40,19 @@ export default defineConfig({
           "react-router",
           "react-router-dom",
           "react-spring",
-          "@innoai-tech/*",
+          "@innoai-tech/*"
         ],
         ui: ["@emotion/*", "@mui/*", "@monaco-editor/*"],
-        markdown: ["unified", "rehype-*"],
-      },
-    }),
+        codemirror: [
+          "@codemirror/*",
+          "@lezer/*"
+        ],
+        markdown: ["unified", "rehype-*"]
+      }
+    })
     // visualizer({
     //   emitFile: true,
     //   filename: "stats.html"
     // })
-  ],
+  ]
 });

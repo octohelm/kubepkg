@@ -2,6 +2,7 @@ import {
   forEach,
   has,
   isObject,
+  map,
   mapValues,
   omit,
   pickBy,
@@ -33,6 +34,15 @@ export class SchemaVisitor {
 
     for (const transformer of this.transformers) {
       schema = transformer(schema);
+    }
+
+    schema.nullable = undefined
+
+    if (has(schema, "oneOf")) {
+      return {
+        ...schema,
+        oneOf: map(schema.oneOf, (s) => this._process(s))
+      };
     }
 
     if (has(schema, "allOf")) {
@@ -76,32 +86,11 @@ export class SchemaVisitor {
     }
 
     if (SchemaVisitor.isObject(schema)) {
-      if (isObject(schema.additionalProperties)) {
-        const additionalProperties: any = this._process(
-          schema.additionalProperties
-        );
-
-        if (isObject(schema.propertyNames)) {
-          const propertyNames: any = this._process(schema.propertyNames);
-
-          return {
-            ...schema,
-            additionalProperties,
-            propertyNames: propertyNames
-          };
-        }
-
-        return {
-          ...schema,
-          additionalProperties
-        };
-      }
-
       return {
         ...schema,
-        properties: mapValues(schema.properties, (propSchema) =>
-          this._process(propSchema)
-        )
+        properties: mapValues(schema.properties, (propSchema) => this._process(propSchema)),
+        propertyNames: this._process(schema.propertyNames || { type: "string" }),
+        additionalProperties: schema.additionalProperties ? this._process(isObject(schema.additionalProperties) ? schema.additionalProperties : {}) : false
       };
     }
 

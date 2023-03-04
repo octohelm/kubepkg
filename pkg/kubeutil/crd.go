@@ -155,28 +155,46 @@ func (scanner *jsonSchemaScanner) Visit(schema *apiextensionsv1.JSONSchemaProps)
 			if found, ok := scanner.definitions[strings.TrimPrefix(*ref, schemaPathPrefix)]; ok {
 				found.DeepCopyInto(schema)
 				*schema = found
-
-				if schema.AdditionalProperties != nil {
-					if additional := schema.AdditionalProperties.Schema; additional != nil {
-						if additional.Type == "" && len(additional.Properties) == 0 {
-							schema.Type = "object"
-							schema.AdditionalProperties = nil
-							schema.XPreserveUnknownFields = ptr.Bool(true)
-						}
-					}
-				}
 			}
 		}
 
-		if len(schema.AnyOf) == 2 {
-			data, _ := json.Marshal(schema.AnyOf)
+		if schema.AdditionalProperties != nil {
+			if additionalSchema := schema.AdditionalProperties.Schema; additionalSchema == nil {
+				schema.Type = "object"
+				schema.XPreserveUnknownFields = ptr.Bool(true)
+				schema.AdditionalProperties = nil
+			} else {
+				if additionalSchema.Type == "" && len(additionalSchema.Properties) == 0 {
+					additionalSchema.Type = "object"
+					additionalSchema.XPreserveUnknownFields = ptr.Bool(true)
+					schema.AdditionalProperties = nil
+				}
+			}
 
+			if len(schema.Properties) != 0 {
+				schema.AdditionalProperties = nil
+			}
+		}
+
+		schema.Nullable = false
+
+		if len(schema.OneOf) == 2 {
+			data, _ := json.Marshal(schema.OneOf)
 			if bytes.Equal(data, []byte(`[{"type":"integer","format":"int32"},{"type":"string"}]`)) {
 				schema.Type = ""
 				schema.Format = ""
 				schema.XIntOrString = true
-				schema.AnyOf = nil
+				schema.OneOf = nil
 			}
+		}
+
+		if schema.OneOf != nil {
+			// ugly set wild object,
+			// because k8s not support
+			schema.Type = "object"
+			schema.Required = nil
+			schema.XPreserveUnknownFields = ptr.Bool(true)
+			schema.OneOf = nil
 		}
 
 		if schema.Format == "int-or-string" {

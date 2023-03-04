@@ -1,12 +1,13 @@
 package kubepkg
 
 import (
-	kubepkg "github.com/octohelm/kubepkg/cuepkg/kubepkg:v1alpha1"
+	kubepkg "github.com/octohelm/kubepkg/cuepkg/kubepkg"
 )
 
 #KubepkgStorage: kubepkg.#Volume & {
 	mountPath: "/etc/kubepkg"
-	type:      "PersistentVolumeClaim"
+
+	type: "PersistentVolumeClaim"
 	opt: claimName: "storage-kubepkg"
 	spec: {
 		accessModes: ["ReadWriteOnce"]

@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/octohelm/kubepkg/pkg/util"
+
 	rbacv1 "k8s.io/api/rbac/v1"
 
 	"github.com/octohelm/kubepkg/pkg/annotation"
@@ -65,16 +67,16 @@ func (c *collector) configDataFrom(tpe string, config map[string]v1alpha1.EnvVar
 }
 
 func (c *collector) walk(kpkg *v1alpha1.KubePkg) error {
-	switch kpkg.Spec.Deploy.Kind {
-	case v1alpha1.DeployKindSecret:
+	switch x := kpkg.Spec.Deploy.Deployer.(type) {
+	case *v1alpha1.DeploySecret:
 		secret := &corev1.Secret{}
 		secret.SetGroupVersionKind(corev1.SchemeGroupVersion.WithKind("Secret"))
 		secret.SetNamespace(kpkg.Namespace)
 		secret.SetName(kpkg.Name)
 
 		configurationType := ""
-		if kpkg.Spec.Deploy.Annotations != nil {
-			if ct, ok := kpkg.Spec.Deploy.Annotations["configuration.octohelm.tech/type"]; ok {
+		if x.Annotations != nil {
+			if ct, ok := x.Annotations["configuration.octohelm.tech/type"]; ok {
 				configurationType = ct
 			}
 		}
@@ -86,15 +88,15 @@ func (c *collector) walk(kpkg *v1alpha1.KubePkg) error {
 
 		secret.StringData = data
 		c.register(secret)
-	case v1alpha1.DeployKindConfigMap:
+	case *v1alpha1.DeployConfigMap:
 		configMap := &corev1.ConfigMap{}
 		configMap.SetGroupVersionKind(corev1.SchemeGroupVersion.WithKind("ConfigMap"))
 		configMap.SetNamespace(kpkg.Namespace)
 		configMap.SetName(kpkg.Name)
 
 		configurationType := ""
-		if kpkg.Spec.Deploy.Annotations != nil {
-			if ct, ok := kpkg.Spec.Deploy.Annotations["configuration.octohelm.tech/type"]; ok {
+		if x.Annotations != nil {
+			if ct, ok := x.Annotations["configuration.octohelm.tech/type"]; ok {
 				configurationType = ct
 			}
 		}
@@ -104,7 +106,7 @@ func (c *collector) walk(kpkg *v1alpha1.KubePkg) error {
 		}
 		configMap.Data = data
 		c.register(configMap)
-	case v1alpha1.DeployKindDeployment:
+	case *v1alpha1.DeployDeployment:
 		deployment := &appsv1.Deployment{}
 		deployment.SetGroupVersionKind(appsv1.SchemeGroupVersion.WithKind("Deployment"))
 		deployment.SetNamespace(kpkg.Namespace)
@@ -119,16 +121,17 @@ func (c *collector) walk(kpkg *v1alpha1.KubePkg) error {
 		deployment.Spec.Selector = &metav1.LabelSelector{
 			MatchLabels: deployment.Spec.Template.Labels,
 		}
-		if len(kpkg.Spec.Deploy.Spec) > 0 {
-			if err := kpkg.Spec.Deploy.Spec.DecodeTo(&deployment.Spec); err != nil {
-				return err
-			}
+
+		spec, err := util.Merge(&deployment.Spec, &x.Spec)
+		if err != nil {
+			return err
 		}
+		deployment.Spec = *spec
 
 		c.patchReloadAnnotation(deployment, podTemplateSpec)
 		c.register(deployment)
 
-	case v1alpha1.DeployKindDaemonSet:
+	case *v1alpha1.DeployDaemonSet:
 		daemonSet := &appsv1.DaemonSet{}
 		daemonSet.SetGroupVersionKind(appsv1.SchemeGroupVersion.WithKind("DaemonSet"))
 		daemonSet.SetNamespace(kpkg.Namespace)
@@ -143,16 +146,17 @@ func (c *collector) walk(kpkg *v1alpha1.KubePkg) error {
 		daemonSet.Spec.Selector = &metav1.LabelSelector{
 			MatchLabels: daemonSet.Spec.Template.Labels,
 		}
-		if len(kpkg.Spec.Deploy.Spec) > 0 {
-			if err := kpkg.Spec.Deploy.Spec.DecodeTo(&daemonSet.Spec); err != nil {
-				return err
-			}
+
+		spec, err := util.Merge(&daemonSet.Spec, &x.Spec)
+		if err != nil {
+			return err
 		}
+		daemonSet.Spec = *spec
 
 		c.patchReloadAnnotation(daemonSet, podTemplateSpec)
 		c.register(daemonSet)
 
-	case v1alpha1.DeployKindStatefulSet:
+	case *v1alpha1.DeployStatefulSet:
 		statefulSet := &appsv1.StatefulSet{}
 		statefulSet.SetGroupVersionKind(appsv1.SchemeGroupVersion.WithKind("StatefulSet"))
 		statefulSet.SetNamespace(kpkg.Namespace)
@@ -167,11 +171,12 @@ func (c *collector) walk(kpkg *v1alpha1.KubePkg) error {
 		statefulSet.Spec.Selector = &metav1.LabelSelector{
 			MatchLabels: statefulSet.Spec.Template.Labels,
 		}
-		if len(kpkg.Spec.Deploy.Spec) > 0 {
-			if err := kpkg.Spec.Deploy.Spec.DecodeTo(&statefulSet.Spec); err != nil {
-				return err
-			}
+
+		spec, err := util.Merge(&statefulSet.Spec, &x.Spec)
+		if err != nil {
+			return err
 		}
+		statefulSet.Spec = *spec
 
 		c.patchReloadAnnotation(statefulSet, podTemplateSpec)
 		c.register(statefulSet)
@@ -301,37 +306,39 @@ func (c *collector) walkVolumes(kpkg *v1alpha1.KubePkg) error {
 	for n := range volumes {
 		v := volumes[n]
 
-		switch v.Type {
-		case "PersistentVolumeClaim":
+		switch x := v.VolumeSource.(type) {
+		case *v1alpha1.VolumePersistentVolumeClaim:
 			persistentVolumeClaim := &corev1.PersistentVolumeClaim{}
 			persistentVolumeClaim.SetGroupVersionKind(corev1.SchemeGroupVersion.WithKind("PersistentVolumeClaim"))
 			persistentVolumeClaim.SetNamespace(kpkg.Namespace)
 			persistentVolumeClaim.SetName(subResourceName(kpkg, n))
 
-			if err := v.Spec.DecodeTo(&persistentVolumeClaim.Spec); err != nil {
+			spec, err := util.Merge(&persistentVolumeClaim.Spec, &x.Spec)
+			if err != nil {
 				return err
 			}
+			persistentVolumeClaim.Spec = *spec
 
 			c.register(persistentVolumeClaim)
-		case "ConfigMap":
+		case *v1alpha1.VolumeConfigMap:
 			configMap := &corev1.ConfigMap{}
 			configMap.SetGroupVersionKind(corev1.SchemeGroupVersion.WithKind("ConfigMap"))
 			configMap.SetNamespace(kpkg.Namespace)
 			configMap.SetName(subResourceName(kpkg, n))
 
-			if err := v.Spec.DecodeTo(&configMap); err != nil {
-				return err
+			if spec := x.Spec; spec != nil {
+				configMap.Data = spec.Data
 			}
 
 			c.register(configMap)
-		case "Secret":
+		case *v1alpha1.VolumeSecret:
 			secret := &corev1.Secret{}
 			secret.SetGroupVersionKind(corev1.SchemeGroupVersion.WithKind("Secret"))
 			secret.SetNamespace(kpkg.Namespace)
 			secret.SetName(subResourceName(kpkg, n))
 
-			if err := v.Spec.DecodeTo(&secret); err != nil {
-				return err
+			if spec := x.Spec; spec != nil {
+				secret.StringData = spec.Data
 			}
 
 			c.register(secret)
@@ -405,7 +412,7 @@ func (c *collector) walkRbac(kpkg *v1alpha1.KubePkg) error {
 }
 
 func ManifestsFromSpec(kpkg *v1alpha1.KubePkg) (map[string]Object, error) {
-	if kpkg.Spec.Deploy == nil {
+	if kpkg.Spec.Deploy.Deployer == nil {
 		return map[string]Object{}, nil
 	}
 	c := &collector{manifests: map[string]Object{}}
@@ -583,68 +590,84 @@ func toContainer(c v1alpha1.Container, name string, podTemplateSpec *corev1.PodT
 	for n := range volumes {
 		v := volumes[n]
 
-		if v.MountPath == "export" {
-			if v.Type == "ConfigMap" || v.Type == "Secret" {
-				envFrom := corev1.EnvFromSource{
-					Prefix: v.Prefix,
-				}
-
-				switch v.Type {
-				case "ConfigMap":
-					envFrom.ConfigMapRef = &corev1.ConfigMapEnvSource{}
-					envFrom.ConfigMapRef.Name = subResourceName(kpkg, n)
-					envFrom.ConfigMapRef.Optional = v.Optional
-
-					kubeutil.AppendAnnotate(podTemplateSpec, annotation.ReloadConfigMap, envFrom.ConfigMapRef.Name)
-
-				case "Secret":
-					envFrom.SecretRef = &corev1.SecretEnvSource{}
-					envFrom.SecretRef.Name = subResourceName(kpkg, n)
-					envFrom.SecretRef.Optional = v.Optional
-
-					kubeutil.AppendAnnotate(podTemplateSpec, annotation.ReloadSecret, envFrom.SecretRef.Name)
-				}
-
-				container.EnvFrom = append(container.EnvFrom, envFrom)
-			}
-			continue
-		}
-
-		volumeMount := corev1.VolumeMount{
-			Name:      subResourceName(kpkg, n),
-			MountPath: v.MountPath,
-			SubPath:   v.SubPath,
-			ReadOnly:  v.ReadOnly,
-		}
-
 		volume := corev1.Volume{}
 
-		opt := v.Opt
-		if opt == nil {
-			opt = v1alpha1.SpecObject{}
-		}
-
-		so := v1alpha1.SpecObject{
-			"name": volumeMount.Name,
-			strings.ToLower(v.Type[0:1]) + v.Type[1:]: opt,
-		}
-
-		if err := so.DecodeTo(&volume); err != nil {
-			return nil, err
-		}
-
-		switch v.Type {
-		case "ConfigMap":
+		switch x := v.VolumeSource.(type) {
+		case *v1alpha1.VolumeConfigMap:
+			volume.ConfigMap = x.Opt
+			if volume.ConfigMap == nil {
+				volume.ConfigMap = &corev1.ConfigMapVolumeSource{}
+			}
 			volume.ConfigMap.Name = subResourceName(kpkg, n)
+
 			kubeutil.AppendAnnotate(podTemplateSpec, annotation.ReloadConfigMap, volume.ConfigMap.Name)
-		case "Secret":
+
+			volumeMount := corev1.VolumeMount{
+				Name: subResourceName(kpkg, n),
+			}
+
+			if x.MountPath == "export" {
+				envFrom := corev1.EnvFromSource{
+					Prefix: x.Prefix,
+				}
+				envFrom.ConfigMapRef = &corev1.ConfigMapEnvSource{}
+				envFrom.ConfigMapRef.Name = subResourceName(kpkg, n)
+				envFrom.ConfigMapRef.Optional = x.Optional
+
+				container.EnvFrom = append(container.EnvFrom, envFrom)
+				kubeutil.AppendAnnotate(podTemplateSpec, annotation.ReloadConfigMap, envFrom.ConfigMapRef.Name)
+			} else {
+				volumeMount.MountPath = x.MountPath
+				volumeMount.SubPath = x.SubPath
+				volumeMount.ReadOnly = x.ReadOnly
+
+				container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+			}
+		case *v1alpha1.VolumeSecret:
+			volume.Secret = x.Opt
+			if volume.Secret == nil {
+				volume.Secret = &corev1.SecretVolumeSource{}
+			}
 			volume.Secret.SecretName = subResourceName(kpkg, n)
 			kubeutil.AppendAnnotate(podTemplateSpec, annotation.ReloadSecret, volume.Secret.SecretName)
-		case "PersistentVolumeClaim":
-			volume.PersistentVolumeClaim.ClaimName = subResourceName(kpkg, n)
-		}
 
-		container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+			volumeMount := corev1.VolumeMount{
+				Name: subResourceName(kpkg, n),
+			}
+
+			if volumeMount.MountPath == "export" {
+				envFrom := corev1.EnvFromSource{
+					Prefix: x.Prefix,
+				}
+				envFrom.SecretRef = &corev1.SecretEnvSource{}
+				envFrom.SecretRef.Name = subResourceName(kpkg, n)
+				envFrom.SecretRef.Optional = x.Optional
+
+				container.EnvFrom = append(container.EnvFrom, envFrom)
+				kubeutil.AppendAnnotate(podTemplateSpec, annotation.ReloadSecret, envFrom.SecretRef.Name)
+			} else {
+				volumeMount.MountPath = x.MountPath
+				volumeMount.SubPath = x.SubPath
+				volumeMount.ReadOnly = x.ReadOnly
+
+				container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+			}
+		case *v1alpha1.VolumePersistentVolumeClaim:
+			if x.MountPath != "export" {
+				volumeMount := corev1.VolumeMount{
+					Name: subResourceName(kpkg, n),
+				}
+
+				volumeMount.MountPath = x.MountPath
+				volumeMount.SubPath = x.SubPath
+				volumeMount.ReadOnly = x.ReadOnly
+
+				volume.PersistentVolumeClaim = x.Opt
+				volume.PersistentVolumeClaim.ClaimName = subResourceName(kpkg, n)
+
+				container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+			}
+		}
 
 		addToSpecVolume(podTemplateSpec, volume)
 	}
@@ -679,12 +702,19 @@ func volumesFrom(kpkg *v1alpha1.KubePkg) map[string]v1alpha1.Volume {
 			data[k] = c.Value
 		}
 	}
-	if !(kpkg.Spec.Deploy.Kind == v1alpha1.DeployKindSecret || kpkg.Spec.Deploy.Kind == v1alpha1.DeployKindConfigMap) {
+
+	switch kpkg.Spec.Deploy.Deployer.(type) {
+	case *v1alpha1.VolumeSecret, *v1alpha1.VolumeConfigMap:
+	default:
 		volumes["#"] = v1alpha1.Volume{
-			MountPath: "export",
-			Type:      "ConfigMap",
-			Spec: map[string]any{
-				"data": data,
+			VolumeSource: v1alpha1.VolumeConfigMap{
+				Type: "ConfigMap",
+				Spec: &v1alpha1.SpecData{
+					Data: data,
+				},
+				VolumeMount: v1alpha1.VolumeMount{
+					MountPath: "export",
+				},
 			},
 		}
 	}

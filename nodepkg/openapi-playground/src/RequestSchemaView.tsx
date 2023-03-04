@@ -2,21 +2,29 @@ import {
   forEach,
   get,
   has,
-  last,
   includes,
-  isObject,
   isUndefined,
   map,
   replace,
   some,
-  isArray,
+  isArray
 } from "@innoai-tech/lodash";
 import { Box, useTheme, SxProps, Theme } from "@mui/material";
 import { createContext, Fragment, ReactNode, useContext } from "react";
-import { isArraySchema, isObjectSchema } from "./utils";
 import { createProvider } from "@nodepkg/runtime";
 import { Markdown } from "@nodepkg/markdown";
 import type { StateSubject } from "@innoai-tech/reactutil";
+import {
+  LSP,
+  SchemaAnyType,
+  SchemaArrayType,
+  SchemaObjectType,
+  SchemaRefType,
+  SchemaStringType,
+  SchemaType,
+  SchemaTypeNode,
+  SchemaUnionType
+} from "@nodepkg/jsonschema";
 
 export type Schema = {
   type?: string;
@@ -25,18 +33,15 @@ export type Schema = {
 
 export const RequestSchemaProvider = createProvider(
   ({
-    rootSchema,
-    schemaBreadcrumbs$,
-  }: {
-    rootSchema: Schema;
-    schemaBreadcrumbs$: StateSubject<Schema[]>;
+     lsp,
+     schemaBreadcrumbs$
+   }: {
+    lsp: LSP;
+    schemaBreadcrumbs$: StateSubject<SchemaType[]>;
   }) => {
     return {
-      rootSchema,
-      schemaBreadcrumbs$,
-      resolveSchemaByRef: (ref: string): Schema => {
-        return get(rootSchema, ref.slice(2).split("/"));
-      },
+      lsp,
+      schemaBreadcrumbs$
     };
   }
 );
@@ -84,7 +89,7 @@ const hasValidate = (schema: any) => {
       "maxItems",
       "minItems",
       "maxProperties",
-      "minProperties",
+      "minProperties"
     ] as Array<keyof IValidatedSchema>,
     (key) => has(schema, key)
   );
@@ -149,28 +154,28 @@ export const getMin = (schema: any): string => {
   return "-∞";
 };
 
-export const displayValidate = (schema: any): string => {
-  if (schema["x-tag-validate"]) {
-    return schema["x-tag-validate"];
+export const displayValidate = (schema: SchemaType): string => {
+  if (schema.meta("x-tag-validate")) {
+    return schema.meta("x-tag-validate");
   }
 
   if (!hasValidate(schema)) {
     return "";
   }
 
-  if (schema.pattern) {
-    return `@r/${String(schema.pattern)}/`;
+  if (schema.meta("pattern")) {
+    return `@r/${String(schema.meta("pattern"))}/`;
   }
 
-  return `@${schema.exclusiveMinimum ? "(" : "["}${getMin(schema)},${getMax(
-    schema
-  )}${schema.exclusiveMaximum ? ")" : "]"}`;
+  return `@${schema.meta("exclusiveMinimum")} ? "(" : "["}${getMin(
+    schema.schema
+  )},${getMax(schema.schema)}${schema.meta("exclusiveMaximum") ? ")" : "]"}`;
 };
 
 const Token = ({
-  sx,
-  children,
-}: {
+                 sx,
+                 children
+               }: {
   children: ReactNode;
   sx?: SxProps<Theme>;
 }) => (
@@ -179,8 +184,8 @@ const Token = ({
       ...(isArray(sx) ? sx : [sx]),
       {
         display: "inline-table",
-        lineHeight: 1.1,
-      },
+        lineHeight: 1.1
+      }
     ]}
   >
     {children}
@@ -201,7 +206,7 @@ const Annotation = ({ name, value }: { name: string; value: any }) => {
           opacity: 0.7,
           fontSize: "0.8em",
           wordBreak: "keep-all",
-          whiteSpace: "nowrap",
+          whiteSpace: "nowrap"
         }}
       >
         <Token sx={{ color: theme.palette.info.main }}>{`@${name}(`}</Token>
@@ -213,10 +218,10 @@ const Annotation = ({ name, value }: { name: string; value: any }) => {
 };
 
 export const TypeLink = ({
-  sx,
-  onClick,
-  children,
-}: {
+                           sx,
+                           onClick,
+                           children
+                         }: {
   sx?: SxProps<Theme>;
   onClick: () => void;
   children: ReactNode;
@@ -235,7 +240,7 @@ export const TypeLink = ({
         display: "inline-block",
         textDecoration: "none",
         color: "inherit",
-        fontWeight: "bold",
+        fontWeight: "bold"
       }}
     >
       {children}
@@ -244,11 +249,11 @@ export const TypeLink = ({
 };
 
 const PropName = ({
-  deprecated,
-  required,
-  nullable,
-  children,
-}: {
+                    deprecated,
+                    required,
+                    nullable,
+                    children
+                  }: {
   deprecated?: boolean;
   nullable?: boolean;
   required?: boolean;
@@ -260,7 +265,7 @@ const PropName = ({
     <Token
       sx={[
         {
-          color: theme.palette.primary.main,
+          color: theme.palette.primary.main
         },
         deprecated ? { textDecoration: "line-through" } : {},
         nullable
@@ -268,7 +273,7 @@ const PropName = ({
           : {},
         !required
           ? { "&:after": { content: `"?"`, color: theme.palette.warning.main } }
-          : {},
+          : {}
       ]}
     >
       {children}
@@ -279,9 +284,9 @@ const PropName = ({
 const IntentContext = createContext(0);
 
 const Line = ({
-  spacing = 0,
-  children,
-}: {
+                spacing = 0,
+                children
+              }: {
   spacing?: number;
   children?: ReactNode;
 }) => {
@@ -294,7 +299,7 @@ const Line = ({
           pl: i,
           my: spacing * 0.5,
           position: "relative",
-          display: "block",
+          display: "block"
         }}
       >
         {children}
@@ -303,16 +308,20 @@ const Line = ({
   );
 };
 
-export const Description = ({ schema }: { schema: any }) => {
+export const Description = ({ schema }: { schema: SchemaType }) => {
   const theme = useTheme();
 
   const description = [
-    schema["x-method"] ? `\`${schema["x-method"]} ${schema["x-path"]}\`` : "",
-    schema["x-param-in"] ? `**@param_in** ${schema["x-param-in"]}` : "",
-    schema["x-content-type"]
-      ? `**@content_type** ${schema["x-content-type"]}`
+    schema.meta("x-method")
+      ? `\`${schema.meta("x-method")} ${schema.meta("x-path")}\``
       : "",
-    schema["description"],
+    schema.meta("x-param-in")
+      ? `**@param_in** ${schema.meta("x-param-in")}`
+      : "",
+    schema.meta("x-content-type")
+      ? `**@content_type** ${schema.meta("x-content-type")}`
+      : "",
+    schema.meta("description")
   ]
     .filter((v) => !!v)
     .join("\n\n");
@@ -327,13 +336,13 @@ export const Description = ({ schema }: { schema: any }) => {
         position: "relative",
         fontSize: "0.8em",
         "& p": {
-          my: 0.2,
+          my: 0.2
         },
         "& code": {
           wordBreak: "keep-all",
-          whiteSpace: "nowrap",
+          whiteSpace: "nowrap"
         },
-        color: theme.palette.text.secondary,
+        color: theme.palette.text.secondary
       }}
     >
       <Markdown>{description}</Markdown>
@@ -349,23 +358,22 @@ const Indent = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const isSimpleSchema = (schema: any = {}) => {
-  return (
-    schema["type"] === "string" ||
-    schema["type"] === "boolean" ||
-    schema["type"] === "integer" ||
-    schema["type"] === "float"
-  );
-};
-
-export const SchemaType = ({ schema }: { schema: Schema }): JSX.Element => {
+export const SchemaTypeView = ({
+                                 schema
+                               }: {
+  schema: SchemaType;
+}): JSX.Element => {
   const schemaCtx = RequestSchemaProvider.use();
 
-  if (schema["$ref"]) {
-    const s = schemaCtx.resolveSchemaByRef(schema["$ref"]);
+  if (schema instanceof SchemaTypeNode) {
+    return <SchemaTypeView schema={schema.underlying} />;
+  }
 
-    if (isSimpleSchema(s)) {
-      return <SchemaType schema={s} />;
+  if (schema instanceof SchemaRefType) {
+    const s = schema.underlying;
+
+    if (!(s instanceof SchemaObjectType || s instanceof SchemaUnionType)) {
+      return <SchemaTypeView schema={s} />;
     }
 
     return (
@@ -374,19 +382,19 @@ export const SchemaType = ({ schema }: { schema: Schema }): JSX.Element => {
           schemaCtx.schemaBreadcrumbs$.next((b) => [...b, s]);
         }}
       >
-        {last(schema["$ref"].split("/"))}
+        {schema.name}
       </TypeLink>
     );
   }
 
-  if (schema["anyOf"]) {
+  if (schema instanceof SchemaUnionType) {
     return (
       <>
-        {map(schema["anyOf"], (s: any, i: number) => {
+        {schema.unions.map((s, i) => {
           return (
             <Fragment key={i}>
               {i > 0 && <Token>&nbsp;{"|"}&nbsp;</Token>}
-              <SchemaType schema={s} />
+              <SchemaTypeView schema={s} />
             </Fragment>
           );
         })}
@@ -394,60 +402,41 @@ export const SchemaType = ({ schema }: { schema: Schema }): JSX.Element => {
     );
   }
 
-  if (isArraySchema(schema)) {
+  if (schema instanceof SchemaArrayType) {
     return (
       <Token sx={{ wordBreak: "keep-all", whiteSpace: "nowrap" }}>
         <Token>{"["}</Token>
         <Token>{"..."}</Token>
-        <SchemaType schema={schema["items"]} />
+        <SchemaTypeView schema={schema.items ?? new SchemaAnyType({})} />
         <Token>{"]"}</Token>
       </Token>
     );
   }
 
-  if (isObjectSchema(schema)) {
-    const asMap = isObject(schema["additionalProperties"]);
-
-    if (asMap) {
-      return (
-        <>
-          <Token>{"{"}</Token>
-          <Indent>
-            <Line>
-              <Token sx={{ mr: 1 }}>{"[K:"}</Token>
-              <SchemaType
-                schema={schema["propertyNames"] || { type: "string" }}
-              />
-              <Token sx={{ mr: 1 }}>{"]:"}&nbsp;</Token>
-              <SchemaType schema={schema["additionalProperties"]} />
-            </Line>
-          </Indent>
-          <Token>{"}"}</Token>
-        </>
-      );
-    }
-
+  if (schema instanceof SchemaObjectType) {
     return (
       <>
         <Token>{"{"}</Token>
         <br />
         <Indent>
           <>
-            {map(schema["properties"], (propSchema, propName) => {
+            {schema.propNames.map((propName) => {
+              const propSchema = schema.prop(propName) ?? new SchemaAnyType({});
+
               return (
                 <Fragment key={propName}>
                   <Line spacing={2}>
                     <Description schema={propSchema} />
                     <Token sx={{ wordBreak: "keep-all", whiteSpace: "nowrap" }}>
                       <PropName
-                        required={includes(schema["required"] || [], propName)}
-                        nullable={propSchema["nullable"]}
-                        deprecated={propSchema["deprecated"]}
+                        required={includes(schema.required, propName)}
+                        nullable={propSchema.meta("nullable")}
+                        deprecated={propSchema.meta("deprecated")}
                       >
                         {propName}
                       </PropName>
                       <Token sx={{ mr: 1 }}>{":"}</Token>
-                      <SchemaType schema={propSchema} />
+                      <SchemaTypeView schema={propSchema} />
                     </Token>
                   </Line>
                 </Fragment>
@@ -455,16 +444,35 @@ export const SchemaType = ({ schema }: { schema: Schema }): JSX.Element => {
             })}
           </>
         </Indent>
+        {schema.additionalProperties && (
+          <>
+            <Indent>
+              <Line>
+                <Token sx={{ mr: 1 }}>{"[K:"}</Token>
+                <SchemaTypeView
+                  schema={new SchemaStringType({ type: "string" })}
+                />
+                <Token sx={{ mr: 1 }}>{"]:"}&nbsp;</Token>
+                <SchemaTypeView schema={schema.additionalProperties} />
+              </Line>
+            </Indent>
+          </>
+        )}
         <Token>{"}"}</Token>
       </>
     );
   }
 
-  const [type, format, defaultValue] = [
-    schema["type"],
-    schema["format"],
-    schema["default"],
+  const [type, format, enumValues, defaultValue] = [
+    schema.meta("type"),
+    schema.meta("format"),
+    schema.meta("enum"),
+    schema.meta("default")
   ];
+
+  if (enumValues && enumValues.length == 1) {
+    return <Token>{JSON.stringify(enumValues[0])}</Token>;
+  }
 
   return (
     <>
@@ -477,9 +485,9 @@ export const SchemaType = ({ schema }: { schema: Schema }): JSX.Element => {
         {!hasValidate(schema) && (
           <Annotation name={"validate"} value={displayValidate(schema)} />
         )}
-        {schema["enum"] && (
+        {enumValues && (
           <>
-            {map(schema["enum"], (value, i) => (
+            {map(enumValues, (value: any, i) => (
               <Annotation
                 key={value}
                 name={"enum"}
@@ -495,16 +503,20 @@ export const SchemaType = ({ schema }: { schema: Schema }): JSX.Element => {
   );
 };
 
-export const RequestSchemaView = ({ schema }: { schema: any }) => {
+export const RequestSchemaView = ({ schema }: { schema?: SchemaType }) => {
+  if (!schema) {
+    return null;
+  }
+
   return (
     <Box
       sx={{
         fontSize: "13px",
-        fontFamily: "monospace",
+        fontFamily: "monospace"
       }}
     >
       <Description schema={schema} />
-      <SchemaType schema={schema} />
+      <SchemaTypeView schema={schema} />
     </Box>
   );
 };

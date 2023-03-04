@@ -64,9 +64,20 @@ func (v Container) RuntimeDoc(names ...string) ([]string, bool) {
 func (v Deploy) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "Kind":
+		case "Deployer":
 			return []string{}, true
-		case "Spec":
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v DeployConfigMap) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Kind":
 			return []string{}, true
 		case "Annotations":
 			return []string{}, true
@@ -78,9 +89,105 @@ func (v Deploy) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
-func (DeployKind) RuntimeDoc(names ...string) ([]string, bool) {
+func (v DeployCronJob) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Kind":
+			return []string{}, true
+		case "Annotations":
+			return []string{}, true
+		case "Spec":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
 	return []string{}, true
 }
+
+func (v DeployDaemonSet) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Kind":
+			return []string{}, true
+		case "Annotations":
+			return []string{}, true
+		case "Spec":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v DeployDeployment) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Kind":
+			return []string{}, true
+		case "Annotations":
+			return []string{}, true
+		case "Spec":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v DeployJob) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Kind":
+			return []string{}, true
+		case "Annotations":
+			return []string{}, true
+		case "Spec":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v DeploySecret) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Kind":
+			return []string{}, true
+		case "Annotations":
+			return []string{}, true
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v DeployStatefulSet) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Kind":
+			return []string{}, true
+		case "Annotations":
+			return []string{}, true
+		case "Spec":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v DigestMeta) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -286,9 +393,19 @@ func (v Spec) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
-func (SpecObject) RuntimeDoc(names ...string) ([]string, bool) {
+func (v SpecData) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Data":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
 	return []string{}, true
 }
+
 func (v Status) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -314,6 +431,41 @@ func (Statuses) RuntimeDoc(names ...string) ([]string, bool) {
 func (v Volume) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
+		case "VolumeSource":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v VolumeConfigMap) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Type":
+			return []string{}, true
+		case "Opt":
+			return []string{}, true
+		case "Spec":
+			return []string{}, true
+		case "VolumeMount":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.VolumeMount, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v VolumeMount) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
 		case "MountPath":
 			return []string{}, true
 		case "Prefix":
@@ -328,17 +480,51 @@ func (v Volume) RuntimeDoc(names ...string) ([]string, bool) {
 			}, true
 		case "SubPath":
 			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v VolumePersistentVolumeClaim) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
 		case "Type":
 			return []string{}, true
 		case "Opt":
-			return []string{
-				"VolumeSource as opt",
-			}, true
+			return []string{}, true
 		case "Spec":
-			return []string{
-				"Spec when Type equals ConfigMap or Secret, could use to define data",
-			}, true
+			return []string{}, true
+		case "VolumeMount":
+			return []string{}, true
 
+		}
+		if doc, ok := runtimeDoc(v.VolumeMount, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v VolumeSecret) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Type":
+			return []string{}, true
+		case "Opt":
+			return []string{}, true
+		case "Spec":
+			return []string{}, true
+		case "VolumeMount":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.VolumeMount, names...); ok {
+			return doc, ok
 		}
 
 		return nil, false

@@ -14,8 +14,9 @@
     "@innoai-tech/lodash": "^0.2.0",
     "@innoai-tech/reactutil": "^0.5.1",
     "@mui/icons-material": "^5.11.11",
-    "@mui/material": "^5.11.11",
+    "@mui/material": "^5.11.12",
     "@nodepkg/codemirror": "workspace:*",
+    "@nodepkg/jsonschema": "workspace:*",
     "@nodepkg/markdown": "workspace:*",
     "@nodepkg/runtime": "workspace:*"
   },

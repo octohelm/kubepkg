@@ -1,4 +1,12 @@
-import { isEmpty, mapValues, omit, pick, pickBy, startsWith } from "@innoai-tech/lodash";
+import {
+  isEmpty,
+  last,
+  mapValues,
+  omit,
+  pick,
+  pickBy,
+  startsWith
+} from "@innoai-tech/lodash";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import {
   StateSubject,
@@ -33,9 +41,9 @@ export const KubePkgEditor = ({
                                 overwrites,
                                 onSubmit
                               }: {
-  overwrites: boolean,
+  overwrites?: boolean;
   kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>;
-  onSubmit?: (kubepkg: ApisKubepkgV1Alpha1KubePkg) => void
+  onSubmit?: (kubepkg: ApisKubepkgV1Alpha1KubePkg) => void;
 }) => {
   const kubepkg = useObservableState(kubepkg$);
 
@@ -79,16 +87,21 @@ export const KubePkgEditor = ({
       {
         ...RawOpenAPI.components.schemas["ApisKubepkgV1Alpha1KubePkg"]
       },
-      (ref) => get(RawOpenAPI, ref.split("/").slice(1), {}),
+      (ref) => {
+        return get(RawOpenAPI, ref.slice(2).split("/"), {});
+      },
       (schema) => {
-        if ((overwrites || hasTemplate) && schema.type == "object") {
+        if ((overwrites || hasTemplate) && (schema.type == "object")) {
+          if (schema.discriminator) {
+            return schema;
+          }
           return omit(schema, ["required"]);
         }
         return schema;
       },
       (schema) => {
         if (schema.type === "object") {
-          switch (get(schema, "x-go-field-name")) {
+          switch (last(get(schema, "x-go-vendor-type", "").split("."))) {
             case "ObjectMeta": {
               return {
                 type: "object",
@@ -96,8 +109,11 @@ export const KubePkgEditor = ({
               };
             }
             case "Spec": {
-              if (overwrites) {
-                const configProps = mapValues(kubepkg.spec.config ?? {}, (_) => ({ "type": "string" }));
+              if (overwrites || hasTemplate) {
+                const configProps = mapValues(
+                  kubepkg.spec.config ?? {},
+                  (_) => ({ type: "string" })
+                );
 
                 return {
                   type: "object",
@@ -105,7 +121,26 @@ export const KubePkgEditor = ({
                     ...omit(schema.properties, ["version"]),
                     config: {
                       type: "object",
-                      properties: configProps
+                      properties: configProps,
+                      additionalProperties: isEmpty(kubepkg.spec.config ?? {})
+                    },
+                    containers: {
+                      ...schema.properties.containers,
+                      properties: mapValues(kubepkg.spec.containers, () => ({
+                        ...schema.properties.containers.additionalProperties
+                      }))
+                    },
+                    services: {
+                      ...schema.properties.services,
+                      properties: mapValues(kubepkg.spec.services, () => ({
+                        ...schema.properties.services.additionalProperties
+                      }))
+                    },
+                    volumes: {
+                      ...schema.properties.volumes,
+                      properties: mapValues(kubepkg.spec.volumes, () => ({
+                        ...schema.properties.volumes.additionalProperties
+                      }))
                     }
                   }
                 };
@@ -121,13 +156,22 @@ export const KubePkgEditor = ({
 
     return {
       type: "object",
-      properties: pick(schema.properties, ["metadata", "spec", "apiVersion", "kind"]),
+      properties: pick(schema.properties, [
+        "metadata",
+        "spec",
+        "apiVersion",
+        "kind"
+      ]),
       additionalProperties: false
     };
   }, [kubepkg, hasTemplate, overwrites]);
 
   return (
-    <Stack direction={"column"} spacing={2} sx={{ height: "100%", overflow: "hidden" }}>
+    <Stack
+      direction={"column"}
+      spacing={2}
+      sx={{ height: "100%", overflow: "hidden" }}
+    >
       <Box sx={{ flex: 1, overflow: "auto", position: "relative" }}>
         <EditorContextProvider>
           <TemplateOverwrites
@@ -171,7 +215,7 @@ const TemplateOverwrites = ({
   code: string;
   schema: any;
   kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>;
-  onSubmit?: (kubepkg: ApisKubepkgV1Alpha1KubePkg) => void
+  onSubmit?: (kubepkg: ApisKubepkgV1Alpha1KubePkg) => void;
 }) => {
   useJSONEditor(schema);
 
@@ -184,28 +228,37 @@ const TemplateOverwrites = ({
 
         setTimeout(() => {
           if (diagnosticCount(view.state) === 0) {
-            onSubmit && onSubmit(((kubepkg) => {
-              if (get(kubepkg, ["metadata", "annotations", annotationKubepkgOverwrites])) {
-                return {
-                  ...kubepkg,
-                  metadata: {
-                    ...kubepkg.metadata,
-                    annotations: {
-                      ...(kubepkg.metadata?.annotations ?? {}),
-                      [annotationKubepkgOverwrites]: JSON.stringify(
-                        JSON.parse(view.state.doc.sliceString(0))
-                      )
+            onSubmit &&
+            onSubmit(
+              ((kubepkg) => {
+                if (
+                  get(kubepkg, [
+                    "metadata",
+                    "annotations",
+                    annotationKubepkgOverwrites
+                  ])
+                ) {
+                  return {
+                    ...kubepkg,
+                    metadata: {
+                      ...kubepkg.metadata,
+                      annotations: {
+                        ...(kubepkg.metadata?.annotations ?? {}),
+                        [annotationKubepkgOverwrites]: JSON.stringify(
+                          JSON.parse(view.state.doc.sliceString(0))
+                        )
+                      }
                     }
-                  }
-                };
-              }
+                  };
+                }
 
-              return {
-                apiVersion: "octohelm.tech/v1alpha1",
-                kind: "KubePkg",
-                ...JSON.parse(view.state.doc.sliceString(0))
-              };
-            })(kubepkg$.value));
+                return {
+                  apiVersion: "octohelm.tech/v1alpha1",
+                  kind: "KubePkg",
+                  ...JSON.parse(view.state.doc.sliceString(0))
+                };
+              })(kubepkg$.value)
+            );
           }
         });
 

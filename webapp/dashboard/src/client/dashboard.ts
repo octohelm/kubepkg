@@ -3379,6 +3379,31 @@ export const RawOpenAPI = {
               },
               kind: {
                 type: "string",
+                enum: ["Secret"],
+                "x-go-field-name": "Kind",
+                "x-tag-validate": "@string{Secret}",
+              },
+            },
+            additionalProperties: false,
+            required: ["kind"],
+            "x-go-vendor-type":
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeploySecret",
+          },
+          {
+            type: "object",
+            properties: {
+              annotations: {
+                type: "object",
+                additionalProperties: {
+                  type: "string",
+                },
+                propertyNames: {
+                  type: "string",
+                },
+                "x-go-field-name": "Annotations",
+              },
+              kind: {
+                type: "string",
                 enum: ["ConfigMap"],
                 "x-go-field-name": "Kind",
                 "x-tag-validate": "@string{ConfigMap}",
@@ -3563,31 +3588,6 @@ export const RawOpenAPI = {
             required: ["kind"],
             "x-go-vendor-type":
               "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployCronJob",
-          },
-          {
-            type: "object",
-            properties: {
-              annotations: {
-                type: "object",
-                additionalProperties: {
-                  type: "string",
-                },
-                propertyNames: {
-                  type: "string",
-                },
-                "x-go-field-name": "Annotations",
-              },
-              kind: {
-                type: "string",
-                enum: ["Secret"],
-                "x-go-field-name": "Kind",
-                "x-tag-validate": "@string{Secret}",
-              },
-            },
-            additionalProperties: false,
-            required: ["kind"],
-            "x-go-vendor-type":
-              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeploySecret",
           },
         ],
         discriminator: {

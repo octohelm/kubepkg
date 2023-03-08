@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/go-courier/logr"
+
 	"github.com/octohelm/courier/pkg/courierhttp"
 	"github.com/octohelm/courier/pkg/statuserror"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
@@ -70,6 +72,12 @@ func (req *ApplyKubePkg) Output(ctx context.Context) (any, error) {
 
 			namespaces[kpkg.Namespace] = true
 		}
+
+		logr.FromContext(ctx).WithValues(
+			"name", kpkg.Name,
+			"namespace", kpkg.Namespace,
+			"version", kpkg.Spec.Version,
+		).Info("Applying")
 
 		if err := c.Patch(ctx, &v1alpha1.KubePkg{
 			TypeMeta:   kpkg.TypeMeta,

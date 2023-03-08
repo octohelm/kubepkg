@@ -1,17 +1,11 @@
 package kubeutil
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"strings"
-	"sync"
 
-	"github.com/octohelm/courier/pkg/openapi/jsonschema"
-	"github.com/octohelm/courier/pkg/openapi/jsonschema/extractors"
-	"github.com/octohelm/gengo/pkg/gengo"
 	"github.com/octohelm/x/ptr"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -112,117 +106,17 @@ func applyCRD(ctx context.Context, apis apiextensionstypesv1.CustomResourceDefin
 }
 
 func scanJSONSchema(ctx context.Context, v any) *apiextensionsv1.JSONSchemaProps {
-	scanner := &jsonSchemaScanner{
-		definitions: map[string]apiextensionsv1.JSONSchemaProps{},
-	}
-
-	s := extractors.SchemaFrom(extractors.ContextWithSchemaRegister(ctx, scanner), v, false)
-
-	d := &apiextensionsv1.JSONSchemaProps{}
-	scanner.convert(s, d)
-
 	f := &apiextensionsv1.JSONSchemaProps{
 		Type: "object",
 		Properties: map[string]apiextensionsv1.JSONSchemaProps{
-			"spec": *d,
+			"spec": {
+				XPreserveUnknownFields: ptr.Bool(true),
+			},
 			"status": {
 				XPreserveUnknownFields: ptr.Bool(true),
 			},
 		},
 	}
 
-	crd.EditSchema(f, scanner)
-
 	return crd.FlattenEmbedded(f, nil)
-}
-
-type jsonSchemaScanner struct {
-	definitions map[string]apiextensionsv1.JSONSchemaProps
-	m           sync.Map
-}
-
-func (scanner *jsonSchemaScanner) Record(typeRef string) bool {
-	_, ok := scanner.m.Load(typeRef)
-	defer scanner.m.Store(typeRef, true)
-	return ok
-}
-
-const schemaPathPrefix = "#/definitions/"
-
-func (scanner *jsonSchemaScanner) Visit(schema *apiextensionsv1.JSONSchemaProps) crd.SchemaVisitor {
-	if schema != nil {
-		if ref := schema.Ref; ref != nil {
-			if found, ok := scanner.definitions[strings.TrimPrefix(*ref, schemaPathPrefix)]; ok {
-				found.DeepCopyInto(schema)
-				*schema = found
-			}
-		}
-
-		if schema.AdditionalProperties != nil {
-			if additionalSchema := schema.AdditionalProperties.Schema; additionalSchema == nil {
-				schema.Type = "object"
-				schema.XPreserveUnknownFields = ptr.Bool(true)
-				schema.AdditionalProperties = nil
-			} else {
-				if additionalSchema.Type == "" && len(additionalSchema.Properties) == 0 {
-					additionalSchema.Type = "object"
-					additionalSchema.XPreserveUnknownFields = ptr.Bool(true)
-					schema.AdditionalProperties = nil
-				}
-			}
-
-			if len(schema.Properties) != 0 {
-				schema.AdditionalProperties = nil
-			}
-		}
-
-		schema.Nullable = false
-
-		if len(schema.OneOf) == 2 {
-			data, _ := json.Marshal(schema.OneOf)
-			if bytes.Equal(data, []byte(`[{"type":"integer","format":"int32"},{"type":"string"}]`)) {
-				schema.Type = ""
-				schema.Format = ""
-				schema.XIntOrString = true
-				schema.OneOf = nil
-			}
-		}
-
-		if schema.OneOf != nil {
-			// ugly set wild object,
-			// because k8s not support
-			schema.Type = "object"
-			schema.Required = nil
-			schema.XPreserveUnknownFields = ptr.Bool(true)
-			schema.OneOf = nil
-		}
-
-		if schema.Format == "int-or-string" {
-			schema.Type = ""
-			schema.Format = ""
-			schema.XIntOrString = true
-		}
-	}
-
-	return scanner
-}
-
-func (scanner *jsonSchemaScanner) convert(s *jsonschema.Schema, ss *apiextensionsv1.JSONSchemaProps) {
-	b := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(b).Encode(s); err != nil {
-		panic(err)
-	}
-	if err := json.NewDecoder(b).Decode(ss); err != nil {
-		panic(err)
-	}
-}
-
-func (scanner *jsonSchemaScanner) RefString(ref string) string {
-	return fmt.Sprintf("%s%s", schemaPathPrefix, gengo.UpperCamelCase(ref))
-}
-
-func (scanner *jsonSchemaScanner) RegisterSchema(ref string, s *jsonschema.Schema) {
-	d := &apiextensionsv1.JSONSchemaProps{}
-	scanner.convert(s, d)
-	scanner.definitions[strings.TrimPrefix(ref, schemaPathPrefix)] = *d
 }

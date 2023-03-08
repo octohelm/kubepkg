@@ -267,7 +267,7 @@ const DeploymentConditions = ({
           (r: any, i) => {
             return (
               <Tooltip
-                title={`${r.metadata.name}.${r.kind}/${r.apiVersion}`}
+                title={`${r.metadata?.name}.${r.kind}/${r.apiVersion}`}
                 key={i}
               >
                 <Box component={"span"}>

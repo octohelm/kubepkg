@@ -598,6 +598,7 @@ func toContainer(c v1alpha1.Container, name string, podTemplateSpec *corev1.PodT
 			if volume.ConfigMap == nil {
 				volume.ConfigMap = &corev1.ConfigMapVolumeSource{}
 			}
+
 			volume.ConfigMap.Name = subResourceName(kpkg, n)
 
 			kubeutil.AppendAnnotate(podTemplateSpec, annotation.ReloadConfigMap, volume.ConfigMap.Name)
@@ -622,6 +623,7 @@ func toContainer(c v1alpha1.Container, name string, podTemplateSpec *corev1.PodT
 				volumeMount.ReadOnly = x.ReadOnly
 
 				container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+				volume.Name = volumeMount.Name
 			}
 		case *v1alpha1.VolumeSecret:
 			volume.Secret = x.Opt
@@ -651,9 +653,12 @@ func toContainer(c v1alpha1.Container, name string, podTemplateSpec *corev1.PodT
 				volumeMount.ReadOnly = x.ReadOnly
 
 				container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+				volume.Name = volumeMount.Name
 			}
 		case *v1alpha1.VolumePersistentVolumeClaim:
-			if x.MountPath != "export" {
+			if x.MountPath == "export" {
+				// not support export
+			} else {
 				volumeMount := corev1.VolumeMount{
 					Name: subResourceName(kpkg, n),
 				}
@@ -666,10 +671,15 @@ func toContainer(c v1alpha1.Container, name string, podTemplateSpec *corev1.PodT
 				volume.PersistentVolumeClaim.ClaimName = subResourceName(kpkg, n)
 
 				container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+				volume.Name = volumeMount.Name
 			}
+		default:
+			return nil, errors.Errorf("invalid volume source %T", x)
 		}
 
-		addToSpecVolume(podTemplateSpec, volume)
+		if volume.Name != "" {
+			addToSpecVolume(podTemplateSpec, volume)
+		}
 	}
 
 	return container, nil
@@ -707,7 +717,7 @@ func volumesFrom(kpkg *v1alpha1.KubePkg) map[string]v1alpha1.Volume {
 	case *v1alpha1.VolumeSecret, *v1alpha1.VolumeConfigMap:
 	default:
 		volumes["#"] = v1alpha1.Volume{
-			VolumeSource: v1alpha1.VolumeConfigMap{
+			VolumeSource: &v1alpha1.VolumeConfigMap{
 				Type: "ConfigMap",
 				Spec: &v1alpha1.SpecData{
 					Data: data,

@@ -2,7 +2,6 @@ package manifest
 
 import (
 	"bytes"
-	"fmt"
 	"net/url"
 	"strings"
 	"text/template"
@@ -119,8 +118,6 @@ func (s *IngressGatewaySet) IngressRules(paths map[string]string, gateways ...st
 			gatewaySet[name] = g
 		}
 	}
-
-	fmt.Println("IngressRules", gateways)
 
 	for i := range gateways {
 		gateway := gateways[i]

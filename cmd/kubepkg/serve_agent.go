@@ -4,11 +4,12 @@ import (
 	"net/http"
 	"strings"
 
+	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
+
 	"github.com/innoai-tech/infra/pkg/cli"
 	"github.com/innoai-tech/infra/pkg/otel"
 	webappagent "github.com/octohelm/kubepkg/cmd/kubepkg/webapp/agent"
 	"github.com/octohelm/kubepkg/internal/agent"
-	"github.com/octohelm/kubepkg/pkg/kubeutil"
 )
 
 func init() {
@@ -29,6 +30,6 @@ func init() {
 type Agent struct {
 	cli.C `component:"kubepkg-agent"`
 	otel.Otel
-	kubeutil.KubeClient
+	kubeutilclient.KubeClient
 	agent.Server
 }

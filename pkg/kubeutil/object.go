@@ -8,6 +8,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+var FieldOwner = client.FieldOwner("kubepkg")
+
 type Object = client.Object
 type ObjectList = client.ObjectList
 

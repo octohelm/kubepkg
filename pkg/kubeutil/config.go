@@ -8,7 +8,7 @@ import (
 var loadInClusterConfig = rest.InClusterConfig
 
 func GetConfig(kubeConfigPath string) (*rest.Config, error) {
-	cfg, err := loadConfig(kubeConfigPath)
+	cfg, err := LoadConfig(kubeConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func GetConfig(kubeConfigPath string) (*rest.Config, error) {
 	return cfg, nil
 }
 
-func loadConfig(kubeConfigPath string) (*rest.Config, error) {
+func LoadConfig(kubeConfigPath string) (*rest.Config, error) {
 	if len(kubeConfigPath) == 0 {
 		if c, err := loadInClusterConfig(); err == nil {
 			return c, nil

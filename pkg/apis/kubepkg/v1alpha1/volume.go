@@ -5,6 +5,7 @@ import (
 
 	"github.com/tidwall/gjson"
 	v1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type VolumeMount struct {
@@ -20,7 +21,20 @@ type VolumeMount struct {
 }
 
 type Volume struct {
-	VolumeSource any `json:"-"`
+	VolumeSource `json:"-"`
+}
+
+type MountResult struct {
+	Reload        string
+	ResourceName  string
+	Volume        *v1.Volume
+	EnvFromSource *v1.EnvFromSource
+	VolumeMount   *v1.VolumeMount
+}
+
+type VolumeSource interface {
+	ToResource(kpkg *KubePkg, name string) (client.Object, error)
+	Mount(name string) *MountResult
 }
 
 func (d *Volume) UnmarshalJSON(data []byte) error {
@@ -30,7 +44,7 @@ func (d *Volume) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(data, t); err != nil {
 			return err
 		}
-		d.VolumeSource = t
+		d.VolumeSource = t.(VolumeSource)
 		return nil
 	}
 
@@ -50,33 +64,10 @@ func (Volume) Discriminator() string {
 
 func (Volume) Mapping() map[string]any {
 	return map[string]any{
-		"Secret":                &VolumeSecret{},
-		"ConfigMap":             &VolumeConfigMap{},
-		"PersistentVolumeClaim": &VolumePersistentVolumeClaim{},
+		"EmptyDir":              VolumeSource(&VolumeEmptyDir{}),
+		"HostPath":              VolumeSource(&VolumeHostPath{}),
+		"Secret":                VolumeSource(&VolumeSecret{}),
+		"ConfigMap":             VolumeSource(&VolumeConfigMap{}),
+		"PersistentVolumeClaim": VolumeSource(&VolumePersistentVolumeClaim{}),
 	}
-}
-
-type VolumeSecret struct {
-	Type string                 `json:"type" validate:"@string{Secret}"`
-	Opt  *v1.SecretVolumeSource `json:"opt,omitempty"`
-	Spec *SpecData              `json:"spec,omitempty"`
-	VolumeMount
-}
-
-type VolumeConfigMap struct {
-	Type string                    `json:"type" validate:"@string{ConfigMap}"`
-	Opt  *v1.ConfigMapVolumeSource `json:"opt,omitempty"`
-	Spec *SpecData                 `json:"spec,omitempty"`
-	VolumeMount
-}
-
-type SpecData struct {
-	Data map[string]string `json:"data"`
-}
-
-type VolumePersistentVolumeClaim struct {
-	Type string                                `json:"type" validate:"@string{PersistentVolumeClaim}"`
-	Opt  *v1.PersistentVolumeClaimVolumeSource `json:"opt,omitempty"`
-	Spec v1.PersistentVolumeClaimSpec          `json:"spec"`
-	VolumeMount
 }

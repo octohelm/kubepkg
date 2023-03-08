@@ -36,18 +36,3 @@ func (v CustomResourceDefinition) RuntimeDoc(names ...string) ([]string, bool) {
 	}
 	return []string{}, true
 }
-
-func (v KubeClient) RuntimeDoc(names ...string) ([]string, bool) {
-	if len(names) > 0 {
-		switch names[0] {
-		case "Kubeconfig":
-			return []string{
-				"Paths to a kubeconfig. Only required if out-of-cluster.",
-			}, true
-
-		}
-
-		return nil, false
-	}
-	return []string{}, true
-}

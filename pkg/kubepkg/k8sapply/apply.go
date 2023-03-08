@@ -9,6 +9,7 @@ import (
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
+	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -31,7 +32,7 @@ func (c *Apply) Init(ctx context.Context) error {
 	if c.c != nil {
 		return nil
 	}
-	cl, err := kubeutil.NewClient(c.Kubeconfig)
+	cl, err := kubeutilclient.NewClient(c.Kubeconfig)
 	if err != nil {
 		return err
 	}
@@ -40,7 +41,7 @@ func (c *Apply) Init(ctx context.Context) error {
 }
 
 func (c *Apply) InjectContext(ctx context.Context) context.Context {
-	return kubeutil.ContextWithClient(ctx, c.c)
+	return kubeutilclient.ContextWithClient(ctx, c.c)
 }
 
 func (c *Apply) Run(ctx context.Context) error {
@@ -53,7 +54,7 @@ func (c *Apply) Run(ctx context.Context) error {
 		kpkg := kpkgs[i]
 
 		if c.CreateNamespace {
-			if _, err := kubeutil.ApplyNamespace(ctx, kubeutil.KubeConfigFromClient(c.c), kpkg.Namespace); err != nil {
+			if _, err := kubeutil.ApplyNamespace(ctx, kubeutilclient.KubeConfigFromClient(c.c), kpkg.Namespace); err != nil {
 				return err
 			}
 		}
@@ -78,9 +79,9 @@ func (c *Apply) Run(ctx context.Context) error {
 
 func applyKubePkg(ctx context.Context, kpkg *kubepkgv1alpha1.KubePkg, patchOptions ...client.PatchOption) error {
 	l := logr.FromContext(ctx)
-	c := kubeutil.ClientFromContext(ctx)
+	c := kubeutilclient.ClientFromContext(ctx)
 
-	config := kubeutil.KubeConfigFromClient(c)
+	config := kubeutilclient.KubeConfigFromClient(c)
 
 	l.WithValues("host", config.Host).Info("applying")
 

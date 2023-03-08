@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 
+	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
+
 	"github.com/go-courier/logr"
 
 	"github.com/octohelm/courier/pkg/courierhttp"
@@ -12,7 +14,6 @@ import (
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubepkg"
 	"github.com/octohelm/kubepkg/pkg/kubepkg/controller"
-	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -48,7 +49,7 @@ func (req *ApplyKubePkg) Output(ctx context.Context) (any, error) {
 
 	namespaces := map[string]bool{}
 
-	c := kubeutil.ClientFromContext(ctx)
+	c := kubeutilclient.ClientFromContext(ctx)
 
 	for i := range kpkgs {
 		kpkg := kpkgs[i]

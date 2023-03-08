@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 
+	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
+
 	"github.com/go-courier/logr"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg"
 
@@ -36,7 +38,7 @@ type Operator struct {
 }
 
 func (s *Operator) Run(ctx context.Context) error {
-	if err := kubeutil.ApplyCRDs(ctx, kubeutil.KubeConfigFromClient(kubeutil.ClientFromContext(ctx)), kubepkg.CRDs...); err != nil {
+	if err := kubeutil.ApplyCRDs(ctx, kubeutilclient.KubeConfigFromClient(kubeutilclient.ClientFromContext(ctx)), kubepkg.CRDs...); err != nil {
 		return errors.Wrap(err, "unable to create crds")
 	}
 	logr.FromContext(ctx).Info("crds created.")
@@ -58,7 +60,7 @@ func (s *Operator) Serve(ctx context.Context) error {
 		MetricsBindAddress: s.MetricsAddr,
 	}
 
-	mgr, err := ctrl.NewManager(kubeutil.KubeConfigFromClient(kubeutil.ClientFromContext(ctx)), ctrlOpt)
+	mgr, err := ctrl.NewManager(kubeutilclient.KubeConfigFromClient(kubeutilclient.ClientFromContext(ctx)), ctrlOpt)
 	if err != nil {
 		return err
 	}

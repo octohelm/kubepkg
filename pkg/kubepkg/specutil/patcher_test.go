@@ -58,8 +58,8 @@ func TestApplyOverwrites(t *testing.T) {
 
 		k, err := ApplyOverwrites(kpkg)
 		testingx.Expect(t, err, testingx.Be[error](nil))
-		testingx.Expect(t, k.Spec.Deploy.Deployer, testingx.Equal[any](&v1alpha1.DeployDeployment{
-			Kind: v1alpha1.DeployKindDeployment,
+		testingx.Expect(t, k.Spec.Deploy.Deployer, testingx.Equal[v1alpha1.Deployer](&v1alpha1.DeployDeployment{
+			Kind: "Deployment",
 			Spec: appsv1.DeploymentSpec{
 				Replicas: ptr.Ptr(int32(1)),
 				Strategy: appsv1.DeploymentStrategy{

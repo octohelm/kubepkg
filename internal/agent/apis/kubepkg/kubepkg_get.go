@@ -4,10 +4,11 @@ import (
 	"context"
 	"net/http"
 
+	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
+
 	"github.com/octohelm/courier/pkg/courierhttp"
 	"github.com/octohelm/courier/pkg/statuserror"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
-	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -25,7 +26,7 @@ func (req *GetKubePkg) Output(ctx context.Context) (any, error) {
 	kpkg.Name = req.Name
 	kpkg.Namespace = req.Namespace
 
-	if err := kubeutil.ClientFromContext(ctx).Get(ctx, client.ObjectKeyFromObject(kpkg), kpkg); err != nil {
+	if err := kubeutilclient.ClientFromContext(ctx).Get(ctx, client.ObjectKeyFromObject(kpkg), kpkg); err != nil {
 		return nil, statuserror.Wrap(err, http.StatusInternalServerError, "RequestK8sFailed")
 	}
 

@@ -83,6 +83,14 @@ package kubepkg
 
 #Deploy: {
 	annotations?: [X=string]: string
+	kind:  "Deployment"
+	spec?: #DeploymentSpec
+} | {
+	annotations?: [X=string]: string
+	kind:  "DaemonSet"
+	spec?: #DaemonSetSpec
+} | {
+	annotations?: [X=string]: string
 	kind:  "StatefulSet"
 	spec?: #StatefulSetSpec
 } | {
@@ -99,14 +107,6 @@ package kubepkg
 } | {
 	annotations?: [X=string]: string
 	kind: "ConfigMap"
-} | {
-	annotations?: [X=string]: string
-	kind:  "Deployment"
-	spec?: #DeploymentSpec
-} | {
-	annotations?: [X=string]: string
-	kind:  "DaemonSet"
-	spec?: #DaemonSetSpec
 }
 
 #DeploymentSpec: {
@@ -137,6 +137,11 @@ package kubepkg
 }
 
 #DigestMetaType: "blob" | "manifest"
+
+#EmptyDirVolumeSource: {
+	medium?:    #StorageMedium
+	sizeLimit?: #Quantity
+}
 
 #EnvVarValueOrFrom: string
 
@@ -170,6 +175,13 @@ package kubepkg
 #HostAlias: {
 	hostnames?: [...string]
 	ip?: string
+}
+
+#HostPathType: string
+
+#HostPathVolumeSource: {
+	path:  string
+	type?: #HostPathType
 }
 
 #Image: {
@@ -618,6 +630,8 @@ package kubepkg
 	resources?: [...{[X=string]: _}]
 }
 
+#StorageMedium: string
+
 #Sysctl: {
 	name:  string
 	value: string
@@ -678,6 +692,18 @@ package kubepkg
 #UnsatisfiableConstraintAction: string
 
 #Volume: {
+	#VolumeMount
+	{
+		opt?: #EmptyDirVolumeSource
+		type: "EmptyDir"
+	}
+} | {
+	#VolumeMount
+	{
+		opt?: #HostPathVolumeSource
+		type: "HostPath"
+	}
+} | {
 	#VolumeMount
 	{
 		opt?:  #SecretVolumeSource

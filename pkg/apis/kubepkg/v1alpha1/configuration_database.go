@@ -1,6 +1,9 @@
-package manifest
+package v1alpha1
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+)
 
 type ConfigurationDatabase struct {
 	Scheme   string
@@ -46,4 +49,30 @@ func (c ConfigurationDatabase) Endpoint() string {
 	}
 
 	return b.String()
+}
+
+func configDataFrom(tpe string, config map[string]EnvVarValueOrFrom) (map[string]string, error) {
+	values := map[string]string{}
+	for k := range config {
+		if config[k].ValueFrom != nil {
+			return nil, fmt.Errorf("config.%q: ref value is not support", k)
+		}
+		values[k] = config[k].Value
+	}
+
+	// FIXME switch as some factory
+	switch tpe {
+	case "database":
+		conf := &ConfigurationDatabase{}
+		conf.Name = values["name"]
+		conf.Scheme = values["scheme"]
+		conf.Host = values["host"]
+		conf.Username = values["username"]
+		conf.Password = values["password"]
+		conf.Extra = values["extra"]
+
+		values["endpoint"] = conf.Endpoint()
+	}
+
+	return values, nil
 }

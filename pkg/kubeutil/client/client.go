@@ -1,7 +1,9 @@
-package kubeutil
+package client
 
 import (
 	"context"
+
+	"github.com/octohelm/kubepkg/pkg/kubeutil"
 
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	contextx "github.com/octohelm/x/context"
@@ -21,10 +23,8 @@ func init() {
 	utilruntime.Must(kubepkgv1alpha1.AddToScheme(scheme))
 }
 
-var FieldOwner = client.FieldOwner("kubepkg")
-
 func NewClient(kubeConfigPath string) (client.Client, error) {
-	kubeConfig, err := loadConfig(kubeConfigPath)
+	kubeConfig, err := kubeutil.LoadConfig(kubeConfigPath)
 	if err != nil {
 		return nil, err
 	}

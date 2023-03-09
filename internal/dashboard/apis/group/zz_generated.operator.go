@@ -54,6 +54,14 @@ func (*DeleteGroupEnv) ResponseContent() any {
 }
 
 func init() {
+	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&DeleteGroupEnvDeployment{}))
+}
+
+func (*DeleteGroupEnvDeployment) ResponseContent() any {
+	return nil
+}
+
+func init() {
 	R.Register(github_com_octohelm_courier_pkg_courier.NewRouter(&GetGroup{}))
 }
 

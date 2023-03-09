@@ -82,6 +82,19 @@ func (v DeleteGroupEnv) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
+func (v DeleteGroupEnvDeployment) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "DeploymentID":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v GetGroup) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {

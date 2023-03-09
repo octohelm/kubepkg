@@ -1,6 +1,6 @@
 import { createDomain } from "../../layout";
 import {
-  ApisKubepkgV1Alpha1KubePkg,
+  ApisKubepkgV1Alpha1KubePkg, deleteGroupEnvDeployment,
   KubepkgChannel,
   latestKubepkgs,
   listGroupEnvClusterDeployments,
@@ -10,15 +10,17 @@ import {
 import { useRequest } from "@nodepkg/runtime";
 import { ignoreElements, map as rxMap, merge, tap } from "rxjs";
 import { GroupEnvProvider } from "./GroupEnv";
-import { map, mapValues, pick, reduce } from "@innoai-tech/lodash";
+import { map, mapValues, pick, pickBy, reduce } from "@innoai-tech/lodash";
 import { channel, deploymentID, kubepkgName } from "./util";
 import { useEffect } from "react";
 
 export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
   const groupEnv$ = GroupEnvProvider.use$();
 
-  const putGroupEnvDeployment$ = useRequest(putGroupEnvDeployment);
   const listGroupEnvDeployment$ = useRequest(listGroupEnvDeployment);
+  const putGroupEnvDeployment$ = useRequest(putGroupEnvDeployment);
+  const deleteGroupEnvDeployment$ = useRequest(deleteGroupEnvDeployment);
+
   const latest$ = useRequest(latestKubepkgs);
   const listGroupEnvClusterDeployments$ = useRequest(listGroupEnvClusterDeployments);
 
@@ -31,6 +33,7 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
 
       latest$: latest$,
       put$: putGroupEnvDeployment$,
+      del$: deleteGroupEnvDeployment$,
       list$: listGroupEnvDeployment$,
       clusterList$: listGroupEnvClusterDeployments$
     },
@@ -111,6 +114,11 @@ export const GroupEnvDeploymentsProvider = createDomain(({}, use) => {
           ...groupEnvDeployments$.value,
           [deploymentID(resp.body)]: resp.body
         }))
+      ),
+
+    (groupEnvDeployments$) =>
+      groupEnvDeployments$.del$.pipe(
+        rxMap((resp) => pickBy(groupEnvDeployments$.value, (k) => k.metadata?.name != resp.config.inputs.deploymentName))
       ),
 
     (groupEnvDeployments$) =>

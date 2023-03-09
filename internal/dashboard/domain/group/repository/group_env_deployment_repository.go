@@ -37,6 +37,22 @@ type GroupEnvDeploymentRepository struct {
 	cipher   vault.Cipher
 }
 
+func (r *GroupEnvDeploymentRepository) Get(ctx context.Context, deploymentID group.DeploymentID) (*group.Deployment, error) {
+	deployment := &group.Deployment{}
+
+	err := dal.From(group.DeploymentT).
+		Where(sqlbuilder.And(
+			group.DeploymentSettingT.DeploymentID.V(sqlbuilder.Eq(deploymentID)),
+		)).
+		Scan(deployment).
+		Find(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return deployment, nil
+}
+
 func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymentID group.DeploymentID, deploymentSettingID group.DeploymentSettingID) (map[string]any, error) {
 	setting := &group.DeploymentSetting{}
 
@@ -443,6 +459,15 @@ func (r *GroupEnvDeploymentRepository) BindKubepkg(ctx context.Context, deployme
 	}
 
 	return d, nil
+}
+
+func (v *GroupEnvDeploymentRepository) Delete(ctx context.Context, deploymentName string) error {
+	return dal.Prepare(group.DeploymentT).ForDelete().
+		Where(sqlbuilder.And(
+			group.DeploymentT.GroupEnvID.V(sqlbuilder.Eq(v.GroupEnv.EnvID)),
+			group.DeploymentT.DeploymentName.V(sqlbuilder.Eq(deploymentName)),
+		)).
+		Save(ctx)
 }
 
 func tryToResolveOverwrites(data []byte) ([]byte, error) {

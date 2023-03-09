@@ -9,12 +9,13 @@ import {
 import {
   StateSubject,
   Subscribe,
+  useExt,
   useMemoObservable,
   useObservableEffect,
   useStateSubject
 } from "@nodepkg/runtime";
-import { DialogProps, useEpics, useProxy } from "../layout";
-import { map as rxMap, tap, filter as rxFilter, merge } from "rxjs";
+import { DialogProps, useDialog } from "../layout";
+import { map as rxMap, tap, filter as rxFilter, merge, distinctUntilChanged } from "rxjs";
 import { KubePkgEditor, useKubePkgAutocomplete } from "../kubepkg";
 import type { KubepkgNameInfo } from "../kubepkg/domain";
 import {
@@ -101,31 +102,40 @@ export const KubePkgEditorWithVersionList = ({
     groupName: group$.value.name
   });
 
-  useEpics(
-    kubepkgNameInfo$,
-    (_) =>
-      kubePkgAutocomplete$.pipe(
-        rxFilter(({ groupName }) => !!groupName),
-        tap(() => {
-          kubePkgAutocomplete$.popper$.next(false);
-        })
-      ),
-    () =>
-      kubepkg$.pipe(
-        rxMap((kubepkg) => {
-          const [groupName, kubePkgName] = kubepkgName(kubepkg).split("/");
-          return {
-            groupName: groupName || "",
-            kubePkgName: kubePkgName || ""
-          };
-        })
-      )
-  );
+  useObservableEffect(() => merge(
+    kubePkgAutocomplete$.pipe(
+      rxFilter(({ groupName }) => !!groupName),
+      tap(() => {
+        kubePkgAutocomplete$.popper$.next(false);
+      })
+    ),
+    kubepkg$.pipe(
+      rxMap((kubepkg) => {
+        const [groupName, kubePkgName] = kubepkgName(kubepkg).split("/");
+        return {
+          groupName: groupName || "",
+          kubePkgName: kubePkgName || ""
+        };
+      })
+    )
+  ).pipe(
+    tap((kubepkgNameInfo) => kubepkgNameInfo$.next(kubepkgNameInfo))
+  ));
 
-  useEpics(channel$, () => kubepkg$.pipe(rxMap((kubepkg) => channel(kubepkg))));
-  useEpics(revision$, () =>
-    kubepkg$.pipe(rxMap((kubepkg) => revision(kubepkg)))
-  );
+  useObservableEffect(() => merge(
+    kubepkg$
+      .pipe(
+        rxMap((kubepkg) => channel(kubepkg) as KubepkgChannel),
+        distinctUntilChanged(),
+        tap((channel) => channel$.next(channel))
+      ),
+    kubepkg$
+      .pipe(
+        rxMap((kubepkg) => revision(kubepkg)),
+        distinctUntilChanged(),
+        tap((channel) => revision$.next(channel))
+      )
+  ));
 
   return (
     <>
@@ -156,11 +166,11 @@ export const KubePkgEditorWithVersionList = ({
   );
 };
 
-export const useDialog = ({
-                            title,
-                            content,
-                            sx = { "& .MuiDialog-paper": { width: "80%" } }
-                          }: DialogProps) => {
+export const useDialogWithoutConfirmButtons = ({
+                                                 title,
+                                                 content,
+                                                 sx = { "& .MuiDialog-paper": { width: "80%" } }
+                                               }: DialogProps) => {
   const dialog$ = useStateSubject(false);
 
   const dialogElement$ = useMemoObservable(() => dialog$.pipe(
@@ -188,13 +198,13 @@ export const useDialog = ({
     ))
   ));
 
-  return useProxy(dialog$, {
+  return useExt(dialog$, {
     title: title,
     elements$: dialogElement$
   });
 };
 
-export const useGroupEnvDeploymentFormWithDialog = (
+export const useGroupEnvDeploymentPutWithDialog = (
   kubepkg?: ApisKubepkgV1Alpha1KubePkg,
   { content, title } = {
     content: (kubepkg$: StateSubject<ApisKubepkgV1Alpha1KubePkg>) => (
@@ -211,7 +221,7 @@ export const useGroupEnvDeploymentFormWithDialog = (
 
   const action = kubepkg ? "更新" : "新建";
 
-  const dialog$ = useDialog({
+  const dialog$ = useDialogWithoutConfirmButtons({
     title: title(action),
     action: `${action}`,
     sx: {
@@ -247,8 +257,36 @@ export const useGroupEnvDeploymentFormWithDialog = (
     groupEnvDeployments$.put$.pipe(tap(() => dialog$.next(false)))
   );
 
-  return useProxy(groupEnvDeployments$, {
-    operationID: groupEnvDeployments$.put$.operationID,
+  return useExt(groupEnvDeployments$.put$, {
+    dialog$: dialog$
+  });
+};
+
+
+export const useGroupEnvDeploymentDelWithDialog = (kubepkg: ApisKubepkgV1Alpha1KubePkg) => {
+  const groupEnvDeployments$ = GroupEnvDeploymentsProvider.use$();
+
+  const dialog$ = useDialog({
+    title: `确认删除部署 ${kubepkg.metadata?.name}`,
+    content: (
+      <Box>
+        一旦删除所有历史记录将清空
+      </Box>
+    ),
+    onConfirm: () => {
+      if (kubepkg.metadata?.name) {
+        groupEnvDeployments$.del$.next({
+          groupName: groupEnvDeployments$.groupName,
+          envName: groupEnvDeployments$.envName,
+          deploymentName: kubepkg.metadata.name
+        });
+      }
+    }
+  });
+
+  useObservableEffect(() => groupEnvDeployments$.del$.pipe(tap(() => dialog$.next(false))));
+
+  return useExt(groupEnvDeployments$.del$, {
     dialog$: dialog$
   });
 };

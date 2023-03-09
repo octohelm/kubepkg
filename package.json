@@ -15,7 +15,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@innoai-tech/devconfig": "^0.1.2",
-    "@innoai-tech/gents": "0.3.0",
+    "@innoai-tech/gents": "^0.3.3",
     "@innoai-tech/monobundle": "^0.5.2",
     "@innoai-tech/vite-presets": "^0.5.0",
     "@nodepkg/devconfig": "workspace:*",

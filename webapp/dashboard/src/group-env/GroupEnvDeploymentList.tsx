@@ -23,14 +23,14 @@ import {
 } from "../group";
 import { IconButtonWithTooltip, Slot } from "../layout";
 import { Download } from "@mui/icons-material";
-import { useGroupEnvDeploymentFormWithDialog } from "./GroupEnvDeployementForm";
 import { Fragment, ReactNode } from "react";
 import type { ApisKubepkgV1Alpha1KubePkg } from "../client/dashboard";
 import { openAPISpecPath } from "../group";
 import { useObservableState, useMemoObservable } from "@nodepkg/runtime";
 import { map as rxMap } from "rxjs";
 import { AccessControl } from "../auth";
-import { useGroupEnvDeploymentHistoryFormWithDialog } from "./GroupEnvDeploymentHistory";
+import { useGroupEnvDeploymentHistoryPutWithDialog } from "./GroupEnvDeploymentHistory";
+import { useGroupEnvDeploymentDelWithDialog, useGroupEnvDeploymentPutWithDialog } from "./GroupEnvDeployementActions";
 
 const InfoSpan = ({
                     label,
@@ -335,8 +335,9 @@ const KubePkgHeading = ({
                         }: {
   kubepkg: ApisKubepkgV1Alpha1KubePkg;
 }) => {
-  const edit$ = useGroupEnvDeploymentFormWithDialog(kubepkg);
-  const history$ = useGroupEnvDeploymentHistoryFormWithDialog(kubepkg);
+  const delete$ = useGroupEnvDeploymentDelWithDialog(kubepkg);
+  const edit$ = useGroupEnvDeploymentPutWithDialog(kubepkg);
+  const history$ = useGroupEnvDeploymentHistoryPutWithDialog(kubepkg);
 
   return (
     <Stack
@@ -455,6 +456,18 @@ const KubePkgHeading = ({
                 历史部署
               </Link>
               <Slot elem$={history$.dialog$.elements$} />
+            </AccessControl>
+            <AccessControl op={delete$}>
+              <Link
+                href={"#"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  delete$.dialog$.next(true);
+                }}
+              >
+                删除
+              </Link>
+              <Slot elem$={delete$.dialog$.elements$} />
             </AccessControl>
           </Stack>
         </Stack>

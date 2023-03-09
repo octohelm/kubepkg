@@ -14,6 +14,29 @@ func runtimeDoc(v any, names ...string) ([]string, bool) {
 	return nil, false
 }
 
+func (v ConfigurationDatabase) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Scheme":
+			return []string{}, true
+		case "Host":
+			return []string{}, true
+		case "Username":
+			return []string{}, true
+		case "Password":
+			return []string{}, true
+		case "Name":
+			return []string{}, true
+		case "Extra":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v Container) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
@@ -67,6 +90,9 @@ func (v Deploy) RuntimeDoc(names ...string) ([]string, bool) {
 		case "Deployer":
 			return []string{}, true
 
+		}
+		if doc, ok := runtimeDoc(v.Deployer, names...); ok {
+			return doc, ok
 		}
 
 		return nil, false
@@ -164,6 +190,7 @@ func (v DeploySecret) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "Annotations":
 			return []string{}, true
+
 		}
 
 		return nil, false
@@ -325,6 +352,27 @@ func (v KubePkgList) RuntimeDoc(names ...string) ([]string, bool) {
 func (Manifests) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
+func (v MountResult) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Reload":
+			return []string{}, true
+		case "ResourceName":
+			return []string{}, true
+		case "Volume":
+			return []string{}, true
+		case "EnvFromSource":
+			return []string{}, true
+		case "VolumeMount":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (ScopeType) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
@@ -435,6 +483,9 @@ func (v Volume) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 
 		}
+		if doc, ok := runtimeDoc(v.VolumeSource, names...); ok {
+			return doc, ok
+		}
 
 		return nil, false
 	}
@@ -449,6 +500,46 @@ func (v VolumeConfigMap) RuntimeDoc(names ...string) ([]string, bool) {
 		case "Opt":
 			return []string{}, true
 		case "Spec":
+			return []string{}, true
+		case "VolumeMount":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.VolumeMount, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v VolumeEmptyDir) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Type":
+			return []string{}, true
+		case "Opt":
+			return []string{}, true
+		case "VolumeMount":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.VolumeMount, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v VolumeHostPath) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Type":
+			return []string{}, true
+		case "Opt":
 			return []string{}, true
 		case "VolumeMount":
 			return []string{}, true

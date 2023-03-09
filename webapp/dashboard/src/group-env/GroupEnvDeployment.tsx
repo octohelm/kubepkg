@@ -5,14 +5,14 @@ import {
   GroupEnvDeploymentExport,
   GroupEnvDeploymentList
 } from "./GroupEnvDeploymentList";
-import { useGroupEnvDeploymentFormWithDialog } from "./GroupEnvDeployementForm";
+import { useGroupEnvDeploymentPutWithDialog } from "./GroupEnvDeployementActions";
 import { AccessControl } from "../auth";
 import { AddCircleOutlineOutlined } from "@mui/icons-material";
 import { GroupEnvCluster } from "./GroupEnvCluster";
 import { Divider, Box, Stack } from "@mui/material";
 
 export const GroupEnvDeploymentMainToolbar = () => {
-  const form$ = useGroupEnvDeploymentFormWithDialog();
+  const form$ = useGroupEnvDeploymentPutWithDialog();
 
   return (
     <AccessControl op={form$}>

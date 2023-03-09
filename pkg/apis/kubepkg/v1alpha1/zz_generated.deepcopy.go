@@ -84,10 +84,6 @@ func (in *Deploy) DeepCopy() *Deploy {
 	return out
 }
 
-func (in *Deploy) DeepCopyInto(out *Deploy) {
-	out.Deployer = in.Deployer
-
-}
 func (in Manifests) DeepCopy() Manifests {
 	if in == nil {
 		return nil

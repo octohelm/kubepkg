@@ -517,7 +517,7 @@ export interface K8SIoApiCoreV1HttpHeader {
   value: string;
 }
 
-export type UtilIntstrIntOrString = any;
+export type UtilIntstrIntOrString = number | string;
 
 export type K8SIoApiCoreV1UriScheme = string;
 
@@ -654,7 +654,485 @@ export interface ApisKubepkgV1Alpha1Container {
   workingDir?: string;
 }
 
-export interface ApisKubepkgV1Alpha1Deploy {}
+export type K8SIoApiBatchV1ConcurrencyPolicy = string;
+
+export type K8SIoApiBatchV1CompletionMode = string;
+
+export type K8SIoApiBatchV1PodFailurePolicyAction = string;
+
+export type K8SIoApiBatchV1PodFailurePolicyOnExitCodesOperator = string;
+
+export interface K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement {
+  containerName: string;
+  operator: K8SIoApiBatchV1PodFailurePolicyOnExitCodesOperator;
+  values: Array<number>;
+}
+
+export type K8SIoApiCoreV1ConditionStatus = string;
+
+export type K8SIoApiCoreV1PodConditionType = string;
+
+export interface K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPattern {
+  status: K8SIoApiCoreV1ConditionStatus;
+  type: K8SIoApiCoreV1PodConditionType;
+}
+
+export interface K8SIoApiBatchV1PodFailurePolicyRule {
+  action: K8SIoApiBatchV1PodFailurePolicyAction;
+  onExitCodes: K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement;
+  onPodConditions: Array<K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPattern>;
+}
+
+export interface K8SIoApiBatchV1PodFailurePolicy {
+  rules: Array<K8SIoApiBatchV1PodFailurePolicyRule>;
+}
+
+export type ApisMetaV1LabelSelectorOperator = string;
+
+export interface ApisMetaV1LabelSelectorRequirement {
+  key: string;
+  operator: ApisMetaV1LabelSelectorOperator;
+  values?: Array<string>;
+}
+
+export interface ApisMetaV1LabelSelector {
+  matchExpressions?: Array<ApisMetaV1LabelSelectorRequirement>;
+  matchLabels?: {
+    [k: string]: string;
+  };
+}
+
+export type K8SIoApiCoreV1NodeSelectorOperator = string;
+
+export interface K8SIoApiCoreV1NodeSelectorRequirement {
+  key: string;
+  operator: K8SIoApiCoreV1NodeSelectorOperator;
+  values?: Array<string>;
+}
+
+export interface K8SIoApiCoreV1NodeSelectorTerm {
+  matchExpressions?: Array<K8SIoApiCoreV1NodeSelectorRequirement>;
+  matchFields?: Array<K8SIoApiCoreV1NodeSelectorRequirement>;
+}
+
+export interface K8SIoApiCoreV1PreferredSchedulingTerm {
+  preference: K8SIoApiCoreV1NodeSelectorTerm;
+  weight: number;
+}
+
+export interface K8SIoApiCoreV1NodeSelector {
+  nodeSelectorTerms: Array<K8SIoApiCoreV1NodeSelectorTerm>;
+}
+
+export interface K8SIoApiCoreV1NodeAffinity {
+  preferredDuringSchedulingIgnoredDuringExecution?: Array<K8SIoApiCoreV1PreferredSchedulingTerm>;
+  requiredDuringSchedulingIgnoredDuringExecution?: K8SIoApiCoreV1NodeSelector;
+}
+
+export interface K8SIoApiCoreV1PodAffinityTerm {
+  labelSelector?: ApisMetaV1LabelSelector;
+  namespaceSelector?: ApisMetaV1LabelSelector;
+  namespaces?: Array<string>;
+  topologyKey: string;
+}
+
+export interface K8SIoApiCoreV1WeightedPodAffinityTerm {
+  podAffinityTerm: K8SIoApiCoreV1PodAffinityTerm;
+  weight: number;
+}
+
+export interface K8SIoApiCoreV1PodAffinity {
+  preferredDuringSchedulingIgnoredDuringExecution?: Array<K8SIoApiCoreV1WeightedPodAffinityTerm>;
+  requiredDuringSchedulingIgnoredDuringExecution?: Array<K8SIoApiCoreV1PodAffinityTerm>;
+}
+
+export interface K8SIoApiCoreV1PodAntiAffinity {
+  preferredDuringSchedulingIgnoredDuringExecution?: Array<K8SIoApiCoreV1WeightedPodAffinityTerm>;
+  requiredDuringSchedulingIgnoredDuringExecution?: Array<K8SIoApiCoreV1PodAffinityTerm>;
+}
+
+export interface K8SIoApiCoreV1Affinity {
+  nodeAffinity?: K8SIoApiCoreV1NodeAffinity;
+  podAffinity?: K8SIoApiCoreV1PodAffinity;
+  podAntiAffinity?: K8SIoApiCoreV1PodAntiAffinity;
+}
+
+export interface K8SIoApiCoreV1PodDnsConfigOption {
+  name?: string;
+  value?: string;
+}
+
+export interface K8SIoApiCoreV1PodDnsConfig {
+  nameservers?: Array<string>;
+  options?: Array<K8SIoApiCoreV1PodDnsConfigOption>;
+  searches?: Array<string>;
+}
+
+export type K8SIoApiCoreV1DnsPolicy = string;
+
+export interface K8SIoApiCoreV1HostAlias {
+  hostnames?: Array<string>;
+  ip?: string;
+}
+
+export interface K8SIoApiCoreV1LocalObjectReference {
+  name?: string;
+}
+
+export type K8SIoApiCoreV1OsName = string;
+
+export interface K8SIoApiCoreV1PodOs {
+  name: K8SIoApiCoreV1OsName;
+}
+
+export enum K8SIoApiCoreV1PreemptionPolicy {
+  Never = "Never",
+  PreemptLowerPriority = "PreemptLowerPriority",
+}
+
+export interface K8SIoApiCoreV1PodReadinessGate {
+  conditionType: K8SIoApiCoreV1PodConditionType;
+}
+
+export interface K8SIoApiCoreV1ClaimSource {
+  resourceClaimName?: string;
+  resourceClaimTemplateName?: string;
+}
+
+export interface K8SIoApiCoreV1PodResourceClaim {
+  name: string;
+  source?: K8SIoApiCoreV1ClaimSource;
+}
+
+export enum K8SIoApiCoreV1RestartPolicy {
+  Always = "Always",
+  OnFailure = "OnFailure",
+  Never = "Never",
+}
+
+export interface K8SIoApiCoreV1PodSchedulingGate {
+  name: string;
+}
+
+export type K8SIoApiCoreV1PodFsGroupChangePolicy = string;
+
+export interface K8SIoApiCoreV1Sysctl {
+  name: string;
+  value: string;
+}
+
+export interface K8SIoApiCoreV1PodSecurityContext {
+  fsGroup?: number;
+  fsGroupChangePolicy?: K8SIoApiCoreV1PodFsGroupChangePolicy;
+  runAsGroup?: number;
+  runAsNonRoot?: boolean;
+  runAsUser?: number;
+  seLinuxOptions?: K8SIoApiCoreV1SeLinuxOptions;
+  seccompProfile?: K8SIoApiCoreV1SeccompProfile;
+  supplementalGroups?: Array<number>;
+  sysctls?: Array<K8SIoApiCoreV1Sysctl>;
+  windowsOptions?: K8SIoApiCoreV1WindowsSecurityContextOptions;
+}
+
+export type K8SIoApiCoreV1TaintEffect = string;
+
+export type K8SIoApiCoreV1TolerationOperator = string;
+
+export interface K8SIoApiCoreV1Toleration {
+  effect?: K8SIoApiCoreV1TaintEffect;
+  key?: string;
+  operator?: K8SIoApiCoreV1TolerationOperator;
+  tolerationSeconds?: number;
+  value?: string;
+}
+
+export type K8SIoApiCoreV1NodeInclusionPolicy = string;
+
+export type K8SIoApiCoreV1UnsatisfiableConstraintAction = string;
+
+export interface K8SIoApiCoreV1TopologySpreadConstraint {
+  labelSelector?: ApisMetaV1LabelSelector;
+  matchLabelKeys?: Array<string>;
+  maxSkew: number;
+  minDomains?: number;
+  nodeAffinityPolicy?: K8SIoApiCoreV1NodeInclusionPolicy;
+  nodeTaintsPolicy?: K8SIoApiCoreV1NodeInclusionPolicy;
+  topologyKey: string;
+  whenUnsatisfiable: K8SIoApiCoreV1UnsatisfiableConstraintAction;
+}
+
+export interface K8SIoApiCoreV1PodSpec {
+  activeDeadlineSeconds?: number;
+  affinity?: K8SIoApiCoreV1Affinity;
+  automountServiceAccountToken?: boolean;
+  dnsConfig?: K8SIoApiCoreV1PodDnsConfig;
+  dnsPolicy?: K8SIoApiCoreV1DnsPolicy;
+  enableServiceLinks?: boolean;
+  hostAliases?: Array<K8SIoApiCoreV1HostAlias>;
+  hostIPC?: boolean;
+  hostNetwork?: boolean;
+  hostPID?: boolean;
+  hostUsers?: boolean;
+  hostname?: string;
+  imagePullSecrets?: Array<K8SIoApiCoreV1LocalObjectReference>;
+  nodeName?: string;
+  nodeSelector?: {
+    [k: string]: string;
+  };
+  os?: K8SIoApiCoreV1PodOs;
+  overhead?: K8SIoApiCoreV1ResourceList;
+  preemptionPolicy?: keyof typeof K8SIoApiCoreV1PreemptionPolicy;
+  priority?: number;
+  priorityClassName?: string;
+  readinessGates?: Array<K8SIoApiCoreV1PodReadinessGate>;
+  resourceClaims?: Array<K8SIoApiCoreV1PodResourceClaim>;
+  restartPolicy?: keyof typeof K8SIoApiCoreV1RestartPolicy;
+  runtimeClassName?: string;
+  schedulerName?: string;
+  schedulingGates?: Array<K8SIoApiCoreV1PodSchedulingGate>;
+  securityContext?: K8SIoApiCoreV1PodSecurityContext;
+  serviceAccount?: string;
+  serviceAccountName?: string;
+  setHostnameAsFQDN?: boolean;
+  shareProcessNamespace?: boolean;
+  subdomain?: string;
+  terminationGracePeriodSeconds?: number;
+  tolerations?: Array<K8SIoApiCoreV1Toleration>;
+  topologySpreadConstraints?: Array<K8SIoApiCoreV1TopologySpreadConstraint>;
+}
+
+export interface K8SIoApiCoreV1PodTemplateSpec {
+  metadata?: ApisMetaV1ObjectMeta;
+  spec?: K8SIoApiCoreV1PodSpec;
+}
+
+export interface K8SIoApiBatchV1JobSpec {
+  activeDeadlineSeconds?: number;
+  backoffLimit?: number;
+  completionMode?: K8SIoApiBatchV1CompletionMode;
+  completions?: number;
+  manualSelector?: boolean;
+  parallelism?: number;
+  podFailurePolicy?: K8SIoApiBatchV1PodFailurePolicy;
+  selector?: ApisMetaV1LabelSelector;
+  suspend?: boolean;
+  template: K8SIoApiCoreV1PodTemplateSpec;
+  ttlSecondsAfterFinished?: number;
+}
+
+export interface K8SIoApiBatchV1JobTemplateSpec {
+  metadata?: ApisMetaV1ObjectMeta;
+  spec?: K8SIoApiBatchV1JobSpec;
+}
+
+export interface K8SIoApiBatchV1CronJobSpec {
+  concurrencyPolicy?: K8SIoApiBatchV1ConcurrencyPolicy;
+  failedJobsHistoryLimit?: number;
+  jobTemplate: K8SIoApiBatchV1JobTemplateSpec;
+  schedule: string;
+  startingDeadlineSeconds?: number;
+  successfulJobsHistoryLimit?: number;
+  suspend?: boolean;
+  timeZone?: string;
+}
+
+export interface K8SIoApiAppsV1RollingUpdateDaemonSet {
+  maxSurge?: UtilIntstrIntOrString;
+  maxUnavailable?: UtilIntstrIntOrString;
+}
+
+export enum K8SIoApiAppsV1DaemonSetUpdateStrategyType {
+  RollingUpdate = "RollingUpdate",
+  OnDelete = "OnDelete",
+}
+
+export interface K8SIoApiAppsV1DaemonSetUpdateStrategy {
+  rollingUpdate?: K8SIoApiAppsV1RollingUpdateDaemonSet;
+  type?: keyof typeof K8SIoApiAppsV1DaemonSetUpdateStrategyType;
+}
+
+export interface K8SIoApiAppsV1DaemonSetSpec {
+  minReadySeconds?: number;
+  revisionHistoryLimit?: number;
+  selector: ApisMetaV1LabelSelector;
+  template: K8SIoApiCoreV1PodTemplateSpec;
+  updateStrategy?: K8SIoApiAppsV1DaemonSetUpdateStrategy;
+}
+
+export interface K8SIoApiAppsV1RollingUpdateDeployment {
+  maxSurge?: UtilIntstrIntOrString;
+  maxUnavailable?: UtilIntstrIntOrString;
+}
+
+export enum K8SIoApiAppsV1DeploymentStrategyType {
+  Recreate = "Recreate",
+  RollingUpdate = "RollingUpdate",
+}
+
+export interface K8SIoApiAppsV1DeploymentStrategy {
+  rollingUpdate?: K8SIoApiAppsV1RollingUpdateDeployment;
+  type?: keyof typeof K8SIoApiAppsV1DeploymentStrategyType;
+}
+
+export interface K8SIoApiAppsV1DeploymentSpec {
+  minReadySeconds?: number;
+  paused?: boolean;
+  progressDeadlineSeconds?: number;
+  replicas?: number;
+  revisionHistoryLimit?: number;
+  selector: ApisMetaV1LabelSelector;
+  strategy?: K8SIoApiAppsV1DeploymentStrategy;
+  template: K8SIoApiCoreV1PodTemplateSpec;
+}
+
+export interface K8SIoApiAppsV1StatefulSetOrdinals {
+  start: number;
+}
+
+export type K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyType = string;
+
+export interface K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicy {
+  whenDeleted?: K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyType;
+  whenScaled?: K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyType;
+}
+
+export type K8SIoApiAppsV1PodManagementPolicyType = string;
+
+export interface K8SIoApiAppsV1RollingUpdateStatefulSetStrategy {
+  maxUnavailable?: UtilIntstrIntOrString;
+  partition?: number;
+}
+
+export type K8SIoApiAppsV1StatefulSetUpdateStrategyType = string;
+
+export interface K8SIoApiAppsV1StatefulSetUpdateStrategy {
+  rollingUpdate?: K8SIoApiAppsV1RollingUpdateStatefulSetStrategy;
+  type?: K8SIoApiAppsV1StatefulSetUpdateStrategyType;
+}
+
+export type K8SIoApiCoreV1PersistentVolumeAccessMode = string;
+
+export interface K8SIoApiCoreV1TypedLocalObjectReference {
+  apiGroup: string;
+  kind: string;
+  name: string;
+}
+
+export interface K8SIoApiCoreV1TypedObjectReference {
+  apiGroup: string;
+  kind: string;
+  name: string;
+  namespace?: string;
+}
+
+export type K8SIoApiCoreV1PersistentVolumeMode = string;
+
+export interface K8SIoApiCoreV1PersistentVolumeClaimSpec {
+  accessModes?: Array<K8SIoApiCoreV1PersistentVolumeAccessMode>;
+  dataSource?: K8SIoApiCoreV1TypedLocalObjectReference;
+  dataSourceRef?: K8SIoApiCoreV1TypedObjectReference;
+  resources?: K8SIoApiCoreV1ResourceRequirements;
+  selector?: ApisMetaV1LabelSelector;
+  storageClassName?: string;
+  volumeMode?: K8SIoApiCoreV1PersistentVolumeMode;
+  volumeName?: string;
+}
+
+export type ApisMetaV1Time = string;
+
+export type K8SIoApiCoreV1PersistentVolumeClaimConditionType = string;
+
+export interface K8SIoApiCoreV1PersistentVolumeClaimCondition {
+  lastProbeTime?: ApisMetaV1Time;
+  lastTransitionTime?: ApisMetaV1Time;
+  message?: string;
+  reason?: string;
+  status: K8SIoApiCoreV1ConditionStatus;
+  type: K8SIoApiCoreV1PersistentVolumeClaimConditionType;
+}
+
+export type K8SIoApiCoreV1PersistentVolumeClaimPhase = string;
+
+export type K8SIoApiCoreV1PersistentVolumeClaimResizeStatus = string;
+
+export interface K8SIoApiCoreV1PersistentVolumeClaimStatus {
+  accessModes?: Array<K8SIoApiCoreV1PersistentVolumeAccessMode>;
+  allocatedResources?: K8SIoApiCoreV1ResourceList;
+  capacity?: K8SIoApiCoreV1ResourceList;
+  conditions?: Array<K8SIoApiCoreV1PersistentVolumeClaimCondition>;
+  phase?: K8SIoApiCoreV1PersistentVolumeClaimPhase;
+  resizeStatus?: K8SIoApiCoreV1PersistentVolumeClaimResizeStatus;
+}
+
+export interface K8SIoApiCoreV1PersistentVolumeClaim
+  extends ApisMetaV1TypeMeta {
+  metadata?: ApisMetaV1ObjectMeta;
+  spec?: K8SIoApiCoreV1PersistentVolumeClaimSpec;
+  status?: K8SIoApiCoreV1PersistentVolumeClaimStatus;
+}
+
+export interface K8SIoApiAppsV1StatefulSetSpec {
+  minReadySeconds?: number;
+  ordinals?: K8SIoApiAppsV1StatefulSetOrdinals;
+  persistentVolumeClaimRetentionPolicy?: K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicy;
+  podManagementPolicy?: K8SIoApiAppsV1PodManagementPolicyType;
+  replicas?: number;
+  revisionHistoryLimit?: number;
+  selector: ApisMetaV1LabelSelector;
+  serviceName: string;
+  template: K8SIoApiCoreV1PodTemplateSpec;
+  updateStrategy?: K8SIoApiAppsV1StatefulSetUpdateStrategy;
+  volumeClaimTemplates?: Array<K8SIoApiCoreV1PersistentVolumeClaim>;
+}
+
+export type ApisKubepkgV1Alpha1Deploy =
+  | {
+      annotations?: {
+        [k: string]: string;
+      };
+      kind: "ConfigMap";
+    }
+  | {
+      annotations?: {
+        [k: string]: string;
+      };
+      kind: "CronJob";
+      spec?: K8SIoApiBatchV1CronJobSpec;
+    }
+  | {
+      annotations?: {
+        [k: string]: string;
+      };
+      kind: "DaemonSet";
+      spec?: K8SIoApiAppsV1DaemonSetSpec;
+    }
+  | {
+      annotations?: {
+        [k: string]: string;
+      };
+      kind: "Deployment";
+      spec?: K8SIoApiAppsV1DeploymentSpec;
+    }
+  | {
+      annotations?: {
+        [k: string]: string;
+      };
+      kind: "Job";
+      spec?: K8SIoApiBatchV1JobSpec;
+    }
+  | {
+      annotations?: {
+        [k: string]: string;
+      };
+      kind: "Secret";
+    }
+  | {
+      annotations?: {
+        [k: string]: string;
+      };
+      kind: "StatefulSet";
+      spec?: K8SIoApiAppsV1StatefulSetSpec;
+    };
 
 export interface ApisKubepkgV1Alpha1Manifests {
   [k: string]: any;
@@ -694,7 +1172,83 @@ export interface ApisKubepkgV1Alpha1Service {
   };
 }
 
-export interface ApisKubepkgV1Alpha1Volume {}
+export interface ApisKubepkgV1Alpha1VolumeMount {
+  mountPath: string;
+  optional?: boolean;
+  prefix?: string;
+  readOnly?: boolean;
+  subPath?: string;
+}
+
+export interface K8SIoApiCoreV1KeyToPath {
+  key: string;
+  mode?: number;
+  path: string;
+}
+
+export interface K8SIoApiCoreV1ConfigMapVolumeSource
+  extends K8SIoApiCoreV1LocalObjectReference {
+  defaultMode?: number;
+  items?: Array<K8SIoApiCoreV1KeyToPath>;
+  optional?: boolean;
+}
+
+export interface ApisKubepkgV1Alpha1SpecData {
+  data: {
+    [k: string]: string;
+  };
+}
+
+export type K8SIoApiCoreV1StorageMedium = string;
+
+export interface K8SIoApiCoreV1EmptyDirVolumeSource {
+  medium?: K8SIoApiCoreV1StorageMedium;
+  sizeLimit?: ApiResourceQuantity;
+}
+
+export type K8SIoApiCoreV1HostPathType = string;
+
+export interface K8SIoApiCoreV1HostPathVolumeSource {
+  path: string;
+  type?: K8SIoApiCoreV1HostPathType;
+}
+
+export interface K8SIoApiCoreV1PersistentVolumeClaimVolumeSource {
+  claimName: string;
+  readOnly?: boolean;
+}
+
+export interface K8SIoApiCoreV1SecretVolumeSource {
+  defaultMode?: number;
+  items?: Array<K8SIoApiCoreV1KeyToPath>;
+  optional?: boolean;
+  secretName?: string;
+}
+
+export type ApisKubepkgV1Alpha1Volume =
+  | (ApisKubepkgV1Alpha1VolumeMount & {
+      opt?: K8SIoApiCoreV1ConfigMapVolumeSource;
+      spec?: ApisKubepkgV1Alpha1SpecData;
+      type: "ConfigMap";
+    })
+  | (ApisKubepkgV1Alpha1VolumeMount & {
+      opt?: K8SIoApiCoreV1EmptyDirVolumeSource;
+      type: "EmptyDir";
+    })
+  | (ApisKubepkgV1Alpha1VolumeMount & {
+      opt?: K8SIoApiCoreV1HostPathVolumeSource;
+      type: "HostPath";
+    })
+  | (ApisKubepkgV1Alpha1VolumeMount & {
+      opt?: K8SIoApiCoreV1PersistentVolumeClaimVolumeSource;
+      spec: K8SIoApiCoreV1PersistentVolumeClaimSpec;
+      type: "PersistentVolumeClaim";
+    })
+  | (ApisKubepkgV1Alpha1VolumeMount & {
+      opt?: K8SIoApiCoreV1SecretVolumeSource;
+      spec?: ApisKubepkgV1Alpha1SpecData;
+      type: "Secret";
+    });
 
 export interface ApisKubepkgV1Alpha1Spec {
   config?: {
@@ -887,6 +1441,25 @@ export const listGroupEnvDeploymentHistory = /*#__PURE__*/ createRequest<
       size: query_size,
       offset: query_offset,
     },
+  })
+);
+
+export const deleteGroupEnvDeployment = /*#__PURE__*/ createRequest<
+  {
+    groupName: string;
+    envName: string;
+    deploymentName: string;
+  },
+  null
+>(
+  "dashboard.DeleteGroupEnvDeployment",
+  ({
+    groupName: path_groupName,
+    envName: path_envName,
+    deploymentName: path_deploymentName,
+  }) => ({
+    method: "DELETE",
+    url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}/deployments/${path_deploymentName}`,
   })
 );
 
@@ -2491,6 +3064,52 @@ export const RawOpenAPI = {
           },
         },
       },
+    "/api/kubepkg-dashboard/v0/groups/{groupName}/envs/{envName}/deployments/{deploymentName}":
+      {
+        delete: {
+          tags: ["group"],
+          operationId: "DeleteGroupEnvDeployment",
+          parameters: [
+            {
+              name: "Authorization",
+              in: "header",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "groupName",
+              in: "path",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "envName",
+              in: "path",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "deploymentName",
+              in: "path",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          responses: {
+            "200": {
+              description: "",
+            },
+          },
+        },
+      },
     "/api/kubepkg-dashboard/v0/groups/{groupName}/kubepkgs": {
       get: {
         tags: ["kubepkg"],
@@ -3413,10 +4032,8 @@ export const RawOpenAPI = {
                   {
                     $ref: "#/components/schemas/K8SIoApiBatchV1CronJobSpec",
                   },
-                  {
-                    "x-go-field-name": "Spec",
-                  },
                 ],
+                "x-go-field-name": "Spec",
               },
             },
             additionalProperties: false,
@@ -3448,10 +4065,8 @@ export const RawOpenAPI = {
                   {
                     $ref: "#/components/schemas/K8SIoApiAppsV1DaemonSetSpec",
                   },
-                  {
-                    "x-go-field-name": "Spec",
-                  },
                 ],
+                "x-go-field-name": "Spec",
               },
             },
             additionalProperties: false,
@@ -3483,10 +4098,8 @@ export const RawOpenAPI = {
                   {
                     $ref: "#/components/schemas/K8SIoApiAppsV1DeploymentSpec",
                   },
-                  {
-                    "x-go-field-name": "Spec",
-                  },
                 ],
+                "x-go-field-name": "Spec",
               },
             },
             additionalProperties: false,
@@ -3518,10 +4131,8 @@ export const RawOpenAPI = {
                   {
                     $ref: "#/components/schemas/K8SIoApiBatchV1JobSpec",
                   },
-                  {
-                    "x-go-field-name": "Spec",
-                  },
                 ],
+                "x-go-field-name": "Spec",
               },
             },
             additionalProperties: false,
@@ -3578,10 +4189,8 @@ export const RawOpenAPI = {
                   {
                     $ref: "#/components/schemas/K8SIoApiAppsV1StatefulSetSpec",
                   },
-                  {
-                    "x-go-field-name": "Spec",
-                  },
                 ],
+                "x-go-field-name": "Spec",
               },
             },
             additionalProperties: false,
@@ -4252,24 +4861,20 @@ export const RawOpenAPI = {
                       {
                         $ref: "#/components/schemas/K8SIoApiCoreV1ConfigMapVolumeSource",
                       },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
                     ],
                     "x-go-field-name": "Opt",
+                    nullable: true,
+                    "x-go-star-level": 1,
                   },
                   spec: {
                     allOf: [
                       {
                         $ref: "#/components/schemas/ApisKubepkgV1Alpha1SpecData",
                       },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
                     ],
                     "x-go-field-name": "Spec",
+                    nullable: true,
+                    "x-go-star-level": 1,
                   },
                   type: {
                     type: "string",
@@ -4298,12 +4903,10 @@ export const RawOpenAPI = {
                       {
                         $ref: "#/components/schemas/K8SIoApiCoreV1EmptyDirVolumeSource",
                       },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
                     ],
                     "x-go-field-name": "Opt",
+                    nullable: true,
+                    "x-go-star-level": 1,
                   },
                   type: {
                     type: "string",
@@ -4332,12 +4935,10 @@ export const RawOpenAPI = {
                       {
                         $ref: "#/components/schemas/K8SIoApiCoreV1HostPathVolumeSource",
                       },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
                     ],
                     "x-go-field-name": "Opt",
+                    nullable: true,
+                    "x-go-star-level": 1,
                   },
                   type: {
                     type: "string",
@@ -4366,22 +4967,18 @@ export const RawOpenAPI = {
                       {
                         $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimVolumeSource",
                       },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
                     ],
                     "x-go-field-name": "Opt",
+                    nullable: true,
+                    "x-go-star-level": 1,
                   },
                   spec: {
                     allOf: [
                       {
                         $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimSpec",
                       },
-                      {
-                        "x-go-field-name": "Spec",
-                      },
                     ],
+                    "x-go-field-name": "Spec",
                   },
                   type: {
                     type: "string",
@@ -4410,24 +5007,20 @@ export const RawOpenAPI = {
                       {
                         $ref: "#/components/schemas/K8SIoApiCoreV1SecretVolumeSource",
                       },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
                     ],
                     "x-go-field-name": "Opt",
+                    nullable: true,
+                    "x-go-star-level": 1,
                   },
                   spec: {
                     allOf: [
                       {
                         $ref: "#/components/schemas/ApisKubepkgV1Alpha1SpecData",
                       },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
                     ],
                     "x-go-field-name": "Spec",
+                    nullable: true,
+                    "x-go-star-level": 1,
                   },
                   type: {
                     type: "string",
@@ -4728,12 +5321,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelectorOperator",
               },
-              {
-                description:
-                  "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
-                "x-go-field-name": "Operator",
-              },
             ],
+            description:
+              "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+            "x-go-field-name": "Operator",
           },
           values: {
             type: "array",
@@ -5449,36 +6040,30 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Selector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           template: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodTemplateSpec",
               },
-              {
-                description:
-                  "An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
-                "x-go-field-name": "Template",
-              },
             ],
+            description:
+              "An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
+            "x-go-field-name": "Template",
           },
           updateStrategy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1DaemonSetUpdateStrategy",
               },
-              {
-                description:
-                  "An update strategy to replace existing DaemonSet pods with new pods.",
-                "x-go-field-name": "UpdateStrategy",
-              },
             ],
+            description:
+              "An update strategy to replace existing DaemonSet pods with new pods.",
+            "x-go-field-name": "UpdateStrategy",
           },
         },
         additionalProperties: false,
@@ -5493,24 +6078,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1RollingUpdateDaemonSet",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "RollingUpdate",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           type: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1DaemonSetUpdateStrategyType",
               },
-              {
-                description:
-                  'Type of daemon set update. Can be "RollingUpdate" or "OnDelete". Default is RollingUpdate.',
-                "x-go-field-name": "Type",
-              },
             ],
+            description:
+              'Type of daemon set update. Can be "RollingUpdate" or "OnDelete". Default is RollingUpdate.',
+            "x-go-field-name": "Type",
           },
         },
         additionalProperties: false,
@@ -5559,36 +6140,29 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Selector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           strategy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1DeploymentStrategy",
               },
-              {
-                description:
-                  "The deployment strategy to use to replace existing pods with new ones.",
-                "x-go-field-name": "Strategy",
-              },
             ],
+            description:
+              "The deployment strategy to use to replace existing pods with new ones.",
+            "x-go-field-name": "Strategy",
           },
           template: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodTemplateSpec",
               },
-              {
-                description:
-                  "Template describes the pods that will be created.",
-                "x-go-field-name": "Template",
-              },
             ],
+            description: "Template describes the pods that will be created.",
+            "x-go-field-name": "Template",
           },
         },
         additionalProperties: false,
@@ -5603,24 +6177,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1RollingUpdateDeployment",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "RollingUpdate",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           type: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1DeploymentStrategyType",
               },
-              {
-                description:
-                  'Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.',
-                "x-go-field-name": "Type",
-              },
             ],
+            description:
+              'Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.',
+            "x-go-field-name": "Type",
           },
         },
         additionalProperties: false,
@@ -5648,24 +6218,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/UtilIntstrIntOrString",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "MaxSurge",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           maxUnavailable: {
             allOf: [
               {
                 $ref: "#/components/schemas/UtilIntstrIntOrString",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "MaxUnavailable",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -5679,24 +6245,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/UtilIntstrIntOrString",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "MaxSurge",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           maxUnavailable: {
             allOf: [
               {
                 $ref: "#/components/schemas/UtilIntstrIntOrString",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "MaxUnavailable",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -5710,12 +6272,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/UtilIntstrIntOrString",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "MaxUnavailable",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           partition: {
             type: "integer",
@@ -5750,24 +6310,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyType",
               },
-              {
-                description:
-                  "WhenDeleted specifies what happens to PVCs created from StatefulSet VolumeClaimTemplates when the StatefulSet is deleted. The default policy of `Retain` causes PVCs to not be affected by StatefulSet deletion. The `Delete` policy causes those PVCs to be deleted.",
-                "x-go-field-name": "WhenDeleted",
-              },
             ],
+            description:
+              "WhenDeleted specifies what happens to PVCs created from StatefulSet VolumeClaimTemplates when the StatefulSet is deleted. The default policy of `Retain` causes PVCs to not be affected by StatefulSet deletion. The `Delete` policy causes those PVCs to be deleted.",
+            "x-go-field-name": "WhenDeleted",
           },
           whenScaled: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyType",
               },
-              {
-                description:
-                  "WhenScaled specifies what happens to PVCs created from StatefulSet VolumeClaimTemplates when the StatefulSet is scaled down. The default policy of `Retain` causes PVCs to not be affected by a scaledown. The `Delete` policy causes the associated PVCs for any excess pods above the replica count to be deleted.",
-                "x-go-field-name": "WhenScaled",
-              },
             ],
+            description:
+              "WhenScaled specifies what happens to PVCs created from StatefulSet VolumeClaimTemplates when the StatefulSet is scaled down. The default policy of `Retain` causes PVCs to not be affected by a scaledown. The `Delete` policy causes the associated PVCs for any excess pods above the replica count to be deleted.",
+            "x-go-field-name": "WhenScaled",
           },
         },
         additionalProperties: false,
@@ -5787,36 +6343,30 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1StatefulSetOrdinals",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Ordinals",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           persistentVolumeClaimRetentionPolicy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicy",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "PersistentVolumeClaimRetentionPolicy",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           podManagementPolicy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1PodManagementPolicyType",
               },
-              {
-                description:
-                  "podManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down. The default policy is `OrderedReady`, where pods are created in increasing order (pod-0, then pod-1, etc) and the controller will wait until each pod is ready before continuing. When scaling down, the pods are removed in the opposite order. The alternative policy is `Parallel` which will create pods in parallel to match the desired scale without waiting, and on scale down will delete all pods at once.",
-                "x-go-field-name": "PodManagementPolicy",
-              },
             ],
+            description:
+              "podManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down. The default policy is `OrderedReady`, where pods are created in increasing order (pod-0, then pod-1, etc) and the controller will wait until each pod is ready before continuing. When scaling down, the pods are removed in the opposite order. The alternative policy is `Parallel` which will create pods in parallel to match the desired scale without waiting, and on scale down will delete all pods at once.",
+            "x-go-field-name": "PodManagementPolicy",
           },
           replicas: {
             type: "integer",
@@ -5837,12 +6387,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Selector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           serviceName: {
             type: "string",
@@ -5853,24 +6401,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodTemplateSpec",
               },
-              {
-                description:
-                  'template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. Each pod will be named with the format <statefulsetname>-<podindex>. For example, a pod in a StatefulSet named "web" with index number "3" would be named "web-3".',
-                "x-go-field-name": "Template",
-              },
             ],
+            description:
+              'template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. Each pod will be named with the format <statefulsetname>-<podindex>. For example, a pod in a StatefulSet named "web" with index number "3" would be named "web-3".',
+            "x-go-field-name": "Template",
           },
           updateStrategy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1StatefulSetUpdateStrategy",
               },
-              {
-                description:
-                  "updateStrategy indicates the StatefulSetUpdateStrategy that will be employed to update Pods in the StatefulSet when a revision is made to Template.",
-                "x-go-field-name": "UpdateStrategy",
-              },
             ],
+            description:
+              "updateStrategy indicates the StatefulSetUpdateStrategy that will be employed to update Pods in the StatefulSet when a revision is made to Template.",
+            "x-go-field-name": "UpdateStrategy",
           },
           volumeClaimTemplates: {
             type: "array",
@@ -5892,24 +6436,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1RollingUpdateStatefulSetStrategy",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "RollingUpdate",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           type: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiAppsV1StatefulSetUpdateStrategyType",
               },
-              {
-                description:
-                  "Type indicates the type of the StatefulSetUpdateStrategy. Default is RollingUpdate.",
-                "x-go-field-name": "Type",
-              },
             ],
+            description:
+              "Type indicates the type of the StatefulSetUpdateStrategy. Default is RollingUpdate.",
+            "x-go-field-name": "Type",
           },
         },
         additionalProperties: false,
@@ -5935,12 +6475,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1ConcurrencyPolicy",
               },
-              {
-                description:
-                  'Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn\'t finished yet; - "Replace": cancels currently running job and replaces it with a new one',
-                "x-go-field-name": "ConcurrencyPolicy",
-              },
             ],
+            description:
+              'Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn\'t finished yet; - "Replace": cancels currently running job and replaces it with a new one',
+            "x-go-field-name": "ConcurrencyPolicy",
           },
           failedJobsHistoryLimit: {
             type: "integer",
@@ -5954,12 +6492,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1JobTemplateSpec",
               },
-              {
-                description:
-                  "Specifies the job that will be created when executing a CronJob.",
-                "x-go-field-name": "JobTemplate",
-              },
             ],
+            description:
+              "Specifies the job that will be created when executing a CronJob.",
+            "x-go-field-name": "JobTemplate",
           },
           schedule: {
             type: "string",
@@ -6018,12 +6554,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1CompletionMode",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "CompletionMode",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           completions: {
             type: "integer",
@@ -6050,24 +6584,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1PodFailurePolicy",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "PodFailurePolicy",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           selector: {
             allOf: [
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Selector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           suspend: {
             type: "boolean",
@@ -6080,12 +6610,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodTemplateSpec",
               },
-              {
-                description:
-                  "Describes the pod that will be created when executing a job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
-                "x-go-field-name": "Template",
-              },
             ],
+            description:
+              "Describes the pod that will be created when executing a job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
+            "x-go-field-name": "Template",
           },
           ttlSecondsAfterFinished: {
             type: "integer",
@@ -6107,22 +6635,18 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1ObjectMeta",
               },
-              {
-                description:
-                  "Standard object's metadata of the jobs created from this template. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-                "x-go-field-name": "ObjectMeta",
-              },
             ],
+            description:
+              "Standard object's metadata of the jobs created from this template. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+            "x-go-field-name": "ObjectMeta",
           },
           spec: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1JobSpec",
               },
-              {
-                "x-go-field-name": "Spec",
-              },
             ],
+            "x-go-field-name": "Spec",
           },
         },
         additionalProperties: false,
@@ -6165,12 +6689,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1PodFailurePolicyOnExitCodesOperator",
               },
-              {
-                description:
-                  "Represents the relationship between the container exit code(s) and the specified values. Containers completed with success (exit code 0) are excluded from the requirement check. Possible values are: - In: the requirement is satisfied if at least one container exit code\n  (might be multiple if there are multiple containers not restricted\n  by the 'containerName' field) is in the set of specified values.\n- NotIn: the requirement is satisfied if at least one container exit code\n  (might be multiple if there are multiple containers not restricted\n  by the 'containerName' field) is not in the set of specified values.\nAdditional values are considered to be added in the future. Clients should react to an unknown operator by assuming the requirement is not satisfied.",
-                "x-go-field-name": "Operator",
-              },
             ],
+            description:
+              "Represents the relationship between the container exit code(s) and the specified values. Containers completed with success (exit code 0) are excluded from the requirement check. Possible values are: - In: the requirement is satisfied if at least one container exit code\n  (might be multiple if there are multiple containers not restricted\n  by the 'containerName' field) is in the set of specified values.\n- NotIn: the requirement is satisfied if at least one container exit code\n  (might be multiple if there are multiple containers not restricted\n  by the 'containerName' field) is not in the set of specified values.\nAdditional values are considered to be added in the future. Clients should react to an unknown operator by assuming the requirement is not satisfied.",
+            "x-go-field-name": "Operator",
           },
           values: {
             type: "array",
@@ -6194,24 +6716,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1ConditionStatus",
               },
-              {
-                description:
-                  "Specifies the required Pod condition status. To match a pod condition it is required that the specified status equals the pod condition status. Defaults to True.",
-                "x-go-field-name": "Status",
-              },
             ],
+            description:
+              "Specifies the required Pod condition status. To match a pod condition it is required that the specified status equals the pod condition status. Defaults to True.",
+            "x-go-field-name": "Status",
           },
           type: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodConditionType",
               },
-              {
-                description:
-                  "Specifies the required Pod condition type. To match a pod condition it is required that specified type equals the pod condition type.",
-                "x-go-field-name": "Type",
-              },
             ],
+            description:
+              "Specifies the required Pod condition type. To match a pod condition it is required that specified type equals the pod condition type.",
+            "x-go-field-name": "Type",
           },
         },
         additionalProperties: false,
@@ -6227,24 +6745,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1PodFailurePolicyAction",
               },
-              {
-                description:
-                  "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are: - FailJob: indicates that the pod's job is marked as Failed and all\n  running pods are terminated.\n- Ignore: indicates that the counter towards the .backoffLimit is not\n  incremented and a replacement pod is created.\n- Count: indicates that the pod is handled in the default way - the\n  counter towards the .backoffLimit is incremented.\nAdditional values are considered to be added in the future. Clients should react to an unknown action by skipping the rule.",
-                "x-go-field-name": "Action",
-              },
             ],
+            description:
+              "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are: - FailJob: indicates that the pod's job is marked as Failed and all\n  running pods are terminated.\n- Ignore: indicates that the counter towards the .backoffLimit is not\n  incremented and a replacement pod is created.\n- Count: indicates that the pod is handled in the default way - the\n  counter towards the .backoffLimit is incremented.\nAdditional values are considered to be added in the future. Clients should react to an unknown action by skipping the rule.",
+            "x-go-field-name": "Action",
           },
           onExitCodes: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "OnExitCodes",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           onPodConditions: {
             type: "array",
@@ -6266,36 +6780,30 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1NodeAffinity",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "NodeAffinity",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           podAffinity: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodAffinity",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "PodAffinity",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           podAntiAffinity: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodAntiAffinity",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "PodAntiAffinity",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -6395,24 +6903,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1StorageMedium",
               },
-              {
-                description:
-                  'medium represents what type of storage medium should back this directory. The default is "" which means to use the node\'s default medium. Must be an empty string (default) or Memory. More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir',
-                "x-go-field-name": "Medium",
-              },
             ],
+            description:
+              'medium represents what type of storage medium should back this directory. The default is "" which means to use the node\'s default medium. Must be an empty string (default) or Memory. More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir',
+            "x-go-field-name": "Medium",
           },
           sizeLimit: {
             allOf: [
               {
                 $ref: "#/components/schemas/ApiResourceQuantity",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "SizeLimit",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -6484,12 +6988,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1HostPathType",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Type",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -6669,12 +7171,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1NodeSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "RequiredDuringSchedulingIgnoredDuringExecution",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -6715,12 +7215,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1NodeSelectorOperator",
               },
-              {
-                description:
-                  "Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
-                "x-go-field-name": "Operator",
-              },
             ],
+            description:
+              "Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+            "x-go-field-name": "Operator",
           },
           values: {
             type: "array",
@@ -6776,34 +7274,28 @@ export const RawOpenAPI = {
                   {
                     $ref: "#/components/schemas/ApisMetaV1ObjectMeta",
                   },
-                  {
-                    description:
-                      "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-                    "x-go-field-name": "ObjectMeta",
-                  },
                 ],
+                description:
+                  "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+                "x-go-field-name": "ObjectMeta",
               },
               spec: {
                 allOf: [
                   {
                     $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimSpec",
                   },
-                  {
-                    "x-go-field-name": "Spec",
-                  },
                 ],
+                "x-go-field-name": "Spec",
               },
               status: {
                 allOf: [
                   {
                     $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimStatus",
                   },
-                  {
-                    description:
-                      "status represents the current information/status of a persistent volume claim. Read-only. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims",
-                    "x-go-field-name": "Status",
-                  },
                 ],
+                description:
+                  "status represents the current information/status of a persistent volume claim. Read-only. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims",
+                "x-go-field-name": "Status",
               },
             },
             additionalProperties: false,
@@ -6819,24 +7311,19 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1Time",
               },
-              {
-                description:
-                  "lastProbeTime is the time we probed the condition.",
-                "x-go-field-name": "LastProbeTime",
-              },
             ],
+            description: "lastProbeTime is the time we probed the condition.",
+            "x-go-field-name": "LastProbeTime",
           },
           lastTransitionTime: {
             allOf: [
               {
                 $ref: "#/components/schemas/ApisMetaV1Time",
               },
-              {
-                description:
-                  "lastTransitionTime is the time the condition transitioned from one status to another.",
-                "x-go-field-name": "LastTransitionTime",
-              },
             ],
+            description:
+              "lastTransitionTime is the time the condition transitioned from one status to another.",
+            "x-go-field-name": "LastTransitionTime",
           },
           message: {
             type: "string",
@@ -6851,20 +7338,16 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1ConditionStatus",
               },
-              {
-                "x-go-field-name": "Status",
-              },
             ],
+            "x-go-field-name": "Status",
           },
           type: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimConditionType",
               },
-              {
-                "x-go-field-name": "Type",
-              },
             ],
+            "x-go-field-name": "Type",
           },
         },
         additionalProperties: false,
@@ -6900,48 +7383,40 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1TypedLocalObjectReference",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "DataSource",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           dataSourceRef: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1TypedObjectReference",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "DataSourceRef",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           resources: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1ResourceRequirements",
               },
-              {
-                description:
-                  "resources represents the minimum resources the volume should have. If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements that are lower than previous value but must still be higher than capacity recorded in the status field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources",
-                "x-go-field-name": "Resources",
-              },
             ],
+            description:
+              "resources represents the minimum resources the volume should have. If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements that are lower than previous value but must still be higher than capacity recorded in the status field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources",
+            "x-go-field-name": "Resources",
           },
           selector: {
             allOf: [
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Selector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           storageClassName: {
             type: "string",
@@ -6954,12 +7429,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeMode",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "VolumeMode",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           volumeName: {
             type: "string",
@@ -6984,24 +7457,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1ResourceList",
               },
-              {
-                description:
-                  "allocatedResources is the storage resource within AllocatedResources tracks the capacity allocated to a PVC. It may be larger than the actual capacity when a volume expansion operation is requested. For storage quota, the larger value from allocatedResources and PVC.spec.resources is used. If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation. If a volume expansion capacity request is lowered, allocatedResources is only lowered if there are no expansion operations in progress and if the actual volume capacity is equal or lower than the requested capacity. This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.",
-                "x-go-field-name": "AllocatedResources",
-              },
             ],
+            description:
+              "allocatedResources is the storage resource within AllocatedResources tracks the capacity allocated to a PVC. It may be larger than the actual capacity when a volume expansion operation is requested. For storage quota, the larger value from allocatedResources and PVC.spec.resources is used. If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation. If a volume expansion capacity request is lowered, allocatedResources is only lowered if there are no expansion operations in progress and if the actual volume capacity is equal or lower than the requested capacity. This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.",
+            "x-go-field-name": "AllocatedResources",
           },
           capacity: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1ResourceList",
               },
-              {
-                description:
-                  "capacity represents the actual resources of the underlying volume.",
-                "x-go-field-name": "Capacity",
-              },
             ],
+            description:
+              "capacity represents the actual resources of the underlying volume.",
+            "x-go-field-name": "Capacity",
           },
           conditions: {
             type: "array",
@@ -7015,24 +7484,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimPhase",
               },
-              {
-                description:
-                  "phase represents the current phase of PersistentVolumeClaim.",
-                "x-go-field-name": "Phase",
-              },
             ],
+            description:
+              "phase represents the current phase of PersistentVolumeClaim.",
+            "x-go-field-name": "Phase",
           },
           resizeStatus: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimResizeStatus",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "ResizeStatus",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -7090,24 +7555,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "LabelSelector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           namespaceSelector: {
             allOf: [
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "NamespaceSelector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           namespaces: {
             type: "array",
@@ -7208,12 +7669,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1OsName",
               },
-              {
-                description:
-                  "Name is the name of the operating system. The currently supported values are linux and windows. Additional value may be defined in future and can be one of: https://github.com/opencontainers/runtime-spec/blob/master/config.md#platform-specific-configuration Clients should expect to handle additional values and treat unrecognized values in this field as os: null",
-                "x-go-field-name": "Name",
-              },
             ],
+            description:
+              "Name is the name of the operating system. The currently supported values are linux and windows. Additional value may be defined in future and can be one of: https://github.com/opencontainers/runtime-spec/blob/master/config.md#platform-specific-configuration Clients should expect to handle additional values and treat unrecognized values in this field as os: null",
+            "x-go-field-name": "Name",
           },
         },
         additionalProperties: false,
@@ -7228,12 +7687,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodConditionType",
               },
-              {
-                description:
-                  "ConditionType refers to a condition in the pod's condition list with matching type.",
-                "x-go-field-name": "ConditionType",
-              },
             ],
+            description:
+              "ConditionType refers to a condition in the pod's condition list with matching type.",
+            "x-go-field-name": "ConditionType",
           },
         },
         additionalProperties: false,
@@ -7252,12 +7709,9 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1ClaimSource",
               },
-              {
-                description:
-                  "Source describes where to find the ResourceClaim.",
-                "x-go-field-name": "Source",
-              },
             ],
+            description: "Source describes where to find the ResourceClaim.",
+            "x-go-field-name": "Source",
           },
         },
         additionalProperties: false,
@@ -7291,12 +7745,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodFsGroupChangePolicy",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "FSGroupChangePolicy",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           runAsGroup: {
             type: "integer",
@@ -7323,24 +7775,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1SeLinuxOptions",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "SELinuxOptions",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           seccompProfile: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1SeccompProfile",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "SeccompProfile",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           supplementalGroups: {
             type: "array",
@@ -7362,12 +7810,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1WindowsSecurityContextOptions",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "WindowsOptions",
+            nullable: true,
+            "x-go-star-level": 1,
           },
         },
         additionalProperties: false,
@@ -7388,12 +7834,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1Affinity",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "Affinity",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           automountServiceAccountToken: {
             type: "boolean",
@@ -7406,24 +7850,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodDnsConfig",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "DNSConfig",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           dnsPolicy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1DnsPolicy",
               },
-              {
-                description:
-                  "Set DNS policy for the pod. Defaults to \"ClusterFirst\". Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'. DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy. To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'.",
-                "x-go-field-name": "DNSPolicy",
-              },
             ],
+            description:
+              "Set DNS policy for the pod. Defaults to \"ClusterFirst\". Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'. DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy. To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'.",
+            "x-go-field-name": "DNSPolicy",
           },
           enableServiceLinks: {
             type: "boolean",
@@ -7486,36 +7926,30 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodOs",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "OS",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           overhead: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1ResourceList",
               },
-              {
-                description:
-                  "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md",
-                "x-go-field-name": "Overhead",
-              },
             ],
+            description:
+              "Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md",
+            "x-go-field-name": "Overhead",
           },
           preemptionPolicy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PreemptionPolicy",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "PreemptionPolicy",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           priority: {
             type: "integer",
@@ -7547,12 +7981,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1RestartPolicy",
               },
-              {
-                description:
-                  "Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy",
-                "x-go-field-name": "RestartPolicy",
-              },
             ],
+            description:
+              "Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy",
+            "x-go-field-name": "RestartPolicy",
           },
           runtimeClassName: {
             type: "string",
@@ -7576,12 +8008,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodSecurityContext",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "SecurityContext",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           serviceAccount: {
             type: "string",
@@ -7640,22 +8070,18 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1ObjectMeta",
               },
-              {
-                description:
-                  "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-                "x-go-field-name": "ObjectMeta",
-              },
             ],
+            description:
+              "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+            "x-go-field-name": "ObjectMeta",
           },
           spec: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodSpec",
               },
-              {
-                "x-go-field-name": "Spec",
-              },
             ],
+            "x-go-field-name": "Spec",
           },
         },
         additionalProperties: false,
@@ -7674,12 +8100,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1NodeSelectorTerm",
               },
-              {
-                description:
-                  "A node selector term, associated with the corresponding weight.",
-                "x-go-field-name": "Preference",
-              },
             ],
+            description:
+              "A node selector term, associated with the corresponding weight.",
+            "x-go-field-name": "Preference",
           },
           weight: {
             type: "integer",
@@ -8092,12 +8516,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1TaintEffect",
               },
-              {
-                description:
-                  "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
-                "x-go-field-name": "Effect",
-              },
             ],
+            description:
+              "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+            "x-go-field-name": "Effect",
           },
           key: {
             type: "string",
@@ -8108,12 +8530,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1TolerationOperator",
               },
-              {
-                description:
-                  "Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.",
-                "x-go-field-name": "Operator",
-              },
             ],
+            description:
+              "Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.",
+            "x-go-field-name": "Operator",
           },
           tolerationSeconds: {
             type: "integer",
@@ -8142,12 +8562,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/ApisMetaV1LabelSelector",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "LabelSelector",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           matchLabelKeys: {
             type: "array",
@@ -8173,24 +8591,20 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1NodeInclusionPolicy",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "NodeAffinityPolicy",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           nodeTaintsPolicy: {
             allOf: [
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1NodeInclusionPolicy",
               },
-              {
-                nullable: true,
-                "x-go-star-level": 1,
-              },
             ],
             "x-go-field-name": "NodeTaintsPolicy",
+            nullable: true,
+            "x-go-star-level": 1,
           },
           topologyKey: {
             type: "string",
@@ -8201,12 +8615,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1UnsatisfiableConstraintAction",
               },
-              {
-                description:
-                  'WhenUnsatisfiable indicates how to deal with a pod if it doesn\'t satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it. - ScheduleAnyway tells the scheduler to schedule the pod in any location,\n  but giving higher precedence to topologies that would help reduce the\n  skew.\nA constraint is considered "Unsatisfiable" for an incoming pod if and only if every possible node assignment for that pod would violate "MaxSkew" on some topology. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: ',
-                "x-go-field-name": "WhenUnsatisfiable",
-              },
             ],
+            description:
+              'WhenUnsatisfiable indicates how to deal with a pod if it doesn\'t satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it. - ScheduleAnyway tells the scheduler to schedule the pod in any location,\n  but giving higher precedence to topologies that would help reduce the\n  skew.\nA constraint is considered "Unsatisfiable" for an incoming pod if and only if every possible node assignment for that pod would violate "MaxSkew" on some topology. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: ',
+            "x-go-field-name": "WhenUnsatisfiable",
           },
         },
         additionalProperties: false,
@@ -8277,12 +8689,10 @@ export const RawOpenAPI = {
               {
                 $ref: "#/components/schemas/K8SIoApiCoreV1PodAffinityTerm",
               },
-              {
-                description:
-                  "Required. A pod affinity term, associated with the corresponding weight.",
-                "x-go-field-name": "PodAffinityTerm",
-              },
             ],
+            description:
+              "Required. A pod affinity term, associated with the corresponding weight.",
+            "x-go-field-name": "PodAffinityTerm",
           },
           weight: {
             type: "integer",

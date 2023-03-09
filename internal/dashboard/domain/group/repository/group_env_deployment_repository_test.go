@@ -3,6 +3,8 @@ package repository_test
 import (
 	"testing"
 
+	"github.com/octohelm/storage/pkg/dberr"
+
 	"github.com/innoai-tech/infra/pkg/otel"
 	"github.com/octohelm/kubepkg/internal/dashboard"
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/group"
@@ -45,6 +47,20 @@ func TestGroupEnvDeploymentRepository(t *testing.T) {
 	testingutil.Expect(t, err, testingutil.Be[error](nil))
 
 	repo := repository.NewGroupEnvDeploymentRepository(&env.Env)
+
+	t.Run("When delete", func(t *testing.T) {
+		d, err := repo.BindKubepkg(ctx, "demo", group.KubepkgRel{
+			KubepkgChannel: kubepkg.CHANNEL__DEV,
+			KubepkgID:      kubepkgRef.KubepkgID,
+		})
+		testingutil.Expect(t, err, testingutil.Be[error](nil))
+
+		err = repo.Delete(ctx, d.DeploymentName)
+		testingutil.Expect(t, err, testingutil.Be[error](nil))
+
+		d, err = repo.Get(ctx, d.DeploymentID)
+		testingutil.Expect(t, dberr.IsErrNotFound(err), testingutil.Be(true))
+	})
 
 	t.Run("When added deployment", func(t *testing.T) {
 		d, err := repo.BindKubepkg(ctx, "demo", group.KubepkgRel{

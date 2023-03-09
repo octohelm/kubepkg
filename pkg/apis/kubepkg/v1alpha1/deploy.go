@@ -18,6 +18,13 @@ type Deploy struct {
 	Deployer `json:"-"`
 }
 
+func (in *Deploy) DeepCopyInto(out *Deploy) {
+	if out.Deployer != nil {
+		// FIXME
+		in.Deployer = out.Deployer
+	}
+}
+
 func (d *Deploy) UnmarshalJSON(data []byte) error {
 	if len(data) == 0 || bytes.Equal(data, []byte("{}")) || bytes.Equal(data, []byte("null")) {
 		return nil

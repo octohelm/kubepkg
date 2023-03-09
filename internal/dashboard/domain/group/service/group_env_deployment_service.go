@@ -84,3 +84,7 @@ func (s *GroupEnvDeploymentService) PutKubePkg(ctx context.Context, pkg *v1alpha
 
 	return kpkg, nil
 }
+
+func (s *GroupEnvDeploymentService) Delete(ctx context.Context, deploymentName string) error {
+	return s.groupEnvDeploymentRepo.Delete(ctx, deploymentName)
+}

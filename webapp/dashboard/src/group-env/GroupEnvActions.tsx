@@ -1,7 +1,7 @@
 import { ClusterEnvType, deleteGroupEnv, GroupEnvInfo, putGroupEnv } from "../client/dashboard";
 import { tap, map as rxMap, merge } from "rxjs";
-import { useForm, useProxy, useDialogForm, fromErrorFields, useDialog } from "../layout";
-import { useRequest, useObservableEffect } from "@nodepkg/runtime";
+import { useForm, useDialogForm, fromErrorFields, useDialog } from "../layout";
+import { useRequest, useObservableEffect, useExt } from "@nodepkg/runtime";
 import {
   string,
   required,
@@ -49,7 +49,7 @@ export const useGroupEnvPut = (
     )
   );
 
-  return useProxy(put$, {
+  return useExt(put$, {
     form$: form$
   });
 };
@@ -66,7 +66,7 @@ export const useGroupEnvPutDialog = (
 
   useObservableEffect(() => put$.pipe(tap(() => dialog$.next(false))));
 
-  return useProxy(put$, {
+  return useExt(put$, {
     dialog$: dialog$
   });
 };
@@ -88,7 +88,7 @@ export const useGroupEnvDelDialog = ({ groupName, envName }: { groupName: string
 
   useObservableEffect(() => del$.pipe(tap(() => dialog$.next(false))));
 
-  return useProxy(del$, {
+  return useExt(del$, {
     dialog$: dialog$
   });
 };

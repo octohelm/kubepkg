@@ -7,7 +7,7 @@ import {
   OpenAPIProvider,
 } from "@nodepkg/openapi-playground";
 
-const PageOpenAPI = () => {
+const Openapi = () => {
   const location = useLocation();
   const query = parseSearch(location.search) as any;
 
@@ -24,4 +24,4 @@ const PageOpenAPI = () => {
   );
 };
 
-export default PageOpenAPI;
+export default Openapi;

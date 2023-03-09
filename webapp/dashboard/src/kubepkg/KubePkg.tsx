@@ -1,17 +1,17 @@
 import {
   Subscribe,
   useObservableState,
-  useStateSubject,
+  useStateSubject
 } from "@nodepkg/runtime";
 import {
   Box,
   CircularProgress,
   List,
   ListItem,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import { Fragment } from "react";
-import { Scaffold, useEpics } from "../layout";
+import { useEpics } from "../layout";
 import { GroupKubePkgProvider } from "./domain";
 import type { Kubepkg } from "../client/dashboard";
 import { Link } from "@nodepkg/router";
@@ -37,7 +37,7 @@ const GroupKubepkgListItem = ({ kubepkg }: { kubepkg: Kubepkg }) => {
   );
 };
 
-const GroupKubepkgList = () => {
+export const GroupKubepkgList = () => {
   const kubepkg$ = GroupKubePkgProvider.use$();
 
   const list = useObservableState(kubepkg$);
@@ -55,7 +55,7 @@ const GroupKubepkgList = () => {
   );
 };
 
-const KubePkgSearch = () => {
+export const KubePkgSearch = () => {
   const inputValue$ = useStateSubject("");
 
   const kubepkg$ = GroupKubePkgProvider.use$();
@@ -66,7 +66,7 @@ const KubePkgSearch = () => {
         kubepkg$.list$.next({
           groupName: kubepkg$.groupName,
           name: input.length > 0 ? [input] : [],
-          size: -1,
+          size: -1
         });
       }),
       ignoreElements()
@@ -102,15 +102,5 @@ const KubePkgSearch = () => {
         }
       </Subscribe>
     </Search>
-  );
-};
-
-export const KubePkgMain = () => {
-  return (
-    <GroupKubePkgProvider>
-      <Scaffold action={<KubePkgSearch />}>
-        <GroupKubepkgList />
-      </Scaffold>
-    </GroupKubePkgProvider>
   );
 };

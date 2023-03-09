@@ -3,6 +3,8 @@ import { join } from "path";
 import { app, presetReact } from "@innoai-tech/vite-presets";
 import { generateClients } from "@innoai-tech/gents";
 import { injectWebAppConfig } from "@innoai-tech/config/vite-plugin-inject-config";
+import pages, { reactResolver } from "vite-plugin-pages";
+import { stringify } from "./src/app/settings";
 
 (process.env as any).APP_VERSION = "__VERSION__";
 
@@ -25,6 +27,13 @@ export default defineConfig({
         }
       }
     }),
+    pages({
+      pagesDir: "./app/routes",
+      resolver: {
+        ...reactResolver(),
+        stringify: stringify
+      }
+    }),
     presetReact({
       chunkGroups: {
         utils: [
@@ -43,11 +52,8 @@ export default defineConfig({
           "@innoai-tech/*"
         ],
         ui: ["@emotion/*", "@mui/*", "@monaco-editor/*"],
-        codemirror: [
-          "@codemirror/*",
-          "@lezer/*"
-        ],
-        markdown: ["unified", "rehype-*"]
+        codemirror: ["@codemirror/*", "@lezer/*", "ajv"],
+        markdown: ["unified", "rehype-*", "remark-*"]
       }
     })
     // visualizer({

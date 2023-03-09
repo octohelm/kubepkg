@@ -21,7 +21,6 @@ import {
   IconButtonWithTooltip,
   NotificationProvider,
   Slot,
-  Scaffold,
   stringAvatar,
   useDialog,
   useProxy
@@ -34,7 +33,7 @@ import { GroupRoleType, refreshGroupRobotToken } from "../client/dashboard";
 import { map as rxMap, tap } from "rxjs";
 import copy from "copy-to-clipboard";
 
-const useGroupRobotTokenRefresh = () => {
+export const useGroupRobotTokenRefresh = () => {
   const notification$ = NotificationProvider.use$();
 
   const refreshGroupRobotToken$ = useRequest(refreshGroupRobotToken);
@@ -138,7 +137,7 @@ const GroupRobotListItem = ({ robot }: { robot: GroupRobot }) => {
   );
 };
 
-const GroupRobotList = () => {
+export const GroupRobotList = () => {
   const robots$ = GroupRobotProvider.use$();
 
   useEffect(() => {
@@ -163,7 +162,7 @@ const GroupRobotList = () => {
   );
 };
 
-const GroupRobotMainToolbar = () => {
+export const GroupRobotMainToolbar = () => {
   const form$ = useGroupRobotFormWithDialog();
 
   return (
@@ -178,15 +177,5 @@ const GroupRobotMainToolbar = () => {
       </IconButtonWithTooltip>
       <Slot elem$={form$.dialog$.elements$} />
     </AccessControl>
-  );
-};
-
-export const GroupRobotMain = () => {
-  return (
-    <GroupRobotProvider>
-      <Scaffold toolbar={<GroupRobotMainToolbar />}>
-        <GroupRobotList />
-      </Scaffold>
-    </GroupRobotProvider>
   );
 };

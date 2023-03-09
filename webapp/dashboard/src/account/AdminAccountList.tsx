@@ -1,7 +1,7 @@
 import {
   useObservableState,
   useObservableEffect,
-  useRequest,
+  useRequest
 } from "@nodepkg/runtime";
 import {
   Avatar,
@@ -12,7 +12,7 @@ import {
   ListItemAvatar,
   ListItemText,
   MenuItem,
-  Select,
+  Select
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { map as rxMap, tap, ignoreElements, filter } from "rxjs";
@@ -21,9 +21,9 @@ import {
   GroupRoleType,
   GroupUser,
   listAdminAccount,
-  putAdminAccount,
+  putAdminAccount
 } from "../client/dashboard";
-import { createSubject, Scaffold, stringAvatar } from "../layout";
+import { createSubject, stringAvatar } from "../layout";
 import { useAccountAutocomplete } from "./AccountAutocomplete";
 import { AccessControl } from "../auth";
 import { map } from "@innoai-tech/lodash";
@@ -38,7 +38,7 @@ export const AdminAccountProvider = createSubject(({}, use) => {
     {
       list$: listAccount$,
       del$: deleteAdminAccount$,
-      put$: putAdminAccount$,
+      put$: putAdminAccount$
     },
     (accounts$) =>
       accounts$.put$.pipe(
@@ -80,12 +80,12 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
                   account$.put$.next({
                     accountID: user.accountID,
                     body: {
-                      roleType,
-                    },
+                      roleType
+                    }
                   });
                 } else {
                   account$.del$.next({
-                    accountID: user.accountID,
+                    accountID: user.accountID
                   });
                 }
               }}
@@ -106,7 +106,7 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
                   >
                     移除管理员
                   </MenuItem>
-                </AccessControl>,
+                </AccessControl>
               ]}
             </Select>
           </AccessControl>
@@ -128,7 +128,7 @@ const AdminAccountListItem = ({ user }: { user: GroupUser }) => {
   );
 };
 
-const AdminAccountList = () => {
+export const AdminAccountList = () => {
   const account$ = AdminAccountProvider.use$();
 
   useEffect(() => {
@@ -155,7 +155,7 @@ export const AdminAdd = () => {
   const account$ = AdminAccountProvider.use$();
 
   const accountAutocomplete$ = useAccountAutocomplete({
-    placeholder: "查询并添加管理员",
+    placeholder: "查询并添加管理员"
   });
 
   useObservableEffect(() =>
@@ -173,8 +173,8 @@ export const AdminAdd = () => {
         account$.put$.next({
           accountID,
           body: {
-            roleType: GroupRoleType.MEMBER,
-          },
+            roleType: GroupRoleType.MEMBER
+          }
         });
       })
     )
@@ -184,15 +184,5 @@ export const AdminAdd = () => {
     <AccessControl op={account$.put$}>
       {accountAutocomplete$.render()}
     </AccessControl>
-  );
-};
-
-export const AdminAccountMain = () => {
-  return (
-    <AdminAccountProvider>
-      <Scaffold action={<AdminAdd />}>
-        <AdminAccountList />
-      </Scaffold>
-    </AdminAccountProvider>
   );
 };

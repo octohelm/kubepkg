@@ -16,9 +16,9 @@ import {
 import { Fragment, useEffect } from "react";
 import { tap, filter } from "rxjs";
 import { GroupRoleType, GroupUser } from "../client/dashboard";
-import { Scaffold, stringAvatar } from "../layout";
+import { stringAvatar } from "../layout";
 import { useAccountAutocomplete } from "../account";
-import { AccessControl } from "../auth";
+import { AccessControl } from "src/auth";
 import { map } from "@innoai-tech/lodash";
 import { GroupAccountProvider } from "./domain";
 
@@ -89,7 +89,7 @@ const GroupAccountListItem = ({ user }: { user: GroupUser }) => {
   );
 };
 
-const GroupAccountList = () => {
+export const GroupAccountList = () => {
   const account$ = GroupAccountProvider.use$();
 
   useEffect(() => {
@@ -146,15 +146,5 @@ export const GroupAccountAdd = () => {
 
   return (
     <AccessControl op={account$.put$}>{accountSearch$.render()}</AccessControl>
-  );
-};
-
-export const GroupAccountMain = () => {
-  return (
-    <GroupAccountProvider>
-      <Scaffold action={<GroupAccountAdd />}>
-        <GroupAccountList />
-      </Scaffold>
-    </GroupAccountProvider>
   );
 };

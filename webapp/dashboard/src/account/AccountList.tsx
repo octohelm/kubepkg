@@ -6,11 +6,11 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { listAccount, AccountUser } from "../client/dashboard";
-import { Scaffold, stringAvatar } from "../layout";
+import { stringAvatar } from "../layout";
 
 export const AccountListItem = ({ user }: { user: AccountUser }) => {
   return (
@@ -32,7 +32,7 @@ export const AccountListItem = ({ user }: { user: AccountUser }) => {
   );
 };
 
-const AccountList = () => {
+export const AccountList = () => {
   const listAccount$ = useRequest(listAccount);
 
   useEffect(() => {
@@ -56,13 +56,5 @@ const AccountList = () => {
         );
       })}
     </List>
-  );
-};
-
-export const AccountMain = () => {
-  return (
-    <Scaffold>
-      <AccountList />
-    </Scaffold>
   );
 };

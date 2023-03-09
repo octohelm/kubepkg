@@ -14,15 +14,22 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// +gengo:deepcopy=false
 type Deploy struct {
 	Deployer `json:"-"`
 }
 
-func (in *Deploy) DeepCopyInto(out *Deploy) {
-	if out.Deployer != nil {
-		// FIXME
-		in.Deployer = out.Deployer
+func (in *Deploy) DeepCopy() *Deploy {
+	if in == nil {
+		return nil
 	}
+	out := new(Deploy)
+	in.Deployer = out.Deployer
+	return out
+}
+
+func (in *Deploy) DeepCopyInto(out *Deploy) {
+	out.Deployer = in.Deployer
 }
 
 func (d *Deploy) UnmarshalJSON(data []byte) error {

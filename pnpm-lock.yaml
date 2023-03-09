@@ -9,7 +9,7 @@ importers:
       '@innoai-tech/devconfig': ^0.1.2
       '@innoai-tech/gents': ^0.3.3
       '@innoai-tech/monobundle': ^0.5.2
-      '@innoai-tech/vite-presets': ^0.5.0
+      '@innoai-tech/vite-presets': ^0.5.1
       '@nodepkg/devconfig': workspace:*
       '@testing-library/react': ^14.0.0
       core-js: ^3.29.0
@@ -21,6 +21,7 @@ importers:
       turbo: ^1.8.3
       typescript: ^4.9.5
       vite: ^4.1.4
+      vite-plugin-pages: ^0.28.0
       vitest: ^0.29.2
     devDependencies:
       '@emotion/react': 11.10.6_react@18.2.0
@@ -28,7 +29,7 @@ importers:
       '@innoai-tech/devconfig': 0.1.2
       '@innoai-tech/gents': 0.3.3
       '@innoai-tech/monobundle': 0.5.2_jay2j7pinmw7swulggywz7ozhe
-      '@innoai-tech/vite-presets': 0.5.0_vwvfc4ezh6jlf6pa67auy3eulu
+      '@innoai-tech/vite-presets': 0.5.1_vwvfc4ezh6jlf6pa67auy3eulu
       '@nodepkg/devconfig': link:nodepkg/devconfig
       '@testing-library/react': 14.0.0_biqbaboplfbrettd7655fr4n2y
       core-js: 3.29.0
@@ -40,6 +41,7 @@ importers:
       turbo: 1.8.3
       typescript: 4.9.5
       vite: 4.1.4
+      vite-plugin-pages: 0.28.0_vite@4.1.4
       vitest: 0.29.2_jsdom@21.1.0
 
   nodepkg/codemirror:
@@ -150,14 +152,14 @@ importers:
 
   nodepkg/router:
     specifiers:
-      '@innoai-tech/lodash': ^0.2.0
+      '@nodepkg/runtime': workspace:*
       '@types/react': ~18.0.28
       react: ~18.2.0
       react-router: ^6.8.2
       react-router-dom: ^6.8.2
       rxjs: ^7.8.0
     dependencies:
-      '@innoai-tech/lodash': 0.2.0
+      '@nodepkg/runtime': link:../runtime
       react-router: 6.8.2_react@18.2.0
       react-router-dom: 6.8.2_biqbaboplfbrettd7655fr4n2y
     devDependencies:
@@ -1292,8 +1294,8 @@ packages:
       react: 18.2.0
       rxjs: 7.8.0
 
-  /@innoai-tech/vite-presets/0.5.0_vwvfc4ezh6jlf6pa67auy3eulu:
-    resolution: {integrity: sha512-f6HT8AE5FP1HK3wSRXPPMlYTlnHmATbzof+AtRhV0wQYou92fuKSk1U3BS7BDMhtrlFlDLRXFjoH03nQJj65bA==, tarball: download/@innoai-tech/vite-presets/0.5.0/3f6a7d9be7d2e5521bfb1ecc4d0fb6d7b94011e1}
+  /@innoai-tech/vite-presets/0.5.1_vwvfc4ezh6jlf6pa67auy3eulu:
+    resolution: {integrity: sha512-CZ/1Hru5DhbfrhgoVurwUOPg9/q2EWMnaku4Xahn42ttiCobt4HoKirkZtynudVwh606HOvhm/mjfZsQ8LrvDw==, tarball: download/@innoai-tech/vite-presets/0.5.1/9dd2be93678536ec2a1bdd35ca908384b164e59c}
     peerDependencies:
       vite: ^4.x
     dependencies:
@@ -1818,7 +1820,6 @@ packages:
     resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
     dependencies:
       '@types/ms': 0.7.31
-    dev: false
 
   /@types/estree/1.0.0:
     resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
@@ -1854,7 +1855,6 @@ packages:
 
   /@types/ms/0.7.31:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
-    dev: false
 
   /@types/node/18.14.6:
     resolution: {integrity: sha512-93+VvleD3mXwlLI/xASjw0FzKcwzl3OdTCzm1LaRfqgS21gfFtK3zDXM5Op9TeeMsJVOaJ2VRDpT9q4Y3d0AvA==}
@@ -2514,6 +2514,13 @@ packages:
       source-map: 0.6.1
     dev: true
 
+  /esprima-extract-comments/1.1.0:
+    resolution: {integrity: sha512-sBQUnvJwpeE9QnPrxh7dpI/dp67erYG4WXEAreAMoelPRpMR7NWb4YtwRPn9b+H1uLQKl/qS8WYmyaljTpjIsw==}
+    engines: {node: '>=4'}
+    dependencies:
+      esprima: 4.0.1
+    dev: true
+
   /esprima/4.0.1:
     resolution: {integrity: sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==}
     engines: {node: '>=4'}
@@ -2537,6 +2544,14 @@ packages:
   /extend/3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
     dev: false
+
+  /extract-comments/1.1.0:
+    resolution: {integrity: sha512-dzbZV2AdSSVW/4E7Ti5hZdHWbA+Z80RJsJhr5uiL10oyjl/gy7/o+HI1HwK4/WSZhlq4SNKU3oUzXlM13Qx02Q==}
+    engines: {node: '>=6'}
+    dependencies:
+      esprima-extract-comments: 1.1.0
+      parse-code-context: 1.0.0
+    dev: true
 
   /fast-deep-equal/3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -3492,6 +3507,11 @@ packages:
     dependencies:
       callsites: 3.1.0
 
+  /parse-code-context/1.0.0:
+    resolution: {integrity: sha512-OZQaqKaQnR21iqhlnPfVisFjBWjhnMl5J9MgbP8xC+EwoVqbXrq78lp+9Zb3ahmLzrIX5Us/qbvBnaS3hkH6OA==}
+    engines: {node: '>=6'}
+    dev: true
+
   /parse-json/5.2.0:
     resolution: {integrity: sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg==}
     engines: {node: '>=8'}
@@ -4288,6 +4308,29 @@ packages:
       - terser
     dev: true
 
+  /vite-plugin-pages/0.28.0_vite@4.1.4:
+    resolution: {integrity: sha512-yncDncFVnjUzhqJnwCgGDZoZ/wO6MEOMe93f2MQjplKXm1MpmHCrTkFCPnQyYGZTVKPAN+y7BQcIpNWPFLQ4+w==}
+    peerDependencies:
+      '@vue/compiler-sfc': ^2.7.0 || ^3.0.0
+      vite: ^2.0.0 || ^3.0.0-0 || ^4.0.0
+    peerDependenciesMeta:
+      '@vue/compiler-sfc':
+        optional: true
+    dependencies:
+      '@types/debug': 4.1.7
+      debug: 4.3.4
+      deep-equal: 2.2.0
+      extract-comments: 1.1.0
+      fast-glob: 3.2.12
+      json5: 2.2.3
+      local-pkg: 0.4.3
+      picocolors: 1.0.0
+      vite: 4.1.4
+      yaml: 2.2.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /vite-tsconfig-paths/4.0.5_typescript@4.9.5:
     resolution: {integrity: sha512-/L/eHwySFYjwxoYt1WRJniuK/jPv+WGwgRGBYx3leciR5wBeqntQpUE6Js6+TJemChc+ter7fDBKieyEWDx4yQ==}
     dependencies:
@@ -4553,6 +4596,11 @@ packages:
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
+
+  /yaml/2.2.1:
+    resolution: {integrity: sha512-e0WHiYql7+9wr4cWMx3TVQrNwejKaEe7/rHNmQmqRjazfOP5W8PB6Jpebb5o6fIapbz9o9+2ipcaTM2ZwDI6lw==}
+    engines: {node: '>= 14'}
+    dev: true
 
   /yargs-parser/21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}

@@ -26,9 +26,6 @@
       ]
     },
     "dev": {
-      "dependsOn": [
-        "^build"
-      ],
       "inputs": [
         "src/*",
         "package.json"

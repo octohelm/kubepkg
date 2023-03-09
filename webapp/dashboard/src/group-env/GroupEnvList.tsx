@@ -15,7 +15,6 @@ import {
 import { useMemo } from "react";
 import { useGroupEnvDelDialog, useGroupEnvPutDialog } from "./GroupEnvActions";
 import {
-  Scaffold,
   IconButtonWithTooltip,
   ListItemLink,
   Slot
@@ -87,7 +86,7 @@ const GroupEnvSettings = ({
   );
 };
 
-const GroupEnvList = () => {
+export const GroupEnvList = () => {
   const groupEnvs$ = GroupEnvsProvider.use$();
 
   const groupEnvs = useObservableState(groupEnvs$);
@@ -107,7 +106,7 @@ const GroupEnvList = () => {
   );
 };
 
-const GroupMainToolbar = () => {
+export const GroupEnvMainToolbar = () => {
   const put$ = useGroupEnvPutDialog();
 
   return (
@@ -122,14 +121,6 @@ const GroupMainToolbar = () => {
       </IconButtonWithTooltip>
       <Slot elem$={put$.dialog$.elements$} />
     </AccessControl>
-  );
-};
-
-export const GroupEnvMain = () => {
-  return (
-    <Scaffold toolbar={<GroupMainToolbar />}>
-      <GroupEnvList />
-    </Scaffold>
   );
 };
 
@@ -150,6 +141,7 @@ export const GroupEnvMenu = () => {
             key={groupEnv.envName}
             title={groupEnv.envName}
             to={`/groups/${groupEnvs$.groupName}/envs/${groupEnv.envName}`}
+            strict
           />
         );
       })}

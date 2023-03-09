@@ -9,11 +9,9 @@ import {
 } from "@innoai-tech/fetcher";
 import { FetcherProvider, PlatformProvider, StoreProvider } from "@nodepkg/runtime";
 import conf from "./config";
-import { BrowserRouter } from "@nodepkg/router";
 import { TokenProvider } from "./auth";
 
 const root = createRoot(document.getElementById("root") as any);
-const basename = `${document.querySelector("base")?.getAttribute("href")}/`;
 
 const fixBaseURL = (baseURL: string) => {
   if (baseURL) {
@@ -56,16 +54,13 @@ const Bootstrap = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-
-    <BrowserRouter basename={basename}>
-      <PlatformProvider>
-        <FetcherProvider fetcher={fetcher}>
-          <StoreProvider name={c.name}>
-            <TokenProvider>{children}</TokenProvider>
-          </StoreProvider>
-        </FetcherProvider>
-      </PlatformProvider>
-    </BrowserRouter>
+    <PlatformProvider>
+      <FetcherProvider fetcher={fetcher}>
+        <StoreProvider name={c.name}>
+          <TokenProvider>{children}</TokenProvider>
+        </StoreProvider>
+      </FetcherProvider>
+    </PlatformProvider>
   );
 };
 

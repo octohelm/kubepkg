@@ -12,7 +12,7 @@ import {
 import { useEffect } from "react";
 import { Group, listGroup } from "../client/dashboard";
 import { useGroupDelDialog, useGroupPutDialog } from "./GroupActions";
-import { Slot, Scaffold } from "../layout";
+import { Slot } from "../layout";
 import { map, merge, tap } from "rxjs";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
@@ -70,7 +70,7 @@ const GroupSettings = ({ group: initialGroup }: { group: Group }) => {
   return <Slot elem$={groupElements$} />;
 };
 
-const GroupList = () => {
+export const GroupList = () => {
   const listGroup$ = useRequest(listGroup);
 
   useEffect(() => {
@@ -97,7 +97,7 @@ const GroupList = () => {
   );
 };
 
-const GroupMainToolbar = () => {
+export const GroupMainToolbar = () => {
   const form$ = useGroupPutDialog();
 
   return (
@@ -112,13 +112,5 @@ const GroupMainToolbar = () => {
       </IconButtonWithTooltip>
       <Slot elem$={form$.dialog$.elements$} />
     </AccessControl>
-  );
-};
-
-export const GroupMain = () => {
-  return (
-    <Scaffold toolbar={<GroupMainToolbar />}>
-      <GroupList />
-    </Scaffold>
   );
 };

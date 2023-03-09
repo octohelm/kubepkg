@@ -10,12 +10,13 @@
     }
   },
   "dependencies": {
-    "@innoai-tech/lodash": "^0.2.0",
     "react-router": "^6.8.2",
-    "react-router-dom": "^6.8.2"
+    "react-router-dom": "^6.8.2",
+    "@nodepkg/runtime": "workspace:*"
   },
   "peerDependencies": {
-    "react": "18.x"
+    "react": "18.x",
+    "rxjs": "18.x"
   },
   "devDependencies": {
     "@types/react": "~18.0.28",

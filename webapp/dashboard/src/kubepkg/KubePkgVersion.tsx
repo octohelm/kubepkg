@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useLocation } from "@nodepkg/router";
+import { useNavigate, useLocation } from "@nodepkg/router";
 import {
   Box,
   IconButton,
@@ -34,7 +34,7 @@ import {
   putKubepkgVersion
 } from "../client/dashboard";
 import { AccessControl } from "../auth";
-import { Scaffold, useDialog, useMenu, useProxy } from "../layout";
+import { useDialog, useMenu, useProxy } from "../layout";
 import { GroupKubePkgVersionProvider } from "./domain";
 import { KubePkgEditor } from "./KubePkgEditor";
 import { MoreHoriz } from "@mui/icons-material";
@@ -360,17 +360,3 @@ export const KubepkgVersionPreview = () => {
   );
 };
 
-export const KubePkgVersionMain = () => {
-  const params = useParams<{ group: string; name: string }>();
-
-  return (
-    <GroupKubePkgVersionProvider
-      groupName={params.group!}
-      kubePkgName={params.name!}
-    >
-      <Scaffold>
-        <KubepkgVersionPreview />
-      </Scaffold>
-    </GroupKubePkgVersionProvider>
-  );
-};

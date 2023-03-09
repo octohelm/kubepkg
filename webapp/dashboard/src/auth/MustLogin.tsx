@@ -16,11 +16,11 @@ export const createCanAccess =
         const exec = create(user.permissions[operationID]! as any)({
           root: groupID
             ? {
-                ...user,
-                groupRole: get(user.groupRoles, [groupID]),
-              }
+              ...user,
+              groupRole: get(user.groupRoles, [groupID])
+            }
             : user,
-          schema: {},
+          schema: {}
         });
         return !!exec(0);
       }
@@ -30,13 +30,13 @@ export const createCanAccess =
   };
 
 export const AccessControlProvider = createProvider({
-  canAccess: createCanAccess(),
+  canAccess: createCanAccess()
 });
 
 export const AccessControl = ({
-  op,
-  children,
-}: {
+                                op,
+                                children
+                              }: {
   op: Op;
   children: ReactNode | ((ok: boolean) => ReactNode);
 }) => {
@@ -66,10 +66,10 @@ export const MustLogon = ({ children }: { children?: ReactNode }) => {
         if (!token$.validateToken(token?.accessToken)) {
           nav(
             `/login${stringifySearch({
-              redirect_uri: `${locationRef.current.pathname}${locationRef.current.search}`,
+              redirect_uri: `${locationRef.current.pathname}${locationRef.current.search}`
             })}`,
             {
-              replace: true,
+              replace: true
             }
           );
         }

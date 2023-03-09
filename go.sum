@@ -322,6 +322,8 @@ github.com/octohelm/courier v0.0.0-20230309015109-858155d95235 h1:H9ZjhCA3g7z680
 github.com/octohelm/courier v0.0.0-20230309015109-858155d95235/go.mod h1:mqpzEbI+4N5dokqPrMEAZYqmiyNHN/xKQ0Cc84I54g4=
 github.com/octohelm/gengo v0.0.0-20230203081555-b66e95cb6110 h1:DXGIYntsK1Oal+ziIjkQz+BgKSs1Qb5m7j5A0U1XYV0=
 github.com/octohelm/gengo v0.0.0-20230203081555-b66e95cb6110/go.mod h1:CPbwRJCrc3mMscDBDyU4Rn7Qk04YTomD+6fFViRybD4=
+github.com/octohelm/gengo v0.0.0-20230309110236-0518d52dbb3f h1:0RQPwW+z1NdJfj8rempNSGlsSu381/S7YXPzBmgumco=
+github.com/octohelm/gengo v0.0.0-20230309110236-0518d52dbb3f/go.mod h1:CPbwRJCrc3mMscDBDyU4Rn7Qk04YTomD+6fFViRybD4=
 github.com/octohelm/storage v0.0.0-20230306100510-1c1a8290ae0c h1:0uiJ/q7SVD1vHulLPIYKrbJvkNB9m9VtNvp0OXjo02U=
 github.com/octohelm/storage v0.0.0-20230306100510-1c1a8290ae0c/go.mod h1:CAUQxdbuFxuK52gBrPXMlAVl0IyrnIn4Wu4oRCUykWc=
 github.com/octohelm/x v0.0.0-20220811034253-019992077a5d h1:RrzP/RZsHePcnumSevr5wwOrKCZ+KBvVEGrM5jchwPI=

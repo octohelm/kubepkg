@@ -2,12 +2,12 @@ import {
   useObservableState,
   useRequest,
   Subscribe,
-  useStateSubject,
+  useStateSubject
 } from "@nodepkg/runtime";
 import {
   AddToDriveOutlined,
   SettingsOutlined,
-  DriveFileRenameOutlineOutlined,
+  DriveFileRenameOutlineOutlined
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -18,7 +18,7 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  useTheme,
+  useTheme
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import {
@@ -26,10 +26,10 @@ import {
   ClusterInstanceStatus,
   ClusterNetType,
   getClusterStatus,
-  listCluster,
+  listCluster
 } from "../client/dashboard";
 import { useClusterFormWithDialog } from "./ClusterForm";
-import { Slot, Scaffold, stringAvatar, useEpics } from "../layout";
+import { Slot, stringAvatar, useEpics } from "../layout";
 import { IconButtonWithTooltip } from "../layout";
 import { AccessControl } from "../auth";
 import { useClusterFormRenameWithDialog } from "./ClusterFormRename";
@@ -67,7 +67,7 @@ export const ClusterStatus = ({ cluster }: { cluster: Cluster }) => {
             color:
               status.ping == "-"
                 ? theme.palette.error.main
-                : theme.palette.success.main,
+                : theme.palette.success.main
           }}
         >
           {status.id} {status.ping}
@@ -90,14 +90,14 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
       clusterForm$.post$.pipe(
         map((resp) => ({
           ...cluster$.value,
-          ...resp.body,
+          ...resp.body
         }))
       ),
     (cluster$) =>
       clusterRenameForm$.post$.pipe(
         map((resp) => ({
           ...cluster$.value,
-          ...resp.body,
+          ...resp.body
         }))
       )
   );
@@ -149,7 +149,7 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
                         sx={{
                           display: "inline-block",
                           fontFamily: "monospace",
-                          paddingRight: 1,
+                          paddingRight: 1
                         }}
                       >
                         {`${cluster.envType}/${cluster.name}`}
@@ -179,7 +179,7 @@ const ClusterListItem = ({ cluster: initialCluster }: { cluster: Cluster }) => {
   );
 };
 
-const ClusterList = () => {
+export const ClusterList = () => {
   const listCluster$ = useRequest(listCluster);
 
   useEffect(() => {
@@ -206,7 +206,7 @@ const ClusterList = () => {
   );
 };
 
-const ClusterMainToolbar = () => {
+export const ClusterMainToolbar = () => {
   const clusterForm$ = useClusterFormWithDialog();
 
   return (
@@ -221,13 +221,5 @@ const ClusterMainToolbar = () => {
       </IconButtonWithTooltip>
       <Slot elem$={clusterForm$.dialog$.elements$} />
     </AccessControl>
-  );
-};
-
-export const ClusterMain = () => {
-  return (
-    <Scaffold toolbar={<ClusterMainToolbar />}>
-      <ClusterList />
-    </Scaffold>
   );
 };

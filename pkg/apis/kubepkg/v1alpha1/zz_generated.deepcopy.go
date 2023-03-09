@@ -5,9 +5,319 @@ DON'T EDIT THIS FILE
 package v1alpha1
 
 import (
+	k8s_io_api_rbac_v1 "k8s.io/api/rbac/v1"
 	k8s_io_apimachinery_pkg_runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
+func (in *ConfigurationDatabase) DeepCopy() *ConfigurationDatabase {
+	if in == nil {
+		return nil
+	}
+	out := new(ConfigurationDatabase)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ConfigurationDatabase) DeepCopyInto(out *ConfigurationDatabase) {
+	out.Scheme = in.Scheme
+	out.Host = in.Host
+	out.Username = in.Username
+	out.Password = in.Password
+	out.Name = in.Name
+	out.Extra = in.Extra
+
+}
+func (in *Container) DeepCopy() *Container {
+	if in == nil {
+		return nil
+	}
+	out := new(Container)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *Container) DeepCopyInto(out *Container) {
+	in.Image.DeepCopyInto(&out.Image)
+	out.WorkingDir = in.WorkingDir
+	if in.Command != nil {
+		i, o := &in.Command, &out.Command
+		*o = make([]string, len(*i))
+		copy(*o, *i)
+	}
+	if in.Args != nil {
+		i, o := &in.Args, &out.Args
+		*o = make([]string, len(*i))
+		copy(*o, *i)
+	}
+	if in.Env != nil {
+		i, o := &in.Env, &out.Env
+		*o = make(map[string]EnvVarValueOrFrom, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	if in.Ports != nil {
+		i, o := &in.Ports, &out.Ports
+		*o = make(map[string]int32, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.Stdin = in.Stdin
+	out.StdinOnce = in.StdinOnce
+	out.TTY = in.TTY
+	out.Resources = in.Resources
+	out.LivenessProbe = in.LivenessProbe
+	out.ReadinessProbe = in.ReadinessProbe
+	out.StartupProbe = in.StartupProbe
+	out.Lifecycle = in.Lifecycle
+	out.SecurityContext = in.SecurityContext
+	out.TerminationMessagePath = in.TerminationMessagePath
+	out.TerminationMessagePolicy = in.TerminationMessagePolicy
+
+}
+func (in *Image) DeepCopy() *Image {
+	if in == nil {
+		return nil
+	}
+	out := new(Image)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *Image) DeepCopyInto(out *Image) {
+	out.Name = in.Name
+	out.Tag = in.Tag
+	out.Digest = in.Digest
+	if in.Platforms != nil {
+		i, o := &in.Platforms, &out.Platforms
+		*o = make([]string, len(*i))
+		copy(*o, *i)
+	}
+	out.PullPolicy = in.PullPolicy
+
+}
+func (in *DeployConfigMap) DeepCopy() *DeployConfigMap {
+	if in == nil {
+		return nil
+	}
+	out := new(DeployConfigMap)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DeployConfigMap) DeepCopyInto(out *DeployConfigMap) {
+	out.Kind = in.Kind
+	if in.Annotations != nil {
+		i, o := &in.Annotations, &out.Annotations
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+
+}
+func (in *DeployCronJob) DeepCopy() *DeployCronJob {
+	if in == nil {
+		return nil
+	}
+	out := new(DeployCronJob)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DeployCronJob) DeepCopyInto(out *DeployCronJob) {
+	out.Kind = in.Kind
+	if in.Annotations != nil {
+		i, o := &in.Annotations, &out.Annotations
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.Spec = *in.Spec.DeepCopy()
+
+}
+func (in *DeployDaemonSet) DeepCopy() *DeployDaemonSet {
+	if in == nil {
+		return nil
+	}
+	out := new(DeployDaemonSet)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DeployDaemonSet) DeepCopyInto(out *DeployDaemonSet) {
+	out.Kind = in.Kind
+	if in.Annotations != nil {
+		i, o := &in.Annotations, &out.Annotations
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.Spec = *in.Spec.DeepCopy()
+
+}
+func (in *DeployDeployment) DeepCopy() *DeployDeployment {
+	if in == nil {
+		return nil
+	}
+	out := new(DeployDeployment)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DeployDeployment) DeepCopyInto(out *DeployDeployment) {
+	out.Kind = in.Kind
+	if in.Annotations != nil {
+		i, o := &in.Annotations, &out.Annotations
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.Spec = *in.Spec.DeepCopy()
+
+}
+func (in *DeployJob) DeepCopy() *DeployJob {
+	if in == nil {
+		return nil
+	}
+	out := new(DeployJob)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DeployJob) DeepCopyInto(out *DeployJob) {
+	out.Kind = in.Kind
+	if in.Annotations != nil {
+		i, o := &in.Annotations, &out.Annotations
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.Spec = *in.Spec.DeepCopy()
+
+}
+func (in *DeploySecret) DeepCopy() *DeploySecret {
+	if in == nil {
+		return nil
+	}
+	out := new(DeploySecret)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DeploySecret) DeepCopyInto(out *DeploySecret) {
+	out.Kind = in.Kind
+	if in.Annotations != nil {
+		i, o := &in.Annotations, &out.Annotations
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+
+}
+func (in *DeployStatefulSet) DeepCopy() *DeployStatefulSet {
+	if in == nil {
+		return nil
+	}
+	out := new(DeployStatefulSet)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DeployStatefulSet) DeepCopyInto(out *DeployStatefulSet) {
+	out.Kind = in.Kind
+	if in.Annotations != nil {
+		i, o := &in.Annotations, &out.Annotations
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.Spec = *in.Spec.DeepCopy()
+
+}
+func (in *DigestMeta) DeepCopy() *DigestMeta {
+	if in == nil {
+		return nil
+	}
+	out := new(DigestMeta)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DigestMeta) DeepCopyInto(out *DigestMeta) {
+	in.Type.DeepCopyInto(&out.Type)
+	out.Digest = in.Digest
+	out.Name = in.Name
+	in.Size.DeepCopyInto(&out.Size)
+	out.Tag = in.Tag
+	out.Platform = in.Platform
+
+}
+func (in *DigestMetaType) DeepCopy() *DigestMetaType {
+	if in == nil {
+		return nil
+	}
+
+	out := new(DigestMetaType)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *DigestMetaType) DeepCopyInto(out *DigestMetaType) {
+	*out = *in
+}
+func (in *FileSize) DeepCopy() *FileSize {
+	if in == nil {
+		return nil
+	}
+
+	out := new(FileSize)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *FileSize) DeepCopyInto(out *FileSize) {
+	*out = *in
+}
+func (in *EnvVarValueOrFrom) DeepCopy() *EnvVarValueOrFrom {
+	if in == nil {
+		return nil
+	}
+	out := new(EnvVarValueOrFrom)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *EnvVarValueOrFrom) DeepCopyInto(out *EnvVarValueOrFrom) {
+	out.Value = in.Value
+	out.ValueFrom = in.ValueFrom
+
+}
+func (in *Expose) DeepCopy() *Expose {
+	if in == nil {
+		return nil
+	}
+	out := new(Expose)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *Expose) DeepCopyInto(out *Expose) {
+	out.Type = in.Type
+	if in.Gateway != nil {
+		i, o := &in.Gateway, &out.Gateway
+		*o = make([]string, len(*i))
+		copy(*o, *i)
+	}
+
+}
 func (in *KubePkg) DeepCopyObject() k8s_io_apimachinery_pkg_runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
@@ -75,15 +385,6 @@ func (in *Spec) DeepCopyInto(out *Spec) {
 	out.Manifests = in.Manifests.DeepCopy()
 
 }
-func (in *Deploy) DeepCopy() *Deploy {
-	if in == nil {
-		return nil
-	}
-	out := new(Deploy)
-	in.DeepCopyInto(out)
-	return out
-}
-
 func (in Manifests) DeepCopy() Manifests {
 	if in == nil {
 		return nil
@@ -123,5 +424,246 @@ func (in *KubePkgList) DeepCopyInto(out *KubePkgList) {
 		*o = make([]KubePkg, len(*i))
 		copy(*o, *i)
 	}
+
+}
+func (in *MountResult) DeepCopy() *MountResult {
+	if in == nil {
+		return nil
+	}
+	out := new(MountResult)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *MountResult) DeepCopyInto(out *MountResult) {
+	out.Reload = in.Reload
+	out.ResourceName = in.ResourceName
+	out.Volume = in.Volume
+	out.EnvFromSource = in.EnvFromSource
+	out.VolumeMount = in.VolumeMount
+
+}
+func (in *ScopeType) DeepCopy() *ScopeType {
+	if in == nil {
+		return nil
+	}
+
+	out := new(ScopeType)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ScopeType) DeepCopyInto(out *ScopeType) {
+	*out = *in
+}
+func (in *Service) DeepCopy() *Service {
+	if in == nil {
+		return nil
+	}
+	out := new(Service)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *Service) DeepCopyInto(out *Service) {
+	if in.Ports != nil {
+		i, o := &in.Ports, &out.Ports
+		*o = make(map[string]int32, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	if in.Paths != nil {
+		i, o := &in.Paths, &out.Paths
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	out.ClusterIP = in.ClusterIP
+	out.Expose = in.Expose
+
+}
+func (in *ServiceAccount) DeepCopy() *ServiceAccount {
+	if in == nil {
+		return nil
+	}
+	out := new(ServiceAccount)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ServiceAccount) DeepCopyInto(out *ServiceAccount) {
+	in.Scope.DeepCopyInto(&out.Scope)
+	if in.Rules != nil {
+		i, o := &in.Rules, &out.Rules
+		*o = make([]k8s_io_api_rbac_v1.PolicyRule, len(*i))
+		copy(*o, *i)
+	}
+
+}
+func (in *SpecData) DeepCopy() *SpecData {
+	if in == nil {
+		return nil
+	}
+	out := new(SpecData)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *SpecData) DeepCopyInto(out *SpecData) {
+	if in.Data != nil {
+		i, o := &in.Data, &out.Data
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+
+}
+func (in *Status) DeepCopy() *Status {
+	if in == nil {
+		return nil
+	}
+	out := new(Status)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *Status) DeepCopyInto(out *Status) {
+	if in.Endpoint != nil {
+		i, o := &in.Endpoint, &out.Endpoint
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	if in.Resources != nil {
+		i, o := &in.Resources, &out.Resources
+		*o = make([]map[string]interface{}, len(*i))
+		copy(*o, *i)
+	}
+	if in.Images != nil {
+		i, o := &in.Images, &out.Images
+		*o = make(map[string]string, len(*i))
+		for key, val := range *i {
+			(*o)[key] = val
+		}
+	}
+	if in.Digests != nil {
+		i, o := &in.Digests, &out.Digests
+		*o = make([]DigestMeta, len(*i))
+		copy(*o, *i)
+	}
+
+}
+func (in Statuses) DeepCopy() Statuses {
+	if in == nil {
+		return nil
+	}
+	out := make(Statuses)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in Statuses) DeepCopyInto(out Statuses) {
+	for k := range in {
+		out[k] = in[k]
+	}
+}
+
+func (in *VolumeConfigMap) DeepCopy() *VolumeConfigMap {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumeConfigMap)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumeConfigMap) DeepCopyInto(out *VolumeConfigMap) {
+	out.Type = in.Type
+	out.Opt = in.Opt
+	out.Spec = in.Spec
+	in.VolumeMount.DeepCopyInto(&out.VolumeMount)
+
+}
+func (in *VolumeMount) DeepCopy() *VolumeMount {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumeMount)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumeMount) DeepCopyInto(out *VolumeMount) {
+	out.MountPath = in.MountPath
+	out.Prefix = in.Prefix
+	out.Optional = in.Optional
+	out.ReadOnly = in.ReadOnly
+	out.SubPath = in.SubPath
+
+}
+func (in *VolumeEmptyDir) DeepCopy() *VolumeEmptyDir {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumeEmptyDir)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumeEmptyDir) DeepCopyInto(out *VolumeEmptyDir) {
+	out.Type = in.Type
+	out.Opt = in.Opt
+	in.VolumeMount.DeepCopyInto(&out.VolumeMount)
+
+}
+func (in *VolumeHostPath) DeepCopy() *VolumeHostPath {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumeHostPath)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumeHostPath) DeepCopyInto(out *VolumeHostPath) {
+	out.Type = in.Type
+	out.Opt = in.Opt
+	in.VolumeMount.DeepCopyInto(&out.VolumeMount)
+
+}
+func (in *VolumePersistentVolumeClaim) DeepCopy() *VolumePersistentVolumeClaim {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumePersistentVolumeClaim)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumePersistentVolumeClaim) DeepCopyInto(out *VolumePersistentVolumeClaim) {
+	out.Type = in.Type
+	out.Opt = in.Opt
+	out.Spec = *in.Spec.DeepCopy()
+	in.VolumeMount.DeepCopyInto(&out.VolumeMount)
+
+}
+func (in *VolumeSecret) DeepCopy() *VolumeSecret {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumeSecret)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumeSecret) DeepCopyInto(out *VolumeSecret) {
+	out.Type = in.Type
+	out.Opt = in.Opt
+	out.Spec = in.Spec
+	in.VolumeMount.DeepCopyInto(&out.VolumeMount)
 
 }

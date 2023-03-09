@@ -14,3 +14,4 @@ export const MustLogout = ({ children }: { children?: ReactNode }) => {
 
   return <Navigate to={"/"} replace={true} />;
 };
+

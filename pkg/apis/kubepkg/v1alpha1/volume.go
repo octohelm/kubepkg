@@ -20,8 +20,22 @@ type VolumeMount struct {
 	SubPath  string `json:"subPath,omitempty"`
 }
 
+// +gengo:deepcopy=false
 type Volume struct {
 	VolumeSource `json:"-"`
+}
+
+func (in *Volume) DeepCopy() *Volume {
+	if in == nil {
+		return nil
+	}
+	out := new(Volume)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *Volume) DeepCopyInto(out *Volume) {
+	out.VolumeSource = in.VolumeSource
 }
 
 type MountResult struct {

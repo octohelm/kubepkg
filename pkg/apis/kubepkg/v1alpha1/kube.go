@@ -13,7 +13,6 @@ func init() {
 }
 
 // KubePkgList
-// +gengo:deepcopy
 // +gengo:deepcopy:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type KubePkgList struct {
 	metav1.TypeMeta `json:",inline"`
@@ -22,7 +21,6 @@ type KubePkgList struct {
 }
 
 // KubePkg
-// +gengo:deepcopy
 // +gengo:deepcopy:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type KubePkg struct {
 	metav1.TypeMeta   `json:",inline"`

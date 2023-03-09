@@ -390,7 +390,7 @@ export const SchemaTypeView = ({
   if (schema instanceof SchemaUnionType) {
     return (
       <>
-        {schema.unions.map((s, i) => {
+        {schema.oneOf.map((s, i) => {
           return (
             <Fragment key={i}>
               {i > 0 && <Token>&nbsp;{"|"}&nbsp;</Token>}

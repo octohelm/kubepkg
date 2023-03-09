@@ -526,141 +526,17 @@
             "kind": {
               "type": "string",
               "enum": [
-                "Deployment"
+                "ConfigMap"
               ],
               "x-go-field-name": "Kind",
-              "x-tag-validate": "@string{Deployment}"
-            },
-            "spec": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/DeploymentSpec"
-                },
-                {
-                  "x-go-field-name": "Spec"
-                }
-              ]
+              "x-tag-validate": "@string{ConfigMap}"
             }
           },
           "additionalProperties": false,
           "required": [
             "kind"
           ],
-          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDeployment"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "annotations": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "propertyNames": {
-                "type": "string"
-              },
-              "x-go-field-name": "Annotations"
-            },
-            "kind": {
-              "type": "string",
-              "enum": [
-                "DaemonSet"
-              ],
-              "x-go-field-name": "Kind",
-              "x-tag-validate": "@string{DaemonSet}"
-            },
-            "spec": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/DaemonSetSpec"
-                },
-                {
-                  "x-go-field-name": "Spec"
-                }
-              ]
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "kind"
-          ],
-          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDaemonSet"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "annotations": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "propertyNames": {
-                "type": "string"
-              },
-              "x-go-field-name": "Annotations"
-            },
-            "kind": {
-              "type": "string",
-              "enum": [
-                "StatefulSet"
-              ],
-              "x-go-field-name": "Kind",
-              "x-tag-validate": "@string{StatefulSet}"
-            },
-            "spec": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/StatefulSetSpec"
-                },
-                {
-                  "x-go-field-name": "Spec"
-                }
-              ]
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "kind"
-          ],
-          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployStatefulSet"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "annotations": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "propertyNames": {
-                "type": "string"
-              },
-              "x-go-field-name": "Annotations"
-            },
-            "kind": {
-              "type": "string",
-              "enum": [
-                "Job"
-              ],
-              "x-go-field-name": "Kind",
-              "x-tag-validate": "@string{Job}"
-            },
-            "spec": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/JobSpec"
-                },
-                {
-                  "x-go-field-name": "Spec"
-                }
-              ]
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "kind"
-          ],
-          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployJob"
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployConfigMap"
         },
         {
           "type": "object",
@@ -716,6 +592,120 @@
             "kind": {
               "type": "string",
               "enum": [
+                "DaemonSet"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{DaemonSet}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DaemonSetSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDaemonSet"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "Deployment"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{Deployment}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeploymentSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDeployment"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "Job"
+              ],
+              "x-go-field-name": "Kind",
+              "x-tag-validate": "@string{Job}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JobSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployJob"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              },
+              "x-go-field-name": "Annotations"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
                 "Secret"
               ],
               "x-go-field-name": "Kind",
@@ -744,17 +734,27 @@
             "kind": {
               "type": "string",
               "enum": [
-                "ConfigMap"
+                "StatefulSet"
               ],
               "x-go-field-name": "Kind",
-              "x-tag-validate": "@string{ConfigMap}"
+              "x-tag-validate": "@string{StatefulSet}"
+            },
+            "spec": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/StatefulSetSpec"
+                },
+                {
+                  "x-go-field-name": "Spec"
+                }
+              ]
             }
           },
           "additionalProperties": false,
           "required": [
             "kind"
           ],
-          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployConfigMap"
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployStatefulSet"
         }
       ],
       "discriminator": {
@@ -4184,6 +4184,55 @@
                 "opt": {
                   "allOf": [
                     {
+                      "$ref": "#/definitions/ConfigMapVolumeSource"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Opt"
+                },
+                "spec": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/SpecData"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Spec"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "ConfigMap"
+                  ],
+                  "x-go-field-name": "Type",
+                  "x-tag-validate": "@string{ConfigMap}"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "type"
+              ]
+            }
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeConfigMap"
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/VolumeMount"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "opt": {
+                  "allOf": [
+                    {
                       "$ref": "#/definitions/EmptyDirVolumeSource"
                     },
                     {
@@ -4258,6 +4307,54 @@
                 "opt": {
                   "allOf": [
                     {
+                      "$ref": "#/definitions/PersistentVolumeClaimVolumeSource"
+                    },
+                    {
+                      "nullable": true,
+                      "x-go-star-level": 1
+                    }
+                  ],
+                  "x-go-field-name": "Opt"
+                },
+                "spec": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/PersistentVolumeClaimSpec"
+                    },
+                    {
+                      "x-go-field-name": "Spec"
+                    }
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "PersistentVolumeClaim"
+                  ],
+                  "x-go-field-name": "Type",
+                  "x-tag-validate": "@string{PersistentVolumeClaim}"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "spec"
+              ]
+            }
+          ],
+          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumePersistentVolumeClaim"
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/VolumeMount"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "opt": {
+                  "allOf": [
+                    {
                       "$ref": "#/definitions/SecretVolumeSource"
                     },
                     {
@@ -4295,103 +4392,6 @@
             }
           ],
           "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeSecret"
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/definitions/VolumeMount"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "opt": {
-                  "allOf": [
-                    {
-                      "$ref": "#/definitions/ConfigMapVolumeSource"
-                    },
-                    {
-                      "nullable": true,
-                      "x-go-star-level": 1
-                    }
-                  ],
-                  "x-go-field-name": "Opt"
-                },
-                "spec": {
-                  "allOf": [
-                    {
-                      "$ref": "#/definitions/SpecData"
-                    },
-                    {
-                      "nullable": true,
-                      "x-go-star-level": 1
-                    }
-                  ],
-                  "x-go-field-name": "Spec"
-                },
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "ConfigMap"
-                  ],
-                  "x-go-field-name": "Type",
-                  "x-tag-validate": "@string{ConfigMap}"
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "type"
-              ]
-            }
-          ],
-          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeConfigMap"
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/definitions/VolumeMount"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "opt": {
-                  "allOf": [
-                    {
-                      "$ref": "#/definitions/PersistentVolumeClaimVolumeSource"
-                    },
-                    {
-                      "nullable": true,
-                      "x-go-star-level": 1
-                    }
-                  ],
-                  "x-go-field-name": "Opt"
-                },
-                "spec": {
-                  "allOf": [
-                    {
-                      "$ref": "#/definitions/PersistentVolumeClaimSpec"
-                    },
-                    {
-                      "x-go-field-name": "Spec"
-                    }
-                  ]
-                },
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "PersistentVolumeClaim"
-                  ],
-                  "x-go-field-name": "Type",
-                  "x-tag-validate": "@string{PersistentVolumeClaim}"
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "type",
-                "spec"
-              ]
-            }
-          ],
-          "x-go-vendor-type": "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumePersistentVolumeClaim"
         }
       ],
       "discriminator": {

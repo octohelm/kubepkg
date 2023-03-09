@@ -158,7 +158,7 @@ export class JSONCompletion {
         } else {
           list = [
             ...list,
-            ...schema.unions
+            ...schema.oneOf
               .map(SchemaType.indirect)
               .filter((s) => s instanceof SchemaObjectType) as SchemaObjectType[]
           ];

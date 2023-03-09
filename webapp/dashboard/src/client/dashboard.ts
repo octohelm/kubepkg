@@ -3379,31 +3379,6 @@ export const RawOpenAPI = {
               },
               kind: {
                 type: "string",
-                enum: ["Secret"],
-                "x-go-field-name": "Kind",
-                "x-tag-validate": "@string{Secret}",
-              },
-            },
-            additionalProperties: false,
-            required: ["kind"],
-            "x-go-vendor-type":
-              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeploySecret",
-          },
-          {
-            type: "object",
-            properties: {
-              annotations: {
-                type: "object",
-                additionalProperties: {
-                  type: "string",
-                },
-                propertyNames: {
-                  type: "string",
-                },
-                "x-go-field-name": "Annotations",
-              },
-              kind: {
-                type: "string",
                 enum: ["ConfigMap"],
                 "x-go-field-name": "Kind",
                 "x-tag-validate": "@string{ConfigMap}",
@@ -3429,14 +3404,14 @@ export const RawOpenAPI = {
               },
               kind: {
                 type: "string",
-                enum: ["Deployment"],
+                enum: ["CronJob"],
                 "x-go-field-name": "Kind",
-                "x-tag-validate": "@string{Deployment}",
+                "x-tag-validate": "@string{CronJob}",
               },
               spec: {
                 allOf: [
                   {
-                    $ref: "#/components/schemas/K8SIoApiAppsV1DeploymentSpec",
+                    $ref: "#/components/schemas/K8SIoApiBatchV1CronJobSpec",
                   },
                   {
                     "x-go-field-name": "Spec",
@@ -3447,7 +3422,7 @@ export const RawOpenAPI = {
             additionalProperties: false,
             required: ["kind"],
             "x-go-vendor-type":
-              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDeployment",
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployCronJob",
           },
           {
             type: "object",
@@ -3499,14 +3474,14 @@ export const RawOpenAPI = {
               },
               kind: {
                 type: "string",
-                enum: ["StatefulSet"],
+                enum: ["Deployment"],
                 "x-go-field-name": "Kind",
-                "x-tag-validate": "@string{StatefulSet}",
+                "x-tag-validate": "@string{Deployment}",
               },
               spec: {
                 allOf: [
                   {
-                    $ref: "#/components/schemas/K8SIoApiAppsV1StatefulSetSpec",
+                    $ref: "#/components/schemas/K8SIoApiAppsV1DeploymentSpec",
                   },
                   {
                     "x-go-field-name": "Spec",
@@ -3517,7 +3492,7 @@ export const RawOpenAPI = {
             additionalProperties: false,
             required: ["kind"],
             "x-go-vendor-type":
-              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployStatefulSet",
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployDeployment",
           },
           {
             type: "object",
@@ -3569,14 +3544,39 @@ export const RawOpenAPI = {
               },
               kind: {
                 type: "string",
-                enum: ["CronJob"],
+                enum: ["Secret"],
                 "x-go-field-name": "Kind",
-                "x-tag-validate": "@string{CronJob}",
+                "x-tag-validate": "@string{Secret}",
+              },
+            },
+            additionalProperties: false,
+            required: ["kind"],
+            "x-go-vendor-type":
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeploySecret",
+          },
+          {
+            type: "object",
+            properties: {
+              annotations: {
+                type: "object",
+                additionalProperties: {
+                  type: "string",
+                },
+                propertyNames: {
+                  type: "string",
+                },
+                "x-go-field-name": "Annotations",
+              },
+              kind: {
+                type: "string",
+                enum: ["StatefulSet"],
+                "x-go-field-name": "Kind",
+                "x-tag-validate": "@string{StatefulSet}",
               },
               spec: {
                 allOf: [
                   {
-                    $ref: "#/components/schemas/K8SIoApiBatchV1CronJobSpec",
+                    $ref: "#/components/schemas/K8SIoApiAppsV1StatefulSetSpec",
                   },
                   {
                     "x-go-field-name": "Spec",
@@ -3587,7 +3587,7 @@ export const RawOpenAPI = {
             additionalProperties: false,
             required: ["kind"],
             "x-go-vendor-type":
-              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployCronJob",
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.DeployStatefulSet",
           },
         ],
         discriminator: {
@@ -4250,52 +4250,6 @@ export const RawOpenAPI = {
                   opt: {
                     allOf: [
                       {
-                        $ref: "#/components/schemas/K8SIoApiCoreV1SecretVolumeSource",
-                      },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
-                    ],
-                    "x-go-field-name": "Opt",
-                  },
-                  spec: {
-                    allOf: [
-                      {
-                        $ref: "#/components/schemas/ApisKubepkgV1Alpha1SpecData",
-                      },
-                      {
-                        nullable: true,
-                        "x-go-star-level": 1,
-                      },
-                    ],
-                    "x-go-field-name": "Spec",
-                  },
-                  type: {
-                    type: "string",
-                    enum: ["Secret"],
-                    "x-go-field-name": "Type",
-                    "x-tag-validate": "@string{Secret}",
-                  },
-                },
-                additionalProperties: false,
-                required: ["type"],
-              },
-            ],
-            "x-go-vendor-type":
-              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeSecret",
-          },
-          {
-            allOf: [
-              {
-                $ref: "#/components/schemas/ApisKubepkgV1Alpha1VolumeMount",
-              },
-              {
-                type: "object",
-                properties: {
-                  opt: {
-                    allOf: [
-                      {
                         $ref: "#/components/schemas/K8SIoApiCoreV1ConfigMapVolumeSource",
                       },
                       {
@@ -4342,6 +4296,74 @@ export const RawOpenAPI = {
                   opt: {
                     allOf: [
                       {
+                        $ref: "#/components/schemas/K8SIoApiCoreV1EmptyDirVolumeSource",
+                      },
+                      {
+                        nullable: true,
+                        "x-go-star-level": 1,
+                      },
+                    ],
+                    "x-go-field-name": "Opt",
+                  },
+                  type: {
+                    type: "string",
+                    enum: ["EmptyDir"],
+                    "x-go-field-name": "Type",
+                    "x-tag-validate": "@string{EmptyDir}",
+                  },
+                },
+                additionalProperties: false,
+                required: ["type"],
+              },
+            ],
+            "x-go-vendor-type":
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeEmptyDir",
+          },
+          {
+            allOf: [
+              {
+                $ref: "#/components/schemas/ApisKubepkgV1Alpha1VolumeMount",
+              },
+              {
+                type: "object",
+                properties: {
+                  opt: {
+                    allOf: [
+                      {
+                        $ref: "#/components/schemas/K8SIoApiCoreV1HostPathVolumeSource",
+                      },
+                      {
+                        nullable: true,
+                        "x-go-star-level": 1,
+                      },
+                    ],
+                    "x-go-field-name": "Opt",
+                  },
+                  type: {
+                    type: "string",
+                    enum: ["HostPath"],
+                    "x-go-field-name": "Type",
+                    "x-tag-validate": "@string{HostPath}",
+                  },
+                },
+                additionalProperties: false,
+                required: ["type"],
+              },
+            ],
+            "x-go-vendor-type":
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeHostPath",
+          },
+          {
+            allOf: [
+              {
+                $ref: "#/components/schemas/ApisKubepkgV1Alpha1VolumeMount",
+              },
+              {
+                type: "object",
+                properties: {
+                  opt: {
+                    allOf: [
+                      {
                         $ref: "#/components/schemas/K8SIoApiCoreV1PersistentVolumeClaimVolumeSource",
                       },
                       {
@@ -4374,6 +4396,52 @@ export const RawOpenAPI = {
             ],
             "x-go-vendor-type":
               "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumePersistentVolumeClaim",
+          },
+          {
+            allOf: [
+              {
+                $ref: "#/components/schemas/ApisKubepkgV1Alpha1VolumeMount",
+              },
+              {
+                type: "object",
+                properties: {
+                  opt: {
+                    allOf: [
+                      {
+                        $ref: "#/components/schemas/K8SIoApiCoreV1SecretVolumeSource",
+                      },
+                      {
+                        nullable: true,
+                        "x-go-star-level": 1,
+                      },
+                    ],
+                    "x-go-field-name": "Opt",
+                  },
+                  spec: {
+                    allOf: [
+                      {
+                        $ref: "#/components/schemas/ApisKubepkgV1Alpha1SpecData",
+                      },
+                      {
+                        nullable: true,
+                        "x-go-star-level": 1,
+                      },
+                    ],
+                    "x-go-field-name": "Spec",
+                  },
+                  type: {
+                    type: "string",
+                    enum: ["Secret"],
+                    "x-go-field-name": "Type",
+                    "x-tag-validate": "@string{Secret}",
+                  },
+                },
+                additionalProperties: false,
+                required: ["type"],
+              },
+            ],
+            "x-go-vendor-type":
+              "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeSecret",
           },
         ],
         discriminator: {
@@ -4426,6 +4494,74 @@ export const RawOpenAPI = {
         ],
         "x-go-vendor-type":
           "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeConfigMap",
+      },
+      ApisKubepkgV1Alpha1VolumeEmptyDir: {
+        allOf: [
+          {
+            $ref: "#/components/schemas/ApisKubepkgV1Alpha1VolumeMount",
+          },
+          {
+            type: "object",
+            properties: {
+              opt: {
+                allOf: [
+                  {
+                    $ref: "#/components/schemas/K8SIoApiCoreV1EmptyDirVolumeSource",
+                  },
+                  {
+                    nullable: true,
+                    "x-go-star-level": 1,
+                  },
+                ],
+                "x-go-field-name": "Opt",
+              },
+              type: {
+                type: "string",
+                enum: ["EmptyDir"],
+                "x-go-field-name": "Type",
+                "x-tag-validate": "@string{EmptyDir}",
+              },
+            },
+            additionalProperties: false,
+            required: ["type"],
+          },
+        ],
+        "x-go-vendor-type":
+          "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeEmptyDir",
+      },
+      ApisKubepkgV1Alpha1VolumeHostPath: {
+        allOf: [
+          {
+            $ref: "#/components/schemas/ApisKubepkgV1Alpha1VolumeMount",
+          },
+          {
+            type: "object",
+            properties: {
+              opt: {
+                allOf: [
+                  {
+                    $ref: "#/components/schemas/K8SIoApiCoreV1HostPathVolumeSource",
+                  },
+                  {
+                    nullable: true,
+                    "x-go-star-level": 1,
+                  },
+                ],
+                "x-go-field-name": "Opt",
+              },
+              type: {
+                type: "string",
+                enum: ["HostPath"],
+                "x-go-field-name": "Type",
+                "x-tag-validate": "@string{HostPath}",
+              },
+            },
+            additionalProperties: false,
+            required: ["type"],
+          },
+        ],
+        "x-go-vendor-type":
+          "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1.VolumeHostPath",
       },
       ApisKubepkgV1Alpha1VolumeMount: {
         type: "object",
@@ -6251,6 +6387,37 @@ export const RawOpenAPI = {
         type: "string",
         "x-go-vendor-type": "k8s.io/api/core/v1.DNSPolicy",
       },
+      K8SIoApiCoreV1EmptyDirVolumeSource: {
+        type: "object",
+        properties: {
+          medium: {
+            allOf: [
+              {
+                $ref: "#/components/schemas/K8SIoApiCoreV1StorageMedium",
+              },
+              {
+                description:
+                  'medium represents what type of storage medium should back this directory. The default is "" which means to use the node\'s default medium. Must be an empty string (default) or Memory. More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir',
+                "x-go-field-name": "Medium",
+              },
+            ],
+          },
+          sizeLimit: {
+            allOf: [
+              {
+                $ref: "#/components/schemas/ApiResourceQuantity",
+              },
+              {
+                nullable: true,
+                "x-go-star-level": 1,
+              },
+            ],
+            "x-go-field-name": "SizeLimit",
+          },
+        },
+        additionalProperties: false,
+        "x-go-vendor-type": "k8s.io/api/core/v1.EmptyDirVolumeSource",
+      },
       K8SIoApiCoreV1ExecAction: {
         type: "object",
         properties: {
@@ -6300,6 +6467,34 @@ export const RawOpenAPI = {
         },
         additionalProperties: false,
         "x-go-vendor-type": "k8s.io/api/core/v1.HostAlias",
+      },
+      K8SIoApiCoreV1HostPathType: {
+        type: "string",
+        "x-go-vendor-type": "k8s.io/api/core/v1.HostPathType",
+      },
+      K8SIoApiCoreV1HostPathVolumeSource: {
+        type: "object",
+        properties: {
+          path: {
+            type: "string",
+            "x-go-field-name": "Path",
+          },
+          type: {
+            allOf: [
+              {
+                $ref: "#/components/schemas/K8SIoApiCoreV1HostPathType",
+              },
+              {
+                nullable: true,
+                "x-go-star-level": 1,
+              },
+            ],
+            "x-go-field-name": "Type",
+          },
+        },
+        additionalProperties: false,
+        required: ["path"],
+        "x-go-vendor-type": "k8s.io/api/core/v1.HostPathVolumeSource",
       },
       K8SIoApiCoreV1HttpGetAction: {
         type: "object",
@@ -7838,6 +8033,10 @@ export const RawOpenAPI = {
         },
         additionalProperties: false,
         "x-go-vendor-type": "k8s.io/api/core/v1.SecurityContext",
+      },
+      K8SIoApiCoreV1StorageMedium: {
+        type: "string",
+        "x-go-vendor-type": "k8s.io/api/core/v1.StorageMedium",
       },
       K8SIoApiCoreV1Sysctl: {
         type: "object",

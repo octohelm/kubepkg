@@ -83,30 +83,30 @@ package kubepkg
 
 #Deploy: {
 	annotations?: [X=string]: string
-	kind:  "Deployment"
-	spec?: #DeploymentSpec
-} | {
-	annotations?: [X=string]: string
-	kind:  "DaemonSet"
-	spec?: #DaemonSetSpec
-} | {
-	annotations?: [X=string]: string
-	kind:  "StatefulSet"
-	spec?: #StatefulSetSpec
-} | {
-	annotations?: [X=string]: string
-	kind:  "Job"
-	spec?: #JobSpec
+	kind: "ConfigMap"
 } | {
 	annotations?: [X=string]: string
 	kind:  "CronJob"
 	spec?: #CronJobSpec
 } | {
 	annotations?: [X=string]: string
+	kind:  "DaemonSet"
+	spec?: #DaemonSetSpec
+} | {
+	annotations?: [X=string]: string
+	kind:  "Deployment"
+	spec?: #DeploymentSpec
+} | {
+	annotations?: [X=string]: string
+	kind:  "Job"
+	spec?: #JobSpec
+} | {
+	annotations?: [X=string]: string
 	kind: "Secret"
 } | {
 	annotations?: [X=string]: string
-	kind: "ConfigMap"
+	kind:  "StatefulSet"
+	spec?: #StatefulSetSpec
 }
 
 #DeploymentSpec: {
@@ -694,6 +694,13 @@ package kubepkg
 #Volume: {
 	#VolumeMount
 	{
+		opt?:  #ConfigMapVolumeSource
+		spec?: #SpecData
+		type:  "ConfigMap"
+	}
+} | {
+	#VolumeMount
+	{
 		opt?: #EmptyDirVolumeSource
 		type: "EmptyDir"
 	}
@@ -706,23 +713,16 @@ package kubepkg
 } | {
 	#VolumeMount
 	{
-		opt?:  #SecretVolumeSource
-		spec?: #SpecData
-		type:  "Secret"
-	}
-} | {
-	#VolumeMount
-	{
-		opt?:  #ConfigMapVolumeSource
-		spec?: #SpecData
-		type:  "ConfigMap"
-	}
-} | {
-	#VolumeMount
-	{
 		opt?: #PersistentVolumeClaimVolumeSource
 		spec: #PersistentVolumeClaimSpec
 		type: "PersistentVolumeClaim"
+	}
+} | {
+	#VolumeMount
+	{
+		opt?:  #SecretVolumeSource
+		spec?: #SpecData
+		type:  "Secret"
 	}
 }
 

@@ -8,13 +8,14 @@ import {
   isString,
   last,
   map,
-  mapValues,
+  mapValues
 } from "@innoai-tech/lodash";
 import type {
   JSONSchema,
   JSONSchemaArray,
   JSONSchemaBoolean,
   JSONSchemaExtendedObject,
+  JSONSchemaIntersection,
   JSONSchemaNumber,
   JSONSchemaObject,
   JSONSchemaRef,
@@ -54,7 +55,20 @@ export class SchemaTypeContext {
     }
 
     if (has(schema, "oneOf")) {
-      return new SchemaUnionType(this, schema as JSONSchemaUnion);
+      return new SchemaUnionType(schema as JSONSchemaUnion, this);
+    }
+
+    if (has(schema, "allOf")) {
+      const maybeObjects = get(schema, "allOf", [])
+        .map((s) => this.of(s))
+        .map((s) => SchemaType.indirect(s))
+        .filter((s) => s instanceof SchemaObjectType);
+
+      if (maybeObjects.length > 1) {
+        return new SchemaObjectType(schema as JSONSchemaObject, this);
+      }
+
+      return new SchemaIntersectionType(schema as JSONSchemaIntersection, this);
     }
 
     switch (get(schema, "type", "") as string) {
@@ -70,24 +84,6 @@ export class SchemaTypeContext {
       case "string":
         return new SchemaStringType(schema as JSONSchemaString);
       default:
-        if (has(schema, "allOf")) {
-          const maybeObjects = get(schema, "allOf", [])
-            .map((s) => this.of(s))
-            .map((s) => SchemaType.indirect(s))
-            .filter((s) => s instanceof SchemaObjectType);
-
-          if (maybeObjects.length > 1) {
-            return new SchemaObjectType(schema as JSONSchemaObject, this);
-          }
-          return this.of(
-            get(schema, "allOf", []).reduce((ret, v: any) => {
-              return {
-                ...ret,
-                ...v
-              };
-            }, {})
-          );
-        }
         if (has(schema, "enum")) {
           if (isString(get(schema, ["enum", 0]))) {
             return new SchemaStringType(schema as JSONSchemaString);
@@ -416,16 +412,59 @@ export class SchemaRefType extends SchemaType<JSONSchemaRef> {
   }
 }
 
+export class SchemaIntersectionType extends SchemaType {
+  public allOf: SchemaType[];
+
+  constructor(schema: JSONSchemaIntersection, ctx: SchemaTypeContext) {
+    super(schema);
+
+    this.allOf = schema.allOf.map((sub) =>
+      ctx.of({
+        ...sub,
+        type: get(sub, "type", get(schema, "type")),
+        ...(get(schema, "required")
+          ? {
+            required: [
+              ...get(schema, "required", []),
+              ...get(sub, "required", [])
+            ]
+          }
+          : {})
+      })
+    );
+  }
+
+  override resolve(
+    keyPath: any[],
+    parent: SchemaTypeNode | null
+  ): SchemaTypeNode | null {
+    if (keyPath.length == 0) {
+      return SchemaTypeNode.of(this, parent);
+    }
+    for (const node of this.allOf) {
+      const ret = node.resolve(keyPath, parent);
+      if (!ret) {
+        return null;
+      }
+    }
+    return SchemaTypeNode.of(this, parent);
+  }
+
+  override get typedef() {
+    return this.allOf.map((t) => t.typedef).join(" & ");
+  }
+}
+
 export class SchemaUnionType extends SchemaType {
-  public unions: SchemaType[];
+  public oneOf: SchemaType[];
   public discriminator?: string;
 
-  constructor(ctx: SchemaTypeContext, schema: JSONSchemaUnion) {
+  constructor(schema: JSONSchemaUnion, ctx: SchemaTypeContext) {
     super(schema);
 
     this.discriminator = schema.discriminator?.propertyName;
 
-    this.unions = schema.oneOf.map((sub) =>
+    this.oneOf = schema.oneOf.map((sub) =>
       ctx.of({
         ...sub,
         type: get(sub, "type", get(schema, "type")),
@@ -447,7 +486,7 @@ export class SchemaUnionType extends SchemaType {
     }
 
     return (
-      this.unions.filter(
+      this.oneOf.filter(
         (e) => e instanceof SchemaObjectType
       ) as SchemaObjectType[]
     )
@@ -457,7 +496,7 @@ export class SchemaUnionType extends SchemaType {
 
   mapping(discriminatorValue: string): SchemaObjectType | null {
     if (this.discriminator) {
-      for (const node of this.unions) {
+      for (const node of this.oneOf) {
         if (node instanceof SchemaObjectType) {
           const discriminatorSchema = node.prop(this.discriminator);
           if (discriminatorSchema) {
@@ -508,7 +547,7 @@ export class SchemaUnionType extends SchemaType {
       return null;
     }
 
-    for (const node of this.unions) {
+    for (const node of this.oneOf) {
       const ret = node.resolve(keyPath, parent);
       if (ret) {
         return ret;
@@ -518,6 +557,6 @@ export class SchemaUnionType extends SchemaType {
   }
 
   override get typedef() {
-    return this.unions.map((t) => t.typedef).join(" | ");
+    return this.oneOf.map((t) => t.typedef).join(" | ");
   }
 }

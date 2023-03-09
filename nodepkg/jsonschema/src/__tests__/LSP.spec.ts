@@ -91,7 +91,7 @@ describe("LSP", () => {
     });
 
     it("should return when matched in tagged union", () => {
-      expect(lsp.schemaAt(["union", ["b", { type: "A" }]])?.parents).toHaveLength(4);
+      expect(lsp.schemaAt(["union", ["b", { type: "A" }]])?.parents).toHaveLength(3);
     });
 
     it("should return null when not matched in tagged union", () => {

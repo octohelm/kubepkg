@@ -73,12 +73,17 @@ export type JSONSchemaRef = {
   $ref: string;
 };
 
+export type JSONSchemaIntersection = {
+  allOf: Array<JSONSchema>;
+};
+
 export type JSONSchema =
-  | JSONSchemaAny
-  | JSONSchemaRef
-  | JSONSchemaUnion
   | JSONSchemaString
   | JSONSchemaNumber
   | JSONSchemaBoolean
   | JSONSchemaArray
-  | JSONSchemaObject;
+  | JSONSchemaObject
+  | JSONSchemaAny
+  | JSONSchemaRef
+  | JSONSchemaIntersection
+  | JSONSchemaUnion

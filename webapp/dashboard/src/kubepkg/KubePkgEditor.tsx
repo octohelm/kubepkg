@@ -35,6 +35,7 @@ import { SchemaVisitor } from "./utils";
 import { PublishOutlined } from "@mui/icons-material";
 
 const annotationKubepkgOverwrites = "kubepkg.innoai.tech/overwrites";
+const annotationKubepkgName = "kubepkg.innoai.tech/name";
 
 export const KubePkgEditor = ({
                                 kubepkg$,
@@ -232,6 +233,11 @@ const TemplateOverwrites = ({
             onSubmit(
               ((kubepkg) => {
                 if (
+                  get(kubepkg, [
+                    "metadata",
+                    "annotations",
+                    annotationKubepkgName
+                  ]) ||
                   get(kubepkg, [
                     "metadata",
                     "annotations",

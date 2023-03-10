@@ -128,7 +128,7 @@ build.node.dashboard:
 dev.agent:
 	pnpm exec turbo run dev --filter=@webapp/agent
 
-debug.dashboard: build.node
+debug.dashboard: build.node.dashboard
 	rm -rf cmd/kubepkg/webapp/dashboard/dist
 	mv webapp/dashboard/dist cmd/kubepkg/webapp/dashboard/
 

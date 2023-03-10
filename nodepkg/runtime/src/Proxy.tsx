@@ -96,7 +96,12 @@ export const createSubject = <
     props: TProps,
     use: typeof useSubject$
   ) => ReturnType<typeof useSubject$<T, E>>
-) => {
+): {
+  ({ children, ...props }: TProps & {
+    children: ReactNode;
+  }): JSX.Element;
+  use$(): StateSubject<T> & E;
+} => {
   const key = Symbol("subject");
 
   const C = createContext<{ [key]: ReturnType<typeof useProvider> }>({} as any);

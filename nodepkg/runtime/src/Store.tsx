@@ -23,7 +23,12 @@ export const createDomain = <
     props: TProps,
     use: typeof useDomain$
   ) => ReturnType<typeof useDomain$<T, E>>
-) => {
+): {
+  ({ children, ...props }: TProps & {
+    children: ReactNode;
+  }): JSX.Element;
+  use$(): Domain<T, {}> & E;
+} => {
   const key = Symbol("domain");
 
   const C = createContext<{ [key]: ReturnType<typeof useProvider> }>({} as any);

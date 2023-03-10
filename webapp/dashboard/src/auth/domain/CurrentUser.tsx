@@ -1,6 +1,5 @@
-import { currentPermissions, currentUser } from "../../client/dashboard";
-import { createDomain } from "../../layout";
-import { useRequest } from "@nodepkg/runtime";
+import { currentPermissions, currentUser } from "src/client/dashboard";
+import { createDomain, useRequest } from "@nodepkg/runtime";
 import { map as rxMap } from "rxjs";
 import { useEffect } from "react";
 
@@ -22,20 +21,20 @@ export const CurrentUserProvider = createDomain(({}, use) => {
     {} as User,
     {
       user$: currentUser$,
-      permissions$: currentPermissions$,
+      permissions$: currentPermissions$
     },
     (domain$) =>
       domain$.user$.pipe(
         rxMap((resp) => ({
           ...domain$.value,
-          ...(resp.body as any),
+          ...(resp.body as any)
         }))
       ),
     (domain$) =>
       domain$.permissions$.pipe(
         rxMap((resp) => ({
           ...domain$.value,
-          permissions: resp.body,
+          permissions: resp.body
         }))
       )
   );

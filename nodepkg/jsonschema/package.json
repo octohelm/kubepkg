@@ -10,8 +10,10 @@
     }
   },
   "dependencies": {
-    "@innoai-tech/lodash": "^0.2.0",
     "ajv": "^8.12.0"
+  },
+  "peerDependencies": {
+    "@innoai-tech/lodash": "*"
   },
   "devDependencies": {
     "ajv-i18n": "^4.2.0"

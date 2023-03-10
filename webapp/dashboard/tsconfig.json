@@ -5,7 +5,7 @@
     "paths": {
       "@nodepkg/*": [
         "../../nodepkg/*/src/index.ts"
-      ],
-    }
+      ]
+    },
   }
 }

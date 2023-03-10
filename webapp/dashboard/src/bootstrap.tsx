@@ -1,4 +1,4 @@
-import { createRoot } from "react-dom/client";
+import conf from "./config";
 import { ReactNode, useMemo } from "react";
 import { App } from "./app/App";
 import {
@@ -7,11 +7,9 @@ import {
   paramsSerializer,
   transformRequestBody
 } from "@innoai-tech/fetcher";
-import { FetcherProvider, PlatformProvider, StoreProvider } from "@nodepkg/runtime";
-import conf from "./config";
 import { TokenProvider } from "./auth";
-
-const root = createRoot(document.getElementById("root") as any);
+import { FetcherProvider, PlatformProvider, StoreProvider } from "@nodepkg/runtime";
+import { bootstrap } from "@nodepkg/uikit";
 
 const fixBaseURL = (baseURL: string) => {
   if (baseURL) {
@@ -64,8 +62,9 @@ const Bootstrap = ({ children }: { children: ReactNode }) => {
   );
 };
 
-root.render(
+
+bootstrap(document.getElementById("root")!, (
   <Bootstrap>
     <App />
   </Bootstrap>
-);
+));

@@ -1,5 +1,5 @@
 {
-  "name": "@nodepkg/openapi-playground",
+  "name": "@nodepkg/uikit",
   "version": "0.0.0",
   "monobundle": {
     "build": {
@@ -10,22 +10,15 @@
     }
   },
   "dependencies": {
-    "@innoai-tech/fetcher": "^0.4.0",
-    "@innoai-tech/lodash": "^0.2.0",
-    "@innoai-tech/reactutil": "^0.5.2",
-    "@mui/icons-material": "^5.11.11",
-    "@mui/material": "^5.11.12",
-    "@nodepkg/codemirror": "workspace:*",
-    "@nodepkg/jsonschema": "workspace:*",
-    "@nodepkg/markdown": "workspace:*",
-    "@nodepkg/runtime": "workspace:*"
+    "@emotion/styled": "11.x",
+    "@emotion/react": "11.x"
   },
   "peerDependencies": {
-    "react": "18.x",
-    "rxjs": "^7.x"
+    "react": "18.x"
   },
   "devDependencies": {
-    "@types/react": "~18.0.28"
+    "@types/react": "~18.0.28",
+    "@types/react-dom": "~18.0.11"
   },
   "exports": {
     ".": {

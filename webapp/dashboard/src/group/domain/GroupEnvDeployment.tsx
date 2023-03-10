@@ -1,4 +1,4 @@
-import { createDomain } from "../../layout";
+import { createDomain } from "src/layout";
 import {
   ApisKubepkgV1Alpha1KubePkg, deleteGroupEnvDeployment,
   KubepkgChannel,
@@ -6,7 +6,7 @@ import {
   listGroupEnvClusterDeployments,
   listGroupEnvDeployment,
   putGroupEnvDeployment
-} from "../../client/dashboard";
+} from "src/client/dashboard";
 import { useRequest } from "@nodepkg/runtime";
 import { ignoreElements, map as rxMap, merge, tap } from "rxjs";
 import { GroupEnvProvider } from "./GroupEnv";

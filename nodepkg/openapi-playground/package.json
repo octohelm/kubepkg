@@ -21,11 +21,9 @@
     "@nodepkg/runtime": "workspace:*"
   },
   "peerDependencies": {
+    "@types/react": "18.x",
     "react": "18.x",
     "rxjs": "^7.x"
-  },
-  "devDependencies": {
-    "@types/react": "~18.0.28"
   },
   "exports": {
     ".": {

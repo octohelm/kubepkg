@@ -3,10 +3,16 @@ import { join } from "path";
 import { generateClients } from "@innoai-tech/gents";
 import { injectWebAppConfig } from "@innoai-tech/config/vite-plugin-inject-config";
 import { app, viteReact, viteChunkSplit, d2Graph } from "@innoai-tech/vite-presets";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { writeFile } from "fs/promises";
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
+  resolve: {
+    dedupe: [
+      "@mui/system",
+      "@mui/material"
+    ]
+  },
   plugins: [
     app("dashboard"),
     injectWebAppConfig(async (c, ctx) => {
@@ -33,6 +39,8 @@ export default defineConfig({
         writeFile("node_modules/g.d2", d2Graph(moduleFederations));
       }
     }),
-    nodeResolve()
+    visualizer({
+      filename: "stats.html"
+    })
   ]
 });

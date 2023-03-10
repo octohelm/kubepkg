@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@mui/icons-material": "^5.11.11",
-    "@mui/material": "^5.11.12",
+    "@mui/material": "5.x",
     "@nodepkg/codemirror": "workspace:*",
     "@nodepkg/openapi-playground": "workspace:*",
     "@nodepkg/router": "workspace:*",

@@ -5,6 +5,30 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+# [0.4.0](https://github.com/octohelm/kubepkg/compare/v0.3.0...v0.4.0)
+
+### Bug Fixes
+
+* **fix** overwrites mode switch ([9cfa6ae](https://github.com/octohelm/kubepkg/commit/9cfa6ae04afd216822ce44556aaab5a8066b888a))
+* **fix** crd as wildcard spec and state ([ce8a669](https://github.com/octohelm/kubepkg/commit/ce8a669d3ea5b0241238235019867841f11e04a6))
+* **fix** PlatformProvider ([18a8b27](https://github.com/octohelm/kubepkg/commit/18a8b27b66a528bedb1dc0c7f6c556da3cfaebdc))
+* **fix** apply overwrites should do deep merging ([070dc0a](https://github.com/octohelm/kubepkg/commit/070dc0a849d49969e5da4072a8f121443b1251f3))
+* **fix** Kubepkg add should fix ([1a9368c](https://github.com/octohelm/kubepkg/commit/1a9368c530e360c86ac574f655f7dcff25855f54))
+* **fix** drawer nav link styling fix ([9478bfe](https://github.com/octohelm/kubepkg/commit/9478bfe9756637580caccf001ff1eebcd406adf8))
+* **fix** group env could deletable ([f15864f](https://github.com/octohelm/kubepkg/commit/f15864f7a19f90d2579ecb7fe1383f4ddfecc13d))
+* **fix** autocomplete config by template ([bf525e3](https://github.com/octohelm/kubepkg/commit/bf525e368100aedf33a0de3213dfb74673dfd92a))
+* **fix** bump list deployments as KubePkgList ([ce492f8](https://github.com/octohelm/kubepkg/commit/ce492f88280ab2c291be46ff9bf0e0a32b6c7a95))
+* **fix** should use config as default overwrites ([618e02b](https://github.com/octohelm/kubepkg/commit/618e02bbab8efc22d6680a2f3888ae954df070bf))
+
+
+### Features
+
+* **feat** chunk split enhance ([d71f5e6](https://github.com/octohelm/kubepkg/commit/d71f5e6fdd4c163b7a0076623103415bc3813e76))
+* **feat** added deployment delete ([ef62ff8](https://github.com/octohelm/kubepkg/commit/ef62ff8c5688160c827d8511b6cfb72d308be9f4))
+* **feat** group with type ([2df3540](https://github.com/octohelm/kubepkg/commit/2df35409d7b903dcf43953a117d44bc82455740c))
+
+
+
 # [0.3.0](https://github.com/octohelm/kubepkg/compare/v0.2.0...v0.3.0)
 
 ### Bug Fixes

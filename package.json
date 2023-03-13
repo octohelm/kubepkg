@@ -14,7 +14,7 @@
   "devDependencies": {
     "@innoai-tech/devconfig": "^0.1.2",
     "@innoai-tech/gents": "^0.3.3",
-    "@innoai-tech/monobundle": "^0.5.2",
+    "@innoai-tech/monobundle": "^0.5.3",
     "@innoai-tech/vite-presets": "^0.6.2",
     "@nodepkg/devconfig": "workspace:*",
     "@testing-library/react": "^14.0.0",

@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@innoai-tech/devconfig': ^0.1.2
       '@innoai-tech/gents': ^0.3.3
-      '@innoai-tech/monobundle': ^0.5.2
+      '@innoai-tech/monobundle': ^0.5.3
       '@innoai-tech/vite-presets': ^0.6.2
       '@nodepkg/devconfig': workspace:*
       '@testing-library/react': ^14.0.0
@@ -22,7 +22,7 @@ importers:
     devDependencies:
       '@innoai-tech/devconfig': 0.1.2
       '@innoai-tech/gents': 0.3.3
-      '@innoai-tech/monobundle': 0.5.2_jay2j7pinmw7swulggywz7ozhe
+      '@innoai-tech/monobundle': 0.5.3_jay2j7pinmw7swulggywz7ozhe
       '@innoai-tech/vite-presets': 0.6.2_vwvfc4ezh6jlf6pa67auy3eulu
       '@nodepkg/devconfig': link:nodepkg/devconfig
       '@testing-library/react': 14.0.0_biqbaboplfbrettd7655fr4n2y
@@ -1251,8 +1251,8 @@ packages:
       lodash: 4.17.21
       lodash-es: 4.17.21
 
-  /@innoai-tech/monobundle/0.5.2_jay2j7pinmw7swulggywz7ozhe:
-    resolution: {integrity: sha512-3dZtcHGWtn+Ze4U/9Yc85ztIZLmUIlOwyL9/cj2cRkkGgsr6Vutt/tWxMgpGGTJ7yJni7dTKva8UyaSh4lEqqQ==, tarball: download/@innoai-tech/monobundle/0.5.2/fd595509af8d5cfef774ac5cc013d5d1ec99b56d}
+  /@innoai-tech/monobundle/0.5.3_jay2j7pinmw7swulggywz7ozhe:
+    resolution: {integrity: sha512-ML+bip6EEpagpWRAqcMhDmUAuLG1QAn3bZh00aB/7tBz6176R9Jj2YqrZVvEJKahqti4CAvPL46oafd48WHO3g==, tarball: download/@innoai-tech/monobundle/0.5.3/b5a2c936a49d1c447f511eda625870da7c455b67}
     hasBin: true
     dependencies:
       '@innoai-tech/lodash': 0.2.0
@@ -1261,7 +1261,7 @@ packages:
       chalk: 5.2.0
       globby: 13.1.3
       js-yaml: 4.1.0
-      minimatch: 5.1.6
+      minimatch: 7.4.2
       rollup: 3.19.1
       rollup-plugin-dts: 5.2.0_h4kaxwm6ctjivrsm4cpxaz7nqu
       rollup-plugin-esbuild: 5.0.0_caszwlkzzxo5hzxqu45fmzwfye
@@ -3364,8 +3364,8 @@ packages:
       mime-db: 1.52.0
     dev: true
 
-  /minimatch/5.1.6:
-    resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
+  /minimatch/7.4.2:
+    resolution: {integrity: sha512-xy4q7wou3vUoC9k1xGTXc+awNdGaGVHtFUaey8tiX4H1QRc04DZ/rmDFwNm2EBsuYEhAZ6SgMmYf3InGY6OauA==}
     engines: {node: '>=10'}
     dependencies:
       brace-expansion: 2.0.1

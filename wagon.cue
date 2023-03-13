@@ -5,42 +5,15 @@ import (
 
 	"wagon.octohelm.tech/core"
 	"github.com/innoai-tech/runtime/cuepkg/imagetool"
+	"github.com/innoai-tech/runtime/cuepkg/kubepkgtool"
 	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
-	"github.com/octohelm/kubepkg/cuepkg/kubepkg"
-	"github.com/octohelm/kubepkg/cuepkg/kubepkgcli"
+
+	"github.com/octohelm/kubepkg/tool"
 	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/component/kubepkg"
 )
 
-pkg: {
-	version: core.#Version & {
-	}
-}
-
-client: core.#Client & {
-	env: {
-		GH_USERNAME: string | *""
-		GH_PASSWORD: core.#Secret
-
-		CONTAINER_REGISTRY_PULL_PROXY: string | *""
-		NPM_REGISTRY_SERVER:           string | *""
-
-		KUBEPKG_REMOTE_REGISTRY_ENDPOINT: _ | *""
-		KUBEPKG_REMOTE_REGISTRY_USERNAME: _ | *""
-		KUBEPKG_REMOTE_REGISTRY_PASSWORD: _ | *""
-
-		KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT: _ | *""
-		KUBEPKG_SIGN_PRIVATE_KEY:            _ | *""
-		KUBEPKG_DB_ENDPOINT:                 _ | *""
-	}
-}
-
-setting: core.#Setting & {
-	registry: "ghcr.io": auth: {
-		username: client.env.GH_USERNAME
-		secret:   client.env.GH_PASSWORD
-	}
-}
+tool
 
 actions: webapp: node.#Project & {
 	source: {
@@ -72,10 +45,16 @@ actions: webapp: node.#Project & {
 		script: "pnpm exec turbo run build --no-cache"
 		image: {
 			"steps": [
-				node.#ConfigPrivateRegistry & {
-					scope: "@innoai-tech"
-					host:  "npm.pkg.github.com"
-					token: client.env.GH_PASSWORD
+				{
+					_env: core.#ClientEnv & {
+						GH_PASSWORD: core.#Secret
+					}
+
+					node.#ConfigPrivateRegistry & {
+						scope: "@innoai-tech"
+						host:  "npm.pkg.github.com"
+						token: _env.GH_PASSWORD
+					}
 				},
 				imagetool.#Script & {
 					run: [
@@ -84,6 +63,11 @@ actions: webapp: node.#Project & {
 				},
 			]
 		}
+	}
+}
+
+pkg: {
+	version: core.#Version & {
 	}
 }
 
@@ -129,69 +113,23 @@ actions: go: golang.#Project & {
 	}
 }
 
-actions: {
-	_version: pkg.version.output
-
-	#Export: kubepkgcli.#Export & {
-		"run": tag: "\(_version)"
-		"env": {
-			"KUBEPKG_LOG_LEVEL":                "DEBUG"
-			"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "\(client.env.KUBEPKG_REMOTE_REGISTRY_ENDPOINT)"
-			"KUBEPKG_REMOTE_REGISTRY_USERNAME": "\(client.env.KUBEPKG_REMOTE_REGISTRY_USERNAME)"
-			"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "\(client.env.KUBEPKG_REMOTE_REGISTRY_PASSWORD)"
+actions: apply: {
+	operator: kubepkgtool.#ApplyToDashboard & {
+		target: group: "system"
+		kubepkg: kubepkgcomponent.#KubepkgOperator & {
+			spec: version: pkg.version.output
 		}
 	}
-
-	"dashboard": {
-		for arch in ["amd64", "arm64"] {
-			"\(arch)": #Export & {
-				"arch":     "\(arch)"
-				"filename": "dashboard.\(arch).kube.tgz"
-				"kubepkg":  kubepkgcomponent.#KubepkgDashboard & {
-					metadata: namespace: "kubepkg"
-					spec: {
-						version: "\(_version)"
-						config: {
-							"KUBEPKG_SIGN_PRIVATE_KEY":            "\(client.env.KUBEPKG_SIGN_PRIVATE_KEY)"
-							"KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT": "\(client.env.KUBEPKG_AUTH_PROVIDER_OIDC_ENDPOINT)"
-							"KUBEPKG_DB_ENDPOINT":                 "\(client.env.KUBEPKG_DB_ENDPOINT)"
-							"KUBEPKG_DB_ENABLE_MIGRATE":           "true"
-						}
-					}
-				}
-			}
+	agent: kubepkgtool.#ApplyToDashboard & {
+		target: group: "system"
+		kubepkg: kubepkgcomponent.#KubepkgAgent & {
+			spec: version: pkg.version.output
 		}
 	}
-
-	"kubepkg": {
-		for arch in ["amd64", "arm64"] {
-			"\(arch)": #Export & {
-				"arch":     "\(arch)"
-				"filename": "kubepkg.\(arch).kube.tgz"
-				"kubepkg":  kubepkg.#KubePkgList & {
-					items: [
-						kubepkgcomponent.#KubepkgAgent & {
-							metadata: namespace: "kube-system"
-							spec: version:       "\(_version)"
-						},
-						kubepkgcomponent.#KubepkgOperator & {
-							metadata: namespace: "kube-system"
-							spec: version:       "\(_version)"
-						},
-						kubepkgcomponent.#ContainerRegistry & {
-							metadata: namespace: "kube-system"
-							spec: {
-								version: "\(_version)"
-								config: {
-									"KUBEPKG_REMOTE_REGISTRY_ENDPOINT": "@secret/container-registry/endpoint?"
-									"KUBEPKG_REMOTE_REGISTRY_USERNAME": "@secret/container-registry/username?"
-									"KUBEPKG_REMOTE_REGISTRY_PASSWORD": "@secret/container-registry/password?"
-								}
-							}
-						},
-					]
-				}
-			}
+	registry: kubepkgtool.#ApplyToDashboard & {
+		target: group: "system"
+		kubepkg: kubepkgcomponent.#ContainerRegistry & {
+			spec: version: pkg.version.output
 		}
 	}
 }

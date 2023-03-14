@@ -94,7 +94,8 @@ export const GroupAccountList = () => {
 
   useEffect(() => {
     account$.list$.next({
-      groupName: account$.groupName
+      groupName: account$.groupName,
+      size: -1,
     });
   }, []);
 

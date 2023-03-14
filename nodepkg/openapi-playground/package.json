@@ -23,7 +23,8 @@
   "peerDependencies": {
     "@types/react": "18.x",
     "react": "18.x",
-    "rxjs": "^7.x"
+    "rxjs": "^7.x",
+    "core-js": "*"
   },
   "exports": {
     ".": {

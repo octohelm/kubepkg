@@ -30,7 +30,11 @@ export default defineConfig({
         }
       }
     }),
-    viteReact(),
+    viteReact({
+      plugins: [
+        ["@innoai-tech/swc-plugin-annotate-pure-calls", {}]
+      ]
+    }),
     viteChunkSplit({
       libRoot: [
         "../../nodepkg"

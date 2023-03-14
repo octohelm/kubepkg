@@ -26,7 +26,7 @@ actions: webapp: node.#Project & {
 			"*.json",
 		]
 		exclude: [
-			"node_modules",
+			"*/node_modules",
 		]
 	}
 
@@ -35,26 +35,31 @@ actions: webapp: node.#Project & {
 	}
 
 	build: {
+
 		outputs: {
 			"agent/dist":     "webapp/agent/dist"
 			"dashboard/dist": "webapp/dashboard/dist"
 		}
+
 		pre: [
 			"pnpm install",
+			"ls node_modules/@innoai-tech/swc-plugin-annotate-pure-calls"
 		]
-		script: "pnpm exec turbo run build --no-cache"
+
+		script: "pnpm exec turbo run build"
+
 		image: {
+			"node": "19"
+
 			"steps": [
-				{
+				node.#ConfigPrivateRegistry & {
 					_env: core.#ClientEnv & {
 						GH_PASSWORD: core.#Secret
 					}
 
-					node.#ConfigPrivateRegistry & {
-						scope: "@innoai-tech"
-						host:  "npm.pkg.github.com"
-						token: _env.GH_PASSWORD
-					}
+					scope: "@innoai-tech"
+					host:  "npm.pkg.github.com"
+					token: _env.GH_PASSWORD
 				},
 				imagetool.#Script & {
 					run: [

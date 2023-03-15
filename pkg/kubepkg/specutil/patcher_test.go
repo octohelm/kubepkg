@@ -154,6 +154,9 @@ spec:
           - linux/arm64
       ports:
         http: 80
+      resources: 	
+        limits: 	
+          "aliyun.com/gpu-mem": "2"
 
   services:
     "#":

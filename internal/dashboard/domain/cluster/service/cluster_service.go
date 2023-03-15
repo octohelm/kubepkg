@@ -74,7 +74,9 @@ func (c *ClusterService) Apply(ctx context.Context, kpkg *v1alpha1.KubePkg) erro
 	apply := &agentclient.ApplyKubePkg{}
 
 	apply.ApisKubepkgV1Alpha1KubePkg = kpkg
-	if kpkgMerged, err := specutil.ApplyOverwrites(kpkg); err != nil {
+	if kpkgMerged, err := specutil.ApplyOverwrites(kpkg); err == nil {
+		return err
+	} else {
 		apply.ApisKubepkgV1Alpha1KubePkg = kpkgMerged
 	}
 

@@ -26,21 +26,33 @@ func Merge[X any](from *X, overwrites *X) (*X, error) {
 }
 
 func DeepMerge(from objx.Map, patch objx.Map) objx.Map {
+	if patch == nil {
+		return from
+	}
+
 	mergedKeys := map[string]bool{}
 
-	merged := from.Transform(func(key string, currValue interface{}) (string, interface{}) {
+	merged := from.Transform(func(key string, currValue any) (string, any) {
 		mergedKeys[key] = true
 
-		if patchValue := patch.Get(key); !patchValue.IsNil() {
-			if patchValue.IsObjxMap() {
+		if patchValue, ok := patch[key]; ok {
+			switch p := patchValue.(type) {
+			case objx.Map:
 				switch x := currValue.(type) {
 				case objx.Map:
-					return key, DeepMerge(x, patchValue.MustObjxMap())
+					return key, DeepMerge(x, p)
 				case map[string]any:
-					return key, DeepMerge(x, patchValue.MustObjxMap())
+					return key, DeepMerge(x, p)
+				}
+			case map[string]any:
+				switch x := currValue.(type) {
+				case objx.Map:
+					return key, DeepMerge(x, p)
+				case map[string]any:
+					return key, DeepMerge(x, p)
 				}
 			}
-			return key, patchValue.Data()
+			return key, patchValue
 		}
 
 		return key, currValue

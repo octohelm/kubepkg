@@ -36,14 +36,11 @@ func DeepMerge(from objx.Map, patch objx.Map) objx.Map {
 		mergedKeys[key] = true
 
 		if patchValue, ok := patch[key]; ok {
+			if m, ok := patchValue.(objx.Map); ok {
+				patchValue = map[string]any(m)
+			}
+
 			switch p := patchValue.(type) {
-			case objx.Map:
-				switch x := currValue.(type) {
-				case objx.Map:
-					return key, DeepMerge(x, p)
-				case map[string]any:
-					return key, DeepMerge(x, p)
-				}
 			case map[string]any:
 				switch x := currValue.(type) {
 				case objx.Map:
@@ -52,7 +49,11 @@ func DeepMerge(from objx.Map, patch objx.Map) objx.Map {
 					return key, DeepMerge(x, p)
 				}
 			}
-			return key, patchValue
+
+			// don't merge nil value
+			if patchValue != nil {
+				return key, patchValue
+			}
 		}
 
 		return key, currValue

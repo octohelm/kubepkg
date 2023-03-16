@@ -37,7 +37,7 @@ func (p *DeleteGroupEnvDeployment) Output(ctx context.Context) (any, error) {
 
 	if ge.Cluster != nil && ge.Cluster.Endpoint != "" && ge.Namespace != "" {
 		if err := clusterservice.NewClusterService(ge.Cluster).Delete(ctx, ge.Namespace, p.DeploymentName); err != nil {
-			logr.FromContext(ctx)
+			logr.FromContext(ctx).Error(err)
 		}
 	}
 

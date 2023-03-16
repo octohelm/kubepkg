@@ -3,15 +3,17 @@ package group
 import (
 	"context"
 
-	"github.com/octohelm/courier/pkg/expression"
-	authoperator "github.com/octohelm/kubepkg/internal/dashboard/apis/auth/operator"
-	"github.com/octohelm/kubepkg/internal/dashboard/domain/group"
-	"github.com/octohelm/kubepkg/pkg/rbac"
+	"github.com/go-courier/logr"
 
 	"github.com/octohelm/courier/pkg/courier"
 	"github.com/octohelm/courier/pkg/courierhttp"
+	"github.com/octohelm/courier/pkg/expression"
+	authoperator "github.com/octohelm/kubepkg/internal/dashboard/apis/auth/operator"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/group/operator"
+	clusterservice "github.com/octohelm/kubepkg/internal/dashboard/domain/cluster/service"
+	"github.com/octohelm/kubepkg/internal/dashboard/domain/group"
 	groupservice "github.com/octohelm/kubepkg/internal/dashboard/domain/group/service"
+	"github.com/octohelm/kubepkg/pkg/rbac"
 )
 
 func (DeleteGroupEnvDeployment) MiddleOperators() courier.MiddleOperators {
@@ -32,6 +34,12 @@ type DeleteGroupEnvDeployment struct {
 func (p *DeleteGroupEnvDeployment) Output(ctx context.Context) (any, error) {
 	ge := operator.GroupEnvContext.From(ctx)
 	ges := groupservice.NewGroupEnvDeploymentService(ge.Group, &ge.Env)
+
+	if ge.Cluster != nil && ge.Cluster.Endpoint != "" && ge.Namespace != "" {
+		if err := clusterservice.NewClusterService(ge.Cluster).Delete(ctx, ge.Namespace, p.DeploymentName); err != nil {
+			logr.FromContext(ctx)
+		}
+	}
 
 	return nil, ges.Delete(ctx, p.DeploymentName)
 }

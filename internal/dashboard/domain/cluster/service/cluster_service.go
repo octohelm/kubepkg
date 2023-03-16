@@ -85,3 +85,19 @@ func (c *ClusterService) Apply(ctx context.Context, kpkg *v1alpha1.KubePkg) erro
 	}
 	return nil
 }
+
+func (c *ClusterService) Delete(ctx context.Context, namespace string, name string) error {
+	newCtx, err := c.injectContext(ctx)
+	if err != nil {
+		return err
+	}
+	del := &agentclient.DelKubePkg{}
+
+	del.Namespace = namespace
+	del.Name = name
+
+	if _, err := del.Invoke(newCtx); err != nil {
+		return err
+	}
+	return nil
+}

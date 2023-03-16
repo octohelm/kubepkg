@@ -3,8 +3,11 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 	"time"
 	_ "time/tzdata"
+
+	"github.com/octohelm/courier/pkg/statuserror"
 
 	"github.com/octohelm/kubepkg/pkg/util"
 
@@ -46,7 +49,7 @@ func (s *GroupEnvDeploymentService) PutKubePkg(ctx context.Context, pkg *v1alpha
 
 	kpkg, kpkgRef, err := s.kubepkgRepo.Put(ctx, pkg)
 	if err != nil {
-		return nil, err
+		return nil, statuserror.Wrap(err, http.StatusBadRequest, "InvalidKubePkg")
 	}
 
 	pkg.Namespace = namespace

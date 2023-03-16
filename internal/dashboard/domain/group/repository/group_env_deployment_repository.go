@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
+
+	"github.com/octohelm/courier/pkg/statuserror"
 
 	"github.com/octohelm/storage/pkg/dberr"
 
@@ -67,7 +70,7 @@ func (r *GroupEnvDeploymentRepository) GetSettingValues(ctx context.Context, dep
 			Scan(&deploymentSettingID).
 			Find(ctx)
 		if err != nil {
-			if dberr.IsErrNotFound(err) {
+			if !dberr.IsErrNotFound(err) {
 				return nil, err
 			}
 		}
@@ -86,6 +89,9 @@ func (r *GroupEnvDeploymentRepository) GetSettingValues(ctx context.Context, dep
 		Scan(setting).
 		Find(ctx)
 	if err != nil {
+		if dberr.IsErrNotFound(err) {
+			return nil, statuserror.Wrap(err, http.StatusNotFound, "DeploymentSettingNotFound")
+		}
 		return nil, err
 	}
 

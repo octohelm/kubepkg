@@ -50,10 +50,11 @@ const (
 )
 
 type Ref struct {
-	KubepkgID         ID
-	KubepkgRevisionID RevisionID
-	SettingID         uint64
-	Overwrites        map[string]any
+	KubepkgID          ID
+	KubepkgRevisionID  RevisionID
+	SettingID          uint64
+	Overwrites         map[string]any
+	DefaultsOverwrites map[string]any
 }
 
 func (r Ref) WithSettingID(settingID uint64) *Ref {

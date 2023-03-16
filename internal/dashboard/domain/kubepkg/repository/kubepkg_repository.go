@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/octohelm/courier/pkg/statuserror"
 	"github.com/octohelm/kubepkg/pkg/util"
+
+	"github.com/octohelm/courier/pkg/statuserror"
 	"github.com/pkg/errors"
 
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/kubepkg"
@@ -55,19 +56,21 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 
 		if overwrites, ok := k.Annotations[kubepkg.AnnotationOverwrites]; ok {
 			_ = json.Unmarshal(util.StringToBytes(overwrites), &ref.Overwrites)
-		} else {
-			// use config as default overwrites
-			if config := k.Spec.Config; config != nil {
-				c := map[string]any{}
-				for k := range config {
-					vv, _ := config[k].MarshalText()
-					c[k] = string(vv)
-				}
-				ref.Overwrites = map[string]any{
-					"spec": map[string]any{
-						"config": c,
-					},
-				}
+		}
+	}
+
+	// use config as default overwrites
+	if ref.Overwrites == nil {
+		if config := k.Spec.Config; config != nil {
+			c := map[string]any{}
+			for k := range config {
+				vv, _ := config[k].MarshalText()
+				c[k] = string(vv)
+			}
+			ref.DefaultsOverwrites = map[string]any{
+				"spec": map[string]any{
+					"config": c,
+				},
 			}
 		}
 	}

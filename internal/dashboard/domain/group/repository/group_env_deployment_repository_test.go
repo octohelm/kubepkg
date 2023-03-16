@@ -84,15 +84,21 @@ func TestGroupEnvDeploymentRepository(t *testing.T) {
 				testingutil.Expect(t, recreated.DeploymentSettingID, testingutil.Be(created.DeploymentSettingID))
 			})
 
-			t.Run("Should get decode setting", func(t *testing.T) {
-				found, err := repo.GetSetting(ctx, d.DeploymentID, created.DeploymentSettingID)
+			t.Run("Should get setting values", func(t *testing.T) {
+				found, err := repo.GetSettingValues(ctx, d.DeploymentID, created.DeploymentSettingID)
 				testingutil.Expect(t, err, testingutil.Be[error](nil))
-				testingutil.Expect(t, found, testingutil.Equal(settings))
+				testingutil.Expect(t, found.Values, testingutil.Equal(settings))
 			})
 
 			t.Run("record deployment", func(t *testing.T) {
 				_, err := repo.RecordDeployment(ctx, created.DeploymentID, kubepkgRef.WithSettingID(uint64(created.DeploymentSettingID)))
 				testingutil.Expect(t, err, testingutil.Be[error](nil))
+
+				t.Run("Should get setting values with zero for latest history setting", func(t *testing.T) {
+					found, err := repo.GetSettingValues(ctx, d.DeploymentID, 0)
+					testingutil.Expect(t, err, testingutil.Be[error](nil))
+					testingutil.Expect(t, found.DeploymentSettingID, testingutil.Equal(created.DeploymentSettingID))
+				})
 
 				t.Run("then could be list", func(t *testing.T) {
 					list, err := repo.ListKubepkg(ctx, nil)

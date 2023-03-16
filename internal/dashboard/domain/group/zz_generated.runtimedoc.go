@@ -149,6 +149,21 @@ func (v DeploymentSetting) RuntimeDoc(names ...string) ([]string, bool) {
 func (DeploymentSettingID) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
+func (v DeploymentValues) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "DeploymentSettingID":
+			return []string{}, true
+		case "Values":
+			return []string{}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
 func (v DeploymentWithKubePkg) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {

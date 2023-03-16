@@ -77,6 +77,8 @@ func (v Ref) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "Overwrites":
 			return []string{}, true
+		case "DefaultsOverwrites":
+			return []string{}, true
 
 		}
 

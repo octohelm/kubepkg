@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/octohelm/storage/pkg/dberr"
+
 	"github.com/octohelm/kubepkg/pkg/util"
 
 	"github.com/pkg/errors"
@@ -53,8 +55,27 @@ func (r *GroupEnvDeploymentRepository) Get(ctx context.Context, deploymentID gro
 	return deployment, nil
 }
 
-func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymentID group.DeploymentID, deploymentSettingID group.DeploymentSettingID) (map[string]any, error) {
+func (r *GroupEnvDeploymentRepository) GetSettingValues(ctx context.Context, deploymentID group.DeploymentID, deploymentSettingID group.DeploymentSettingID) (*group.DeploymentValues, error) {
 	setting := &group.DeploymentSetting{}
+
+	if deploymentSettingID == 0 {
+		err := dal.From(group.DeploymentHistoryT).
+			Where(sqlbuilder.And(group.DeploymentHistoryT.DeploymentID.V(sqlbuilder.Eq(deploymentID)))).
+			OrderBy(sqlbuilder.DescOrder(group.DeploymentHistoryT.DeploymentHistoryID)).
+			Limit(1).
+			Select(group.DeploymentHistoryT.DeploymentSettingID).
+			Scan(&deploymentSettingID).
+			Find(ctx)
+		if err != nil {
+			if dberr.IsErrNotFound(err) {
+				return nil, err
+			}
+		}
+	}
+
+	if deploymentSettingID == 0 {
+		return &group.DeploymentValues{}, nil
+	}
 
 	err := dal.From(group.DeploymentSettingT).
 		Where(sqlbuilder.And(
@@ -73,11 +94,14 @@ func (r *GroupEnvDeploymentRepository) GetSetting(ctx context.Context, deploymen
 		return nil, err
 	}
 
-	m := map[string]any{}
-	if err := json.Unmarshal(jsonRaw, &m); err != nil {
+	overwrites := map[string]any{}
+	if err := json.Unmarshal(jsonRaw, &overwrites); err != nil {
 		return nil, err
 	}
-	return m, nil
+	return &group.DeploymentValues{
+		DeploymentSettingID: deploymentSettingID,
+		Values:              overwrites,
+	}, nil
 }
 
 func (r *GroupEnvDeploymentRepository) RecordSetting(ctx context.Context, deploymentID group.DeploymentID, settings map[string]any) (*group.DeploymentSetting, error) {

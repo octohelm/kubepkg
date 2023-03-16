@@ -38,7 +38,7 @@ func (v Server) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "AgentID":
 			return []string{
-				"Server ID",
+				"Server DeploymentSettingID",
 			}, true
 		case "Platforms":
 			return []string{

@@ -59,12 +59,34 @@ func (s *GroupEnvDeploymentService) PutKubePkg(ctx context.Context, pkg *v1alpha
 		return nil, err
 	}
 
-	deploymentSetting, err := s.groupEnvDeploymentRepo.RecordSetting(ctx, deployment.DeploymentID, kpkgRef.Overwrites)
-	if err != nil {
-		return nil, err
+	var settingID uint64
+
+	if overwrites := kpkgRef.Overwrites; overwrites != nil {
+		deploymentSetting, err := s.groupEnvDeploymentRepo.RecordSetting(ctx, deployment.DeploymentID, overwrites)
+		if err != nil {
+			return nil, err
+		}
+		settingID = uint64(deploymentSetting.DeploymentSettingID)
+	} else {
+		deploymentSettingValues, err := s.groupEnvDeploymentRepo.GetSettingValues(ctx, deployment.DeploymentID, 0)
+		if err != nil {
+			return nil, err
+		}
+
+		if deploymentSettingValues.Values == nil {
+			deploymentSetting, err := s.groupEnvDeploymentRepo.RecordSetting(ctx, deployment.DeploymentID, kpkgRef.DefaultsOverwrites)
+			if err != nil {
+				return nil, err
+			}
+			kpkgRef.Overwrites = kpkgRef.DefaultsOverwrites
+			settingID = uint64(deploymentSetting.DeploymentSettingID)
+		} else {
+			kpkgRef.Overwrites = deploymentSettingValues.Values
+			settingID = uint64(deploymentSettingValues.DeploymentSettingID)
+		}
 	}
 
-	deploymentHistory, err := s.groupEnvDeploymentRepo.RecordDeployment(ctx, deployment.DeploymentID, kpkgRef.WithSettingID(uint64(deploymentSetting.DeploymentSettingID)))
+	deploymentHistory, err := s.groupEnvDeploymentRepo.RecordDeployment(ctx, deployment.DeploymentID, kpkgRef.WithSettingID(settingID))
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +97,10 @@ func (s *GroupEnvDeploymentService) PutKubePkg(ctx context.Context, pkg *v1alpha
 		kpkg.Annotations = map[string]string{}
 	}
 
-	overwritesData, _ := json.Marshal(kpkgRef.Overwrites)
-	kpkg.Annotations[kubepkg.AnnotationOverwrites] = util.BytesToString(overwritesData)
+	if kpkgRef.Overwrites != nil {
+		overwritesData, _ := json.Marshal(kpkgRef.Overwrites)
+		kpkg.Annotations[kubepkg.AnnotationOverwrites] = util.BytesToString(overwritesData)
+	}
 
 	kpkg.Annotations[kubepkg.AnnotationChannel] = deployment.KubepkgChannel.String()
 	kpkg.Annotations[kubepkg.AnnotationDeploymentID] = deploymentHistory.DeploymentID.String()

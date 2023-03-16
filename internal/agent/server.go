@@ -22,7 +22,7 @@ import (
 
 type Server struct {
 	Storage containerregistry.Storage
-	// Server ID
+	// Server DeploymentSettingID
 	AgentID string `flag:",omitempty"`
 	// Supported platforms
 	Platforms []string `flag:"platform,omitempty"`

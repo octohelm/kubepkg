@@ -29,7 +29,7 @@ k.k8s: gen.kubepkg
 
 k.dashboard:
 	$(KUBEPKG) serve dashboard --log-level=debug -c \
-		--addr=:8081 \
+		--addr=0.0.0.0:8081 \
  		--db-enable-migrate \
  		--auth-provider-oidc-endpoint=${OIDC_PROVIDER}
 

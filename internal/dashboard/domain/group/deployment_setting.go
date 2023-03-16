@@ -30,3 +30,8 @@ func (id DeploymentSettingID) MarshalText() (text []byte, err error) {
 func (id DeploymentSettingID) String() string {
 	return datatypes.SFID(id).String()
 }
+
+type DeploymentValues struct {
+	DeploymentSettingID DeploymentSettingID
+	Values              map[string]any
+}

@@ -10,7 +10,7 @@ import { get, has, last, map } from "@innoai-tech/lodash";
 import type { EditorState } from "@codemirror/state";
 import type { SyntaxNode } from "@lezer/common";
 import { syntaxTree } from "@codemirror/language";
-import { Completion, snippetCompletion } from "@codemirror/autocomplete";
+import { type Completion, snippetCompletion } from "@codemirror/autocomplete";
 
 const unquote = (s: string) => {
   try {

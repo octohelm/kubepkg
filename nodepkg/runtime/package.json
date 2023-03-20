@@ -12,11 +12,10 @@
   "dependencies": {
     "@innoai-tech/lodash": "^0.2.0",
     "@innoai-tech/reactutil": "^0.5.3",
+    "@types/react": "~18.0.28",
     "react": "~18.2.0",
-    "@types/react": "~18.x",
     "rxjs": "^7.8.0"
   },
-  "peerDependencies": {},
   "exports": {
     ".": {
       "import": {
@@ -37,5 +36,6 @@
     "prepublishOnly": "pnpm run build",
     "lint": "prettier --write ."
   },
-  "type": "module"
+  "type": "module",
+  "peerDependencies": {}
 }

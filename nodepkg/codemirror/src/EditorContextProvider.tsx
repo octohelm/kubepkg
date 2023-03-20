@@ -9,7 +9,7 @@ import {
 } from "rxjs";
 import { createProvider, tapEffect } from "@nodepkg/runtime";
 import { useObservableEffect } from "@innoai-tech/reactutil";
-import { EditorState, Extension } from "@codemirror/state";
+import { EditorState, type Extension } from "@codemirror/state";
 import { lintGutter, lintKeymap } from "@codemirror/lint";
 import { EditorView, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers } from "@codemirror/view";
 import { bracketMatching, foldGutter, foldKeymap } from "@codemirror/language";

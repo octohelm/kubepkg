@@ -1,5 +1,5 @@
 import type { JSONSchema } from "./JSONSchema";
-import Ajv, { ErrorObject } from "ajv/dist/ajv";
+import Ajv, { type ErrorObject } from "ajv/dist/ajv";
 import { SchemaType, SchemaTypeContext, SchemaTypeNode } from "./SchemaType";
 import { get } from "@innoai-tech/lodash";
 

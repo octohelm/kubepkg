@@ -10,16 +10,16 @@
     }
   },
   "dependencies": {
-    "@emotion/styled": "11.x",
-    "@emotion/react": "11.x"
+    "@emotion/react": "~11.10.6",
+    "@emotion/styled": "~11.10.6"
   },
   "peerDependencies": {
+    "@types/react": "18.x",
     "react": "18.x",
-    "react-dom": "18.x",
-    "@types/react": "18.x"
+    "react-dom": "18.x"
   },
   "devDependencies": {
-    "@types/react-dom": "18.x"
+    "@types/react-dom": "~18.0.11"
   },
   "exports": {
     ".": {

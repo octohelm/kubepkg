@@ -2,7 +2,7 @@
   "name": "@nodepkg/devconfig",
   "version": "0.0.0",
   "dependencies": {
-    "@innoai-tech/config": "^0.4.13"
+    "@innoai-tech/devconfig": "^0.2.0"
   },
   "license": "MIT",
   "private": true,

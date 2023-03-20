@@ -19,8 +19,8 @@ import {
 import type { ReactNode } from "react";
 import {
   paramsSerializer,
-  RequestConfig,
-  FetcherResponse,
+  type RequestConfig,
+  type FetcherResponse,
 } from "@innoai-tech/fetcher";
 import { Box } from "@mui/material";
 

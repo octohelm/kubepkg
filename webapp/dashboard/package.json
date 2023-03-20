@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@mui/icons-material": "^5.11.11",
-    "@mui/material": "5.x",
+    "@mui/material": "~5.11.13",
     "@nodepkg/codemirror": "workspace:*",
     "@nodepkg/openapi-playground": "workspace:*",
     "@nodepkg/router": "workspace:*",
@@ -11,15 +11,15 @@
     "@nodepkg/uikit": "workspace:*"
   },
   "peerDependencies": {
-    "@innoai-tech/reactutil": "*",
-    "@types/lodash-es": "*",
-    "@mui/system": "5.x",
-    "@mui/styled-engine": "5.x",
     "@emotion/react": "11.x",
     "@innoai-tech/config": "^0.4.13",
     "@innoai-tech/fetcher": "^0.4.0",
     "@innoai-tech/form": "^0.2.0",
     "@innoai-tech/lodash": "^0.2.0",
+    "@innoai-tech/reactutil": "*",
+    "@mui/styled-engine": "5.x",
+    "@mui/system": "5.x",
+    "@types/lodash-es": "*",
     "@types/node": "^18.15.0",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",

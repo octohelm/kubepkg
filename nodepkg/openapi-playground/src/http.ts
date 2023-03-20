@@ -1,6 +1,6 @@
 import { paramsSerializer } from "@innoai-tech/fetcher";
 import {
-  Dictionary,
+  type Dictionary,
   filter,
   first,
   isEmpty,

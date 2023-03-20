@@ -1,5 +1,5 @@
 import { useStore$, Domain } from "@innoai-tech/reactutil";
-import { createContext, ReactNode, useContext, useMemo } from "react";
+import { createContext, type ReactNode, useContext, useMemo } from "react";
 import type { Observable } from "rxjs";
 import { useProxy } from "./Proxy";
 

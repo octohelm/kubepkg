@@ -12,9 +12,9 @@
   "dependencies": {
     "@innoai-tech/fetcher": "^0.4.0",
     "@innoai-tech/lodash": "^0.2.0",
-    "@innoai-tech/reactutil": "^0.5.2",
+    "@innoai-tech/reactutil": "^0.5.3",
     "@mui/icons-material": "^5.11.11",
-    "@mui/material": "^5.11.12",
+    "@mui/material": "^5.11.13",
     "@nodepkg/codemirror": "workspace:*",
     "@nodepkg/jsonschema": "workspace:*",
     "@nodepkg/markdown": "workspace:*",
@@ -22,9 +22,9 @@
   },
   "peerDependencies": {
     "@types/react": "18.x",
+    "core-js": "*",
     "react": "18.x",
-    "rxjs": "^7.x",
-    "core-js": "*"
+    "rxjs": "^7.x"
   },
   "exports": {
     ".": {

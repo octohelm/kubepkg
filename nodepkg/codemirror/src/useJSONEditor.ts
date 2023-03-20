@@ -1,13 +1,13 @@
 import {
   autocompletion,
   CompletionContext,
-  CompletionResult,
+  type CompletionResult,
   startCompletion
 } from "@codemirror/autocomplete";
 import { indentWithTab } from "@codemirror/commands";
 import { json } from "@codemirror/lang-json";
 import { syntaxTree } from "@codemirror/language";
-import { Diagnostic, linter } from "@codemirror/lint";
+import { type Diagnostic, linter } from "@codemirror/lint";
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";

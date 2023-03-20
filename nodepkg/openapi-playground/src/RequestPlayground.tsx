@@ -3,8 +3,8 @@ import {
   Box,
   Divider,
   IconButton,
-  IconButtonProps,
-  IconButtonTypeMap,
+  type IconButtonProps,
+  type IconButtonTypeMap,
   Paper,
   Stack,
   Tooltip
@@ -55,7 +55,7 @@ import {
   EditorContainer
 } from "@nodepkg/codemirror";
 import {
-  JSONSchema,
+  type JSONSchema,
   LSP,
   SchemaObjectType,
   SchemaRefType,

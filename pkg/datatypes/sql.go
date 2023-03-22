@@ -1,10 +1,18 @@
 package datatypes
 
-import b "github.com/octohelm/storage/pkg/sqlbuilder"
+import (
+	"strings"
+
+	b "github.com/octohelm/storage/pkg/sqlbuilder"
+)
 
 func RightLikeOrIn[T ~string](values ...T) b.ColumnValueExpr[T] {
 	if len(values) == 1 {
-		return b.RightLike[T](values[0])
+		v := string(values[0])
+		if strings.HasSuffix(v, "$") {
+			return b.Eq[T](T(v[0 : len(v)-1]))
+		}
+		return b.RightLike[T](T(v))
 	}
 	return b.In(values...)
 }

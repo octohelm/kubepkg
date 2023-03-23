@@ -21,6 +21,9 @@ type collector struct {
 }
 
 func (c *collector) register(o Object) {
+	if o == nil || o.GetObjectKind() == nil {
+		return
+	}
 	c.manifests[objectID(o)] = o
 }
 

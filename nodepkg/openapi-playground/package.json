@@ -10,21 +10,11 @@
     }
   },
   "dependencies": {
-    "@innoai-tech/fetcher": "^0.4.0",
-    "@innoai-tech/lodash": "^0.2.0",
-    "@innoai-tech/reactutil": "^0.5.3",
-    "@mui/icons-material": "^5.11.11",
-    "@mui/material": "^5.11.13",
-    "@nodepkg/codemirror": "workspace:*",
-    "@nodepkg/jsonschema": "workspace:*",
-    "@nodepkg/markdown": "workspace:*",
-    "@nodepkg/runtime": "workspace:*"
-  },
-  "peerDependencies": {
-    "@types/react": "18.x",
-    "core-js": "*",
-    "react": "18.x",
-    "rxjs": "^7.x"
+    "@nodepkg/codemirror": "workspace:^",
+    "@nodepkg/jsonschema": "workspace:^",
+    "@nodepkg/runtime": "workspace:^",
+    "@nodepkg/ui": "workspace:^",
+    "@nodepkg/vuemarkdown": "workspace:^"
   },
   "exports": {
     ".": {
@@ -42,7 +32,7 @@
   "private": true,
   "scripts": {
     "build": "monobundle",
-    "test": "vitest --run --passWithNoTests",
+    "test": "vitest --run --passWithNoTests --dir .",
     "prepublishOnly": "pnpm run build",
     "lint": "prettier --write ."
   },

@@ -1,0 +1,41 @@
+{
+  "name": "@nodepkg/ui",
+  "version": "0.1.0",
+  "monobundle": {
+    "exports": {
+      ".": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@innoai-tech/vueuikit": "^0.8.1",
+    "@mdi/js": "^7.2.96",
+    "@nodepkg/runtime": "workspace:^",
+    "copy-to-clipboard": "^3.3.3",
+    "rxjs": "^7.8.1",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@popperjs/core": "^2.11.7"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.mjs"
+      }
+    }
+  },
+  "files": [
+    "*.mjs",
+    "*.d.ts"
+  ],
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "prettier --write .",
+    "build": "monobundle",
+    "test": "vitest --run --passWithNoTests --dir .",
+    "prepublishOnly": "pnpm run build"
+  },
+  "type": "module"
+}

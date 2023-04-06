@@ -26,7 +26,6 @@ k.k8s: gen.kubepkg
 	$(KUBEPKG) serve agent --dump-k8s
 	$(KUBEPKG) serve dashboard --dump-k8s
 
-
 k.dashboard:
 	$(KUBEPKG) serve dashboard --log-level=debug -c \
 		--addr=0.0.0.0:8081 \
@@ -61,7 +60,7 @@ k.export:
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
 		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
- 		--output=.tmp/demo.kube.tgz \
+ 		--output=.tmp/demo.kube.tgt \
  			./testdata/demo.yaml
 
 k.export.list:
@@ -70,7 +69,7 @@ k.export.list:
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
 		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
- 		--output=.tmp/demo.kube.tgz \
+ 		--output=.tmp/demo.kube.tgt \
  			./testdata/demo.list.yaml
 
 k.apply.demo:
@@ -90,7 +89,7 @@ k.import.remote:
 	$(KUBEPKG) import --log-level=debug --import-to=http://0.0.0.0:32060 --incremental .tmp/demo.kube.tgz
 	@echo "incremental import without debug"
 	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 --incremental .tmp/demo.kube.tgz
-	@echo "import kube.tgz debug"
+	@echo "import kube.tgt debug"
 	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 .tmp/demo.kube.tgz
 
 install.demo:
@@ -101,11 +100,11 @@ debug: k.export k.import
 remote.debug: k.export remote.sync remote.ctr.import
 
 remote.sync:
-	scp .tmp/demo.kube.tgz root@localhost:/data/demo.kube.tgz
+	scp .tmp/demo.kube.tgt root@localhost:/data/demo.kube.tgz
 
 remote.ctr.import:
 	@echo "if kube.pkg multi-arch supported --all-platforms is required"
-	ssh root@localhost "gzip --decompress --stdout /data/demo.kube.tgz | ctr image import --all-platforms -"
+	ssh root@localhost "gzip --decompress --stdout /data/demo.kube.tgt | ctr image import --all-platforms -"
 
 eval:
 	cuem eval -o components.yaml ./cuepkg/kubepkg
@@ -113,8 +112,11 @@ eval:
 update.node:
 	pnpm up -r --latest
 
+clean.node:
+	find . -name 'node_modules' -type d -prune -print -exec rm -rf '{}' \;
+
 dep.node:
-	pnpm i
+	pnpm install
 
 lint.node:
 	pnpm exec turbo run lint --force
@@ -122,18 +124,17 @@ lint.node:
 build.node:
 	pnpm exec turbo run build --force
 
-build.node.dashboard:
-	pnpm exec turbo run build --force --filter=@webapp/dashboard
-
 dev.agent:
 	pnpm exec turbo run dev --filter=@webapp/agent
 
-debug.dashboard: build.node.dashboard
-	rm -rf cmd/kubepkg/webapp/dashboard/dist
-	mv webapp/dashboard/dist cmd/kubepkg/webapp/dashboard/
+build.dashboard:
+	APP=dashboard pnpm exec vite build --mode production
+
+build.agent:
+	APP=agent pnpm exec vite build --mode production
 
 dev.dashboard:
-	pnpm exec turbo run dev --filter=@webapp/dashboard
+	pnpm exec vite
 
 build.webapp:
 	$(WAGON) do webapp build --output=cmd/kubepkg/webapp
@@ -147,7 +148,7 @@ archive:
 kubetgz:
 	$(WAGON) do kubepkg $(ARCH)
 
-kubetgz.dashboard:
+kubetgt.dashboard:
 	$(WAGON) do dashboard $(ARCH)
 
 KUBEPKGTGZ=.build/kubepkg/$(ARCH)/images/kubepkg.$(ARCH).kube.tgz

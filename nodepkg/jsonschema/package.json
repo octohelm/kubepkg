@@ -10,13 +10,7 @@
     }
   },
   "dependencies": {
-    "ajv": "^8.12.0"
-  },
-  "peerDependencies": {
-    "@innoai-tech/lodash": "*"
-  },
-  "devDependencies": {
-    "ajv-i18n": "^4.2.0"
+    "@nodepkg/runtime": "workspace:^"
   },
   "exports": {
     ".": {
@@ -34,7 +28,7 @@
   "private": true,
   "scripts": {
     "build": "monobundle",
-    "test": "vitest --run --passWithNoTests",
+    "test": "vitest --run --passWithNoTests --dir .",
     "prepublishOnly": "pnpm run build",
     "lint": "prettier --write ."
   },

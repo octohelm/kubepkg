@@ -1,20 +1,25 @@
 {
   "name": "@nodepkg/runtime",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "monobundle": {
-    "build": {
-      "clean": true
-    },
     "exports": {
-      ".": "./src/index.ts"
+      ".": "./src/index.ts",
+      "./jsx-runtime": "./src/jsx-runtime.ts",
+      "./jsx-dev-runtime": "./src/jsx-dev-runtime.ts",
+      "./lodash": "./src/lodash.ts",
+      "./fetcher": "./src/fetcher.ts",
+      "./rxjs": "./src/rxjs.ts",
+      "./vue": "./src/vue.ts"
     }
   },
   "dependencies": {
+    "@innoai-tech/fetcher": "^0.4.0",
     "@innoai-tech/lodash": "^0.2.0",
-    "@innoai-tech/reactutil": "^0.5.3",
-    "@types/react": "~18.0.28",
-    "react": "~18.2.0",
-    "rxjs": "^7.8.0"
+    "@innoai-tech/vueformdata": "^0.1.1",
+    "@innoai-tech/vuekit": "^0.6.1",
+    "rxjs": "^7.8.1",
+    "vue": "^3.3.4",
+    "date-fns": "^2.30.0"
   },
   "exports": {
     ".": {
@@ -31,11 +36,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "lint": "prettier --write .",
     "build": "monobundle",
-    "test": "vitest --run --passWithNoTests",
-    "prepublishOnly": "pnpm run build",
-    "lint": "prettier --write ."
+    "test": "vitest --run --passWithNoTests --dir .",
+    "prepublishOnly": "pnpm run build"
   },
-  "type": "module",
-  "peerDependencies": {}
+  "type": "module"
 }

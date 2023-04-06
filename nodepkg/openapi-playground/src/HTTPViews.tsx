@@ -7,7 +7,7 @@ import {
   pick,
   sortBy,
   toUpper,
-} from "@innoai-tech/lodash";
+} from "@nodepkg/runtime/lodash";
 import {
   buildOriginalUrl,
   getContentType,
@@ -16,13 +16,13 @@ import {
   isContentTypeMultipartFormData,
   isContentTypeTextHTML,
 } from "./http";
-import type { ReactNode } from "react";
 import {
   paramsSerializer,
   type RequestConfig,
   type FetcherResponse,
-} from "@innoai-tech/fetcher";
-import { Box } from "@mui/material";
+} from "@nodepkg/runtime/fetcher";
+import { Box } from "@nodepkg/ui";
+import { component, t, type VNodeChild } from "@nodepkg/runtime";
 
 const getDefaultHeads = (): Record<string, any> => ({
   "User-Agent": navigator.userAgent,
@@ -50,7 +50,7 @@ const HttpFirstLine = ({ method, url, params }: RequestConfig<any>) => (
   <Box component={"span"} sx={{ fontWeight: "bold" }}>
     {toUpper(method)}
     &nbsp;
-    <Box component={"span"} sx={{ fontWeight: "normal" }}>
+    <Box component={"span"} sx={{ fontWeight: "medium" }}>
       {buildOriginalUrl(`${url as string}`, params as any)}
     </Box>
     &nbsp; HTTP/1.1
@@ -110,50 +110,64 @@ const stringifyBody = (request: RequestConfig<any>) => {
   return request.body;
 };
 
-const CodeView = ({ children }: { children: ReactNode }) => {
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        overflow: "auto",
-      }}
-    >
+const CodeView = component(
+  {
+    $default: t.custom<VNodeChild>().optional(),
+  },
+  ({}, { slots }) => {
+    return () => (
       <Box
-        component={"pre"}
         sx={{
-          padding: 1,
-          fontSize: 12,
-          margin: 0,
-          fontFamily: "monospace",
+          width: "100%",
+          overflow: "auto",
         }}
       >
-        <code>{children}</code>
+        <Box
+          component={"pre"}
+          sx={{
+            padding: 4,
+            margin: 0,
+            textStyle: "sys.body-small",
+            fontFamily: "code",
+          }}
+        >
+          <code>{slots.default?.()}</code>
+        </Box>
       </Box>
-    </Box>
-  );
-};
+    );
+  }
+);
 
-export const HttpRequest = ({ request }: { request: RequestConfig<any> }) => {
-  return (
-    <CodeView>
-      <HttpFirstLine {...request} />
-      <>
-        {map(
-          sortObject(assign(getDefaultHeads(), request.headers)),
-          (value: string, key: string) => (
-            <HeadRow key={key} field={key} value={value} />
-          )
-        )}
-      </>
-      {request.body && (
-        <>
-          <br />
-          {stringifyBody(request)}
-        </>
-      )}
-    </CodeView>
-  );
-};
+export const HttpRequest = component(
+  {
+    request: t.custom<RequestConfig<any>>(),
+  },
+  (props) => {
+    return () => {
+      const request = props.request;
+
+      return (
+        <CodeView>
+          <HttpFirstLine {...request} />
+          <>
+            {map(
+              sortObject(assign(getDefaultHeads(), request.headers)),
+              (value: string, key: string) => (
+                <HeadRow key={key} field={key} value={value} />
+              )
+            )}
+          </>
+          {request.body && (
+            <>
+              <br />
+              {stringifyBody(request)}
+            </>
+          )}
+        </CodeView>
+      );
+    };
+  }
+);
 
 // @ts-ignore
 const abToString = (buffer: any) => Buffer.from(buffer).toString("utf8");
@@ -167,41 +181,44 @@ const toDataURI = (buffer: any, contentType: string) => {
   return `data:${contentType};base64,${btoa(binary)}`;
 };
 
-export const HTTPResponse = ({
-  response,
-}: {
-  response: FetcherResponse<any, any>;
-}) => {
-  if (isContentTypeTextHTML(response.headers)) {
-    return (
-      <div>
-        <img
-          src={toDataURI(response.body, getContentType(response.headers))}
-          alt={""}
-        />
-      </div>
-    );
-  }
+export const HTTPResponse = component(
+  {
+    response: t.custom<FetcherResponse<any, any>>(),
+  },
+  (props, {}) => {
+    return () => {
+      const response = props.response;
 
-  return (
-    <CodeView>
-      <span>HTTP/1.1 {response.status}</span>
-      <br />
-      {response.headers && (
-        <>
-          {map(response.headers, (value: string, key: string) => (
-            <HeadRow key={key} field={key} value={value} />
-          ))}
-        </>
-      )}
-      <br />
-      {response.body && (
-        <>
-          {isContentTypeJSON(response.headers)
-            ? JSON.stringify(response.body, null, 2)
-            : `${abToString(response.body)}`}
-        </>
-      )}
-    </CodeView>
-  );
-};
+      if (isContentTypeTextHTML(response.headers)) {
+        return (
+          <div>
+            <img
+              src={toDataURI(response.body, getContentType(response.headers))}
+              alt={""}
+            />
+          </div>
+        );
+      }
+
+      return (
+        <CodeView>
+          <span>HTTP/1.1 {response.status}</span>
+          <br />
+          {response.headers && (
+            <>
+              {map(response.headers, (value: string, key: string) => (
+                <HeadRow key={key} field={key} value={value} />
+              ))}
+            </>
+          )}
+          <br />
+          {response.body
+            ? isContentTypeJSON(response.headers)
+              ? JSON.stringify(response.body, null, 2)
+              : `${abToString(response.body)}`
+            : null}
+        </CodeView>
+      );
+    };
+  }
+);

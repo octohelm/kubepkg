@@ -1,0 +1,6 @@
+{
+  "extends": "@nodepkg/devconfig/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src"
+  }
+}

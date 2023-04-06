@@ -1,16 +1,16 @@
-import {
-  has,
-  isObject,
-  map,
-  mapValues,
-  omit,
-} from "@innoai-tech/lodash";
+import { has, isObject, map, mapValues, omit } from "@nodepkg/runtime/lodash";
 
 export class SchemaVisitor {
-  static isObject = (schema: any) => schema.type === "object" || has(schema, "properties");
-  static isArray = (schema: any) => schema.type === "array" || has(schema, "items");
+  static isObject = (schema: any) =>
+    schema.type === "object" || has(schema, "properties");
+  static isArray = (schema: any) =>
+    schema.type === "array" || has(schema, "items");
 
-  static create(schema: any, resolve: (ref: string, visitor: SchemaVisitor) => any, ...transformers: Array<(schema: any) => any>) {
+  static create(
+    schema: any,
+    resolve: (ref: string, visitor: SchemaVisitor) => any,
+    ...transformers: Array<(schema: any) => any>
+  ) {
     return new SchemaVisitor(schema, resolve, transformers);
   }
 
@@ -18,8 +18,7 @@ export class SchemaVisitor {
     private rootSchema: any,
     private resolve: (ref: string, visitor: SchemaVisitor) => any,
     private transformers: Array<(schema: any) => any> = []
-  ) {
-  }
+  ) {}
 
   process(schema: any): any {
     if (typeof schema === "undefined") {
@@ -30,19 +29,19 @@ export class SchemaVisitor {
       schema = transformer(schema);
     }
 
-    schema.nullable = undefined
+    schema.nullable = undefined;
 
     if (has(schema, "oneOf")) {
       return {
         ...schema,
-        oneOf: map(schema.oneOf, (s) => this.process(s))
+        oneOf: map(schema.oneOf, (s) => this.process(s)),
       };
     }
 
     if (has(schema, "allOf")) {
       return {
         ...schema,
-        allOf: map(schema.allOf, (s) => this.process(s))
+        allOf: map(schema.allOf, (s) => this.process(s)),
       };
     }
 
@@ -57,16 +56,24 @@ export class SchemaVisitor {
     if (SchemaVisitor.isObject(schema)) {
       return {
         ...schema,
-        properties: mapValues(schema.properties, (propSchema) => this.process(propSchema)),
+        properties: mapValues(schema.properties, (propSchema) =>
+          this.process(propSchema)
+        ),
         propertyNames: this.process(schema.propertyNames || { type: "string" }),
-        additionalProperties: schema.additionalProperties ? this.process(isObject(schema.additionalProperties) ? schema.additionalProperties : {}) : false
+        additionalProperties: schema.additionalProperties
+          ? this.process(
+              isObject(schema.additionalProperties)
+                ? schema.additionalProperties
+                : {}
+            )
+          : false,
       };
     }
 
     if (SchemaVisitor.isArray(schema)) {
       return {
         ...schema,
-        items: this.process(schema.items)
+        items: this.process(schema.items),
       };
     }
 

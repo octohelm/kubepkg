@@ -1,13 +1,14 @@
+import { type AnyType, refName, JSONSchemaDecoder } from "@nodepkg/runtime";
+import { isUndefined, isString, get } from "@nodepkg/runtime/lodash";
+import type { SchemaType } from "./SchemaType";
+import { SchemaTypeContext, SchemaTypeNode } from "./SchemaType";
 import type { JSONSchema } from "./JSONSchema";
-import Ajv, { type ErrorObject } from "ajv/dist/ajv";
-import { SchemaType, SchemaTypeContext, SchemaTypeNode } from "./SchemaType";
-import { get } from "@innoai-tech/lodash";
-
-export interface Localize {
-  (errors?: null | ErrorObject[]): void;
-}
 
 export class LSP {
+  static indirect(type: AnyType | null): AnyType | null {
+    return type;
+  }
+
   static create(schema: JSONSchema, resolve?: (ref: string) => JSONSchema) {
     return new LSP(schema, resolve);
   }
@@ -19,79 +20,100 @@ export class LSP {
   ) {
   }
 
-  _ajv: any;
-  private get ajv() {
-    return (this._ajv =
-      this._ajv ??
-      new Ajv({
-        strictSchema: false,
-        validateFormats: false,
-        allErrors: false,
-        allowMatchingProperties: true
-      }));
+  _type?: AnyType;
+  private get type(): AnyType {
+    return (this._type ??= JSONSchemaDecoder.decode(this.schema, (ref) => {
+      return [this.resolve(ref), refName(ref)];
+    }));
   }
 
-  validate(data: any, localize?: Localize) {
-    if (this.ajv.validate(this.schema, data)) {
-      return {};
-    }
-
-    const errors = this.ajv.errors;
-
-    const parentInstancePath = (instancePath: string) => {
-      const parts = instancePath.split("/");
-      if (parts.length == 1) {
-        return "";
-      }
-      return parts.slice(0, parts.length - 1).join("/");
-    };
+  validate(data: any) {
+    const [err] = this.type.validate(data);
 
     const errMaps: { [k: string]: string } = {};
 
-    for (const err of errors) {
-      if (err.keyword === "additionalProperties") {
-        if (err.params.additionalProperty) {
-          err.instancePath += `/${err.params.additionalProperty}`;
+    if (err) {
+      for (const f of err.failures()) {
+        let loc = f.path;
+
+        if (isUndefined(f.value)) {
+          loc = f.path.slice(0, f.path.length - 1);
         }
-      }
 
-      if (err.keyword === "discriminator") {
-        err.instancePath += `/${err.params.tag}`;
-      }
+        if (f.type == "never") {
+          // FIXME
+          continue;
+        }
 
-      if (localize) {
-        localize([err]);
-      }
+        errMaps[`/${loc.join("/")}`] = (() => {
+          if (isUndefined(f.value)) {
+            return `缺失必填字段 ${JSON.stringify(f.key)}`;
+          }
 
-      switch (err.keyword) {
-        case "enum":
-          errMaps[err.instancePath] = `${
-            err.message
-          }: ${err.params.allowedValues.join(", ")}`;
-          break;
-        default:
-          errMaps[err.instancePath] = err.message;
-      }
-    }
+          switch (f.type) {
+            case "never":
+              return `未声明字段不允许`;
+            case "string":
+              return `字符类型不匹配`;
+            case "number":
+              return `数字类型不匹配`;
+            case "integer":
+              return `整数类型不匹配`;
+            case "bool":
+              return `布尔类型不匹配`;
+            case "enums": {
+              const t = this.typeAt(f.path)!;
+              return `值只能是: ${Object.values(t.schema)
+                .map((v) => JSON.stringify(v))
+                .join(", ")}`;
+            }
+          }
 
-    for (const instancePath in errMaps) {
-      const pInstancePath = parentInstancePath(instancePath);
-      if (pInstancePath != instancePath && errMaps[pInstancePath]) {
-        delete errMaps[pInstancePath];
+          return f.message;
+        })();
       }
     }
 
     return errMaps;
   }
 
-  _type?: SchemaType;
-  private get type() {
-    return (this._type =
-      this._type ??
-      SchemaTypeContext.create({ resolve: this.resolve }).of(this.schema));
+  typeAt(path: any[]) {
+    return LSP.indirect(this.visit(this.type, path));
+  }
+
+  _schemaType?: SchemaType;
+  private get schemaType() {
+    return (this._schemaType ??= SchemaTypeContext.create({
+      resolve: this.resolve
+    }).of(this.schema));
   }
 
   schemaAt(keyPath: any[]): SchemaTypeNode | null {
-    return this.type.resolve(keyPath, null);
+    return this.schemaType.resolve(keyPath, null);
+  }
+
+  private visit(type: AnyType, path: any[]): AnyType | null {
+    const [first, ...others] = path;
+
+    if (!isUndefined(first)) {
+      for (const [f, _, t] of type.entries(isString(first) ? {} : [], {
+        path: [],
+        branch: []
+      })) {
+        if (f == first) {
+          if (t.type == "never") {
+            return t as AnyType;
+          }
+
+          if (others.length) {
+            return this.visit(t as AnyType, others);
+          }
+
+          return t as AnyType;
+        }
+      }
+    }
+
+    return null;
   }
 }

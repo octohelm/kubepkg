@@ -1,0 +1,7 @@
+{
+  "extends": "@innoai-tech/vuedevconfig/tsconfig.json",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
+    "jsxImportSource": "@nodepkg/runtime"
+  }
+}

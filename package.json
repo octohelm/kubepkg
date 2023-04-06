@@ -1,32 +1,36 @@
 {
   "name": "kubepkg",
+  "private": true,
   "type": "module",
   "version": "0.0.0",
-  "private": true,
   "engines": {
-    "node": ">= 18",
-    "pnpm": ">= 7"
+    "node": ">= 20",
+    "pnpm": ">= 8"
   },
   "scripts": {
     "postinstall": "monobundle"
   },
-  "prettier": {},
+  "dependencies": {
+    "@nodepkg/runtime": "workspace:^",
+    "@nodepkg/ui": "workspace:^"
+  },
   "devDependencies": {
-    "@innoai-tech/gents": "^0.3.3",
-    "@innoai-tech/monobundle": "^0.6.1",
-    "@innoai-tech/swc-plugin-annotate-pure-calls": "^0.1.0",
-    "@innoai-tech/vite-presets": "^0.7.0",
-    "@nodepkg/devconfig": "workspace:*",
-    "@testing-library/react": "^14.0.0",
-    "core-js": "^3.29.1",
-    "esbuild": "^0.17.12",
-    "jsdom": "^21.1.1",
-    "prettier": "^2.8.5",
+    "@innoai-tech/config": "^0.4.13",
+    "@innoai-tech/gents": "^0.6.2",
+    "@innoai-tech/monobundle": "^0.8.14",
+    "@innoai-tech/vue-vite-presets": "^0.4.0",
+    "@nodepkg/devconfig": "workspace:^",
+    "@vue/test-utils": "^2.3.2",
+    "copy-to-clipboard": "^3.3.3",
+    "jsdom": "^22.0.0",
+    "normalize.css": "^8.0.1",
+    "prettier": "^2.8.8",
     "rollup-plugin-visualizer": "^5.9.0",
-    "tsx": "^3.12.5",
-    "turbo": "^1.8.3",
-    "typescript": "^5.0.2",
-    "vite": "^4.2.0",
-    "vitest": "^0.29.3"
-  }
+    "tsx": "^3.12.7",
+    "turbo": "^1.9.8",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8",
+    "vitest": "^0.31.1"
+  },
+  "prettier": {}
 }

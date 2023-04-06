@@ -19,11 +19,13 @@ actions: webapp: node.#Project & {
 	source: {
 		path: "."
 		include: [
-			"webapp/",
+			"nodedevpkg/",
 			"nodepkg/",
+			"webapp/",
 			".npmrc",
-			"pnpm-*.yaml",
 			"*.json",
+			"*.config.ts",
+			"pnpm-*.yaml",
 		]
 		exclude: [
 			"*/node_modules",
@@ -35,21 +37,23 @@ actions: webapp: node.#Project & {
 	}
 
 	build: {
-
 		outputs: {
-			"agent/dist":     "webapp/agent/dist"
-			"dashboard/dist": "webapp/dashboard/dist"
+			// output: vite dest
+			"agent/dist":     "public/agent"
+			"dashboard/dist": "public/dashboard"
 		}
 
 		pre: [
 			"pnpm install",
-			"ls node_modules/@innoai-tech/swc-plugin-annotate-pure-calls"
 		]
 
-		script: "pnpm exec turbo run build"
+		script: """
+			APP=dashboard pnpm exec vite build --mode production
+			APP=agent pnpm exec vite build --mode production
+			"""
 
 		image: {
-			"node": "19"
+			"node": "20"
 
 			"steps": [
 				node.#ConfigPrivateRegistry & {

@@ -1,4 +1,4 @@
-import { paramsSerializer } from "@innoai-tech/fetcher";
+import { paramsSerializer } from "@nodepkg/runtime/fetcher";
 import {
   type Dictionary,
   filter,
@@ -12,7 +12,7 @@ import {
   pickBy,
   reduce,
   replace,
-} from "@innoai-tech/lodash";
+} from "@nodepkg/runtime/lodash";
 
 const pickParametersIn =
   (where: string) =>

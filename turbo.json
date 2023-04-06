@@ -24,13 +24,6 @@
         "src/*",
         "package.json"
       ]
-    },
-    "dev": {
-      "inputs": [
-        "src/*",
-        "package.json"
-      ],
-      "cache": false
     }
   }
 }

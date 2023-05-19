@@ -1,0 +1,24 @@
+{
+  "extends": "@nodepkg/devconfig/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@webapp/dashboard/*": [
+        "webapp/dashboard/*"
+      ],
+      "@webapp/agent/*": [
+        "webapp/agent/*"
+      ],
+      "@nodepkg/runtime/*": [
+        "nodepkg/runtime/src/*.ts"
+      ],
+      "@nodepkg/*": [
+        "nodepkg/*/src/index.ts"
+      ]
+    }
+  },
+  "exclude": [
+    "_old/**",
+    "nodepkg/*/*.d.ts"
+  ]
+}

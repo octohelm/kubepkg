@@ -1,8 +1,7 @@
 export * from "./EditorContextProvider";
 export * from "./EditorContainer";
-export * from "./useJSONEditor";
-export * from "./JSONCompletion";
 
+export * from "./json";
 
 export { keymap, EditorView } from "@codemirror/view";
 export { EditorState } from "@codemirror/state";

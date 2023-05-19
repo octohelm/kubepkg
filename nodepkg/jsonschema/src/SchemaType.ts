@@ -8,8 +8,8 @@ import {
   isString,
   last,
   map,
-  mapValues
-} from "@innoai-tech/lodash";
+  mapValues,
+} from "@nodepkg/runtime/lodash";
 import type {
   JSONSchema,
   JSONSchemaArray,
@@ -20,7 +20,7 @@ import type {
   JSONSchemaObject,
   JSONSchemaRef,
   JSONSchemaString,
-  JSONSchemaUnion
+  JSONSchemaUnion,
 } from "./JSONSchema";
 
 export interface SchemaNodeContextOptions {
@@ -39,8 +39,7 @@ export class SchemaTypeContext {
     return new SchemaTypeContext(options);
   }
 
-  constructor(public options: SchemaNodeContextOptions) {
-  }
+  constructor(public options: SchemaNodeContextOptions) {}
 
   private refs: Record<string, SchemaType> = {};
 
@@ -59,10 +58,11 @@ export class SchemaTypeContext {
     }
 
     if (has(schema, "allOf")) {
-      const maybeObjects = get(schema, "allOf", [])
+      const allOfs = get(schema, "allOf", [])
         .map((s) => this.of(s))
-        .map((s) => SchemaType.indirect(s))
-        .filter((s) => s instanceof SchemaObjectType);
+        .map((s) => SchemaType.indirect(s));
+
+      const maybeObjects = allOfs.filter((s) => s instanceof SchemaObjectType);
 
       if (maybeObjects.length > 1) {
         return new SchemaObjectType(schema as JSONSchemaObject, this);
@@ -98,8 +98,7 @@ export class SchemaTypeContext {
 }
 
 export class SchemaType<S extends JSONSchema = {}> {
-  constructor(public schema: S) {
-  }
+  constructor(public schema: S) {}
 
   static indirect(schema: SchemaType): SchemaType {
     if (schema instanceof SchemaRefType) {
@@ -424,12 +423,12 @@ export class SchemaIntersectionType extends SchemaType {
         type: get(sub, "type", get(schema, "type")),
         ...(get(schema, "required")
           ? {
-            required: [
-              ...get(schema, "required", []),
-              ...get(sub, "required", [])
-            ]
-          }
-          : {})
+              required: [
+                ...get(schema, "required", []),
+                ...get(sub, "required", []),
+              ],
+            }
+          : {}),
       })
     );
   }
@@ -470,12 +469,12 @@ export class SchemaUnionType extends SchemaType {
         type: get(sub, "type", get(schema, "type")),
         ...(get(schema, "required")
           ? {
-            required: [
-              ...get(schema, "required", []),
-              ...get(sub, "required", [])
-            ]
-          }
-          : {})
+              required: [
+                ...get(schema, "required", []),
+                ...get(sub, "required", []),
+              ],
+            }
+          : {}),
       })
     );
   }
@@ -538,7 +537,7 @@ export class SchemaUnionType extends SchemaType {
         return SchemaTypeNode.of(
           new SchemaStringType({
             type: "string",
-            enum: this.discriminatorEnum
+            enum: this.discriminatorEnum,
           }),
           parent
         );

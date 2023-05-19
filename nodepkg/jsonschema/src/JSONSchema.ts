@@ -86,4 +86,4 @@ export type JSONSchema =
   | JSONSchemaAny
   | JSONSchemaRef
   | JSONSchemaIntersection
-  | JSONSchemaUnion
+  | JSONSchemaUnion;

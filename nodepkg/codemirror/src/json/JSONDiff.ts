@@ -16,7 +16,7 @@ import {
   StateField
 } from "@codemirror/state";
 import { walkNode } from "./util";
-import { syntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree } from "@codemirror/language";
 
 const addDiffLineEffect = StateEffect.define<{
   type?: "m" | "d" | "a";
@@ -74,7 +74,7 @@ function cutRange(ranges: DecorationSet, r: { from: number; to: number }) {
   });
 }
 
-const jsonDiff = (src: () => any): Extension[] => {
+const jsonDiff = (base: () => any): Extension[] => {
   return [
     diffedLines,
     gutterLineClass.compute([diffedLines], (state) => {
@@ -88,7 +88,7 @@ const jsonDiff = (src: () => any): Extension[] => {
     }),
     EditorView.updateListener.of((v: ViewUpdate) => {
       if (v.viewportChanged || v.docChanged) {
-        diffAndDispatchEffects(v, src());
+        diffAndDispatchEffects(v, base());
       }
     })
   ];
@@ -112,30 +112,47 @@ const diffAndDispatchEffects = (v: ViewUpdate, src: string) => {
     return;
   }
 
+
+  const tree = ensureSyntaxTree(v.state, v.view.viewport.to);
+
+  if (!tree) {
+    return;
+  }
+
   const effects: Array<ReturnType<typeof addDiffLineEffect.of>> = [];
   const newLines = new Set<number>();
 
   let last = -1;
 
-  walkNode(v.state, syntaxTree(v.state).topNode, (path, node) => {
+
+  walkNode(v.state, tree.topNode, (path, node) => {
     if (diffRet.has(path)) {
       const [type] = diffRet.get(path)!;
+
+      let endNode = node;
+
+      if (node.type.name == "PropertyName") {
+        if (node.nextSibling) {
+          endNode = node.nextSibling;
+        }
+      }
+
       const lineStartPos = v.view.lineBlockAt(node.from).from;
-      const lineEndPos = v.view.lineBlockAt(node.to).from;
+      const lineEndPos = v.view.lineBlockAt(endNode.to).from;
 
       if (lineEndPos > last) {
         last = lineEndPos;
 
-        effects.push(
-          addDiffLineEffect.of({
-            type,
-            from: lineStartPos,
-            to: lineEndPos
-          })
-        );
-
-        newLines.add(lineStartPos);
-        newLines.add(lineEndPos);
+        for (let linePos = lineStartPos; linePos <= lineEndPos; linePos++) {
+          effects.push(
+            addDiffLineEffect.of({
+              type,
+              from: linePos,
+              to: linePos
+            })
+          );
+          newLines.add(linePos);
+        }
       }
     }
   });

@@ -177,9 +177,7 @@ const TemplateEditor = component$(
 
     useJSONEditor(schema);
 
-    const overwrites$ = observableRef(
-      props.overwrites ?? {}
-    );
+    const overwrites$ = observableRef(props.overwrites ?? {});
 
     useJSONDiff(() => cloneWithoutNull(props.kubepkg));
 

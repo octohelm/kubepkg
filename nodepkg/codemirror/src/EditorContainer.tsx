@@ -51,7 +51,7 @@ export const EditorContainer = styled("div", () => {
     },
     "& .cm-gutters": {
       border: "none",
-      backgroundColor: "rgba(0,0,0,0)",
+      containerStyle: "sys.surface-container-lowest",
     },
     "& .cm-tooltip": {
       border: "none",

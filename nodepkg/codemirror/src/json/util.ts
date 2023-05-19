@@ -30,6 +30,7 @@ export const walkNode = (
         if (n.name == "Property") {
           const propNameNode = n.firstChild;
           const propValueNode = n.lastChild;
+
           if (propNameNode && propValueNode) {
             const propName = unquote(
               editorState.sliceDoc(propNameNode.from, propNameNode.to)

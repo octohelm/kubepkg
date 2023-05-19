@@ -120,20 +120,22 @@ const diffAndDispatchEffects = (v: ViewUpdate, src: string) => {
   walkNode(v.state, syntaxTree(v.state).topNode, (path, node) => {
     if (diffRet.has(path)) {
       const [type] = diffRet.get(path)!;
-      const linePos = v.view.lineBlockAt(node.from).from;
+      const lineStartPos = v.view.lineBlockAt(node.from).from;
+      const lineEndPos = v.view.lineBlockAt(node.to).from;
 
-      if (linePos > last) {
-        last = linePos;
+      if (lineEndPos > last) {
+        last = lineEndPos;
 
         effects.push(
           addDiffLineEffect.of({
             type,
-            from: linePos,
-            to: linePos
+            from: lineStartPos,
+            to: lineEndPos
           })
         );
 
-        newLines.add(linePos);
+        newLines.add(lineStartPos);
+        newLines.add(lineEndPos);
       }
     }
   });

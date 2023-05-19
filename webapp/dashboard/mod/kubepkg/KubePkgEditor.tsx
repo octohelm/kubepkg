@@ -27,15 +27,20 @@ import {
 } from "@nodepkg/codemirror";
 import { Box, Tooltip, FilledButton } from "@nodepkg/ui";
 import { firstValueFrom, combineLatest } from "@nodepkg/runtime/rxjs";
-import { get, merge, set } from "@nodepkg/runtime/lodash";
+import {
+  get,
+  merge,
+  set,
+  isPlainObject,
+  isArray
+} from "@nodepkg/runtime/lodash";
 
 export const annotationKubepkgName = "kubepkg.innoai.tech/name";
 export const annotationKubepkgRevision = "kubepkg.innoai.tech/revision";
 export const annotationKubepkgChannel = "kubepkg.innoai.tech/channel";
 export const annotationKubepkgDeploymentSettingID =
   "kubepkg.innoai.tech/deploymentSettingID";
-export const annotationKubepkgOverwrites =
-  "kubepkg.innoai.tech/overwrites";
+export const annotationKubepkgOverwrites = "kubepkg.innoai.tech/overwrites";
 
 const getAnnotation = (
   kubepkg: ApisKubepkgV1Alpha1KubePkg,
@@ -120,6 +125,47 @@ const schema = JSONSchemaEncoder.encode(
   })
 );
 
+const cloneWithoutNull = (o: any): any => {
+  if (isPlainObject(o)) {
+    const values: Record<string, any> = {};
+    for (const k in o) {
+      const v = cloneWithoutNull(o[k]);
+      if (Object.is(v, null)) {
+        continue;
+      }
+      values[k] = v;
+    }
+    return values;
+  } else if (isArray(o)) {
+    return o.map((v) => cloneWithoutNull(v));
+  }
+  return o;
+};
+
+export const diffAsOverwrites = (
+  kubepkg: ApisKubepkgV1Alpha1KubePkg,
+  overwrites: Partial<ApisKubepkgV1Alpha1KubePkg>
+) => {
+  const changes = diff({ spec: overwrites.spec }, { spec: kubepkg.spec });
+
+  const newOverwrites = {
+    spec: {
+      config: {
+        ...kubepkg.spec.config
+      }
+    }
+  };
+
+
+  for (const [k, [t, v]] of changes) {
+    if (t == "m" || t == "a") {
+      set(newOverwrites, k.slice(1).split("/"), v);
+    }
+  }
+
+  return cloneWithoutNull(newOverwrites);
+};
+
 const TemplateEditor = component$(
   {
     kubepkg: t.custom<ApisKubepkgV1Alpha1KubePkg>(),
@@ -131,21 +177,20 @@ const TemplateEditor = component$(
 
     useJSONEditor(schema);
 
-    const overwrites$ = observableRef(props.overwrites ?? {});
+    const overwrites$ = observableRef(
+      props.overwrites ?? {}
+    );
 
-    useJSONDiff(() => props.kubepkg);
+    useJSONDiff(() => cloneWithoutNull(props.kubepkg));
 
     const editorCtx = EditorContextProvider.use();
 
     rx(
-      combineLatest([
-        props.kubepkg$,
-        overwrites$
-      ]),
+      combineLatest([props.kubepkg$, overwrites$]),
       subscribeUntilUnmount(([kubepkg, overwrites]) => {
         editorCtx.doc$.next(
           JSON.stringify(
-            merge({}, kubepkg, overwrites),
+            cloneWithoutNull(merge({}, kubepkg, overwrites)),
             null,
             2
           )
@@ -160,29 +205,21 @@ const TemplateEditor = component$(
         // valid
         if (diagnosticCount(view.state) === 0) {
           if (props.overwrites) {
-            const template = props.kubepkg;
+            const template = cloneWithoutNull(props.kubepkg);
 
-            const kubepkg = JSON.parse(view.state.doc.sliceString(0)) as ApisKubepkgV1Alpha1KubePkg;
-            const changes = diff(kubepkg, template);
+            const kubepkg = JSON.parse(
+              view.state.doc.sliceString(0)
+            ) as ApisKubepkgV1Alpha1KubePkg;
 
-            const overwrites = {
-              spec: {
-                config: {
-                  ...kubepkg.spec.config
-                }
-              }
-            };
-
-            for (const [k, [_, v]] of changes) {
-              set(overwrites, k.slice(1).split("/"), v);
-            }
-
-            set(template, ["metadata", "annotations", annotationKubepkgOverwrites], JSON.stringify(overwrites));
+            set(
+              template,
+              ["metadata", "annotations", annotationKubepkgOverwrites],
+              JSON.stringify(diffAsOverwrites(template, kubepkg))
+            );
 
             emit("submit", template);
             return;
           }
-
 
           emit("submit", JSON.parse(view.state.doc.sliceString(0)));
         }

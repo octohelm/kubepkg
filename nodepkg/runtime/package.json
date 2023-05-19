@@ -8,6 +8,7 @@
       "./jsx-dev-runtime": "./src/jsx-dev-runtime.ts",
       "./lodash": "./src/lodash.ts",
       "./fetcher": "./src/fetcher.ts",
+      "./typedef": "./src/typedef.ts",
       "./rxjs": "./src/rxjs.ts",
       "./vue": "./src/vue.ts"
     }
@@ -17,6 +18,7 @@
     "@innoai-tech/lodash": "^0.2.0",
     "@innoai-tech/vueformdata": "^0.1.1",
     "@innoai-tech/vuekit": "^0.6.1",
+    "@innoai-tech/typedef": "^0.2.6",
     "rxjs": "^7.8.1",
     "vue": "^3.3.4",
     "date-fns": "^2.30.0"

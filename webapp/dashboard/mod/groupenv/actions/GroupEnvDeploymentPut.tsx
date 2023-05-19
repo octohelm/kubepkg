@@ -37,6 +37,7 @@ import {
   alpha
 } from "@nodepkg/ui";
 import {
+  diffAsOverwrites,
   KubePkgEditor,
   resolveKubePkgVersionAndSetting
 } from "@webapp/dashboard/mod/kubepkg";
@@ -75,6 +76,7 @@ const GroupEnvDeploymentPut = component$(
     }
 
     const kubepkgRevision$ = useRequest(getKubepkgRevision);
+    const kubepkgOverwrites$ = observableRef<Partial<ApisKubepkgV1Alpha1KubePkg>>({});
 
     rx(
       filters$,
@@ -127,6 +129,10 @@ const GroupEnvDeploymentPut = component$(
       subscribeUntilUnmount((resp) => {
         kubepkgTemplateFailed$.value = "";
         kubepkgTemplate$.value = resp.body;
+
+        if (props.kubepkg && revision(props.kubepkg) == revision(kubepkgTemplate$.value)) {
+          kubepkgOverwrites$.value = diffAsOverwrites(kubepkgTemplate$.value, props.kubepkg);
+        }
       })
     );
 
@@ -138,11 +144,11 @@ const GroupEnvDeploymentPut = component$(
     );
 
     const kubepkgEditorEl = rx(
-      combineLatest([kubepkgTemplate$, props.kubepkg$]),
+      combineLatest([kubepkgTemplate$, kubepkgOverwrites$]),
       render(([kubepkgTemplate, overwrites]) => {
         const revisionID = revision(kubepkgTemplate);
 
-        if (overwrites) {
+        if (props.kubepkg) {
           return (
             revisionID &&
             kubepkgTemplate.spec.version && (

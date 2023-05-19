@@ -1087,7 +1087,7 @@ export type K8SIoApiBatchV1PodFailurePolicy = {
 
 export type K8SIoApiBatchV1PodFailurePolicyRule = {
   action: K8SIoApiBatchV1PodFailurePolicyAction;
-  onExitCodes: K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement;
+  onExitCodes?: K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement;
   onPodConditions: Array<K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPattern>;
 };
 
@@ -1328,7 +1328,7 @@ export type K8SIoApiCoreV1UnsatisfiableConstraintAction = string;
 export type K8SIoApiAppsV1DaemonSetSpec = {
   minReadySeconds?: number;
   revisionHistoryLimit?: number;
-  selector: ApisMetaV1LabelSelector;
+  selector?: ApisMetaV1LabelSelector;
   template: K8SIoApiCoreV1PodTemplateSpec;
   updateStrategy?: K8SIoApiAppsV1DaemonSetUpdateStrategy;
 };
@@ -1354,7 +1354,7 @@ export type K8SIoApiAppsV1DeploymentSpec = {
   progressDeadlineSeconds?: number;
   replicas?: number;
   revisionHistoryLimit?: number;
-  selector: ApisMetaV1LabelSelector;
+  selector?: ApisMetaV1LabelSelector;
   strategy?: K8SIoApiAppsV1DeploymentStrategy;
   template: K8SIoApiCoreV1PodTemplateSpec;
 };
@@ -1381,7 +1381,7 @@ export type K8SIoApiAppsV1StatefulSetSpec = {
   podManagementPolicy?: K8SIoApiAppsV1PodManagementPolicyType;
   replicas?: number;
   revisionHistoryLimit?: number;
-  selector: ApisMetaV1LabelSelector;
+  selector?: ApisMetaV1LabelSelector;
   serviceName: string;
   template: K8SIoApiCoreV1PodTemplateSpec;
   updateStrategy?: K8SIoApiAppsV1StatefulSetUpdateStrategy;
@@ -2431,10 +2431,12 @@ export const K8SIoApiBatchV1PodFailurePolicyRuleSchema = /*#__PURE__*/ t.object(
         description:
           "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are: - FailJob: indicates that the pod's job is marked as Failed and all",
       }),
-    onExitCodes: t.ref(
-      "K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement",
-      () => K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirementSchema
-    ),
+    onExitCodes: t
+      .ref(
+        "K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement",
+        () => K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirementSchema
+      )
+      .optional(),
     onPodConditions: t.array(
       t.ref(
         "K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPattern",
@@ -2986,10 +2988,9 @@ export const K8SIoApiCoreV1UnsatisfiableConstraintActionSchema =
 export const K8SIoApiAppsV1DaemonSetSpecSchema = /*#__PURE__*/ t.object({
   minReadySeconds: t.integer().optional(),
   revisionHistoryLimit: t.integer().optional(),
-  selector: t.ref(
-    "ApisMetaV1LabelSelector",
-    () => ApisMetaV1LabelSelectorSchema
-  ),
+  selector: t
+    .ref("ApisMetaV1LabelSelector", () => ApisMetaV1LabelSelectorSchema)
+    .optional(),
   template: t
     .ref(
       "K8SIoApiCoreV1PodTemplateSpec",
@@ -3050,10 +3051,9 @@ export const K8SIoApiAppsV1DeploymentSpecSchema = /*#__PURE__*/ t.object({
   progressDeadlineSeconds: t.integer().optional(),
   replicas: t.integer().optional(),
   revisionHistoryLimit: t.integer().optional(),
-  selector: t.ref(
-    "ApisMetaV1LabelSelector",
-    () => ApisMetaV1LabelSelectorSchema
-  ),
+  selector: t
+    .ref("ApisMetaV1LabelSelector", () => ApisMetaV1LabelSelectorSchema)
+    .optional(),
   strategy: t
     .ref(
       "K8SIoApiAppsV1DeploymentStrategy",
@@ -3132,10 +3132,9 @@ export const K8SIoApiAppsV1StatefulSetSpecSchema = /*#__PURE__*/ t.object({
     .optional(),
   replicas: t.integer().optional(),
   revisionHistoryLimit: t.integer().optional(),
-  selector: t.ref(
-    "ApisMetaV1LabelSelector",
-    () => ApisMetaV1LabelSelectorSchema
-  ),
+  selector: t
+    .ref("ApisMetaV1LabelSelector", () => ApisMetaV1LabelSelectorSchema)
+    .optional(),
   serviceName: t.string(),
   template: t
     .ref(

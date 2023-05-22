@@ -15,9 +15,9 @@
     "@nodepkg/ui": "workspace:^"
   },
   "devDependencies": {
-    "@innoai-tech/config": "^0.4.13",
+    "@innoai-tech/config": "^0.5.2",
     "@innoai-tech/gents": "^0.6.2",
-    "@innoai-tech/monobundle": "^0.8.14",
+    "@innoai-tech/monobundle": "^0.9.5",
     "@innoai-tech/vue-vite-presets": "^0.4.0",
     "@nodepkg/devconfig": "workspace:^",
     "@vue/test-utils": "^2.3.2",

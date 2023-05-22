@@ -11,8 +11,10 @@
     "@mdi/js": "^7.2.96",
     "@nodepkg/runtime": "workspace:^",
     "copy-to-clipboard": "^3.3.3",
-    "rxjs": "^7.8.1",
     "vue": "^3.3.4"
+  },
+  "peerDependencies": {
+    "core-js": "*"
   },
   "devDependencies": {
     "@popperjs/core": "^2.11.7"

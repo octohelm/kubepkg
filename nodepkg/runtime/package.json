@@ -10,24 +10,76 @@
       "./fetcher": "./src/fetcher.ts",
       "./typedef": "./src/typedef.ts",
       "./rxjs": "./src/rxjs.ts",
-      "./vue": "./src/vue.ts"
+      "./vue": "./src/vue.ts",
+      "./date-fns": "./src/date-fns.ts"
     }
   },
   "dependencies": {
-    "@innoai-tech/fetcher": "^0.4.0",
-    "@innoai-tech/lodash": "^0.2.0",
+    "@innoai-tech/fetcher": "^0.5.2",
+    "@innoai-tech/lodash": "^0.2.1",
+    "@innoai-tech/typedef": "^0.2.6",
     "@innoai-tech/vueformdata": "^0.1.1",
     "@innoai-tech/vuekit": "^0.6.1",
-    "@innoai-tech/typedef": "^0.2.6",
     "rxjs": "^7.8.1",
     "vue": "^3.3.4",
     "date-fns": "^2.30.0"
+  },
+  "peerDependencies": {
+    "core-js": "*"
   },
   "exports": {
     ".": {
       "import": {
         "types": "./index.d.ts",
         "default": "./index.mjs"
+      }
+    },
+    "./jsx-runtime": {
+      "import": {
+        "types": "./jsx-runtime.d.ts",
+        "default": "./jsx-runtime.mjs"
+      }
+    },
+    "./jsx-dev-runtime": {
+      "import": {
+        "types": "./jsx-dev-runtime.d.ts",
+        "default": "./jsx-dev-runtime.mjs"
+      }
+    },
+    "./lodash": {
+      "import": {
+        "types": "./lodash.d.ts",
+        "default": "./lodash.mjs"
+      }
+    },
+    "./fetcher": {
+      "import": {
+        "types": "./fetcher.d.ts",
+        "default": "./fetcher.mjs"
+      }
+    },
+    "./typedef": {
+      "import": {
+        "types": "./typedef.d.ts",
+        "default": "./typedef.mjs"
+      }
+    },
+    "./rxjs": {
+      "import": {
+        "types": "./rxjs.d.ts",
+        "default": "./rxjs.mjs"
+      }
+    },
+    "./vue": {
+      "import": {
+        "types": "./vue.d.ts",
+        "default": "./vue.mjs"
+      }
+    },
+    "./date-fns": {
+      "import": {
+        "types": "./date-fns.d.ts",
+        "default": "./date-fns.mjs"
       }
     }
   },

@@ -1,4 +1,4 @@
-import { distinctUntilChanged, Observable } from "@nodepkg/runtime/rxjs";
+import { distinctUntilChanged, Observable } from "rxjs";
 import { rx, subscribeUntilUnmount } from "@innoai-tech/vuekit";
 
 class Persist<T extends any> {

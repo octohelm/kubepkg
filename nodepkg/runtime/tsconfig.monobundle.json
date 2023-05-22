@@ -1,7 +1,6 @@
 {
   "extends": "@nodepkg/devconfig/tsconfig.json",
   "compilerOptions": {
-    "jsxImportSource": "@innoai-tech/vuekit",
-    "rootDir": "./src"
+    "jsxImportSource": "@innoai-tech/vuekit"
   }
 }

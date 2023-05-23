@@ -31,7 +31,7 @@ func merge(kpkg *kubepkgv1alpha1.KubePkg, overwrites []byte) (*kubepkgv1alpha1.K
 	if err := json.Unmarshal(overwrites, &overwritesObj); err != nil {
 		return nil, err
 	}
-	merged := util.DeepMerge(srcObj, overwritesObj)
+	merged := util.MergeObj(srcObj, overwritesObj)
 	var m kubepkgv1alpha1.KubePkg
 	if err := util.DecodeTo(merged, &m); err != nil {
 		return nil, err

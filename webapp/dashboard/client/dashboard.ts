@@ -2179,7 +2179,7 @@ export const K8SIoApiCoreV1ResourceRequirementsSchema = /*#__PURE__*/ t.object({
     .ref("K8SIoApiCoreV1ResourceList", () => K8SIoApiCoreV1ResourceListSchema)
     .annotate({
       description:
-        "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+        "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
     })
     .optional(),
 });
@@ -2340,7 +2340,7 @@ export const K8SIoApiBatchV1CronJobSpecSchema = /*#__PURE__*/ t.object({
     )
     .annotate({
       description:
-        'Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn\'t finished yet; - "Replace": cancels currently running job and replaces it with a new one',
+        "Specifies how to treat concurrent executions of a Job. Valid values are:",
     })
     .optional(),
   failedJobsHistoryLimit: t.integer().optional(),
@@ -2404,7 +2404,7 @@ export const K8SIoApiBatchV1JobSpecSchema = /*#__PURE__*/ t.object({
     )
     .annotate({
       description:
-        "Describes the pod that will be created when executing a job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
+        'Describes the pod that will be created when executing a job. The only allowed template.spec.restartPolicy values are "Never" or "OnFailure". More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/',
     }),
   ttlSecondsAfterFinished: t.integer().optional(),
 });
@@ -2429,7 +2429,7 @@ export const K8SIoApiBatchV1PodFailurePolicyRuleSchema = /*#__PURE__*/ t.object(
       )
       .annotate({
         description:
-          "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are: - FailJob: indicates that the pod's job is marked as Failed and all",
+          "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are:",
       }),
     onExitCodes: t
       .ref(
@@ -2459,7 +2459,7 @@ export const K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirementSchema =
       )
       .annotate({
         description:
-          "Represents the relationship between the container exit code(s) and the specified values. Containers completed with success (exit code 0) are excluded from the requirement check. Possible values are: - In: the requirement is satisfied if at least one container exit code",
+          "Represents the relationship between the container exit code(s) and the specified values. Containers completed with success (exit code 0) are excluded from the requirement check. Possible values are:",
       }),
     values: t.array(t.integer()),
   });
@@ -2607,7 +2607,7 @@ export const K8SIoApiCoreV1PodSpecSchema = /*#__PURE__*/ t.object({
     .ref("K8SIoApiCoreV1RestartPolicy", () => K8SIoApiCoreV1RestartPolicySchema)
     .annotate({
       description:
-        "Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy",
+        "Restart policy for all containers within the pod. One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy",
     })
     .optional(),
   runtimeClassName: t.string().optional(),
@@ -2998,7 +2998,7 @@ export const K8SIoApiAppsV1DaemonSetSpecSchema = /*#__PURE__*/ t.object({
     )
     .annotate({
       description:
-        "An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
+        'An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template\'s node selector (or on every node if no node selector is specified). The only allowed template.spec.restartPolicy value is "Always". More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template',
     }),
   updateStrategy: t
     .ref(
@@ -3070,7 +3070,8 @@ export const K8SIoApiAppsV1DeploymentSpecSchema = /*#__PURE__*/ t.object({
       () => K8SIoApiCoreV1PodTemplateSpecSchema
     )
     .annotate({
-      description: "Template describes the pods that will be created.",
+      description:
+        'Template describes the pods that will be created. The only allowed template.spec.restartPolicy value is "Always".',
     }),
 });
 
@@ -3143,7 +3144,7 @@ export const K8SIoApiAppsV1StatefulSetSpecSchema = /*#__PURE__*/ t.object({
     )
     .annotate({
       description:
-        'template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. Each pod will be named with the format <statefulsetname>-<podindex>. For example, a pod in a StatefulSet named "web" with index number "3" would be named "web-3".',
+        'template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. Each pod will be named with the format <statefulsetname>-<podindex>. For example, a pod in a StatefulSet named "web" with index number "3" would be named "web-3". The only allowed template.spec.restartPolicy value is "Always".',
     }),
   updateStrategy: t
     .ref(

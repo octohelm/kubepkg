@@ -18,7 +18,7 @@ func init() {
 }
 
 func (*BindGroupEnvCluster) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster)
 }
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 }
 
 func (*CreateGroupRobot) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_account.Robot{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_account.Robot)
 }
 
 func init() {
@@ -66,7 +66,7 @@ func init() {
 }
 
 func (*GetGroup) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.Group{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.Group)
 }
 
 func init() {
@@ -74,7 +74,7 @@ func init() {
 }
 
 func (*ListGroup) ResponseContent() any {
-	return &[]*github_com_octohelm_kubepkg_internal_dashboard_domain_group.Group{}
+	return new([]*github_com_octohelm_kubepkg_internal_dashboard_domain_group.Group)
 }
 
 func init() {
@@ -82,7 +82,7 @@ func init() {
 }
 
 func (*ListGroupAccount) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.UserDataList{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.UserDataList)
 }
 
 func init() {
@@ -90,7 +90,7 @@ func init() {
 }
 
 func (*ListGroupEnv) ResponseContent() any {
-	return &[]*github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster{}
+	return new([]*github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster)
 }
 
 func init() {
@@ -98,7 +98,7 @@ func init() {
 }
 
 func (*ListGroupEnvClusterDeployments) ResponseContent() any {
-	return &[]github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+	return new([]github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg)
 }
 
 func (*ListGroupEnvClusterDeployments) ResponseErrors() []error {
@@ -116,7 +116,7 @@ func init() {
 }
 
 func (*ListGroupEnvDeployment) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkgList{}
+	return new(github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkgList)
 }
 
 func init() {
@@ -124,7 +124,7 @@ func init() {
 }
 
 func (*ListGroupEnvDeploymentHistory) ResponseContent() any {
-	return &[]*github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+	return new([]*github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg)
 }
 
 func init() {
@@ -132,7 +132,7 @@ func init() {
 }
 
 func (*ListGroupRobot) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.RobotDataList{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.RobotDataList)
 }
 
 func init() {
@@ -140,7 +140,7 @@ func init() {
 }
 
 func (*PutGroup) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.Group{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.Group)
 }
 
 func init() {
@@ -148,7 +148,7 @@ func init() {
 }
 
 func (*PutGroupAccount) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.Account{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.Account)
 }
 
 func init() {
@@ -156,7 +156,7 @@ func init() {
 }
 
 func (*PutGroupEnv) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster)
 }
 
 func init() {
@@ -164,7 +164,7 @@ func init() {
 }
 
 func (*PutGroupEnvDeployment) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+	return new(github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg)
 }
 
 func init() {
@@ -172,7 +172,7 @@ func init() {
 }
 
 func (*RefreshGroupRobotToken) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_auth.Token{}
+	return new(github_com_octohelm_kubepkg_pkg_auth.Token)
 }
 
 func init() {
@@ -180,5 +180,5 @@ func init() {
 }
 
 func (*UnbindGroupEnvCluster) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.EnvWithCluster)
 }

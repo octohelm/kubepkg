@@ -30,16 +30,35 @@ func TestKubepkgRepository(t *testing.T) {
 	repo := repository.NewKubepkgRepository()
 
 	t.Run("When add a kubepkg", func(t *testing.T) {
-		created, _, err := repo.Put(ctx, k)
+		created, _, err := repo.Put(ctx, k.DeepCopy())
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 
-		t.Run("recreated should return previous version", func(t *testing.T) {
-			v := k.DeepCopy()
-			v.Spec.Version = "v0.1.0"
-
-			recreated, _, err := repo.Put(ctx, k)
+		t.Run("recreated without spec changes, should return same", func(t *testing.T) {
+			recreated, _, err := repo.Put(ctx, k.DeepCopy())
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
-			testingutil.Expect(t, recreated.Spec.Version, testingutil.Equal(created.Spec.Version))
+			testingutil.Expect(t, recreated, testingutil.Equal(created))
+		})
+
+		t.Run("recreated should return previous kube template version, and diffed overwrites", func(t *testing.T) {
+			modifiedKubepkg := created.DeepCopy()
+
+			modifiedKubepkg.Spec.Version = "v0.1.0"
+			modifiedKubepkg.Spec.Config = map[string]v1alpha1.EnvVarValueOrFrom{
+				"ENV": {Value: "DEV"},
+			}
+
+			recreated, ref, err := repo.Put(ctx, modifiedKubepkg)
+			testingutil.Expect(t, err, testingutil.Be[error](nil))
+			testingutil.Expect(t, recreated, testingutil.Equal(created))
+
+			testingutil.Expect(t, ref.Overwrites, testingutil.Equal(map[string]any{
+				"spec": map[string]any{
+					"version": "v0.1.0",
+					"config": map[string]any{
+						"ENV": "DEV",
+					},
+				},
+			}))
 		})
 
 		t.Run("list", func(t *testing.T) {

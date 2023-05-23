@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/octohelm/storage/pkg/dberr"
+	"github.com/opencontainers/go-digest"
+
 	"github.com/octohelm/kubepkg/pkg/util"
 
 	"github.com/octohelm/courier/pkg/statuserror"
@@ -19,7 +22,6 @@ import (
 	"github.com/octohelm/kubepkg/pkg/version/semver"
 	"github.com/octohelm/storage/pkg/dal"
 	"github.com/octohelm/storage/pkg/sqlbuilder"
-	"github.com/opencontainers/go-digest"
 )
 
 func NewKubepkgRepository() *KubepkgRepository {
@@ -30,14 +32,22 @@ type KubepkgRepository struct {
 }
 
 func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1alpha1.KubePkg, *kubepkg.Ref, error) {
+	kk := &v1alpha1.KubePkg{}
+	kk.Name = k.Name
+	kk.Namespace = k.Namespace
+
+	if kk.Annotations == nil {
+		kk.Annotations = map[string]string{}
+	}
+
 	kpkg := &kubepkg.Kubepkg{}
 	kpkg.Group = k.Namespace
 	kpkg.Name = k.Name
 
 	revision := &kubepkg.Revision{}
+
 	version := &kubepkg.Version{}
 	version.Channel = kubepkg.CHANNEL__DEV
-	version.Version = k.Spec.Version
 
 	ref := &kubepkg.Ref{}
 
@@ -48,6 +58,10 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 				kpkg.Group = parts[0]
 				kpkg.Name = parts[1]
 			}
+		}
+
+		if reversionID, ok := k.Annotations[kubepkg.AnnotationRevision]; ok {
+			_ = revision.ID.UnmarshalText([]byte(reversionID))
 		}
 
 		if c, ok := k.Annotations[kubepkg.AnnotationChannel]; ok {
@@ -75,21 +89,12 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 		}
 	}
 
-	data, err := json.Marshal(k.Spec)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	revision.Spec = data
-	revision.Digest = digest.FromBytes(data).String()
-
 	id, err := idgen.FromContextAndCast[kubepkg.ID](ctx).ID()
 	if err != nil {
 		return nil, nil, err
 	}
 	kpkg.ID = id
 	version.ID = datatypes.SFID(id)
-	revision.ID = kubepkg.RevisionID(id)
 
 	if err := dal.Tx(ctx, kpkg, func(ctx context.Context) error {
 		err := dal.Prepare(kpkg).
@@ -108,21 +113,55 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 		// bind to kubepkg
 		revision.KubepkgID = kpkg.ID
 
-		err = dal.Prepare(revision).
-			OnConflict(kubepkg.RevisionT.I.IDigest).
-			DoUpdateSet(
-				kubepkg.RevisionT.KubepkgID,
-			).
-			Returning(
-				kubepkg.RevisionT.ID,
-				kubepkg.RevisionT.CreatedAt,
-			).
-			Scan(revision).
-			Save(ctx)
+		if revision.ID != 0 {
+			err = dal.From(kubepkg.RevisionT).
+				Where(
+					sqlbuilder.And(
+						kubepkg.RevisionT.ID.V(sqlbuilder.Eq(revision.ID)),
+						kubepkg.RevisionT.KubepkgID.V(sqlbuilder.Eq(revision.KubepkgID)),
+					),
+				).
+				Limit(1).Scan(revision).Find(ctx)
+			if err != nil {
+				if !dberr.IsErrNotFound(err) {
+					return err
+				}
+				revision.ID = 0
+			}
+		}
 
-		if err != nil {
+		if revision.ID == 0 {
+			// try creat new revision
+			revision.ID = kubepkg.RevisionID(id)
+
+			data, err := json.Marshal(k.Spec)
+			if err != nil {
+				return err
+			}
+
+			revision.Spec = data
+			revision.Digest = digest.FromBytes(data).String()
+
+			err = dal.Prepare(revision).
+				OnConflict(kubepkg.RevisionT.I.IDigest).
+				DoNothing().
+				Returning(
+					kubepkg.RevisionT.ID,
+					kubepkg.RevisionT.Spec,
+					kubepkg.RevisionT.CreatedAt,
+				).
+				Scan(revision).
+				Save(ctx)
+			if err != nil {
+				return err
+			}
+		}
+
+		if err := json.Unmarshal(revision.Spec, &kk.Spec); err != nil {
 			return err
 		}
+
+		version.Version = kk.Spec.Version
 
 		version.KubepkgID = kpkg.ID
 		version.RevisionID = revision.ID
@@ -150,18 +189,24 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 		return nil, nil, err
 	}
 
-	if k.Annotations == nil {
-		k.Annotations = map[string]string{}
-	}
-
-	k.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kpkg.Group, kpkg.Name)
-	k.Annotations[kubepkg.AnnotationRevision] = revision.ID.String()
-	k.Spec.Version = version.Version
+	kk.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kpkg.Group, kpkg.Name)
+	kk.Annotations[kubepkg.AnnotationChannel] = version.Channel.String()
+	kk.Annotations[kubepkg.AnnotationRevision] = revision.ID.String()
 
 	ref.KubepkgID = kpkg.ID
 	ref.KubepkgRevisionID = revision.ID
 
-	return k, ref, nil
+	if ref.Overwrites == nil {
+		diffed, err := util.Diff(&kk.Spec, &k.Spec)
+		if err != nil {
+			return nil, nil, err
+		}
+		ref.Overwrites = map[string]any{
+			"spec": diffed,
+		}
+	}
+
+	return kk, ref, nil
 }
 
 func (KubepkgRepository) Delete(ctx context.Context, group string, name string) error {

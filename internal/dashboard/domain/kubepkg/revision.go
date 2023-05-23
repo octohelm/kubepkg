@@ -7,8 +7,7 @@ import (
 // +gengo:table:register=T
 // +gengo:table:group=kubepkg
 // @def primary ID
-// @def unique_index i_digest Digest
-// @def index i_kubepkg KubepkgID
+// @def unique_index i_digest KubepkgID Digest
 // @def index i_created_at CreatedAt
 type Revision struct {
 	// Kubepkg Revision ID

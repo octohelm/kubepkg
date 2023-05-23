@@ -28,7 +28,7 @@ import {
   alpha,
   mdiHistory
 } from "@nodepkg/ui";
-import { KubePkgEditor } from "@webapp/dashboard/mod/kubepkg";
+import { KubePkgEditor, mergeOverwritesIfExists } from "@webapp/dashboard/mod/kubepkg";
 import { AccessControl } from "@webapp/dashboard/mod/auth";
 import { pick, omit, get } from "@nodepkg/runtime/lodash";
 import { parseISO, format } from "@nodepkg/runtime/date-fns";
@@ -255,7 +255,7 @@ export const GroupEnvDeploymentHistoryPutBtn = component$(
     rx(
       put$,
       subscribeUntilUnmount((resp) => {
-        emit("did-put", resp.body);
+        emit("did-put", mergeOverwritesIfExists(resp.body));
       })
     );
 

@@ -38,7 +38,7 @@ import {
 } from "@nodepkg/ui";
 import {
   diffAsOverwrites,
-  KubePkgEditor,
+  KubePkgEditor, mergeOverwritesIfExists,
   resolveKubePkgVersionAndSetting
 } from "@webapp/dashboard/mod/kubepkg";
 import { AccessControl } from "@webapp/dashboard/mod/auth";
@@ -330,7 +330,7 @@ export const GroupEnvDeploymentPutBtn = component$(
     rx(
       put$,
       subscribeUntilUnmount((resp) => {
-        emit("did-put", resp.body);
+        emit("did-put", mergeOverwritesIfExists(resp.body));
       })
     );
 

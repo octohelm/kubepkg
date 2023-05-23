@@ -16,7 +16,7 @@ import (
 func init() {
 	s := cli.AddTo(Serve, &Dashboard{})
 
-	s.ApplyHandler(func(h http.Handler) http.Handler {
+	s.ApplyGlobalHandlers(func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			if strings.HasPrefix(req.URL.Path, "/api/") {
 				h.ServeHTTP(rw, req)

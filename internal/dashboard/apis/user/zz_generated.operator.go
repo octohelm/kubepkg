@@ -15,7 +15,7 @@ func init() {
 }
 
 func (*CurrentPermissions) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_rbac.Permissions{}
+	return new(github_com_octohelm_kubepkg_pkg_rbac.Permissions)
 }
 
 func init() {
@@ -23,5 +23,5 @@ func init() {
 }
 
 func (*CurrentUser) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_apis_auth_operator.Account{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_apis_auth_operator.Account)
 }

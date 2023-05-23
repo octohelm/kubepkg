@@ -23,7 +23,7 @@ func init() {
 }
 
 func (*ListAccount) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_account.UserDataList{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_account.UserDataList)
 }
 
 func init() {
@@ -31,7 +31,7 @@ func init() {
 }
 
 func (*ListAdminAccount) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.UserDataList{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.UserDataList)
 }
 
 func init() {
@@ -39,5 +39,5 @@ func init() {
 }
 
 func (*PutAdminAccount) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_group.Account{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_group.Account)
 }

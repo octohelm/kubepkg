@@ -29,7 +29,7 @@ func init() {
 }
 
 func (*ExchangeToken) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_auth.Token{}
+	return new(github_com_octohelm_kubepkg_pkg_auth.Token)
 }
 
 func init() {
@@ -37,5 +37,5 @@ func init() {
 }
 
 func (*ListAuthProvider) ResponseContent() any {
-	return &[]*github_com_octohelm_kubepkg_pkg_auth.ProviderInfo{}
+	return new([]*github_com_octohelm_kubepkg_pkg_auth.ProviderInfo)
 }

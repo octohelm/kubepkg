@@ -15,7 +15,7 @@ func init() {
 }
 
 func (*StatBlob) ResponseContent() any {
-	return &github_com_distribution_distribution_v3.Descriptor{}
+	return new(github_com_distribution_distribution_v3.Descriptor)
 }
 
 func (*StatBlob) ResponseErrors() []error {

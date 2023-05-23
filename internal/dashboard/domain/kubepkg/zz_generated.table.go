@@ -128,6 +128,7 @@ func (Revision) Primary() []string {
 func (Revision) UniqueIndexes() github_com_octohelm_storage_pkg_sqlbuilder.Indexes {
 	return github_com_octohelm_storage_pkg_sqlbuilder.Indexes{
 		"i_digest": []string{
+			"KubepkgID",
 			"Digest",
 		},
 	}
@@ -137,9 +138,6 @@ func (Revision) Indexes() github_com_octohelm_storage_pkg_sqlbuilder.Indexes {
 	return github_com_octohelm_storage_pkg_sqlbuilder.Indexes{
 		"i_created_at": []string{
 			"CreatedAt",
-		},
-		"i_kubepkg": []string{
-			"KubepkgID",
 		},
 	}
 }
@@ -207,6 +205,7 @@ var RevisionT = &tableRevision{
 			"ID",
 		}...),
 		IDigest: github_com_octohelm_storage_pkg_sqlbuilder.TableFromModel(&Revision{}).Cols([]string{
+			"KubepkgID",
 			"Digest",
 		}...),
 	},

@@ -23,7 +23,7 @@ func init() {
 }
 
 func (*GetKubepkgRevision) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+	return new(github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg)
 }
 
 func init() {
@@ -31,7 +31,7 @@ func init() {
 }
 
 func (*LatestKubepkgs) ResponseContent() any {
-	return &map[string]*github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.VersionInfo{}
+	return new(map[string]*github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.VersionInfo)
 }
 
 func init() {
@@ -39,7 +39,7 @@ func init() {
 }
 
 func (*ListKubepkg) ResponseContent() any {
-	return &[]*github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.Kubepkg{}
+	return new([]*github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.Kubepkg)
 }
 
 func init() {
@@ -47,7 +47,7 @@ func init() {
 }
 
 func (*ListKubepkgVersion) ResponseContent() any {
-	return &[]*github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.VersionInfo{}
+	return new([]*github_com_octohelm_kubepkg_internal_dashboard_domain_kubepkg.VersionInfo)
 }
 
 func init() {

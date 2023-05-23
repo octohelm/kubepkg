@@ -55,7 +55,7 @@ func init() {
 }
 
 func (*GetKubePkg) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+	return new(github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg)
 }
 
 func (*GetKubePkg) ResponseErrors() []error {
@@ -73,7 +73,7 @@ func init() {
 }
 
 func (*ListKubePkg) ResponseContent() any {
-	return &[]github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg{}
+	return new([]github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg)
 }
 
 func (*ListKubePkg) ResponseErrors() []error {

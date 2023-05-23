@@ -3,10 +3,9 @@ package dashboard
 import (
 	"context"
 
-	"github.com/octohelm/kubepkg/pkg/rbac"
-
 	"github.com/innoai-tech/infra/pkg/http"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis"
+	"github.com/octohelm/kubepkg/pkg/rbac"
 )
 
 var permissions = rbac.PermissionsFromRouter("dashboard", apis.R)

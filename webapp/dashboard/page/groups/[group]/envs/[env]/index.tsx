@@ -4,7 +4,7 @@ import {
   GroupEnvProvider
 } from "@webapp/dashboard/mod/groupenv";
 import { rx, render } from "@innoai-tech/vuekit";
-import { map } from "@nodepkg/runtime/rxjs";
+import { map, combineLatest } from "@nodepkg/runtime/rxjs";
 
 export default component$(
   {
@@ -15,9 +15,9 @@ export default component$(
     const ge$ = GroupEnvProvider.use();
 
     return rx(
-      ge$,
-      map((ge) => {
-        return ge.envs[props.env];
+      combineLatest(ge$, props.env$),
+      map(([ge, env]) => {
+        return ge.envs[env];
       }),
       render((env) => {
         if (!env) {

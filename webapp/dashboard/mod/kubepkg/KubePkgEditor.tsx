@@ -49,6 +49,28 @@ const getAnnotation = (
   return get(kubepkg, ["metadata", "annotations", key]);
 };
 
+export const mergeOverwritesIfExists = (
+  kubepkg: ApisKubepkgV1Alpha1KubePkg
+) => {
+  const overwrites = getAnnotation(kubepkg, annotationKubepkgOverwrites);
+
+  if (overwrites) {
+    return merge({},
+      kubepkg,
+      {
+        metadata: {
+          annotations: {
+            [annotationKubepkgOverwrites]: null
+          }
+        }
+      },
+      JSON.parse(overwrites)
+    );
+  }
+
+  return kubepkg;
+};
+
 export const resolveKubePkgVersionAndSetting = (
   kubepkg?: ApisKubepkgV1Alpha1KubePkg
 ) => {
@@ -156,7 +178,6 @@ export const diffAsOverwrites = (
     }
   };
 
-
   for (const [k, [t, v]] of changes) {
     if (t == "m" || t == "a") {
       set(newOverwrites, k.slice(1).split("/"), v);
@@ -202,24 +223,10 @@ const TemplateEditor = component$(
       setTimeout(() => {
         // valid
         if (diagnosticCount(view.state) === 0) {
-          if (props.overwrites) {
-            const template = cloneWithoutNull(props.kubepkg);
-
-            const kubepkg = JSON.parse(
-              view.state.doc.sliceString(0)
-            ) as ApisKubepkgV1Alpha1KubePkg;
-
-            set(
-              template,
-              ["metadata", "annotations", annotationKubepkgOverwrites],
-              JSON.stringify(diffAsOverwrites(template, kubepkg))
-            );
-
-            emit("submit", template);
-            return;
-          }
-
-          emit("submit", JSON.parse(view.state.doc.sliceString(0)));
+          emit(
+            "submit",
+            cloneWithoutNull(JSON.parse(view.state.doc.sliceString(0)))
+          );
         }
       });
 

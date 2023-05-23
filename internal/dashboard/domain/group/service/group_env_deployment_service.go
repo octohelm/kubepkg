@@ -46,13 +46,12 @@ func (s *GroupEnvDeploymentService) PutKubePkg(ctx context.Context, pkg *v1alpha
 	namespace := pkg.Namespace
 
 	pkg.Namespace = s.group.Name
-
 	kpkg, kpkgRef, err := s.kubepkgRepo.Put(ctx, pkg)
 	if err != nil {
 		return nil, statuserror.Wrap(err, http.StatusBadRequest, "InvalidKubePkg")
 	}
 
-	pkg.Namespace = namespace
+	kpkg.Namespace = namespace
 
 	deployment, err := s.groupEnvDeploymentRepo.BindKubepkg(ctx, kpkg.Name, group.KubepkgRel{
 		KubepkgID:      kpkgRef.KubepkgID,

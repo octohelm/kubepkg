@@ -16,7 +16,7 @@ require (
 	github.com/go-logr/logr v1.2.4
 	github.com/go-rod/rod v0.112.2
 	github.com/google/uuid v1.3.0
-	github.com/innoai-tech/infra v0.0.0-20230523055408-b60d97c09cfb
+	github.com/innoai-tech/infra v0.0.0-20230523100858-148131f5b258
 	github.com/lestrrat-go/jwx/v2 v2.0.9
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-isatty v0.0.19

@@ -14,7 +14,7 @@ func init() {
 }
 
 func (*GetClusterStatus) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.InstanceStatus{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.InstanceStatus)
 }
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 }
 
 func (*ListCluster) ResponseContent() any {
-	return &[]*github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.Cluster{}
+	return new([]*github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.Cluster)
 }
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 }
 
 func (*PutCluster) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.Cluster{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.Cluster)
 }
 
 func init() {
@@ -38,5 +38,5 @@ func init() {
 }
 
 func (*RenameCluster) ResponseContent() any {
-	return &github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.Cluster{}
+	return new(github_com_octohelm_kubepkg_internal_dashboard_domain_cluster.Cluster)
 }

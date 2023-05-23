@@ -33,6 +33,7 @@ type KubepkgRepository struct {
 
 func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1alpha1.KubePkg, *kubepkg.Ref, error) {
 	kk := &v1alpha1.KubePkg{}
+	kk.SetGroupVersionKind(v1alpha1.SchemeGroupVersion.WithKind("KubePkg"))
 	kk.Name = k.Name
 	kk.Namespace = k.Namespace
 

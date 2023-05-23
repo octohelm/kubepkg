@@ -37,6 +37,9 @@ func TestKubepkgRepository(t *testing.T) {
 			recreated, _, err := repo.Put(ctx, k.DeepCopy())
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
 			testingutil.Expect(t, recreated, testingutil.Equal(created))
+
+			testingutil.Expect(t, recreated.Kind, testingutil.Equal("KubePkg"))
+			testingutil.Expect(t, recreated.GroupVersionKind().GroupVersion(), testingutil.Equal(v1alpha1.SchemeGroupVersion))
 		})
 
 		t.Run("recreated should return previous kube template version, and diffed overwrites", func(t *testing.T) {
@@ -92,6 +95,7 @@ type Obj = map[string]any
 type Array = []any
 
 func init() {
+	k.SetGroupVersionKind(v1alpha1.SchemeGroupVersion.WithKind("KubePkg"))
 	k.Name = "test"
 	k.Namespace = "test"
 	k.Spec.Version = "0.0.0"

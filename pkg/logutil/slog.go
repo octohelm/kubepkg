@@ -97,7 +97,7 @@ func withLevelColor(level slog.Level) func(io.Writer) io.Writer {
 	return WithColor(FgWhite)
 }
 
-func (s *slogHandler) Handle(r slog.Record) error {
+func (s *slogHandler) Handle(ctx context.Context, r slog.Record) error {
 	buf := bytes.NewBuffer(nil)
 
 	_, _ = fmt.Fprintf(WithColor(FgWhite)(buf), "%s", r.Time.Format("15:04:05.000"))
@@ -115,12 +115,13 @@ func (s *slogHandler) Handle(r slog.Record) error {
 
 	_, _ = fmt.Fprint(buf, "\n")
 
-	r.Attrs(func(attr slog.Attr) {
+	r.Attrs(func(attr slog.Attr) bool {
 		if attr.Key == "err" {
 			if err := attr.Value.Any().(error); err != nil {
 				_, _ = fmt.Fprintf(buf, "%+v", err)
 			}
 		}
+		return true
 	})
 
 	_, _ = io.Copy(colorable.NewColorableStdout(), buf)

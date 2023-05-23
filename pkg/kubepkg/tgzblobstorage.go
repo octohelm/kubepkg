@@ -64,7 +64,6 @@ func (bs *tgzBlobStorage) Create(ctx context.Context) (BlobWriter, error) {
 
 type BlobWriter interface {
 	io.WriteCloser
-	Cancel() error
 	Commit(ctx context.Context, provisional *digest.Digest) (canonical distribution.Descriptor, err error)
 }
 

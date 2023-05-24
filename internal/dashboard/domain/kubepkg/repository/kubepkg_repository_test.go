@@ -30,15 +30,20 @@ func TestKubepkgRepository(t *testing.T) {
 	repo := repository.NewKubepkgRepository()
 
 	t.Run("When add a kubepkg", func(t *testing.T) {
-		created, _, err := repo.Put(ctx, k.DeepCopy())
+		created, createdRef, err := repo.Put(ctx, k.DeepCopy())
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 
+		t.Run("for create", func(t *testing.T) {
+			testingutil.Expect(t, createdRef.Overwrites == nil, testingutil.Be(true))
+		})
+
 		t.Run("recreated without spec changes, should return same", func(t *testing.T) {
-			recreated, _, err := repo.Put(ctx, k.DeepCopy())
+			recreated, recreatedRef, err := repo.Put(ctx, k.DeepCopy())
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
 			testingutil.Expect(t, recreated, testingutil.Equal(created))
 
 			testingutil.Expect(t, recreated.Kind, testingutil.Equal("KubePkg"))
+			testingutil.Expect(t, recreatedRef.Overwrites == nil, testingutil.Be(true))
 			testingutil.Expect(t, recreated.GroupVersionKind().GroupVersion(), testingutil.Equal(v1alpha1.SchemeGroupVersion))
 		})
 

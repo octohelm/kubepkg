@@ -74,22 +74,7 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 		}
 	}
 
-	// use config as default overwrites
-	if ref.Overwrites == nil {
-		if config := k.Spec.Config; config != nil {
-			c := map[string]any{}
-			for k := range config {
-				vv, _ := config[k].MarshalText()
-				c[k] = string(vv)
-			}
-			ref.DefaultsOverwrites = map[string]any{
-				"spec": map[string]any{
-					"config": c,
-				},
-			}
-		}
-	}
-
+	ref.KubepkgRevisionID = revision.ID
 	id, err := idgen.FromContextAndCast[kubepkg.ID](ctx).ID()
 	if err != nil {
 		return nil, nil, err
@@ -127,7 +112,9 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 				if !dberr.IsErrNotFound(err) {
 					return err
 				}
+
 				revision.ID = 0
+				ref.KubepkgRevisionID = revision.ID
 			}
 		}
 
@@ -190,22 +177,41 @@ func (r *KubepkgRepository) Put(ctx context.Context, k *v1alpha1.KubePkg) (*v1al
 		return nil, nil, err
 	}
 
-	kk.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kpkg.Group, kpkg.Name)
-	kk.Annotations[kubepkg.AnnotationChannel] = version.Channel.String()
-	kk.Annotations[kubepkg.AnnotationRevision] = revision.ID.String()
+	if ref.Overwrites == nil {
+		if ref.KubepkgRevisionID == 0 {
+			// when create new
+			// use config as default overwrites
+			if ref.Overwrites == nil {
+				if config := k.Spec.Config; config != nil {
+					c := map[string]any{}
+					for k := range config {
+						vv, _ := config[k].MarshalText()
+						c[k] = string(vv)
+					}
+					ref.DefaultsOverwrites = map[string]any{
+						"spec": map[string]any{
+							"config": c,
+						},
+					}
+				}
+			}
+		} else {
+			diffed, err := util.Diff(&kk.Spec, &k.Spec)
+			if err != nil {
+				return nil, nil, err
+			}
+			ref.Overwrites = map[string]any{
+				"spec": diffed,
+			}
+		}
+	}
 
 	ref.KubepkgID = kpkg.ID
 	ref.KubepkgRevisionID = revision.ID
 
-	if ref.Overwrites == nil {
-		diffed, err := util.Diff(&kk.Spec, &k.Spec)
-		if err != nil {
-			return nil, nil, err
-		}
-		ref.Overwrites = map[string]any{
-			"spec": diffed,
-		}
-	}
+	kk.Annotations[kubepkg.AnnotationName] = fmt.Sprintf("%s/%s", kpkg.Group, kpkg.Name)
+	kk.Annotations[kubepkg.AnnotationChannel] = version.Channel.String()
+	kk.Annotations[kubepkg.AnnotationRevision] = ref.KubepkgRevisionID.String()
 
 	return kk, ref, nil
 }

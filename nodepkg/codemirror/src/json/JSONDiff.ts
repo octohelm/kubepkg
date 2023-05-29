@@ -53,7 +53,12 @@ const diffedLines = StateField.define<DecorationSet>({
         lines = cutRange(lines, e.value);
       }
     });
-    return lines;
+
+    return lines.update({
+      filterFrom: 0,
+      filterTo: tr.newDoc.length,
+      filter: () => true
+    });
   },
   provide: (f) => EditorView.decorations.from(f)
 });

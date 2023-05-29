@@ -11,6 +11,8 @@ import {
   subscribeOnMountedUntilUnmount,
   type VNodeChild
 } from "@nodepkg/runtime";
+// @ts-ignore
+import semver from "semver";
 import { styled, Box, Icon, mdiChevronUp, mdiChevronDown } from "@nodepkg/ui";
 import {
   type KubepkgVersionInfo,
@@ -161,6 +163,21 @@ const Chip = styled("span")({
   alignItems: "center"
 });
 
+const trimV = (v: string) => {
+  if (v.startsWith("v")) {
+    return v.slice(1);
+  }
+  return v;
+};
+
+const compare = (a: string, b: string) => {
+  return semver.gt(trimV(a), trimV(b)) ? -1 : 1;
+};
+
+export const orderVersions = (versions: string[]) => {
+  return versions.sort(compare);
+};
+
 export const GroupKubepkgVersionList = component$(
   {
     kubepkgName: t.string()
@@ -211,10 +228,13 @@ export const GroupKubepkgVersionList = component$(
       }),
       render((versions) => {
         const grouped = groupBy(versions, (k) => getBaseVersion(k.version));
+        const keys = orderVersions(Object.keys(grouped));
 
         return (
           <>
-            {map(grouped, (kubepkgVersions, base) => {
+            {map(keys, (base) => {
+              const kubepkgVersions = grouped[base]!;
+
               return (
                 <GroupKubepkgVersionListGroup
                   key={base}

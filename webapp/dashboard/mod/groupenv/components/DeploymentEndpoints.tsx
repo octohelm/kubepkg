@@ -21,12 +21,32 @@ export const DeploymentEndpoints = component(
             {map(props.kubepkg.status?.endpoint, (address, name) => {
               if (name !== "default") {
                 return (
-                  <Endpoint
-                    key={name}
-                    name={name}
-                    endpoint={address}
-                    openAPISpec={openAPISpec}
-                  />
+                  <>
+                    {openAPISpec && (
+                      <Chip>
+                        <Tooltip title={"OpenAPI 文档"}>
+                        <span>
+                          <RouterLink
+                            {...({ target: "_blank" } as any)}
+                            to={pathToOpenAPISpecDoc(
+                              `${address}${openAPISpec}`
+                            )}
+                          >
+                            <Icon path={mdiApi} placement={"start"} />
+                          </RouterLink>
+                        </span>
+                        </Tooltip>
+                      </Chip>
+                    )}
+                    <Chip>
+                      <Tooltip title={`访问地址`}>
+                        <a href={address} target={"_blank"}>
+                          {name}
+                          <Icon path={mdiOpenInNew} placement={"end"} />
+                        </a>
+                      </Tooltip>
+                    </Chip>
+                  </>
                 );
               }
               return null;
@@ -39,41 +59,10 @@ export const DeploymentEndpoints = component(
   }
 );
 
-const Endpoint = styled(
-  "div",
-  {
-    name: t.string(),
-    endpoint: t.string(),
-    openAPISpec: t.string().optional()
-  },
-  (props) => (Wrap) => {
-    return (
-      <Wrap>
-        {props.openAPISpec && (
-          <Tooltip title={"OpenAPI 文档"}>
-            <span>
-              <RouterLink
-                {...({ target: "_blank" } as any)}
-                to={pathToOpenAPISpecDoc(
-                  `${props.endpoint}${props.openAPISpec}`
-                )}
-              >
-                <Icon path={mdiApi} placement={"start"} />
-              </RouterLink>
-            </span>
-          </Tooltip>
-        )}
-        <Tooltip title={`访问地址 ${props.endpoint}`}>
-          <a href={props.endpoint} target={"_blank"}>
-            {props.name}
-            <Icon path={mdiOpenInNew} placement={"end"} />
-          </a>
-        </Tooltip>
-      </Wrap>
-    );
-  }
+const Chip = styled(
+  "div"
 )({
-  px: 10,
+  px: 8,
   h: 16,
   rounded: 16,
   textStyle: "sys.body-small",
@@ -87,26 +76,5 @@ const Endpoint = styled(
     alignItems: "center",
     textDecoration: "none",
     gap: 4
-  },
-
-  $data_icon: {
-    fontSize: "1em",
-    _data_placement__start: {
-      ml: -4
-    },
-    _data_placement__end: {
-      mr: -4
-    }
-  },
-
-  $data_endpoint_address: {
-    display: "none"
-  },
-
-  _hover: {
-    $data_endpoint_address: {
-      display: "inline-block",
-      ml: 4
-    }
   }
 });

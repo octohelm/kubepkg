@@ -26,6 +26,7 @@
     "normalize.css": "^8.0.1",
     "prettier": "^2.8.8",
     "rollup-plugin-visualizer": "^5.9.0",
+    "semver": "^7.5.1",
     "tsx": "^3.12.7",
     "turbo": "^1.9.8",
     "typescript": "^5.0.4",

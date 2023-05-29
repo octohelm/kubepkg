@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
@@ -44,6 +48,9 @@ importers:
       rollup-plugin-visualizer:
         specifier: ^5.9.0
         version: 5.9.0(rollup@3.23.0)
+      semver:
+        specifier: ^7.5.1
+        version: 7.5.1
       tsx:
         specifier: ^3.12.7
         version: 3.12.7

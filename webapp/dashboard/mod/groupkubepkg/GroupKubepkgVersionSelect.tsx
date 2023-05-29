@@ -18,6 +18,7 @@ import {
 import { combineLatest, map as rxMap } from "@nodepkg/runtime/rxjs";
 import { getBaseVersion } from "@webapp/dashboard/mod/groupkubepkg/helpers";
 import { groupBy, map } from "@nodepkg/runtime/lodash";
+import { orderVersions } from "@webapp/dashboard/mod/groupkubepkg/GroupKubepkgVersionList";
 
 export const GroupKubepkgVersionSelect = component$(
   {
@@ -55,12 +56,14 @@ export const GroupKubepkgVersionSelect = component$(
     return rx(
       listKubepkgVersion$,
       rxMap((resp) => resp.body),
-      render((versions) => {
-        const grouped = groupBy(versions, (k) => getBaseVersion(k.version));
+      render((allVersions) => {
+        const grouped = groupBy(allVersions, (k) => getBaseVersion(k.version));
+        const bases = orderVersions(Object.keys(grouped));
 
         return (
           <Box sx={{ py: 8 }}>
-            {map(grouped, (versions, base) => {
+            {map(bases, (base) => {
+              const versions = grouped[base]!;
               const focused = !!versions.find((v) => v.revisionID == props.revisionID);
 
               return (

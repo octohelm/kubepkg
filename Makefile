@@ -59,9 +59,18 @@ k.export:
 		--log-level=debug \
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
-		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
- 		--output=.tmp/demo.kube.tgt \
+ 		--output=.tmp/ \
  			./testdata/demo.yaml
+
+k.export.patch:
+	$(KUBEPKG) export \
+		--log-level=debug \
+		--storage-root=.tmp/kubepkg \
+		--platform=linux/$(ARCH) \
+		--since=./testdata/demo.previous.yaml \
+ 		--output=.tmp/ \
+ 			./testdata/demo.yaml
+
 
 k.export.list:
 	$(KUBEPKG) export \
@@ -69,7 +78,7 @@ k.export.list:
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
 		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
- 		--output=.tmp/demo.kube.tgt \
+ 		--output=.tmp/demo.kube.tgz \
  			./testdata/demo.list.yaml
 
 k.apply.demo:

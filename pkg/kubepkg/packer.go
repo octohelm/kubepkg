@@ -23,12 +23,33 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewPacker(n distribution.Namespace) *Packer {
-	return &Packer{Namespace: n}
+func NewPacker(n distribution.Namespace, optionFuncs ...PackerOptionFunc) *Packer {
+	o := &packerOptions{
+		FilterBlob: func(d digest.Digest) bool {
+			return true
+		},
+	}
+	for i := range optionFuncs {
+		optionFuncs[i](o)
+	}
+	return &Packer{Namespace: n, options: *o}
+}
+
+type PackerOptionFunc = func(o *packerOptions)
+
+type packerOptions struct {
+	FilterBlob func(d digest.Digest) bool
+}
+
+func WithFilterBlob(filterBlob func(d digest.Digest) bool) PackerOptionFunc {
+	return func(o *packerOptions) {
+		o.FilterBlob = filterBlob
+	}
 }
 
 type Packer struct {
 	distribution.Namespace
+	options packerOptions
 }
 
 func (p *Packer) KubeTgzTo(ctx context.Context, w io.Writer, kpkgs ...*v1alpha1.KubePkg) (dgst digest.Digest, err error) {
@@ -95,17 +116,19 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 
 		switch dm.Type {
 		case "blob":
-			blobs := repo.Blobs(ctx)
-			desc, err := blobs.Stat(ctx, pd)
-			if err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
-			}
-			f, err := blobs.Open(ctx, pd)
-			if err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
-			}
-			if err := p.copyBlobTo(ctx, tw, f, desc, i, len(kpkg.Status.Digests)); err != nil {
-				return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
+			if p.options.FilterBlob(pd) {
+				blobs := repo.Blobs(ctx)
+				desc, err := blobs.Stat(ctx, pd)
+				if err != nil {
+					return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
+				}
+				f, err := blobs.Open(ctx, pd)
+				if err != nil {
+					return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
+				}
+				if err := p.copyBlobTo(ctx, tw, f, desc, i, len(kpkg.Status.Digests)); err != nil {
+					return errors.Wrapf(err, "[%s] %s@%s", dm.Type, dm.Name, dm.Digest)
+				}
 			}
 		case "manifest":
 			manifests, _ := repo.Manifests(ctx)

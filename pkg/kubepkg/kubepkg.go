@@ -172,34 +172,55 @@ func (reg *Registry) ImportDigest(ctx context.Context, dm *v1alpha1.DigestMeta, 
 	if err != nil {
 		return err
 	}
+	return ImportDigest(ctx, repo, dm, r, false)
+}
 
+func ImportDigest(ctx context.Context, repo distribution.Repository, dm *v1alpha1.DigestMeta, r io.Reader, skipManifestList bool) error {
 	d, _ := digest.Parse(dm.Digest)
 
 	switch dm.Type {
 	case "blob":
-		if err := reg.importBlob(ctx, repo, r, distribution.Descriptor{
+		if err := ImportBlob(ctx, repo, r, distribution.Descriptor{
 			Digest: d,
 			Size:   int64(dm.Size),
 		}); err != nil {
 			return errors.Wrapf(err, "import blob %s@%s failed", dm.Name, dm.Digest)
 		}
 	case "manifest":
-		if err := reg.importManifest(ctx, repo, r, d); err != nil {
-			return errors.Wrapf(err, "import manifest %s@%s failed", dm.Name, dm.Digest)
+		if err := ImportBlob(ctx, repo, r, distribution.Descriptor{
+			Digest: d,
+			Size:   int64(dm.Size),
+		}); err != nil {
+			return errors.Wrapf(err, "import blob %s@%s failed", dm.Name, dm.Digest)
 		}
 
-		if dm.Tag != "" && dm.Platform == "" {
-			if err := repo.Tags(ctx).Tag(ctx, dm.Tag, distribution.Descriptor{
-				Digest: d,
-			}); err != nil {
-				return errors.Wrapf(err, "tag manifest %s:%s@%s failed", dm.Name, dm.Tag, dm.Digest)
+		if skipManifestList && dm.Platform == "" {
+			return nil
+		}
+
+		tag := ""
+
+		if dm.Tag != "" {
+			if skipManifestList {
+				// tag on manifest
+				tag = dm.Tag
+			} else {
+				// tag on manifest list
+				if dm.Platform == "" {
+					tag = dm.Tag
+				}
 			}
 		}
+
+		if err := ImportManifest(ctx, repo, r, d, tag); err != nil {
+			return errors.Wrapf(err, "import manifest %s@%s failed", dm.Name, dm.Digest)
+		}
 	}
+
 	return nil
 }
 
-func (reg *Registry) importManifest(ctx context.Context, repo distribution.Repository, r io.Reader, d digest.Digest) error {
+func ImportManifest(ctx context.Context, repo distribution.Repository, r io.Reader, d digest.Digest, tag string) error {
 	manifests, err := repo.Manifests(ctx, storage.SkipLayerVerification())
 	if err != nil {
 		return err
@@ -227,15 +248,20 @@ func (reg *Registry) importManifest(ctx context.Context, repo distribution.Repos
 		return err
 	}
 
-	if _, err := manifests.Put(ctx, m); err != nil {
-		return err
+	if tag != "" {
+		if _, err := manifests.Put(ctx, m, distribution.WithTag(tag)); err != nil {
+			return err
+		}
+	} else {
+		if _, err := manifests.Put(ctx, m); err != nil {
+			return err
+		}
 	}
 
 	return nil
-
 }
 
-func (reg *Registry) importBlob(ctx context.Context, repo distribution.Repository, r io.Reader, desc distribution.Descriptor) error {
+func ImportBlob(ctx context.Context, repo distribution.Repository, r io.Reader, desc distribution.Descriptor) error {
 	blobs := repo.Blobs(ctx)
 
 	_, err := blobs.Stat(ctx, desc.Digest)

@@ -62,6 +62,14 @@ k.export:
  		--output=.tmp/ \
  			./testdata/demo.yaml
 
+k.upload:
+	$(KUBEPKG) upload \
+			--extract-manifests-yaml=.tmp/manifests/demo.uploaded.yaml \
+			--registry-endpoint=https://${CONTAINER_REGISTRY} \
+			--registry-username=${CONTAINER_REGISTRY_USERNAME} \
+			--registry-password=${CONTAINER_REGISTRY_PASSWORD} \
+				./.tmp/demo-0.0.2-linux-arm64.kube.tgz
+
 k.export.patch:
 	$(KUBEPKG) export \
 		--log-level=debug \
@@ -70,7 +78,6 @@ k.export.patch:
 		--since=./testdata/demo.previous.yaml \
  		--output=.tmp/ \
  			./testdata/demo.yaml
-
 
 k.export.list:
 	$(KUBEPKG) export \

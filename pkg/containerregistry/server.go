@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"runtime"
 
+	containerregistryclient "github.com/octohelm/kubepkg/pkg/containerregistry/client"
+
 	"github.com/distribution/distribution/v3"
 	"github.com/distribution/distribution/v3/configuration"
 	"github.com/distribution/distribution/v3/registry/handlers"
@@ -15,14 +17,7 @@ import (
 	"github.com/octohelm/courier/pkg/courierhttp/handler"
 )
 
-type RemoteRegistry struct {
-	// Remote container registry endpoint
-	Endpoint string `flag:",omitempty"`
-	// Remote container registry username
-	Username string `flag:",omitempty"`
-	// Remote container registry password
-	Password string `flag:",omitempty,secret"`
-}
+type RemoteRegistry = containerregistryclient.RemoteRegistry
 
 type Server struct {
 	Storage Storage

@@ -22,7 +22,7 @@ type UploadBlob struct {
 }
 
 func (r *UploadBlob) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
 }
 
 func (r *UploadBlob) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {
@@ -38,7 +38,7 @@ type StatBlob struct {
 }
 
 func (r *StatBlob) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
 }
 
 func (r *StatBlob) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (*StatBlobResponse, github_com_octohelm_courier_pkg_courier.Metadata, error) {
@@ -56,7 +56,7 @@ type ListKubePkg struct {
 }
 
 func (r *ListKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
 }
 
 func (r *ListKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (*ListKubePkgResponse, github_com_octohelm_courier_pkg_courier.Metadata, error) {
@@ -73,7 +73,7 @@ type ApplyKubePkg struct {
 }
 
 func (r *ApplyKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
 }
 
 func (r *ApplyKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {
@@ -91,7 +91,7 @@ type GetKubePkg struct {
 }
 
 func (r *GetKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
 }
 
 func (r *GetKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (*GetKubePkgResponse, github_com_octohelm_courier_pkg_courier.Metadata, error) {
@@ -109,7 +109,7 @@ type DelKubePkg struct {
 }
 
 func (r *DelKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContent(ctx, "agent").Do(ctx, r, metas...)
+	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
 }
 
 func (r *DelKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {

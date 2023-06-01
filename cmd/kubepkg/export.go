@@ -41,13 +41,14 @@ type Exporter struct {
 	ForceResolve bool `flag:",omitempty"`
 	// Output path for kubepkg.tgz
 	Output string
-	// Extract manifests as yaml
-	ExtractManifestsYaml string `flag:",omitempty"`
+
 	// Supported platforms
 	Platform []string `flag:",omitempty"`
 
 	// For create patcher
 	SinceKubepkgJSON string `flag:"since,omitempty"`
+
+	ManifestDumper
 }
 
 func (s *Exporter) SetDefaults() {
@@ -144,6 +145,36 @@ func (s *Exporter) Run(ctx context.Context) error {
 
 	l.WithValues("digest", d).Info("%s generated.", output)
 
+	return s.ManifestDumper.DumpManifests(kubepkgs)
+}
+
+func (s *Exporter) resolveDigests(ctx context.Context, dr *kubepkg.DigestResolver, kubepkgs []*v1alpha1.KubePkg) error {
+	for i := range kubepkgs {
+		kpkg := kubepkgs[i]
+
+		kubepkg.AnnotationPlatforms(kpkg, s.Platform)
+
+		if s.ForceResolve {
+			for k := range kpkg.Status.Images {
+				kpkg.Status.Images[k] = ""
+			}
+		}
+
+		resolved, err := dr.Resolve(ctx, kpkg)
+		if err != nil {
+			return err
+		}
+		kubepkgs[i] = resolved
+	}
+	return nil
+}
+
+type ManifestDumper struct {
+	// Extract manifests as yaml
+	ExtractManifestsYaml string `flag:",omitempty"`
+}
+
+func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 	if s.ExtractManifestsYaml != "" {
 		manifestsYamlFile, err := ioutil.CreateOrOpen(s.ExtractManifestsYaml)
 		if err != nil {
@@ -167,26 +198,5 @@ func (s *Exporter) Run(ctx context.Context) error {
 		}
 	}
 
-	return nil
-}
-
-func (s *Exporter) resolveDigests(ctx context.Context, dr *kubepkg.DigestResolver, kubepkgs []*v1alpha1.KubePkg) error {
-	for i := range kubepkgs {
-		kpkg := kubepkgs[i]
-
-		kubepkg.AnnotationPlatforms(kpkg, s.Platform)
-
-		if s.ForceResolve {
-			for k := range kpkg.Status.Images {
-				kpkg.Status.Images[k] = ""
-			}
-		}
-
-		resolved, err := dr.Resolve(ctx, kpkg)
-		if err != nil {
-			return err
-		}
-		kubepkgs[i] = resolved
-	}
 	return nil
 }

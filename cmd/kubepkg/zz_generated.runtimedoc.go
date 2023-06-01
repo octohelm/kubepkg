@@ -136,15 +136,20 @@ func (v Exporter) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{
 				"Output path for kubepkg.tgz",
 			}, true
-		case "ExtractManifestsYaml":
-			return []string{
-				"Extract manifests as yaml",
-			}, true
 		case "Platform":
 			return []string{
 				"Supported platforms",
 			}, true
+		case "SinceKubepkgJSON":
+			return []string{
+				"For create patcher",
+			}, true
+		case "ManifestDumper":
+			return []string{}, true
 
+		}
+		if doc, ok := runtimeDoc(v.ManifestDumper, names...); ok {
+			return doc, ok
 		}
 
 		return nil, false
@@ -199,6 +204,21 @@ func (v Importer) RuntimeDoc(names ...string) ([]string, bool) {
 		case "ManifestOutput":
 			return []string{
 				"Dir to output manifest. Only for importing to STORAGE_ROOT",
+			}, true
+
+		}
+
+		return nil, false
+	}
+	return []string{}, true
+}
+
+func (v ManifestDumper) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "ExtractManifestsYaml":
+			return []string{
+				"Extract manifests as yaml",
 			}, true
 
 		}
@@ -290,4 +310,49 @@ func (v Registry) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{
 		"Container Registry",
 	}, true
+}
+
+func (v Upload) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "Logger":
+			return []string{}, true
+		case "Uploader":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.Logger, names...); ok {
+			return doc, ok
+		}
+		if doc, ok := runtimeDoc(v.Uploader, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{
+		"Upload kubepkg.tgz to container registry",
+	}, true
+}
+
+func (v Uploader) RuntimeDoc(names ...string) ([]string, bool) {
+	if len(names) > 0 {
+		switch names[0] {
+		case "KubeTgzFile":
+			return []string{}, true
+		case "Registry":
+			return []string{}, true
+		case "KeepOriginHost":
+			return []string{}, true
+		case "ManifestDumper":
+			return []string{}, true
+
+		}
+		if doc, ok := runtimeDoc(v.ManifestDumper, names...); ok {
+			return doc, ok
+		}
+
+		return nil, false
+	}
+	return []string{}, true
 }

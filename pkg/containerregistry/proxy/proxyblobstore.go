@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
+	containerregistryclient "github.com/octohelm/kubepkg/pkg/containerregistry/client"
+
 	"github.com/pkg/errors"
 
 	"github.com/octohelm/kubepkg/pkg/ioutil"
@@ -20,7 +22,7 @@ type proxyBlobStore struct {
 	localStore     distribution.BlobStore
 	remoteStore    distribution.BlobService
 	repositoryName reference.Named
-	authChallenger authChallenger
+	authChallenger containerregistryclient.AuthChallenger
 }
 
 var _ distribution.BlobStore = &proxyBlobStore{}
@@ -80,7 +82,7 @@ func (pbs *proxyBlobStore) Stat(ctx context.Context, dgst digest.Digest) (distri
 		return distribution.Descriptor{}, err
 	}
 
-	if err := pbs.authChallenger.tryEstablishChallenges(ctx); err != nil {
+	if err := pbs.authChallenger.TryEstablishChallenges(ctx); err != nil {
 		return distribution.Descriptor{}, err
 	}
 
@@ -132,7 +134,7 @@ func (pbs *proxyBlobStore) Open(ctx context.Context, dgst digest.Digest) (io.Rea
 		return blob, nil
 	}
 
-	if err := pbs.authChallenger.tryEstablishChallenges(ctx); err != nil {
+	if err := pbs.authChallenger.TryEstablishChallenges(ctx); err != nil {
 		return nil, err
 	}
 

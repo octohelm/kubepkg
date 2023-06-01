@@ -3,19 +3,21 @@ package proxy
 import (
 	"context"
 
+	containerregistryclient "github.com/octohelm/kubepkg/pkg/containerregistry/client"
+
 	"github.com/distribution/distribution/v3"
 )
 
 type proxyTagService struct {
 	localTags      distribution.TagService
 	remoteTags     distribution.TagService
-	authChallenger authChallenger
+	authChallenger containerregistryclient.AuthChallenger
 }
 
 var _ distribution.TagService = proxyTagService{}
 
 func (pt proxyTagService) Get(ctx context.Context, tag string) (distribution.Descriptor, error) {
-	err := pt.authChallenger.tryEstablishChallenges(ctx)
+	err := pt.authChallenger.TryEstablishChallenges(ctx)
 	if err == nil {
 		desc, err := pt.remoteTags.Get(ctx, tag)
 		if err == nil {
@@ -47,7 +49,7 @@ func (pt proxyTagService) Untag(ctx context.Context, tag string) error {
 }
 
 func (pt proxyTagService) All(ctx context.Context) ([]string, error) {
-	err := pt.authChallenger.tryEstablishChallenges(ctx)
+	err := pt.authChallenger.TryEstablishChallenges(ctx)
 	if err == nil {
 		tags, err := pt.remoteTags.All(ctx)
 		if err == nil {

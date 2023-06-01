@@ -33,29 +33,6 @@ func (v Configuration) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{}, true
 }
 
-func (v RemoteRegistry) RuntimeDoc(names ...string) ([]string, bool) {
-	if len(names) > 0 {
-		switch names[0] {
-		case "Endpoint":
-			return []string{
-				"Remote container registry endpoint",
-			}, true
-		case "Username":
-			return []string{
-				"Remote container registry username",
-			}, true
-		case "Password":
-			return []string{
-				"Remote container registry password",
-			}, true
-
-		}
-
-		return nil, false
-	}
-	return []string{}, true
-}
-
 func (v Server) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {

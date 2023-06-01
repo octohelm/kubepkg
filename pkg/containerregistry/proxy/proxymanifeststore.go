@@ -3,11 +3,11 @@ package proxy
 import (
 	"context"
 
-	"github.com/distribution/distribution/v3/registry/storage"
-
 	"github.com/distribution/distribution/v3"
 	dcontext "github.com/distribution/distribution/v3/context"
 	"github.com/distribution/distribution/v3/reference"
+	"github.com/distribution/distribution/v3/registry/storage"
+	containerregistryclient "github.com/octohelm/kubepkg/pkg/containerregistry/client"
 	"github.com/opencontainers/go-digest"
 )
 
@@ -15,7 +15,7 @@ type proxyManifestStore struct {
 	repositoryName  reference.Named
 	localManifests  distribution.ManifestService
 	remoteManifests distribution.ManifestService
-	authChallenger  authChallenger
+	authChallenger  containerregistryclient.AuthChallenger
 }
 
 var _ distribution.ManifestService = &proxyManifestStore{}
@@ -28,7 +28,7 @@ func (pms proxyManifestStore) Exists(ctx context.Context, dgst digest.Digest) (b
 	if exists {
 		return true, nil
 	}
-	if err := pms.authChallenger.tryEstablishChallenges(ctx); err != nil {
+	if err := pms.authChallenger.TryEstablishChallenges(ctx); err != nil {
 		return false, err
 	}
 	return pms.remoteManifests.Exists(ctx, dgst)
@@ -37,7 +37,7 @@ func (pms proxyManifestStore) Exists(ctx context.Context, dgst digest.Digest) (b
 func (pms proxyManifestStore) Get(ctx context.Context, dgst digest.Digest, options ...distribution.ManifestServiceOption) (distribution.Manifest, error) {
 	manifest, err := pms.localManifests.Get(ctx, dgst, options...)
 	if err != nil {
-		if err := pms.authChallenger.tryEstablishChallenges(ctx); err != nil {
+		if err := pms.authChallenger.TryEstablishChallenges(ctx); err != nil {
 			return nil, err
 		}
 

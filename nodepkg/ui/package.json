@@ -7,7 +7,7 @@
     }
   },
   "dependencies": {
-    "@innoai-tech/vueuikit": "^0.8.1",
+    "@innoai-tech/vueuikit": "^0.8.3",
     "@mdi/js": "^7.2.96",
     "@nodepkg/runtime": "workspace:^",
     "copy-to-clipboard": "^3.3.3",
@@ -17,7 +17,7 @@
     "core-js": "*"
   },
   "devDependencies": {
-    "@popperjs/core": "^2.11.7"
+    "@popperjs/core": "^2.11.8"
   },
   "exports": {
     ".": {

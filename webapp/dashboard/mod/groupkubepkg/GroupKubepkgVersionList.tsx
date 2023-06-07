@@ -163,15 +163,8 @@ const Chip = styled("span")({
   alignItems: "center"
 });
 
-const trimV = (v: string) => {
-  if (v.startsWith("v")) {
-    return v.slice(1);
-  }
-  return v;
-};
-
 const compare = (a: string, b: string) => {
-  return semver.gt(trimV(a), trimV(b)) ? -1 : 1;
+  return semver.gt(semver.coerce(a), semver.coerce(b)) ? -1 : 1;
 };
 
 export const orderVersions = (versions: string[]) => {

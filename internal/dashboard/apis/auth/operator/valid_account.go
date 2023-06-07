@@ -87,7 +87,7 @@ func (a *Account) InjectContext(ctx context.Context) context.Context {
 			case "adminRole":
 				return a.AdminRole.String(), true
 			}
-			return "", false
+			return "", true
 		})),
 	)
 }

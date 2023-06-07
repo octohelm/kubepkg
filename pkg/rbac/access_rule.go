@@ -49,6 +49,7 @@ func (n *NeedAccessRule) CanAccess(ctx context.Context) bool {
 	}
 	if b, ok := ret.(bool); ok {
 		return b
+
 	}
 	return false
 }

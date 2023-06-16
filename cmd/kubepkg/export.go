@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/opencontainers/go-digest"
@@ -176,11 +178,17 @@ type ManifestDumper struct {
 
 func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 	if s.ExtractManifestsYaml != "" {
-		manifestsYamlFile, err := ioutil.CreateOrOpen(s.ExtractManifestsYaml)
-		if err != nil {
-			return errors.Wrapf(err, "open %s failed", s.ExtractManifestsYaml)
+		var w io.Writer = os.Stdout
+
+		if s.ExtractManifestsYaml != "-" {
+			manifestsYamlFile, err := ioutil.CreateOrOpen(s.ExtractManifestsYaml)
+			if err != nil {
+				return errors.Wrapf(err, "open %s failed", s.ExtractManifestsYaml)
+			}
+			defer manifestsYamlFile.Close()
+
+			w = manifestsYamlFile
 		}
-		defer manifestsYamlFile.Close()
 
 		for i := range kubepkgs {
 			manifests, err := manifest.ExtractComplete(kubepkgs[i])
@@ -192,8 +200,8 @@ func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 				if err != nil {
 					return errors.Wrapf(err, "encoding to yaml failed: %s", s.ExtractManifestsYaml)
 				}
-				_, _ = manifestsYamlFile.WriteString("---\n")
-				_, _ = manifestsYamlFile.Write(data)
+				_, _ = fmt.Fprint(w, "---\n")
+				_, _ = w.Write(data)
 			}
 		}
 	}

@@ -16,6 +16,8 @@ func init() {
 type Agent struct {
 	cli.C `component:"kubepkg-agent"`
 	otel.Otel
+	Metric otel.Metric
+
 	kubeutilclient.KubeClient
 	agent.Server
 }

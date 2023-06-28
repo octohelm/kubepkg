@@ -33,7 +33,8 @@ export const GroupEnvDeploymentsExportBtn = component$(
       subscribeUntilUnmount(() => {
         window.open(list$.toHref({
           groupName: props.groupName,
-          envName: props.envName
+          envName: props.envName,
+          size: -1,
         }));
       })
     );

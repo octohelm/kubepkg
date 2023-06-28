@@ -31,6 +31,8 @@ func init() {
 type Dashboard struct {
 	cli.C `component:"kubepkg-dashboard"`
 	otel.Otel
+	Metric otel.Metric
+
 	idgen.IDGen
 	Sign             signer.JWTSigner
 	Auth             dashboard.AuthProvider

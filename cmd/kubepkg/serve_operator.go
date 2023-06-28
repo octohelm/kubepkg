@@ -16,6 +16,7 @@ func init() {
 type Operator struct {
 	cli.C `component:"kubepkg-operator"`
 	otel.Otel
+
 	kubeutilclient.KubeClient
 	controller.Operator
 }

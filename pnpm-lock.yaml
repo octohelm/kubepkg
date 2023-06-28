@@ -178,8 +178,8 @@ importers:
   nodepkg/ui:
     dependencies:
       '@innoai-tech/vueuikit':
-        specifier: ^0.8.4
-        version: 0.8.4
+        specifier: ^0.8.5
+        version: 0.8.5
       '@mdi/js':
         specifier: ^7.2.96
         version: 7.2.96
@@ -758,8 +758,8 @@ packages:
       vue-router: 4.2.2(vue@3.3.4)
     dev: false
 
-  /@innoai-tech/vueuikit@0.8.4:
-    resolution: {integrity: sha512-iR8eUFfclFbxHDDBAQ5OOOkv07a6quq4Uk8zVAiO7Q4Wdr6n0Wfpx8lv/Zx7T8WzCdvtuOmpHVPaRdIgR2Nf4Q==, tarball: https://npm.pkg.github.com/download/@innoai-tech/vueuikit/0.8.4/712b65e8d4cb00f8efa8e1f5f1b71c8e8b75096c}
+  /@innoai-tech/vueuikit@0.8.5:
+    resolution: {integrity: sha512-6NsQt8jkZrOprmbxhaPqu0J9TARgVUjujTcvOKxqh15mmJv6Q1eCn52R1xbuLdsCgvP3N4PSOaBadGt0/w3fVw==, tarball: https://npm.pkg.github.com/download/@innoai-tech/vueuikit/0.8.5/4a5855d6d768c4f8c2749fd24ea6d5acfc1080a3}
     dependencies:
       '@emotion/cache': 11.11.0
       '@emotion/serialize': 1.1.2

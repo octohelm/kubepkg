@@ -157,7 +157,7 @@ const GroupEnvDeploymentPut = component$(
                 kubepkg={kubepkgTemplate}
                 overwrites={{
                   metadata: {
-                    name: overwrites.metadata?.name
+                    name: props.kubepkg.metadata?.name ?? overwrites.metadata?.name
                   },
                   spec: omit(overwrites.spec, ["version"]) as any
                 }}

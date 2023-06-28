@@ -1,42 +1,68 @@
 # KubePkg
 
 ```mermaid
+
 %%{init:{'theme':'base'}}%%
-flowchart BT
-    subgraph internet ["Internet"]
-        kubepkg_manifest("KubePkg.yaml")
-        kubepkg_airgap("KubePkg.airgap.tgz")
+sequenceDiagram
+    actor dev
+
+    box centre
+        participant kubepkg_dashboard as KubePkg Dashboard
     end
-    
-    subgraph intranet ["Intranet"]
-        kubepkg_airgap_intranet("KubePkg.airgap.tgz")
-        
-        subgraph cluster ["k8s/k3s cluster"]
-            kubepkg_agent(("KubePkg\nAgent"))
-            kubepkg_registry[("KubePkg\nRegistry")]
-            kubepkg_crd[["KubePkg CRD"]]
-            kubepkg_operator(("KubePkg\nOperator"))
-            k8s_manifests[["Kuberneters\nManifests"]]
+
+    box k3s/k8s cluster
+        participant cluster_kubepkg_agent as KubePkg Agent
+        participant cluster_k8s_api as Kubernetes API
+        participant cluster_kubepkg_operator as KubePkg Operator
+        participant cluster_container_registry as Container Registry
+        participant cluster_pod as Workloads
+    end
+
+    par setup
+        cluster_kubepkg_agent ->> kubepkg_dashboard: register
+    end
+
+    par version
+        dev ->> kubepkg_dashboard: put KubePkg.yaml
+    end
+
+    par direct
+        kubepkg_dashboard ->> cluster_kubepkg_agent: put KubePkg.yaml
+        activate cluster_kubepkg_agent
+        cluster_kubepkg_agent ->> cluster_k8s_api: apply KubePkg.yaml
+        deactivate cluster_kubepkg_agent
+    end
+
+    par airgap
+        kubepkg_dashboard ->> dev: get KubePkg.yaml
+        activate dev
+        dev ->> dev: create KubePkg.airgap.tgz
+
+        dev ->> cluster_kubepkg_agent: update KubePkg.airgap.tgz
+
+        deactivate dev
+
+        activate cluster_kubepkg_agent
+        cluster_kubepkg_agent ->> cluster_container_registry: upload images
+        cluster_kubepkg_agent ->> cluster_k8s_api: apply KubePkg.yaml
+        deactivate cluster_kubepkg_agent
+
+    end
+
+    par CRD to Kubernetes resources
+        loop watch CRD kubepkg
+            cluster_k8s_api -->> cluster_kubepkg_operator: convert to Kubernetes resources
+            cluster_kubepkg_operator ->> cluster_k8s_api: apply kubepkg resources
+        end
+
+        par pod creation
+            cluster_container_registry ->> cluster_pod: pull images
+
+            loop watch kubepkg resources
+                cluster_k8s_api -->> cluster_kubepkg_operator: convert to KubePkg.State
+            end
         end
     end
-    
-    kubepkg_manifest
-        ==> |`kubepkg save`| kubepkg_airgap 
-        -.-> kubepkg_airgap_intranet
-        ==> |`kubepkg import`| kubepkg_agent    
-    
-    kubepkg_agent
-        -->|apply when images ready| kubepkg_crd
-        -.->|notice changes| kubepkg_operator
-        -->|apply| k8s_manifests
-    
-    kubepkg_agent
-        --> |import image manifests / blobs| kubepkg_registry
-        -.-> |pull image| k8s_manifests
-        
-    k8s_manifests
-        -.->|notice changes| kubepkg_operator
-        -->|update status| kubepkg_crd    
 ```
 
 ## Requires

@@ -38,8 +38,6 @@ actions: webapp: node.#Project & {
 
 	build: {
 		outputs: {
-			// output: vite dest
-			"agent/dist":     "public/agent"
 			"dashboard/dist": "public/dashboard"
 		}
 
@@ -49,7 +47,6 @@ actions: webapp: node.#Project & {
 
 		script: """
 			APP=dashboard pnpm exec vite build --mode production
-			APP=agent pnpm exec vite build --mode production
 			"""
 
 		image: {

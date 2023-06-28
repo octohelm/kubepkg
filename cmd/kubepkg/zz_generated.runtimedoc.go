@@ -279,6 +279,8 @@ func (v PrintManifests) RuntimeDoc(names ...string) ([]string, bool) {
 		switch names[0] {
 		case "Namespace":
 			return []string{}, true
+		case "Output":
+			return []string{}, true
 		case "KubepkgJSON":
 			return []string{}, true
 

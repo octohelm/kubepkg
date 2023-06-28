@@ -80,7 +80,7 @@ func (s *Server) Init(ctx context.Context) error {
 	svc.Handler = handler.ApplyHandlerMiddlewares(
 		middleware.HealthCheckHandler(),
 		middleware.ContextInjectorMiddleware(infraconfiguration.ContextInjectorFromContext(ctx)),
-		middleware.LogHandler(),
+		middleware.LogAndMetricHandler(),
 		enableMirrors,
 	)(app)
 

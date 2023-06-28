@@ -20,7 +20,7 @@ test:
 install:
 	go install ./cmd/kubepkg
 
-k.k8s: gen.kubepkg
+k.k8s:
 	$(KUBEPKG) serve operator --dump-k8s
 	$(KUBEPKG) serve registry --dump-k8s
 	$(KUBEPKG) serve agent --dump-k8s
@@ -140,14 +140,8 @@ lint.node:
 build.node:
 	pnpm exec turbo run build --force
 
-dev.agent:
-	pnpm exec turbo run dev --filter=@webapp/agent
-
 build.dashboard:
 	APP=dashboard pnpm exec vite build --mode production
-
-build.agent:
-	APP=agent pnpm exec vite build --mode production
 
 dev.dashboard:
 	pnpm exec vite

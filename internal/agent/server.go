@@ -31,11 +31,6 @@ type Server struct {
 
 	r *kubepkg.Registry
 	s *http.Server
-	h handler.HandlerMiddleware
-}
-
-func (s *Server) ApplyHandler(h handler.HandlerMiddleware) {
-	s.h = h
 }
 
 func (s *Server) SetDefaults() {
@@ -78,7 +73,7 @@ func (a *Server) Init(ctx context.Context) error {
 			apis.R,
 			fmt.Sprintf("%s-agent@%s", info.App.Name, info.App.Version),
 			middleware.ContextInjectorMiddleware(configuration.ContextInjectorFromContext(ctx)),
-			middleware.LogHandler(),
+			middleware.LogAndMetricHandler(),
 		)
 		if err != nil {
 			return err
@@ -90,10 +85,6 @@ func (a *Server) Init(ctx context.Context) error {
 			middleware.CompressLevelHandlerMiddleware(gzip.DefaultCompression),
 			middleware.DefaultCORS(),
 		)(h)
-
-		if a.h != nil {
-			h = a.h(h)
-		}
 
 		a.s = &http.Server{
 			Addr:    a.AgentAddr,

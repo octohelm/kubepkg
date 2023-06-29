@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/octohelm/kubepkg/pkg/kubeutil"
 	appsv1 "k8s.io/api/apps/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -14,17 +13,6 @@ func Apply(ctx context.Context, cc client.Client, o client.Object) error {
 		return err
 	}
 	return nil
-}
-
-func AnnotateHash(o client.Object, key string, hash string) {
-	switch m := o.(type) {
-	case *appsv1.Deployment:
-		kubeutil.Annotate(&m.Spec.Template, key, hash)
-	case *appsv1.StatefulSet:
-		kubeutil.Annotate(&m.Spec.Template, key, hash)
-	case *appsv1.DaemonSet:
-		kubeutil.Annotate(&m.Spec.Template, key, hash)
-	}
 }
 
 func RangeWorkload(ctx context.Context, c client.Client, namespace string, each func(o client.Object) error) error {

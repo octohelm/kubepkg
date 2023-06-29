@@ -4,6 +4,10 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+
+	"github.com/octohelm/kubepkg/pkg/kubeutil"
+	appsv1 "k8s.io/api/apps/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func StringDataHash(inputs map[string]string) string {
@@ -18,4 +22,15 @@ func DataHash(inputs map[string][]byte) string {
 	w := sha256.New()
 	w.Write(data)
 	return fmt.Sprintf("%x", w.Sum(nil))
+}
+
+func AnnotateHash(o client.Object, key string, hash string) {
+	switch m := o.(type) {
+	case *appsv1.Deployment:
+		kubeutil.Annotate(&m.Spec.Template, key, hash)
+	case *appsv1.StatefulSet:
+		kubeutil.Annotate(&m.Spec.Template, key, hash)
+	case *appsv1.DaemonSet:
+		kubeutil.Annotate(&m.Spec.Template, key, hash)
+	}
 }

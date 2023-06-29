@@ -142,7 +142,7 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 
 		for i := range cms.Items {
 			cm := cms.Items[i]
-			AnnotateHash(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
+			manifest.AnnotateHash(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
 		}
 	}
 
@@ -158,7 +158,7 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 
 		for i := range ss.Items {
 			s := ss.Items[i]
-			AnnotateHash(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
+			manifest.AnnotateHash(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
 		}
 	}
 

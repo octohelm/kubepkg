@@ -28,8 +28,8 @@
     "rollup-plugin-visualizer": "^5.9.2",
     "semver": "^7.5.3",
     "tsx": "^3.12.7",
-    "turbo": "^1.10.6",
-    "typescript": "^5.1.5",
+    "turbo": "^1.10.7",
+    "typescript": "^5.1.6",
     "vite": "^4.3.9",
     "vitest": "^0.32.2"
   },

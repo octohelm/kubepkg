@@ -704,6 +704,15 @@ export enum AccountType {
   ROBOT = "ROBOT",
 }
 
+export const displayAccountType = (v: AccountType) => {
+  return (
+    {
+      USER: "USER",
+      ROBOT: "ROBOT",
+    }[v] ?? v
+  );
+};
+
 export type AccountUserInfo = {
   email?: string;
   mobile?: string;
@@ -716,6 +725,17 @@ export enum GroupRoleType {
   MEMBER = "MEMBER",
   GUEST = "GUEST",
 }
+
+export const displayGroupRoleType = (v: GroupRoleType) => {
+  return (
+    {
+      OWNER: "拥有者",
+      ADMIN: "管理员",
+      MEMBER: "成员",
+      GUEST: "访问者",
+    }[v] ?? v
+  );
+};
 
 export type GroupUserDataList = {
   data: Array<GroupUser>;
@@ -770,10 +790,28 @@ export enum ClusterEnvType {
   ONLINE = "ONLINE",
 }
 
+export const displayClusterEnvType = (v: ClusterEnvType) => {
+  return (
+    {
+      DEV: "开发集群",
+      ONLINE: "生产集群",
+    }[v] ?? v
+  );
+};
+
 export enum ClusterNetType {
   DIRECT = "DIRECT",
   AIRGAP = "AIRGAP",
 }
+
+export const displayClusterNetType = (v: ClusterNetType) => {
+  return (
+    {
+      DIRECT: "可直连",
+      AIRGAP: "离线",
+    }[v] ?? v
+  );
+};
 
 export type ClusterId = string;
 
@@ -801,6 +839,15 @@ export enum GroupType {
   DEPLOYMENT = "DEPLOYMENT",
 }
 
+export const displayGroupType = (v: GroupType) => {
+  return (
+    {
+      DEVELOP: "研发",
+      DEPLOYMENT: "交付组",
+    }[v] ?? v
+  );
+};
+
 export type GroupEnvWithCluster = GroupEnv & {
   cluster?: Cluster;
 };
@@ -822,6 +869,15 @@ export enum GroupEnvType {
   DEV = "DEV",
   ONLINE = "ONLINE",
 }
+
+export const displayGroupEnvType = (v: GroupEnvType) => {
+  return (
+    {
+      DEV: "开发环境",
+      ONLINE: "线上环境",
+    }[v] ?? v
+  );
+};
 
 export type GroupEnvCluster = {
   namespace: string;
@@ -1649,6 +1705,17 @@ export enum KubepkgChannel {
   RC = "RC",
   STABLE = "STABLE",
 }
+
+export const displayKubepkgChannel = (v: KubepkgChannel) => {
+  return (
+    {
+      DEV: "开发",
+      BETA: "测试",
+      RC: "预览",
+      STABLE: "正式",
+    }[v] ?? v
+  );
+};
 
 export type KubepkgRevisionId = string;
 

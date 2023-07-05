@@ -16,9 +16,9 @@ import {
   type KubepkgRevisionId
 } from "@webapp/dashboard/client/dashboard";
 import { combineLatest, map as rxMap } from "@nodepkg/runtime/rxjs";
-import { getBaseVersion } from "@webapp/dashboard/mod/groupkubepkg/helpers";
+import { getBaseVersion } from "./helpers";
 import { groupBy, map } from "@nodepkg/runtime/lodash";
-import { orderVersions } from "@webapp/dashboard/mod/groupkubepkg/GroupKubepkgVersionList";
+import { FilterInput, orderVersions } from "./GroupKubepkgVersionList";
 
 export const GroupKubepkgVersionSelect = component$(
   {
@@ -53,15 +53,43 @@ export const GroupKubepkgVersionSelect = component$(
       })
     );
 
+    const filterInput$ = observableRef({
+      input: ""
+    });
+
     return rx(
-      listKubepkgVersion$,
-      rxMap((resp) => resp.body),
-      render((allVersions) => {
-        const grouped = groupBy(allVersions, (k) => getBaseVersion(k.version));
+      combineLatest(
+        rx(
+          listKubepkgVersion$,
+          rxMap((resp) => resp.body)
+        ),
+        filterInput$
+      ),
+      rxMap(([allVersions, filters]) => {
+        if (filters.input) {
+          return allVersions.filter((v) =>
+            v.version.includes(filters.input)
+          );
+        }
+        return allVersions
+      }),
+      render((versions) => {
+        const grouped = groupBy(versions, (k) => getBaseVersion(k.version));
         const bases = orderVersions(Object.keys(grouped));
 
         return (
           <Box sx={{ py: 8 }}>
+            <Box sx={{ py: 4 }}>
+              <FilterInput
+                sx={{ width: "100%" }}
+                placeholder={"输入并筛选版本"}
+                onInput={(e) =>
+                  filterInput$.next((f) => {
+                    f.input = (e.target as HTMLInputElement).value?.trim() ?? "";
+                  })
+                }
+              />
+            </Box>
             {map(bases, (base) => {
               const versions = grouped[base]!;
               const focused = !!versions.find((v) => v.revisionID == props.revisionID);

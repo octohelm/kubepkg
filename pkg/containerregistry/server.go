@@ -11,6 +11,7 @@ import (
 	"github.com/distribution/distribution/v3/configuration"
 	"github.com/distribution/distribution/v3/registry/handlers"
 	regsitrymiddleware "github.com/distribution/distribution/v3/registry/middleware/registry"
+	"github.com/distribution/distribution/v3/registry/storage/driver"
 	"github.com/go-courier/logr"
 	infraconfiguration "github.com/innoai-tech/infra/pkg/configuration"
 	"github.com/innoai-tech/infra/pkg/http/middleware"
@@ -58,7 +59,7 @@ func (s *Server) Init(ctx context.Context) error {
 		return err
 	}
 
-	_ = regsitrymiddleware.Register("custom", func(ctx context.Context, registry distribution.Namespace, options map[string]any) (distribution.Namespace, error) {
+	_ = regsitrymiddleware.Register("custom", func(ctx context.Context, registry distribution.Namespace, driver driver.StorageDriver, options map[string]interface{}) (distribution.Namespace, error) {
 		return cr, nil
 	})
 

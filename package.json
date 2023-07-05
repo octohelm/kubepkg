@@ -16,9 +16,9 @@
   },
   "devDependencies": {
     "@innoai-tech/config": "^0.5.2",
-    "@innoai-tech/gents": "^0.6.3",
-    "@innoai-tech/monobundle": "^0.9.6",
-    "@innoai-tech/vue-vite-presets": "^0.4.1",
+    "@innoai-tech/gents": "^0.6.4",
+    "@innoai-tech/monobundle": "^0.10.0",
+    "@innoai-tech/vue-vite-presets": "^0.5.1",
     "@nodepkg/devconfig": "workspace:^",
     "@vue/test-utils": "^2.4.0",
     "copy-to-clipboard": "^3.3.3",
@@ -31,7 +31,7 @@
     "turbo": "^1.10.7",
     "typescript": "^5.1.6",
     "vite": "^4.3.9",
-    "vitest": "^0.32.2"
+    "vitest": "^0.32.4"
   },
   "prettier": {}
 }

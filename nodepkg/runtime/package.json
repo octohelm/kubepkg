@@ -17,9 +17,9 @@
   "dependencies": {
     "@innoai-tech/fetcher": "^0.5.3",
     "@innoai-tech/lodash": "^0.2.1",
-    "@innoai-tech/typedef": "^0.2.7",
-    "@innoai-tech/vueformdata": "^0.1.1",
-    "@innoai-tech/vuekit": "^0.6.2",
+    "@innoai-tech/typedef": "^0.2.8",
+    "@innoai-tech/vueformdata": "^0.1.2",
+    "@innoai-tech/vuekit": "^0.6.3",
     "date-fns": "^2.30.0",
     "rxjs": "^7.8.1",
     "vue": "^3.3.4"

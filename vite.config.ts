@@ -1,6 +1,5 @@
 import { defineConfig, type PluginOption } from "vite";
-import { app, viteChunkSplit, viteVue } from "@innoai-tech/vue-vite-presets";
-import { chunkCleanup } from "@innoai-tech/monobundle";
+import { app, viteChunkSplit, viteVue, chunkCleanup } from "@innoai-tech/vue-vite-presets";
 import { injectWebAppConfig } from "@innoai-tech/config/vite-plugin-inject-config";
 import { generateClients } from "@innoai-tech/gents";
 import { visualizer } from "rollup-plugin-visualizer";

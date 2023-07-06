@@ -58,9 +58,10 @@ import (
 		}
 	}
 
-	_output: core.#Subdir & {
-		input: run.output.rootfs
-		path:  run.workdir
+	_output: core.#Copy & {
+		contents: run.output.rootfs
+		source:   run.workdir
+		dest:     "/"
 	}
 
 	output: _output.output

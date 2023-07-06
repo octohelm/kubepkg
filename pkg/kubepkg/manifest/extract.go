@@ -13,16 +13,14 @@ import (
 
 type ObjectProcess = func(o Object) (Object, error)
 
-func Extract(m any, progress ...ObjectProcess) (map[string]Object, error) {
+func ExtractWith(m any, progress ...ObjectProcess) (map[string]Object, error) {
 	w := &walker{
 		manifests: map[string]Object{},
 		progress:  progress,
 	}
-
 	if err := w.walk(m, nil); err != nil {
 		return nil, err
 	}
-
 	return w.manifests, nil
 }
 

@@ -2,26 +2,10 @@ package agent
 
 import (
 	"mime"
-	"net/http"
 	"strings"
 )
 
 var HEADER_KUBEPKG_AGENT = "X-Kubepkg-Server"
-
-func agentMetaHandlerMiddleware(version string, a *Server) func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			rw.Header().Set(HEADER_KUBEPKG_AGENT, ToKubeAgentHead(&AgentInfo{
-				AgentID:            a.AgentID,
-				SupportedPlatforms: a.Platforms,
-
-				Version: version,
-			}))
-
-			h.ServeHTTP(rw, req)
-		})
-	}
-}
 
 type AgentInfo struct {
 	AgentID            string

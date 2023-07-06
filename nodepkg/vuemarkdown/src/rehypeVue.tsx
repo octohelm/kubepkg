@@ -8,8 +8,8 @@ import { h } from "@nodepkg/runtime/vue";
 const tableElements = new Set(["table", "thead", "tbody", "tfoot", "tr"]);
 
 export function rehypeVue({
-                            components
-                          }: {
+  components,
+}: {
   components: Record<string, Component<any>>;
 }) {
   // @ts-ignore
@@ -22,7 +22,7 @@ export function rehypeVue({
   function createElement(
     name: string,
     props: any,
-    children?: any[] | undefined
+    children?: any[] | undefined,
   ) {
     if (children && tableElements.has(name)) {
       children = children.filter((child) => !whitespace(child));

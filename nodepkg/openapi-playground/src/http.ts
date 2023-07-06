@@ -24,7 +24,7 @@ const pickKeysIn =
   (parameters: any[]): string[] =>
     map(
       pickParametersIn(where)(parameters),
-      (parameter: any) => parameter.name
+      (parameter: any) => parameter.name,
     );
 
 const pickDefaults = (where: string, parameters: any[]) =>
@@ -34,13 +34,13 @@ const pickDefaults = (where: string, parameters: any[]) =>
       ...defaults,
       [String(parameter.name)]: parameter.default,
     }),
-    {}
+    {},
   );
 
 export const pickValuesIn = (
   where: string,
   parameters: any[],
-  values: any
+  values: any,
 ) => ({
   ...pickDefaults(where, parameters),
   ...pick(values, pickKeysIn(where)(parameters)),
@@ -58,11 +58,11 @@ const mayWithQuery = (queries: Record<string, any>): string => {
 
 export const compilePath = (
   path: string,
-  params: Dictionary<any> = {}
+  params: Dictionary<any> = {},
 ): string =>
   replace(path, /{([\s\S]+?)}/g, (target: string, key: string) =>
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    ([] as string[]).concat(params[key] || target).join(",")
+    ([] as string[]).concat(params[key] || target).join(","),
   );
 
 export const buildOriginalUrl = (url: string, queries: Record<string, any>) => {

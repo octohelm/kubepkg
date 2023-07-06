@@ -1,4 +1,10 @@
-import { rx, t, component$, type Component, type VNode } from "@nodepkg/runtime";
+import {
+  rx,
+  t,
+  component$,
+  type Component,
+  type VNode,
+} from "@nodepkg/runtime";
 import { combineLatest, from, switchMap, map } from "@nodepkg/runtime/rxjs";
 import { unified, remarkRehype, remarkParse, rehypeVue } from "./unified";
 
@@ -13,14 +19,14 @@ export const Markdown = component$(
         unified()
           .use(remarkParse)
           .use(remarkRehype)
-          .use(rehypeVue, { components: components ?? {} })
-      )
+          .use(rehypeVue, { components: components ?? {} }),
+      ),
     );
 
     return rx(
       combineLatest([processor$, props.text$]),
       switchMap(([processor, text]) => from(processor.process(text))),
-      render((vfile: any) => vfile.result as VNode)
+      render((vfile: any) => vfile.result as VNode),
     );
-  }
+  },
 );

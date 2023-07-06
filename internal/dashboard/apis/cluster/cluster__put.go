@@ -30,5 +30,5 @@ type PutCluster struct {
 }
 
 func (p *PutCluster) Output(ctx context.Context) (any, error) {
-	return clusterrepository.NewClusterRepository().Put(ctx, p.Name, p.Info)
+	return clusterrepository.NewClusterRepository().PutInfo(ctx, p.Name, p.Info)
 }

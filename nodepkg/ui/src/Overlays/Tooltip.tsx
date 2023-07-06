@@ -2,7 +2,7 @@ import {
   defineTransition,
   transition,
   Popper,
-  styled
+  styled,
 } from "@innoai-tech/vueuikit";
 
 import { component, t, type VNodeChild } from "@nodepkg/runtime";
@@ -11,24 +11,24 @@ import { cloneVNode, ref } from "vue";
 const FadeInOutTransition = defineTransition(
   {
     from: {
-      opacity: 0
+      opacity: 0,
     },
     to: {
-      opacity: 1
+      opacity: 1,
     },
     duration: transition.duration.md1,
-    easing: transition.easing.standard.accelerate
+    easing: transition.easing.standard.accelerate,
   },
   {
     from: {
-      opacity: 1
+      opacity: 1,
     },
     to: {
-      opacity: 0
+      opacity: 0,
     },
     duration: transition.duration.sm4,
-    easing: transition.easing.standard.decelerate
-  }
+    easing: transition.easing.standard.decelerate,
+  },
 );
 
 const TooltipContainer = styled("div")({
@@ -40,13 +40,13 @@ const TooltipContainer = styled("div")({
   textStyle: "sys.body-small",
   pos: "relative",
   zIndex: 100,
-  pointerEvents: "none"
+  pointerEvents: "none",
 });
 
 export const Tooltip = component(
   {
     title: t.custom<VNodeChild>().optional(),
-    $default: t.custom<VNodeChild>().optional()
+    $default: t.custom<VNodeChild>().optional(),
   },
   (props, { slots }) => {
     const isOpen = ref(false);
@@ -68,21 +68,21 @@ export const Tooltip = component(
         >
           {child
             ? cloneVNode(child, {
-              onVnodeMounted: (node) => {
-                triggerRef.value = resolveElement(node.el);
-              },
-              onMouseover: () => {
-                isOpen.value = true;
-              },
-              onMouseleave: () => {
-                isOpen.value = false;
-              }
-            })
+                onVnodeMounted: (node) => {
+                  triggerRef.value = resolveElement(node.el);
+                },
+                onMouseover: () => {
+                  isOpen.value = true;
+                },
+                onMouseleave: () => {
+                  isOpen.value = false;
+                },
+              })
             : null}
         </Popper>
       );
     };
-  }
+  },
 );
 
 function resolveElement(el: any): HTMLElement | null {

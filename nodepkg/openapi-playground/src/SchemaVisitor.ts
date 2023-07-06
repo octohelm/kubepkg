@@ -17,7 +17,7 @@ export class SchemaVisitor {
   constructor(
     private rootSchema: any,
     private resolve: (ref: string, visitor: SchemaVisitor) => any,
-    private transformers: Array<(schema: any) => any> = []
+    private transformers: Array<(schema: any) => any> = [],
   ) {}
 
   process(schema: any): any {
@@ -57,14 +57,14 @@ export class SchemaVisitor {
       return {
         ...schema,
         properties: mapValues(schema.properties, (propSchema) =>
-          this.process(propSchema)
+          this.process(propSchema),
         ),
         propertyNames: this.process(schema.propertyNames || { type: "string" }),
         additionalProperties: schema.additionalProperties
           ? this.process(
               isObject(schema.additionalProperties)
                 ? schema.additionalProperties
-                : {}
+                : {},
             )
           : false,
       };

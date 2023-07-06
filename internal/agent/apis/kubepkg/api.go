@@ -2,6 +2,9 @@
 // +gengo:operator:tag=kubepkg
 package kubepkg
 
-import "github.com/octohelm/courier/pkg/courier"
+import (
+	"github.com/octohelm/courier/pkg/courier"
+	authoperator "github.com/octohelm/kubepkg/internal/agent/apis/auth/operator"
+)
 
-var R = courier.NewRouter()
+var R = courier.NewRouter(&authoperator.ValidAccount{})

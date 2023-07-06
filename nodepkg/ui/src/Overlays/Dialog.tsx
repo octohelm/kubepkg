@@ -19,7 +19,7 @@ import { watch, ref, type VNodeChild } from "vue";
 import { FilledButton, TextButton } from "../Buttons";
 
 export const useDialog = (
-  r: (dialog$: ObservableRef<boolean>) => JSX.Element
+  r: (dialog$: ObservableRef<boolean>) => JSX.Element,
 ) => {
   const isOpen$ = observableRef(false);
 
@@ -32,7 +32,7 @@ export const useDialog = (
             {r(isOpen$)}
           </Dialog>
         );
-      })
+      }),
     ),
   });
 };
@@ -143,7 +143,7 @@ export const DialogContent = styled(
         {slots.action && <div data-role={"action"}>{slots.action()}</div>}
       </Wrap>
     );
-  }
+  },
 )({
   display: "flex",
   flexDirection: "column",
@@ -177,7 +177,7 @@ const FadeInOutTransition = defineTransition(
     },
     duration: transition.duration.sm4,
     easing: transition.easing.standard.accelerate,
-  }
+  },
 );
 
 export const Dialog = component(
@@ -200,7 +200,7 @@ export const Dialog = component(
           // animate leave first，then unmount
           animateToEnterOrLevel.value = false;
         }
-      }
+      },
     );
 
     return () => {
@@ -231,5 +231,5 @@ export const Dialog = component(
         </Overlay>
       );
     };
-  }
+  },
 );

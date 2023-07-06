@@ -1,1 +1,1 @@
-export * from "@innoai-tech/lodash"
+export * from "@innoai-tech/lodash";

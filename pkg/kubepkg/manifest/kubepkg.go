@@ -10,7 +10,22 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func ExtractComplete(kpkg *v1alpha1.KubePkg) (map[string]Object, error) {
+func ExtractSorted(kpkg *v1alpha1.KubePkg) ([]Object, error) {
+	manifests, err := Extract(kpkg)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]Object, 0, len(manifests))
+
+	for k := range manifests {
+		list = append(list, manifests[k])
+	}
+
+	return SortByKind(list), nil
+}
+
+func Extract(kpkg *v1alpha1.KubePkg) (map[string]Object, error) {
 	final := map[string]Object{}
 
 	manifests, err := ManifestsFromSpec(kpkg)

@@ -29,11 +29,22 @@ type Auth interface {
 	ExchangeToken(ctx context.Context, name string, code string) (token *Token, err error)
 }
 
+type TokenExchange struct {
+	Type string `json:"type"`
+	// When type totp
+	Passcode string `json:"passcode,omitempty"`
+}
+
 type Token struct {
-	Type         string `json:"type"`
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken,omitempty"`
-	// AccountID
+	AccessToken  string    `json:"access_token"`
+	Token        string    `json:"token,omitempty"`
+	RefreshToken string    `json:"refresh_token,omitempty"`
+	ExpiresIn    int       `json:"expires_in"`
+	IssuedAt     time.Time `json:"issued_at"`
+
+	// Token type
+	Type string `json:"type"`
+	// ext
 	ID string `json:"id,omitempty"`
 }
 
@@ -134,11 +145,15 @@ func (a *auth) ExchangeToken(ctx context.Context, name string, code string) (*To
 		ID:   userContext[0],
 	}
 
-	tok, _, err := ss.Sign(ctx, 2*time.Hour, "access", userContext...)
+	t.ExpiresIn = int((2 * time.Hour).Seconds())
+	t.IssuedAt = time.Now()
+
+	tok, _, err := ss.Sign(ctx, time.Duration(t.ExpiresIn)*time.Second, "access", userContext...)
 	if err != nil {
 		return nil, err
 	}
 	t.AccessToken = tok
+	t.Token = tok
 
 	refreshTok, _, err := ss.Sign(ctx, 24*time.Hour, "refresh", userContext...)
 	if err != nil {

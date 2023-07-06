@@ -8,5 +8,5 @@ export const sameWidthModifier = createPopperModifier(
     name: "sameWidth",
     phase: "beforeWrite",
     requires: ["computeStyles"],
-  }
+  },
 );

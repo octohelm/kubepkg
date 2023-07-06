@@ -5,7 +5,7 @@ export const when = defineExpression(
   "when",
   (
     condition: ExpressionBuildFunc<any, boolean>,
-    then: ExpressionBuildFunc<any, any>
+    then: ExpressionBuildFunc<any, any>,
   ) => {
     return (ctx) => {
       if (condition(ctx)(get(ctx, "root"))) {
@@ -13,5 +13,5 @@ export const when = defineExpression(
       }
       return null;
     };
-  }
+  },
 );

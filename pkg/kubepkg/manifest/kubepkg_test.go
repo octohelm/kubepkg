@@ -20,7 +20,7 @@ func TestExtractComplete(t *testing.T) {
 		Expect(t, err, Be[error](nil))
 
 		t.Run("Should be successfully", func(t *testing.T) {
-			manifests, err := manifest.ExtractComplete(kpkgs[0])
+			manifests, err := manifest.Extract(kpkgs[0])
 			Expect(t, err, Be[error](nil))
 
 			names := make([]string, 0)

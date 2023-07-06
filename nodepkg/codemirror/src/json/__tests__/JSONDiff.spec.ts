@@ -23,7 +23,7 @@ describe("JSONDiff", () => {
             b: 1,
           },
         },
-      }
+      },
     );
 
     expect([...ret.entries()]).toEqual([["/x/a/b", ["m", 2, 1]]]);

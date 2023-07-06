@@ -34,9 +34,11 @@ type Dashboard struct {
 	Metric otel.Metric
 
 	idgen.IDGen
+
 	Sign             signer.JWTSigner
 	Auth             dashboard.AuthProvider
 	AuthProviderOidc auth.OIDC
 	DB               dashboard.Database
+
 	dashboard.Server
 }

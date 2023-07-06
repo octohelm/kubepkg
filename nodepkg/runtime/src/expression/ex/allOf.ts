@@ -8,8 +8,8 @@ import {
 export const allOf = defineExpression(
   "allOf",
   <TTarget extends any>(
-      ...buildExprFns: ExpressionBuildFunc<TTarget, boolean>[]
-    ) =>
+    ...buildExprFns: ExpressionBuildFunc<TTarget, boolean>[]
+  ) =>
     (ctx) => {
       const fns = buildExprFns
         .map((buildExprFn) => buildExprFn(ctx))
@@ -38,5 +38,5 @@ export const allOf = defineExpression(
         .join(", 且");
 
       return fn;
-    }
+    },
 );

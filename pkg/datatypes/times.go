@@ -9,6 +9,7 @@ import (
 	"github.com/octohelm/storage/pkg/datatypes"
 )
 
+type Datetime = datatypes.Datetime
 type Timestamp = datatypes.Timestamp
 
 var TimestampZero = datatypes.TimestampZero

@@ -52,7 +52,7 @@ export const oneOf = defineExpression(
 
       return fn;
     };
-  }
+  },
 );
 
 export const oneOfEnum = <T extends any>(e: T) => oneOf(...keys(e));

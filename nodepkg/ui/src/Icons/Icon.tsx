@@ -31,7 +31,7 @@ export const Icon = styled(
           </svg>
         </Wrapper>
       );
-    }
+    },
 )({
   display: "inline-block",
   boxSize: "1.2em",

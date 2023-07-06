@@ -1,16 +1,23 @@
 package agent
 
 import (
-	"encoding/base32"
+	"context"
 	"fmt"
+	"image"
 	"math"
+	"net/http"
 	"strings"
 	"time"
 
-	"github.com/pquerna/otp"
+	"github.com/pkg/errors"
+
+	"github.com/octohelm/courier/pkg/courierhttp/client"
+
+	"encoding/base32"
 
 	"github.com/lestrrat-go/jwx/v2/jwt"
-	"github.com/octohelm/storage/pkg/datatypes"
+	"github.com/octohelm/kubepkg/pkg/datatypes"
+	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
 
@@ -37,8 +44,6 @@ func ParseAgentToken(token string, salt ...string) (*Agent, error) {
 		})
 
 		a.OtpKeyURL = k.URL()
-
-		fmt.Println(a.OtpKeyURL)
 	}
 
 	a.Time = datatypes.Datetime(time.Now())
@@ -48,12 +53,14 @@ func ParseAgentToken(token string, salt ...string) (*Agent, error) {
 }
 
 type Agent struct {
-	Name      string             `json:"name"`
-	Token     string             `json:"token,omitempty"`
-	Endpoint  string             `json:"endpoint"`
-	OtpKeyURL string             `json:"otpKey"`
-	Time      datatypes.Datetime `json:"time,omitempty"`
-	Labels    map[string]string  `json:"labels,omitempty"`
+	Name     string `json:"name"`
+	Endpoint string `json:"endpoint"`
+
+	Token     string `json:"token,omitempty"`
+	OtpKeyURL string `json:"otpKeyURL,omitempty"`
+
+	Time   datatypes.Datetime `json:"time,omitempty"`
+	Labels map[string]string  `json:"labels,omitempty"`
 }
 
 func (a *Agent) GenerateOtp() (string, time.Time, error) {
@@ -73,18 +80,76 @@ func (a *Agent) GenerateOtp() (string, time.Time, error) {
 	return c, n, err
 }
 
-func (a *Agent) ValidateOtp(passcode string, t time.Time) (bool, error) {
+func (a *Agent) Qrcode() (image.Image, error) {
+	k, err := otp.NewKeyFromURL(a.OtpKeyURL)
+	if err != nil {
+		return nil, err
+	}
+	return k.Image(512, 512)
+}
+
+func (a *Agent) ValidateOtp(passcode string, t time.Time) error {
 	n := time.Now()
 
 	k, err := otp.NewKeyFromURL(a.OtpKeyURL)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return totp.ValidateCustom(passcode, k.Secret(), n, totp.ValidateOpts{
+	ok, err := totp.ValidateCustom(passcode, k.Secret(), n, totp.ValidateOpts{
 		Skew:      uint(math.Abs(t.Sub(n).Seconds())) + 1,
 		Period:    uint(k.Period()),
 		Digits:    k.Digits(),
 		Algorithm: k.Algorithm(),
 	})
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return errors.New("invalid passcode")
+	}
+
+	return nil
+}
+
+func (a *Agent) AuthRoundTripper() client.HttpTransport {
+	return func(rt http.RoundTripper) http.RoundTripper {
+		return &authRoundTripper{
+			nextRoundTripper: rt,
+			a:                a,
+		}
+	}
+}
+
+type authRoundTripper struct {
+	nextRoundTripper http.RoundTripper
+	a                *Agent
+}
+
+func (a *authRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
+	if a.a.OtpKeyURL != "" {
+		passcode, t, err := a.a.GenerateOtp()
+		if err != nil {
+			return nil, err
+		}
+		request.Header.Set("Authorization", fmt.Sprintf("Totp %s@%d", passcode, t.Unix()))
+		return a.nextRoundTripper.RoundTrip(request)
+	}
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.a.Token))
+	return a.nextRoundTripper.RoundTrip(request)
+}
+
+type agentContext struct {
+}
+
+func FromContext(ctx context.Context) *Agent {
+	if a, ok := ctx.Value(agentContext{}).(*Agent); ok {
+		return a
+	}
+	return nil
+}
+
+func WithContext(ctx context.Context, a *Agent) context.Context {
+	return context.WithValue(ctx, agentContext{}, a)
 }

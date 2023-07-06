@@ -7,8 +7,8 @@ import {
 export const select = defineExpression(
   "select",
   <TTarget extends any>(
-      ...buildExprFns: ExpressionBuildFunc<TTarget, boolean>[]
-    ) =>
+    ...buildExprFns: ExpressionBuildFunc<TTarget, boolean>[]
+  ) =>
     (ctx) => {
       for (const buildExprFn of buildExprFns) {
         const fn = buildExprFn(ctx);
@@ -23,5 +23,5 @@ export const select = defineExpression(
       }
 
       return null;
-    }
+    },
 );

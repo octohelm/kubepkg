@@ -5,7 +5,7 @@ import {
   FormData,
   type InputComponentProps,
   Field,
-  render
+  render,
 } from "@nodepkg/runtime";
 import { combineLatest, Observable } from "@nodepkg/runtime/rxjs";
 import { Box } from "@innoai-tech/vueuikit";
@@ -20,7 +20,7 @@ import { Divider } from "../Shapes";
 
 export const FormControl = component$(
   {
-    form$: t.custom<FormData<any>>()
+    form$: t.custom<FormData<any>>(),
   },
   ({ form$ }, { render }) => {
     return rx(
@@ -33,14 +33,14 @@ export const FormControl = component$(
             })}
           </Box>
         );
-      })
+      }),
     );
-  }
+  },
 );
 
 export const FieldControl = component$(
   {
-    field$: t.custom<Field>()
+    field$: t.custom<Field>(),
   },
   ({ field$ }, { render }) => {
     onUnmounted(() => {
@@ -59,7 +59,7 @@ export const FieldControl = component$(
               {[...field$.form$.fields(field$.typedef, value, field$.path)].map(
                 (f) => {
                   return <FieldControl key={f.name} field$={f} />;
-                }
+                },
               )}
             </Box>
           );
@@ -72,9 +72,9 @@ export const FieldControl = component$(
             (field$.typedef.getSchema("enum") ?? []).map((e: any) => {
               return {
                 label: e,
-                value: e
+                value: e,
               };
-            })
+            }),
           );
         }
 
@@ -83,9 +83,9 @@ export const FieldControl = component$(
             [true, false].map((e) => {
               return {
                 label: e ? "是" : "否",
-                value: e
+                value: e,
               };
-            })
+            }),
           );
         }
 
@@ -122,18 +122,18 @@ export const FieldControl = component$(
               value: value ?? s.initial,
               onValueChange: (v) => {
                 field$.update(v);
-              }
+              },
             })}
           </TextField>
         );
-      })
+      }),
     );
-  }
+  },
 );
 
 export const FieldArray = component$(
   {
-    field$: t.custom<Field>()
+    field$: t.custom<Field>(),
   },
   ({ field$ }) => {
     return rx(
@@ -148,8 +148,8 @@ export const FieldArray = component$(
                   ...field$.form$.fields(
                     field$.typedef,
                     values ?? [],
-                    field$.path
-                  )
+                    field$.path,
+                  ),
                 ].map((fieldItem) => {
                   return (
                     <Box sx={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -157,7 +157,7 @@ export const FieldArray = component$(
                         type="button"
                         onClick={() => {
                           field$.update(
-                            values.filter((_, i) => i !== last(fieldItem.path))
+                            values.filter((_, i) => i !== last(fieldItem.path)),
                           );
                         }}
                       >
@@ -168,7 +168,7 @@ export const FieldArray = component$(
                           flex: 1,
                           display: "flex",
                           flexDirection: "column",
-                          gap: 16
+                          gap: 16,
                         }}
                       >
                         <FieldControl key={fieldItem.name} field$={fieldItem} />
@@ -190,16 +190,16 @@ export const FieldArray = component$(
             <Divider />
           </>
         );
-      })
+      }),
     );
-  }
+  },
 );
 
 const renderTextInput = ({
-                           readOnly,
-                           onValueChange,
-                           ...others
-                         }: InputComponentProps<any>) => {
+  readOnly,
+  onValueChange,
+  ...others
+}: InputComponentProps<any>) => {
   return (
     <input
       {...others}
@@ -214,17 +214,17 @@ const renderTextInput = ({
 };
 
 export const createEnumSelectInput = (
-  options: Array<{ label: string; value: any }>
+  options: Array<{ label: string; value: any }>,
 ) =>
   Object.assign(
     ({
-       name,
-       value,
-       onValueChange,
-       focus,
-       onFocus,
-       onBlur
-     }: InputComponentProps<any>) => {
+      name,
+      value,
+      onValueChange,
+      focus,
+      onFocus,
+      onBlur,
+    }: InputComponentProps<any>) => {
       return (
         <Menu
           isOpen={focus}
@@ -271,6 +271,6 @@ export const createEnumSelectInput = (
       );
     },
     {
-      $trailing: <Icon path={mdiMenuDown} />
-    }
+      $trailing: <Icon path={mdiMenuDown} />,
+    },
   );

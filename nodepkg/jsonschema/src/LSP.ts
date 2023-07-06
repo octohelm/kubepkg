@@ -16,9 +16,8 @@ export class LSP {
   constructor(
     private schema: JSONSchema,
     private readonly resolve: (ref: string) => JSONSchema = (ref: string) =>
-      get(schema, ref.slice(2).split("/"), {})
-  ) {
-  }
+      get(schema, ref.slice(2).split("/"), {}),
+  ) {}
 
   _type?: AnyType;
   private get type(): AnyType {
@@ -84,7 +83,7 @@ export class LSP {
   _schemaType?: SchemaType;
   private get schemaType() {
     return (this._schemaType ??= SchemaTypeContext.create({
-      resolve: this.resolve
+      resolve: this.resolve,
     }).of(this.schema));
   }
 
@@ -98,7 +97,7 @@ export class LSP {
     if (!isUndefined(first)) {
       for (const [f, _, t] of type.entries(isString(first) ? {} : [], {
         path: [],
-        branch: []
+        branch: [],
       })) {
         if (f == first) {
           if (t.type == "never") {

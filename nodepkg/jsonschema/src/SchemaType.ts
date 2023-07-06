@@ -125,7 +125,7 @@ export class SchemaType<S extends JSONSchema = {}> {
 
   resolve(
     instancePath: any[],
-    parent: SchemaTypeNode | null
+    parent: SchemaTypeNode | null,
   ): SchemaTypeNode | null {
     if (instancePath.length == 0) {
       return SchemaTypeNode.of(this, parent);
@@ -145,7 +145,7 @@ export class SchemaType<S extends JSONSchema = {}> {
 export class SchemaTypeNode extends SchemaType {
   static of(
     node: SchemaType | null,
-    parent: SchemaType | null
+    parent: SchemaType | null,
   ): SchemaTypeNode | null {
     if (!node) {
       return null;
@@ -159,7 +159,10 @@ export class SchemaTypeNode extends SchemaType {
     return new SchemaTypeNode(node);
   }
 
-  constructor(public underlying: SchemaType, public parent?: SchemaTypeNode) {
+  constructor(
+    public underlying: SchemaType,
+    public parent?: SchemaTypeNode,
+  ) {
     super(underlying.schema);
   }
 
@@ -194,7 +197,10 @@ export class SchemaAnyType extends SchemaType {
 export class SchemaArrayType extends SchemaType {
   readonly items?: SchemaType;
 
-  constructor(schema: JSONSchemaArray, private ctx: SchemaTypeContext) {
+  constructor(
+    schema: JSONSchemaArray,
+    private ctx: SchemaTypeContext,
+  ) {
     super(schema);
 
     if (schema.items) {
@@ -204,7 +210,7 @@ export class SchemaArrayType extends SchemaType {
 
   override resolve(
     keyPath: any[],
-    parent: SchemaTypeNode | null
+    parent: SchemaTypeNode | null,
   ): SchemaTypeNode | null {
     if (keyPath.length == 0) {
       return SchemaTypeNode.of(this, parent);
@@ -227,7 +233,7 @@ export class SchemaArrayType extends SchemaType {
 
 export class SchemaObjectType extends SchemaType {
   static isExtended(
-    schema: JSONSchemaObject
+    schema: JSONSchemaObject,
   ): schema is JSONSchemaExtendedObject {
     return has(schema, "allOf");
   }
@@ -237,7 +243,10 @@ export class SchemaObjectType extends SchemaType {
   readonly required: string[] = [];
   readonly additionalProperties?: SchemaType;
 
-  constructor(schema: JSONSchemaObject, private ctx: SchemaTypeContext) {
+  constructor(
+    schema: JSONSchemaObject,
+    private ctx: SchemaTypeContext,
+  ) {
     super(schema);
 
     if (SchemaObjectType.isExtended(schema)) {
@@ -245,13 +254,13 @@ export class SchemaObjectType extends SchemaType {
     } else {
       this.required = schema.required || [];
       this.properties = mapValues(schema.properties, (propSchema) =>
-        this.ctx.of(propSchema)
+        this.ctx.of(propSchema),
       );
       if (schema.additionalProperties) {
         this.additionalProperties = this.ctx.of(
           isObject(schema.additionalProperties)
             ? schema.additionalProperties
-            : {}
+            : {},
         );
       }
     }
@@ -301,7 +310,7 @@ export class SchemaObjectType extends SchemaType {
 
   override resolve(
     keyPath: any[],
-    parent: SchemaTypeNode | null
+    parent: SchemaTypeNode | null,
   ): SchemaTypeNode | null {
     if (keyPath.length == 0) {
       return SchemaTypeNode.of(this, parent);
@@ -326,7 +335,7 @@ export class SchemaObjectType extends SchemaType {
     const props = map(
       this.properties,
       (p, name) =>
-        `${name}${includes(this.required, name) ? "" : "?"}: ${p.typedef}`
+        `${name}${includes(this.required, name) ? "" : "?"}: ${p.typedef}`,
     ).join(", ");
 
     const additional = this.additionalProperties
@@ -387,7 +396,10 @@ export class SchemaBooleanType extends SchemaType {
 }
 
 export class SchemaRefType extends SchemaType<JSONSchemaRef> {
-  constructor(private ctx: SchemaTypeContext, schema: JSONSchemaRef) {
+  constructor(
+    private ctx: SchemaTypeContext,
+    schema: JSONSchemaRef,
+  ) {
     super(schema);
   }
 
@@ -401,7 +413,7 @@ export class SchemaRefType extends SchemaType<JSONSchemaRef> {
 
   override resolve(
     keyPath: any[],
-    parent: SchemaTypeNode | null
+    parent: SchemaTypeNode | null,
   ): SchemaTypeNode | null {
     return this.underlying.resolve(keyPath, parent);
   }
@@ -429,13 +441,13 @@ export class SchemaIntersectionType extends SchemaType {
               ],
             }
           : {}),
-      })
+      }),
     );
   }
 
   override resolve(
     keyPath: any[],
-    parent: SchemaTypeNode | null
+    parent: SchemaTypeNode | null,
   ): SchemaTypeNode | null {
     if (keyPath.length == 0) {
       return SchemaTypeNode.of(this, parent);
@@ -475,7 +487,7 @@ export class SchemaUnionType extends SchemaType {
               ],
             }
           : {}),
-      })
+      }),
     );
   }
 
@@ -486,7 +498,7 @@ export class SchemaUnionType extends SchemaType {
 
     return (
       this.oneOf.filter(
-        (e) => e instanceof SchemaObjectType
+        (e) => e instanceof SchemaObjectType,
       ) as SchemaObjectType[]
     )
       .map((e) => get(e.prop(this.discriminator!), "enum", [] as string[]))
@@ -511,7 +523,7 @@ export class SchemaUnionType extends SchemaType {
 
   override resolve(
     keyPath: any[],
-    parent: SchemaTypeNode | null
+    parent: SchemaTypeNode | null,
   ): SchemaTypeNode | null {
     if (keyPath.length == 0) {
       return SchemaTypeNode.of(this, parent);
@@ -539,7 +551,7 @@ export class SchemaUnionType extends SchemaType {
             type: "string",
             enum: this.discriminatorEnum,
           }),
-          parent
+          parent,
         );
       }
 

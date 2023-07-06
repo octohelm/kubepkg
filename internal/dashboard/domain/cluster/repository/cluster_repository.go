@@ -37,7 +37,7 @@ func (ClusterRepository) Rename(ctx context.Context, oldName string, newName str
 	return c, err
 }
 
-func (ClusterRepository) Put(ctx context.Context, name string, info cluster.Info) (*cluster.Cluster, error) {
+func (ClusterRepository) PutInfo(ctx context.Context, name string, info cluster.Info) (*cluster.Cluster, error) {
 	c := &cluster.Cluster{}
 
 	clusterID, err := idgen.FromContextAndCast[cluster.ID](ctx).ID()
@@ -53,8 +53,43 @@ func (ClusterRepository) Put(ctx context.Context, name string, info cluster.Info
 		DoUpdateSet(
 			cluster.ClusterT.Desc,
 			cluster.ClusterT.EnvType,
+		).
+		Returning(
+			cluster.ClusterT.ID,
 			cluster.ClusterT.NetType,
-			cluster.ClusterT.Endpoint,
+			cluster.ClusterT.AgentInfo,
+			cluster.ClusterT.CreatedAt,
+			cluster.ClusterT.UpdatedAt,
+		).
+		Scan(c).Save(ctx); err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (ClusterRepository) PutAgentInfo(ctx context.Context, name string, agentInfo cluster.AgentInfo, agentSecureInfo cluster.AgentSecureInfo) (*cluster.Cluster, error) {
+	c := &cluster.Cluster{}
+
+	clusterID, err := idgen.FromContextAndCast[cluster.ID](ctx).ID()
+	if err != nil {
+		return nil, err
+	}
+	c.ID = clusterID
+	c.Name = name
+	c.AgentInfo = agentInfo
+	c.AgentSecureInfo = agentSecureInfo
+	// when some agent update, it means could direct access
+	c.NetType = cluster.NET_TYPE__DIRECT
+
+	if err := dal.Prepare(c).
+		OnConflict(cluster.ClusterT.I.IName).
+		DoUpdateSet(
+			cluster.ClusterT.Desc,
+			cluster.ClusterT.EnvType,
+			cluster.ClusterT.NetType,
+			cluster.ClusterT.AgentInfo,
+			cluster.ClusterT.AgentSecureInfo,
 		).
 		Returning(
 			cluster.ClusterT.ID,

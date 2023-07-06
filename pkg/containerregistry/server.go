@@ -64,7 +64,6 @@ func (s *Server) Init(ctx context.Context) error {
 	})
 
 	app := handlers.NewApp(ctx, &configuration.Configuration{
-		// just hack
 		Storage: configuration.Storage{"filesystem": map[string]any{
 			"rootdirectory": c.StorageRoot,
 		}},

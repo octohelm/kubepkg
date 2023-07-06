@@ -13,5 +13,5 @@ export const FetcherProvider = createProvider(
     }),
   {
     name: "Fetcher",
-  }
+  },
 );

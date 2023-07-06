@@ -5,9 +5,7 @@ import (
 )
 
 #ContainerRegistry: kubepkg.#KubePkg & {
-	metadata: {
-		name: string | *"container-registry"
-	}
+	metadata: name: string | *"container-registry"
 	spec: {
 		version: _
 
@@ -16,23 +14,22 @@ import (
 			spec: replicas: _ | *1
 		}
 
-		config: "KUBEPKG_LOG_LEVEL":                string | *"info"
-		config: "KUBEPKG_LOG_FILTER":               string | *"Always"
-		config: "KUBEPKG_TRACE_COLLECTOR_ENDPOINT": string | *""
-		config: "KUBEPKG_STORAGE_ROOT":             string | *"/etc/kubepkg"
-		config: "KUBEPKG_REMOTE_REGISTRY_ENDPOINT": string | *""
-		config: "KUBEPKG_REMOTE_REGISTRY_USERNAME": string | *""
-		config: "KUBEPKG_REMOTE_REGISTRY_PASSWORD": string | *""
+		config: KUBEPKG_LOG_LEVEL:                string | *"info"
+		config: KUBEPKG_LOG_ASYNC:                string | *"false"
+		config: KUBEPKG_LOG_FILTER:               string | *"Always"
+		config: KUBEPKG_TRACE_COLLECTOR_ENDPOINT: string | *""
+		config: KUBEPKG_STORAGE_ROOT:             string | *"/etc/kubepkg"
+		config: KUBEPKG_REMOTE_REGISTRY_ENDPOINT: string | *""
+		config: KUBEPKG_REMOTE_REGISTRY_USERNAME: string | *""
+		config: KUBEPKG_REMOTE_REGISTRY_PASSWORD: string | *""
 
-		services: "#": {
-			ports: containers."container-registry".ports
-		}
+		services: "#": ports: containers."container-registry".ports
 
 		containers: "container-registry": {
 
-			ports: "http": _ | *5000
+			ports: http: _ | *5000
 
-			env: "KUBEPKG_REGISTRY_ADDR": _ | *":\(ports."http")"
+			env: KUBEPKG_REGISTRY_ADDR: _ | *":\(ports."http")"
 
 			readinessProbe: {
 				httpGet: {

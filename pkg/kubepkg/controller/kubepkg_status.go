@@ -72,7 +72,7 @@ func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconci
 		kubeutil.Annotate(kpkg, annotation.IngressGateway, strings.Join(r.HostOptions.IngressGateway, ","))
 	}
 
-	manifests, err := manifest.ExtractComplete(kpkg)
+	manifests, err := manifest.Extract(kpkg)
 	if err != nil {
 		l.Error(err, "extra manifests failed")
 		return reconcile.Result{}, nil

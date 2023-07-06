@@ -18,7 +18,7 @@ import {
 import { Container } from "@webapp/dashboard/layout";
 import { interval, map, merge } from "@nodepkg/runtime/rxjs";
 import { subscribeUntilUnmount } from "@innoai-tech/vuekit";
-import { ClusterAddBtn, ClusterEditBtn, ClusterRenameBtn } from "./actions";
+import { ClusterAddBtn, ClusterCreateAgentResourcesBtn, ClusterEditBtn, ClusterRenameBtn } from "./actions";
 import { Chip } from "./ui";
 
 export const ClusterStatus = component$(
@@ -61,7 +61,7 @@ export const ClusterStatus = component$(
 
 const StyledStatus = styled("small")({
   opacity: 0.7,
-  color: "sys.green",
+  color: "sys.success",
 
   "&[data-error=true]": {
     color: "sys.error"
@@ -84,7 +84,7 @@ export const ClusterListItem = component$(
       cluster$,
       render((cluster) => {
         const canDirect =
-          cluster.netType == ClusterNetType.DIRECT && !!cluster.endpoint;
+          cluster.netType == ClusterNetType.DIRECT && !!(cluster.agentInfo?.endpoint);
 
         return (
           <ListItem
@@ -98,15 +98,18 @@ export const ClusterListItem = component$(
             $supporting={
               <Row>
                 {cluster.desc && <span>{cluster.desc}</span>}
-                {cluster.endpoint && (
-                  <a target={"_blank"} href={cluster.endpoint}>
-                    {cluster.endpoint}
+                {cluster.agentInfo?.endpoint && (
+                  <a target={"_blank"} href={cluster.agentInfo?.endpoint}>
+                    {cluster.agentInfo?.endpoint}
                   </a>
                 )}
               </Row>
             }
             $trailing={
               <>
+                <ClusterCreateAgentResourcesBtn
+                  cluster={cluster}
+                />
                 <ClusterRenameBtn
                   cluster={cluster}
                   onDidUpdate={(c) => cluster$.value = c}

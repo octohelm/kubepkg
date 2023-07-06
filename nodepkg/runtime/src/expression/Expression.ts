@@ -9,7 +9,7 @@ export const isExpression = (args: any[]): boolean => {
 
 export type Expression<TArgs extends any[] = any[]> = readonly [
   string,
-  ...TArgs
+  ...TArgs,
 ];
 
 export interface ExpressionFunc<TInput, TOutput, TContext extends object = {}> {
@@ -22,7 +22,7 @@ export interface ExpressionFunc<TInput, TOutput, TContext extends object = {}> {
 export interface ExpressionBuildFunc<
   TInput,
   TOutput,
-  TContext extends object = {}
+  TContext extends object = {},
 > {
   (ctx: TContext): ExpressionFunc<TInput, TOutput, TContext>;
 }
@@ -32,7 +32,7 @@ export const isValidBuildExprFn = (fn: any) =>
 
 export const walkExpression = (
   expr: any,
-  cb: (name: string, args: any[]) => void
+  cb: (name: string, args: any[]) => void,
 ) => {
   if (isExpression(expr as any)) {
     const [name, ...args] = expr;
@@ -82,13 +82,13 @@ export class ExpressionFactory {
 
   register(
     name: string,
-    builder: (...args: any[]) => ExpressionBuildFunc<any, any>
+    builder: (...args: any[]) => ExpressionBuildFunc<any, any>,
   ) {
     this.builders[name] = builder;
   }
 
   create = <TInput, TOutput, TContext extends object = {}>(
-    expr: Expression
+    expr: Expression,
   ): ExpressionBuildFunc<TInput, TOutput, TContext> => {
     const [name, ...args] = expr;
     if (!isString(name)) {
@@ -122,7 +122,7 @@ export class ExpressionFactory {
             if (prop === "toString") {
               return () =>
                 `${type}(${args.map((arg) =>
-                  isString(arg) ? `"${arg}"` : arg
+                  isString(arg) ? `"${arg}"` : arg,
                 )})`;
             }
 
@@ -148,12 +148,12 @@ export const defineExpression = <
   TInput,
   TOutput,
   TContext extends object = {},
-  TArgs extends any[] = any
+  TArgs extends any[] = any,
 >(
   name: string,
   buildExprFn: (
     ...args: TArgs
-  ) => (ctx: TContext) => null | ((v: TInput) => TOutput)
+  ) => (ctx: TContext) => null | ((v: TInput) => TOutput),
 ) => {
   return Object.assign(
     (...args: InferArgs<TArgs>) => [name, ...args] as const,
@@ -161,6 +161,6 @@ export const defineExpression = <
       registerToExpressionFactory: (factory: ExpressionFactory) => {
         factory.register(name, buildExprFn as any);
       },
-    }
+    },
   );
 };

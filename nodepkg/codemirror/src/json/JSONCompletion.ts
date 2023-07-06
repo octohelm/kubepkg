@@ -94,7 +94,7 @@ export const selectionAt = (state: EditorState, pos: number) => {
           if (selectionSet.node.name !== "PropertyName") {
             const propName = parent.getChild("PropertyName")!;
             const prop = unquote(
-              state.sliceDoc(propName.from, propName.to)
+              state.sliceDoc(propName.from, propName.to),
             ).trim();
 
             if (prop) {
@@ -144,7 +144,7 @@ export class JSONCompletion {
 
   private _resolveCompletions(
     schema: SchemaType,
-    selection: ReturnType<typeof selectionAt>
+    selection: ReturnType<typeof selectionAt>,
   ): Completion[] {
     schema = SchemaType.indirect(schema);
 
@@ -181,7 +181,7 @@ export class JSONCompletion {
             ...(schema.oneOf
               .map(SchemaType.indirect)
               .filter(
-                (s) => s instanceof SchemaObjectType
+                (s) => s instanceof SchemaObjectType,
               ) as SchemaObjectType[]),
           ];
         }
@@ -225,7 +225,7 @@ export class JSONCompletion {
             }
 
             completions.push(
-              snippetCompletion(`"${propName}": ${snippetHolder}`, base)
+              snippetCompletion(`"${propName}": ${snippetHolder}`, base),
             );
           } else {
             completions.push(base);

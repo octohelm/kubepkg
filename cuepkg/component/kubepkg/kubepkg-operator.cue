@@ -5,9 +5,7 @@ import (
 )
 
 #KubepkgOperator: kubepkg.#KubePkg & {
-	metadata: {
-		name: string | *"kubepkg-operator"
-	}
+	metadata: name: string | *"kubepkg-operator"
 	spec: {
 		version: _
 
@@ -16,14 +14,15 @@ import (
 			spec: replicas: _ | *1
 		}
 
-		config: "KUBEPKG_LOG_LEVEL":                string | *"info"
-		config: "KUBEPKG_LOG_FILTER":               string | *"Always"
-		config: "KUBEPKG_TRACE_COLLECTOR_ENDPOINT": string | *""
-		config: "KUBEPKG_KUBECONFIG":               string | *""
-		config: "KUBEPKG_INGRESS_GATEWAY":          string | *""
-		config: "KUBEPKG_WATCH_NAMESPACE":          string | *""
-		config: "KUBEPKG_METRICS_ADDR":             string | *""
-		config: "KUBEPKG_ENABLE_LEADER_ELECTION":   string | *"false"
+		config: KUBEPKG_LOG_LEVEL:                string | *"info"
+		config: KUBEPKG_LOG_ASYNC:                string | *"false"
+		config: KUBEPKG_LOG_FILTER:               string | *"Always"
+		config: KUBEPKG_TRACE_COLLECTOR_ENDPOINT: string | *""
+		config: KUBEPKG_KUBECONFIG:               string | *""
+		config: KUBEPKG_INGRESS_GATEWAY:          string | *""
+		config: KUBEPKG_WATCH_NAMESPACE:          string | *""
+		config: KUBEPKG_METRICS_ADDR:             string | *""
+		config: KUBEPKG_ENABLE_LEADER_ELECTION:   string | *"false"
 
 		containers: "kubepkg-operator": {
 			image: {

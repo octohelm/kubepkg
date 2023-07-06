@@ -25,7 +25,7 @@ export const ListItem = styled(
         {slots.trailing && <div data-role={"trailing"}>{slots.trailing()}</div>}
       </Container>
     );
-  }
+  },
 )({
   containerStyle: "inherit",
   display: "flex",

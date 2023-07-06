@@ -4,7 +4,7 @@ import (
 	"context"
 
 	clusterrepository "github.com/octohelm/kubepkg/internal/dashboard/domain/cluster/repository"
-	"github.com/octohelm/kubepkg/internal/dashboard/domain/cluster/service"
+	clusterservice "github.com/octohelm/kubepkg/internal/dashboard/domain/cluster/service"
 
 	authoperator "github.com/octohelm/kubepkg/internal/dashboard/apis/auth/operator"
 
@@ -33,5 +33,5 @@ func (p *GetClusterStatus) Output(ctx context.Context) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return service.NewClusterService(c).Status(ctx)
+	return clusterservice.NewClusterService(c).Status(ctx)
 }

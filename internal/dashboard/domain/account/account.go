@@ -24,6 +24,7 @@ const (
 	TYPE_UNKNOWN Type = iota
 	TYPE__USER
 	TYPE__ROBOT
+	TYPE__AGENT
 )
 
 type ID uint64

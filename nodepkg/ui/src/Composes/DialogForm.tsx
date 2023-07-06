@@ -11,7 +11,7 @@ import { type FormData } from "@nodepkg/runtime";
 
 export const useDialogForm = (
   form$: FormData<any>,
-  { action }: { action: string }
+  { action }: { action: string },
 ) => {
   const dialog$ = useDialog(() => {
     return (

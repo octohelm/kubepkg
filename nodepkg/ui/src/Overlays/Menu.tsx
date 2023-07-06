@@ -10,15 +10,15 @@ const MenuContainer = styled("div")({
   minW: 120,
   containerStyle: "sys.surface-container",
   pos: "relative",
-  zIndex: 100
+  zIndex: 100,
 });
 
 export const MenuItem = styled("div", {
-  active: t.boolean().optional()
+  active: t.boolean().optional(),
 })({
   "& + &": {
     borderTop: "1px solid",
-    borderColor: "sys.outline-variant"
+    borderColor: "sys.outline-variant",
   },
   py: 8,
   px: 16,
@@ -28,16 +28,16 @@ export const MenuItem = styled("div", {
 
   _hover: {
     cursor: "pointer",
-    bgColor: variant("sys.on-surface", alpha(0.08))
+    bgColor: variant("sys.on-surface", alpha(0.08)),
   },
 
   _focus: {
-    bgColor: variant("sys.on-surface", alpha(0.08))
+    bgColor: variant("sys.on-surface", alpha(0.08)),
   },
 
   _active: {
-    bgColor: variant("sys.on-surface", alpha(0.08))
-  }
+    bgColor: variant("sys.on-surface", alpha(0.08)),
+  },
 });
 
 export const Menu = component(
@@ -52,7 +52,7 @@ export const Menu = component(
     onSelected: t.custom<(value: string) => void>(),
 
     $menu: t.custom<VNodeChild>(),
-    $default: t.custom<VNodeChild>()
+    $default: t.custom<VNodeChild>(),
   },
   (props, { slots, emit }) => {
     const isOpen = ref(false);
@@ -61,7 +61,7 @@ export const Menu = component(
       () => props.isOpen,
       (o) => {
         isOpen.value = o ?? isOpen.value;
-      }
+      },
     );
 
     watch(
@@ -72,7 +72,7 @@ export const Menu = component(
         } else {
           emit("did-close");
         }
-      }
+      },
     );
 
     const handleTriggerClick = () => {
@@ -113,14 +113,14 @@ export const Menu = component(
           {trigger
             ? !props.disabled
               ? cloneVNode(trigger, {
-                onClick: handleTriggerClick
-              })
+                  onClick: handleTriggerClick,
+                })
               : cloneVNode(trigger, {
-                "data-disabled": props.disabled
-              })
+                  "data-disabled": props.disabled,
+                })
             : null}
         </Popper>
       );
     };
-  }
+  },
 );

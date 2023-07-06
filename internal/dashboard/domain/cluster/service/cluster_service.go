@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/octohelm/kubepkg/pkg/agent"
+
 	"github.com/octohelm/kubepkg/pkg/kubepkg/specutil"
 
 	agentclient "github.com/octohelm/kubepkg/internal/agent/client/agent"
@@ -15,16 +17,20 @@ import (
 func NewClusterService(c *cluster.Cluster) *ClusterService {
 	return &ClusterService{
 		c: c,
+		a: agent.NewRegister(),
 	}
 }
 
 type ClusterService struct {
 	c *cluster.Cluster
+	a agent.Registry
 }
 
 func (c *ClusterService) injectContext(ctx context.Context) (context.Context, error) {
 	a := &agentclient.Client{}
-	a.Endpoint = c.c.Endpoint
+	a.Endpoint = c.c.AgentInfo.Endpoint
+	a.OtpKeyURL = c.c.AgentSecureInfo.OtpKeyURL
+
 	if err := a.Init(ctx); err != nil {
 		return nil, err
 	}
@@ -45,9 +51,9 @@ func (c *ClusterService) Status(ctx context.Context) (*cluster.InstanceStatus, e
 	}
 
 	return &cluster.InstanceStatus{
-		ID:                 info.AgentID,
-		SupportedPlatforms: info.SupportedPlatforms,
-		Ping:               strfmt.Duration(time.Since(started)),
+		Ping: strfmt.Duration(time.Since(started)),
+
+		ClusterInfo: *info,
 	}, nil
 
 }
@@ -74,7 +80,7 @@ func (c *ClusterService) Apply(ctx context.Context, kpkg *v1alpha1.KubePkg) erro
 	apply := &agentclient.ApplyKubePkg{}
 
 	if kpkgMerged, err := specutil.ApplyOverwrites(kpkg); err == nil {
-		apply.ApisKubepkgV1Alpha1KubePkg = kpkgMerged
+		apply.ApisKubepkgV1Alpha1KubePkg = *kpkgMerged
 	} else {
 		return err
 	}

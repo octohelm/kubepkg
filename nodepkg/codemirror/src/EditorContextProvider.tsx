@@ -1,4 +1,10 @@
-import { combineLatest, map, merge, of, switchMap } from "@nodepkg/runtime/rxjs";
+import {
+  combineLatest,
+  map,
+  merge,
+  of,
+  switchMap,
+} from "@nodepkg/runtime/rxjs";
 import { EditorState, type Extension } from "@codemirror/state";
 import { lintGutter, lintKeymap } from "@codemirror/lint";
 import {
@@ -7,7 +13,7 @@ import {
   highlightActiveLineGutter,
   highlightSpecialChars,
   keymap,
-  lineNumbers
+  lineNumbers,
 } from "@codemirror/view";
 import { bracketMatching, foldGutter, foldKeymap } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
@@ -25,7 +31,7 @@ export const createEditorContext = (doc?: string) => {
     // fold
     foldGutter({
       openText: String.fromCharCode(0x25be),
-      closedText: String.fromCharCode(0x25b8)
+      closedText: String.fromCharCode(0x25b8),
     }),
     keymap.of(foldKeymap),
 
@@ -41,7 +47,7 @@ export const createEditorContext = (doc?: string) => {
 
     history(),
     keymap.of(historyKeymap),
-    keymap.of(defaultKeymap)
+    keymap.of(defaultKeymap),
   ];
 
   const extension$ = observableRef<Array<() => Extension>>([]);
@@ -53,9 +59,9 @@ export const createEditorContext = (doc?: string) => {
     map(([doc, extensions]) =>
       EditorState.create({
         doc,
-        extensions: [...extensions, base].map((e) => e())
-      })
-    )
+        extensions: [...extensions, base].map((e) => e()),
+      }),
+    ),
   );
 
   return {
@@ -80,24 +86,24 @@ export const createEditorContext = (doc?: string) => {
             return of(
               new EditorView({
                 parent: container,
-                state: state
-              })
+                state: state,
+              }),
             );
           }),
           tapEffect((view) => {
             view$.next(view);
             return () => view?.destroy();
-          })
-        )
-      )
+          }),
+        ),
+      ),
   };
 };
 
 export const EditorContextProvider = createProvider(
   () => createEditorContext(),
   {
-    name: "EditorContext"
-  }
+    name: "EditorContext",
+  },
 );
 
 export const useExtension = (create: () => Extension | Extension[]) => {
@@ -106,6 +112,6 @@ export const useExtension = (create: () => Extension | Extension[]) => {
   rx(
     ctx.dom$,
     tapEffect(() => ctx.use(() => create())),
-    subscribeUntilUnmount()
+    subscribeUntilUnmount(),
   );
 };

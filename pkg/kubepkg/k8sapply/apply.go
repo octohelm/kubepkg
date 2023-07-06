@@ -85,7 +85,7 @@ func applyKubePkg(ctx context.Context, kpkg *kubepkgv1alpha1.KubePkg, patchOptio
 
 	l.WithValues("host", config.Host).Info("applying")
 
-	manifests, err := manifest.ExtractComplete(kpkg)
+	manifests, err := manifest.Extract(kpkg)
 	if err != nil {
 		return err
 	}

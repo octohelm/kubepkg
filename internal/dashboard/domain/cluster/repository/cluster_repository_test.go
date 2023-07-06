@@ -30,14 +30,14 @@ func TestClusterRepository(t *testing.T) {
 	repo := repository.NewClusterRepository()
 
 	t.Run("When add a cluster test", func(t *testing.T) {
-		created, err := repo.Put(ctx, "test", cluster.Info{
+		created, err := repo.PutInfo(ctx, "test", cluster.Info{
 			Desc: "test",
 		})
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 		testingutil.Expect(t, created.ID > 0, testingutil.Be(true))
 
 		t.Run("Should update desc", func(t *testing.T) {
-			updated, err := repo.Put(ctx, "test", cluster.Info{
+			updated, err := repo.PutInfo(ctx, "test", cluster.Info{
 				Desc: "test 2",
 			})
 			testingutil.Expect(t, err, testingutil.Be[error](nil))

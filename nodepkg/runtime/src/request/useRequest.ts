@@ -5,13 +5,13 @@ import {
 import { FetcherProvider } from "./FetcherProvider";
 
 export const useRequest = <TReq, TRespData>(
-  createConfig: RequestConfigCreator<TReq, TRespData>
+  createConfig: RequestConfigCreator<TReq, TRespData>,
 ) => {
   const fetcher = FetcherProvider.use();
 
   return createRequestSubject<TReq, TRespData, RespError>(
     createConfig,
-    fetcher
+    fetcher,
   );
 };
 

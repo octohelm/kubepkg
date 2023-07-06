@@ -5,6 +5,7 @@ import (
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/admin"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/auth"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/cluster"
+	"github.com/octohelm/kubepkg/internal/dashboard/apis/clusteragent"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/group"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/kubepkg"
 	"github.com/octohelm/kubepkg/internal/dashboard/apis/user"
@@ -18,5 +19,6 @@ var R = courierhttp.GroupRouter("/api/kubepkg-dashboard").With(
 		group.R,
 		admin.R,
 		kubepkg.R,
+		clusteragent.R,
 	),
 )

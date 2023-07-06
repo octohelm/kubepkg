@@ -103,7 +103,7 @@ func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcil
 		}
 	}()
 
-	manifests, err := manifest.ExtractComplete(kpkg)
+	manifests, err := manifest.Extract(kpkg)
 	if err != nil {
 		return reconcile.Result{}, errors.Wrapf(err, "extra manifests failed")
 	}

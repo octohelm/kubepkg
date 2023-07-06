@@ -11,7 +11,6 @@ import {
   type Cluster,
   ClusterEnvType,
   type ClusterInfo,
-  ClusterNetType,
   putCluster
 } from "@webapp/dashboard/client/dashboard";
 import {
@@ -39,15 +38,7 @@ const schema = t.intersection(
       ),
     desc: t.string().optional().use(FormData.label("集群描述")),
     envType: t.nativeEnum(ClusterEnvType).use(FormData.label("集群类型"))
-  }),
-  t
-    .discriminatorMapping("netType", {
-      [ClusterNetType.AIRGAP]: t.object({}),
-      [ClusterNetType.DIRECT]: t.object({
-        endpoint: t.string().use(FormData.label("集群访问地址"))
-      })
-    })
-    .use(FormData.label("集群网络类型"))
+  })
 );
 
 export const useClusterPut = (initials?: ClusterInfo & { name: string }) => {

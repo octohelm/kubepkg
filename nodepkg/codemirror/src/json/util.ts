@@ -13,7 +13,7 @@ export const walkNode = (
   editorState: EditorState,
   node: SyntaxNode | null,
   each: (path: string, node: SyntaxNode) => void,
-  path = "/"
+  path = "/",
 ) => {
   if (!node) {
     return;
@@ -33,7 +33,7 @@ export const walkNode = (
 
           if (propNameNode && propValueNode) {
             const propName = unquote(
-              editorState.sliceDoc(propNameNode.from, propNameNode.to)
+              editorState.sliceDoc(propNameNode.from, propNameNode.to),
             );
             each(`${path}${propName}`, propNameNode);
             walkNode(editorState, propValueNode, each, `${path}${propName}/`);

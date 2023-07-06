@@ -2,6 +2,10 @@ package repository
 
 import (
 	"context"
+	"net/http"
+
+	"github.com/octohelm/courier/pkg/statuserror"
+	"github.com/octohelm/storage/pkg/dberr"
 
 	"github.com/octohelm/kubepkg/internal/dashboard/domain/cluster"
 
@@ -36,6 +40,9 @@ func (r *GroupEnvRepository) Get(ctx context.Context, envName string) (*group.En
 		Scan(&env.Env).
 		Find(ctx)
 	if err != nil {
+		if dberr.IsErrNotFound(err) {
+			return nil, statuserror.Wrap(err, http.StatusNotFound, "GroupEnvNotFound")
+		}
 		return nil, err
 	}
 

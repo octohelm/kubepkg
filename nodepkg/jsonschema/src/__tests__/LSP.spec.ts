@@ -9,7 +9,7 @@ describe("LSP", () => {
       expect(
         lsp.validate({
           x: 1,
-        })
+        }),
       ).toEqual({
         "/x": `未声明字段不允许`,
       });
@@ -19,7 +19,7 @@ describe("LSP", () => {
       expect(
         lsp.validate({
           obj: {},
-        })
+        }),
       ).toEqual({
         "/obj": `缺失必填字段 "a"`,
       });
@@ -31,7 +31,7 @@ describe("LSP", () => {
           obj: {
             a: 1,
           },
-        })
+        }),
       ).toEqual({
         "/obj/a": "字符类型不匹配",
       });
@@ -43,7 +43,7 @@ describe("LSP", () => {
           map: {
             a: 1,
           },
-        })
+        }),
       ).toEqual({
         "/map/a": "字符类型不匹配",
       });
@@ -55,7 +55,7 @@ describe("LSP", () => {
           obj: {
             a: 1,
           },
-        })
+        }),
       ).toEqual({
         "/obj/a": "字符类型不匹配",
       });
@@ -68,7 +68,7 @@ describe("LSP", () => {
             a: "1",
             c: "1",
           },
-        })
+        }),
       ).toEqual({
         "/obj/c": `值只能是: "X", "Y", "Z"`,
       });
@@ -78,7 +78,7 @@ describe("LSP", () => {
       expect(
         lsp.validate({
           arr: ["1", 2],
-        })
+        }),
       ).toEqual({
         "/arr/1": "字符类型不匹配",
       });
@@ -92,7 +92,7 @@ describe("LSP", () => {
             a: "1",
             // undefined: "a"
           },
-        })
+        }),
       ).toEqual({
         // "/union/undefined": "未声明字段不允许"
       });
@@ -104,7 +104,7 @@ describe("LSP", () => {
           union: {
             type: "Undefined",
           },
-        })
+        }),
       ).toEqual({
         "/union/type": `值只能是: "A", "B"`,
       });
@@ -130,7 +130,7 @@ describe("LSP", () => {
 
     it("should return when matched in tagged union", () => {
       expect(
-        lsp.schemaAt(["union", ["b", { type: "A" }]])?.parents
+        lsp.schemaAt(["union", ["b", { type: "A" }]])?.parents,
       ).toHaveLength(3);
     });
 

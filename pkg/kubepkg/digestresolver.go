@@ -30,7 +30,7 @@ type DigestResolver struct {
 }
 
 func (r *DigestResolver) collectImages(images map[string]string, pkg *v1alpha1.KubePkg) error {
-	manifests, err := manifest.ExtractComplete(pkg)
+	manifests, err := manifest.Extract(pkg)
 	if err != nil {
 		return err
 	}

@@ -30,5 +30,5 @@ export const pipe = defineExpression(
         .join("");
 
       return fn;
-    }
+    },
 );

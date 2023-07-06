@@ -1,11 +1,14 @@
 package main
 
 import (
-	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
-
 	"github.com/innoai-tech/infra/pkg/cli"
 	"github.com/innoai-tech/infra/pkg/otel"
-	"github.com/octohelm/kubepkg/internal/agent"
+	internalagent "github.com/octohelm/kubepkg/internal/agent"
+	"github.com/octohelm/kubepkg/pkg/agent/remote"
+	"github.com/octohelm/kubepkg/pkg/idgen"
+	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
+	"github.com/octohelm/kubepkg/pkg/kubeutil/clusterinfo"
+	"github.com/octohelm/kubepkg/pkg/signer"
 )
 
 func init() {
@@ -18,6 +21,25 @@ type Agent struct {
 	otel.Otel
 	Metric otel.Metric
 
+	idgen.IDGen
+
+	Sign JWTSigner
+
 	kubeutilclient.KubeClient
-	agent.Server
+	clusterinfo.Provider
+
+	internalagent.Server
+
+	AgentRegistry remote.AgentRegistryConnect
+}
+
+type JWTSigner struct {
+	signer.JWTSigner
+}
+
+func (s *JWTSigner) SetDefaults() {
+	if s.Issuer == "" {
+		s.Issuer = "agent.kubepkg.octohelm.tech"
+	}
+	s.JWTSigner.SetDefaults()
 }

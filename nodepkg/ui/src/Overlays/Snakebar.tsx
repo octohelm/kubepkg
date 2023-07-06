@@ -36,7 +36,7 @@ export const Snakebar = component$(
         timer(props.autoCloseAfter),
         subscribeOnMountedUntilUnmount(() => {
           animated$.value = false;
-        })
+        }),
       );
     }
 
@@ -65,9 +65,9 @@ export const Snakebar = component$(
             </SlideInOutTransition>
           </Overlay>
         );
-      })
+      }),
     );
-  }
+  },
 );
 
 const SnakebarContainer = styled("div")({
@@ -110,5 +110,5 @@ const SlideInOutTransition = defineTransition(
     },
     duration: transition.duration.sm1,
     easing: transition.easing.standard.accelerate,
-  }
+  },
 );

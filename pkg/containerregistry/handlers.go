@@ -1,8 +1,11 @@
 package containerregistry
 
 import (
+	"context"
 	"net/http"
 	"strings"
+
+	"github.com/distribution/distribution/v3/registry/handlers"
 )
 
 const (
@@ -32,4 +35,20 @@ func enableMirrors(nextHandler http.Handler) http.Handler {
 
 		nextHandler.ServeHTTP(rw, req)
 	})
+}
+
+type App = handlers.App
+
+type registryAppContext struct {
+}
+
+func ContextWithRegistryApp(ctx context.Context, app *App) context.Context {
+	return context.WithValue(ctx, registryAppContext{}, app)
+}
+
+func RegistryAppFromContext(ctx context.Context) *App {
+	if v, ok := ctx.Value(registryAppContext{}).(*App); ok {
+		return v
+	}
+	return nil
 }

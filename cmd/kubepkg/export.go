@@ -172,7 +172,6 @@ func (s *Exporter) resolveDigests(ctx context.Context, dr *kubepkg.DigestResolve
 }
 
 type ManifestDumper struct {
-	// Extract manifests as yaml
 	ExtractManifestsYaml string `flag:",omitempty"`
 }
 
@@ -191,7 +190,7 @@ func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 		}
 
 		for i := range kubepkgs {
-			manifests, err := manifest.ExtractComplete(kubepkgs[i])
+			manifests, err := manifest.ExtractSorted(kubepkgs[i])
 			if err != nil {
 				return errors.Wrapf(err, "extract manifests failed: %s", s.ExtractManifestsYaml)
 			}

@@ -1,62 +1,57 @@
 package agent
 
 import (
-	"compress/gzip"
 	"context"
-	"fmt"
-	"net/http"
-	"runtime"
 
-	"github.com/go-courier/logr"
-	"github.com/innoai-tech/infra/pkg/cli"
-	"github.com/innoai-tech/infra/pkg/configuration"
-	"github.com/innoai-tech/infra/pkg/http/middleware"
-	"github.com/octohelm/courier/pkg/courierhttp/handler"
-	"github.com/octohelm/courier/pkg/courierhttp/handler/httprouter"
+	"github.com/distribution/distribution/v3"
+	"github.com/distribution/distribution/v3/configuration"
+	"github.com/distribution/distribution/v3/registry/handlers"
+	regsitrymiddleware "github.com/distribution/distribution/v3/registry/middleware/registry"
+	"github.com/distribution/distribution/v3/registry/storage/driver"
+	infraconfiguration "github.com/innoai-tech/infra/pkg/configuration"
+	infrahttp "github.com/innoai-tech/infra/pkg/http"
 	"github.com/octohelm/kubepkg/internal/agent/apis"
 	"github.com/octohelm/kubepkg/pkg/containerregistry"
-	"github.com/octohelm/kubepkg/pkg/kubepkg"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
+	"github.com/octohelm/kubepkg/pkg/serverinfo"
 )
 
 type Server struct {
-	Storage containerregistry.Storage
-	// Server DeploymentSettingID
-	AgentID string `flag:",omitempty"`
-	// Supported platforms
-	Platforms []string `flag:"platform,omitempty"`
-	// The address the server endpoint binds to
-	AgentAddr string `flag:",omitempty,expose=http"`
+	Storage        containerregistry.Storage
+	RemoteRegistry containerregistry.RemoteRegistry
 
-	r *kubepkg.Registry
-	s *http.Server
+	Public serverinfo.Public
+
+	registry *containerregistry.App
+
+	infrahttp.Server
 }
 
 func (s *Server) SetDefaults() {
-	if s.AgentID == "" {
-		s.AgentID = "dev"
-	}
-
-	if s.AgentAddr == "" {
-		s.AgentAddr = ":32060"
-	}
-
-	if s.Platforms == nil {
-		s.Platforms = []string{
-			"linux/amd64",
-			"linux/arm64",
-		}
+	if s.Addr == "" {
+		s.Addr = ":32060"
 	}
 }
 
-func (a *Server) Init(ctx context.Context) error {
-	if a.r != nil {
-		return nil
+func (s *Server) Init(ctx context.Context) error {
+	if err := s.Public.InitWithAddr(s.Addr); err != nil {
+		return err
+	}
+
+	s.ApplyRouter(apis.R)
+	if err := s.Public.ApplyRouter(apis.R); err != nil {
+		return err
 	}
 
 	c := containerregistry.Configuration{
-		StorageRoot: a.Storage.Root,
+		StorageRoot: s.Storage.Root,
+	}
+
+	if s.RemoteRegistry.Endpoint != "" {
+		c.Proxy = &containerregistry.Proxy{
+			RemoteURL: s.RemoteRegistry.Endpoint,
+			Username:  s.RemoteRegistry.Username,
+			Password:  s.RemoteRegistry.Password,
+		}
 	}
 
 	cr, err := c.New(ctx)
@@ -64,49 +59,31 @@ func (a *Server) Init(ctx context.Context) error {
 		return err
 	}
 
-	a.r = kubepkg.NewRegistry(cr, c.MustStorage())
+	_ = regsitrymiddleware.Register("custom", func(ctx context.Context, registry distribution.Namespace, driver driver.StorageDriver, options map[string]interface{}) (distribution.Namespace, error) {
+		return cr, nil
+	})
 
-	if a.s == nil {
-		info := cli.InfoFromContext(ctx)
+	s.registry = handlers.NewApp(ctx, &configuration.Configuration{
+		Storage: configuration.Storage{
+			"filesystem": map[string]any{
+				"rootdirectory": c.StorageRoot,
+			},
+		},
+		Middleware: map[string][]configuration.Middleware{
+			"registry": {
+				{
+					Name: "custom",
+				},
+			},
+		},
+	})
 
-		h, err := httprouter.New(
-			apis.R,
-			fmt.Sprintf("%s-agent@%s", info.App.Name, info.App.Version),
-			middleware.ContextInjectorMiddleware(configuration.ContextInjectorFromContext(ctx)),
-			middleware.LogAndMetricHandler(),
-		)
-		if err != nil {
-			return err
-		}
-
-		h = handler.ApplyHandlerMiddlewares(
-			agentMetaHandlerMiddleware(info.App.Version, a),
-			middleware.HealthCheckHandler(),
-			middleware.CompressLevelHandlerMiddleware(gzip.DefaultCompression),
-			middleware.DefaultCORS(),
-		)(h)
-
-		a.s = &http.Server{
-			Addr:    a.AgentAddr,
-			Handler: h2c.NewHandler(h, &http2.Server{}),
-		}
-	}
-
-	return nil
+	return s.Server.Init(ctx)
 }
 
-func (a *Server) InjectContext(ctx context.Context) context.Context {
-	return kubepkg.ContextWithRegistry(ctx, a.r)
-}
-
-func (a *Server) Serve(ctx context.Context) error {
-	if a.s == nil {
-		return nil
-	}
-	logr.FromContext(ctx).Info("agent serve on %s (%s/%s)", a.s.Addr, runtime.GOOS, runtime.GOARCH)
-	return a.s.ListenAndServe()
-}
-
-func (a *Server) Shutdown(ctx context.Context) error {
-	return a.s.Shutdown(ctx)
+func (s *Server) InjectContext(ctx context.Context) context.Context {
+	return infraconfiguration.InjectContext(ctx,
+		infraconfiguration.InjectContextFunc(containerregistry.ContextWithRegistryApp, s.registry),
+		infraconfiguration.InjectContextFunc(serverinfo.EndpointProviderWithContext, serverinfo.EndpointProvider(&s.Public)),
+	)
 }

@@ -123,7 +123,7 @@ export const convertToRequestSchema = (openapi: any) => {
                   "x-param-in": p.in,
                 },
               }),
-              {}
+              {},
             ),
             __responses: {
               type: "object",
@@ -181,7 +181,7 @@ export const RequestPlayground = component(
         <Playground schema={schema} openapi={props.openapi} />
       </EditorContextProvider>
     );
-  }
+  },
 );
 
 const Playground = component(
@@ -205,7 +205,7 @@ const Playground = component(
         method: operation.method,
         url: `${operation.basePath || ""}${compilePath(
           operation.path,
-          pickValuesIn("path", operation.parameters, inputs)
+          pickValuesIn("path", operation.parameters, inputs),
         )}`,
         params: pickValuesIn("query", operation.parameters, inputs),
         headers: pickValuesIn("header", operation.parameters, inputs),
@@ -228,7 +228,7 @@ const Playground = component(
 
     rx(
       merge(request$, request$.error$),
-      subscribeUntilUnmount((resp) => resp$.next(resp))
+      subscribeUntilUnmount((resp) => resp$.next(resp)),
     );
 
     const respEl = rx(
@@ -242,8 +242,8 @@ const Playground = component(
           </>
         ) : (
           <Tips />
-        )
-      )
+        ),
+      ),
     );
 
     return () => {
@@ -329,7 +329,7 @@ const Playground = component(
         </Box>
       );
     };
-  }
+  },
 );
 
 const Tips = () => {
@@ -401,9 +401,9 @@ const RequestSubmit = component$(
             <Icon path={mdiPlayCircle} />
           </IconButton>
         </Tooltip>
-      ))
+      )),
     );
-  }
+  },
 );
 
 export const Documents = component$(
@@ -430,19 +430,19 @@ export const Documents = component$(
           s = s.parent ?? null;
         }
         let schemaBreadcrumbs = s?.parents.filter(
-          (p) => !(p.underlying instanceof SchemaRefType)
+          (p) => !(p.underlying instanceof SchemaRefType),
         );
         return schemaBreadcrumbs ?? [];
       }),
-      subscribeUntilUnmount(props.schemaBreadcrumbs$)
+      subscribeUntilUnmount(props.schemaBreadcrumbs$),
     );
 
     useExtension(() =>
       EditorView.updateListener.of((u) => {
         instancePath$.next(
-          selectionAt(u.state, u.state.selection.main.head).instancePath
+          selectionAt(u.state, u.state.selection.main.head).instancePath,
         );
-      })
+      }),
     );
 
     const schemaBreadcrumbsEl = rx(
@@ -466,24 +466,24 @@ export const Documents = component$(
                   }}
                   onClick={() =>
                     props.schemaBreadcrumbs$.next((schemaBreadcrumbs) =>
-                      schemaBreadcrumbs.slice(0, i + 1)
+                      schemaBreadcrumbs.slice(0, i + 1),
                     )
                   }
                 >
                   {schema.meta("x-id") || "#"}
                 </TypeLink>
               </Box>
-            )
+            ),
           )}
         </>
-      ))
+      )),
     );
 
     const schemaViewEl = rx(
       props.schemaBreadcrumbs$,
       render((schemaBreadcrumbs) => {
         return <RequestSchemaView schema={last(schemaBreadcrumbs)} />;
-      })
+      }),
     );
 
     return () => (
@@ -524,5 +524,5 @@ export const Documents = component$(
         </RequestSchemaProvider>
       </Box>
     );
-  }
+  },
 );

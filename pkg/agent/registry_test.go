@@ -19,13 +19,13 @@ func TestRegistry(t *testing.T) {
 	r := NewRegister()
 
 	t.Run("setup flow", func(t *testing.T) {
-		token, err := r.NewAccessToken(ctx, "test")
+		token, err := r.NewAccessToken(ctx, "10000")
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 
 		a, err := ParseAgentToken(token)
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 
-		err = r.Register(ctx, a)
+		err = r.Validate(ctx, a)
 		testingutil.Expect(t, err, testingutil.Be[error](nil))
 
 		t.Run("otp validate", func(t *testing.T) {

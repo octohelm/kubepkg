@@ -14,7 +14,7 @@ import (
 
 func ManifestsFromWildcard(kpkg *v1alpha1.KubePkg) (map[string]Object, error) {
 	c := &completer{kpkg: kpkg}
-	manifests, err := Extract(
+	manifests, err := ExtractWith(
 		kpkg.Spec.Manifests,
 		c.patchNamespace,
 		c.patchNodeAffinityIfNeed,

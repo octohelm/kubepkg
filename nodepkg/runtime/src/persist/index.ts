@@ -34,7 +34,7 @@ class Persist<T extends any> {
 
 export const persist = <T extends any, O extends Observable<T | null>>(
   name: string,
-  create: (stored: T | null) => O
+  create: (stored: T | null) => O,
 ) => {
   const p = Persist.create<T>(name);
   const stored = p.load();
@@ -46,7 +46,7 @@ export const persist = <T extends any, O extends Observable<T | null>>(
     distinctUntilChanged(),
     subscribeUntilUnmount((value) => {
       p.store(value);
-    })
+    }),
   );
 
   return o$;

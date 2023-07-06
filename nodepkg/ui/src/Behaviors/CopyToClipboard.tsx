@@ -22,7 +22,7 @@ export const CopyToClipboard = styled(
         </Wrap>
       );
     };
-  }
+  },
 )({
   cursor: "pointer",
 });

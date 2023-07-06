@@ -1,14 +1,16 @@
 ARCH=$(shell go env GOARCH)
-
 WAGON = wagon -p wagon.cue
+KUBECONFIG = ${HOME}/.kube/config
+KUBEPKG = go run ./cmd/kubepkg
 
 DEBUG = 0
 ifeq ($(DEBUG),1)
 	WAGON := $(WAGON) --log-level=debug
 endif
 
-KUBECONFIG = ${HOME}/.kube/config
-KUBEPKG = go run ./cmd/kubepkg
+ifneq ( ,$(wildcard .secrets/local.mk))
+	include .secrets/local.mk
+endif
 
 gen:
 	go run ./tool/internal/cmd/tool gen ./cmd/kubepkg
@@ -21,9 +23,8 @@ install:
 	go install ./cmd/kubepkg
 
 k.k8s:
-	$(KUBEPKG) serve operator --dump-k8s
 	$(KUBEPKG) serve registry --dump-k8s
-	$(KUBEPKG) serve agent --dump-k8s
+	$(KUBEPKG) serve operator --dump-k8s
 	$(KUBEPKG) serve dashboard --dump-k8s
 
 k.dashboard:
@@ -42,11 +43,10 @@ k.operator:
 
 k.agent:
 	$(KUBEPKG) \
-		--agent-addr=:32060 \
 		--storage-root=.tmp/kubepkg \
-		--platform=linux/$(ARCH) \
+		--addr=127.0.0.1:32060 \
 		--kubeconfig=$(KUBECONFIG) \
-			serve agent
+			-c serve agent
 
 k.registry:
 	$(KUBEPKG) \
@@ -62,12 +62,23 @@ k.export:
  		--output=.tmp/ \
  			./testdata/demo.yaml
 
+
 k.upload:
 	$(KUBEPKG) upload \
-			--extract-manifests-yaml=.tmp/manifests/demo.uploaded.yaml \
+			--extract-manifests-yaml=.tmp/manifests/demo.manifests.yaml \
 			--registry-endpoint=https://${CONTAINER_REGISTRY} \
 			--registry-username=${CONTAINER_REGISTRY_USERNAME} \
 			--registry-password=${CONTAINER_REGISTRY_PASSWORD} \
+				./.tmp/demo-0.0.2-linux-arm64.kube.tgz
+
+PASSCODE =
+
+k.upload.agent:
+	$(KUBEPKG) upload \
+			--registry-endpoint=http://127.0.0.1:32060 \
+			--registry-username=otp \
+			--registry-password=${PASSCODE} \
+			--keep-origin-host=true \
 				./.tmp/demo-0.0.2-linux-arm64.kube.tgz
 
 k.export.patch:
@@ -78,6 +89,8 @@ k.export.patch:
 		--since=./testdata/demo.previous.yaml \
  		--output=.tmp/ \
  			./testdata/demo.yaml
+
+
 
 k.export.list:
 	$(KUBEPKG) export \
@@ -94,24 +107,8 @@ k.apply.demo:
 k.manifests:
 	$(KUBEPKG) manifests ./testdata/demo.yaml
 
-k.import:
-	mkdir -p .tmp/manifests
-	$(KUBEPKG) import --import-to=.tmp/kubepkg --manifest-output=.tmp/manifests .tmp/demo.kube.tgz
-
-k.import.remote:
-	@echo "incremental import with spec directly"
-	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 --incremental ./testdata/demo.yaml
-	@echo "incremental import with debug"
-	$(KUBEPKG) import --log-level=debug --import-to=http://0.0.0.0:32060 --incremental .tmp/demo.kube.tgz
-	@echo "incremental import without debug"
-	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 --incremental .tmp/demo.kube.tgz
-	@echo "import kube.tgt debug"
-	$(KUBEPKG) import --import-to=http://0.0.0.0:32060 .tmp/demo.kube.tgz
-
 install.demo:
-	$(KUBEPKG) import -i=http://localhost:32060 ./testdata/demo.yaml
-
-debug: k.export k.import
+	$(KUBEPKG) upload -i=http://localhost:32060 ./testdata/demo.yaml
 
 remote.debug: k.export remote.sync remote.ctr.import
 
@@ -163,8 +160,4 @@ kubetgt.dashboard:
 
 KUBEPKGTGZ=.build/kubepkg/$(ARCH)/images/kubepkg.$(ARCH).kube.tgz
 
-deploy:
-	$(KUBEPKG) import \
-		--import-to=http://localhost:32060 \
-		$(KUBEPKGTGZ)
 

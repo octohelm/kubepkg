@@ -26,7 +26,7 @@ export const listAccount = /*#__PURE__*/ createRequest<
       size: query_size,
       offset: query_offset,
     },
-  })
+  }),
 );
 
 export const listAdminAccount = /*#__PURE__*/ createRequest<
@@ -56,7 +56,7 @@ export const listAdminAccount = /*#__PURE__*/ createRequest<
       offset: query_offset,
       roleType: query_roleType,
     },
-  })
+  }),
 );
 
 export const deleteAdminAccount = /*#__PURE__*/ createRequest<
@@ -121,12 +121,26 @@ export const exchangeToken = /*#__PURE__*/ createRequest<
   },
 }));
 
+export const registerClusterAgent = /*#__PURE__*/ createRequest<
+  {
+    body: Agent;
+  },
+  any
+>("dashboard.RegisterClusterAgent", ({ body: body }) => ({
+  method: "PUT",
+  url: "/api/kubepkg-dashboard/v0/clusteragent/register",
+  body: body,
+  headers: {
+    "Content-Type": "application/json",
+  },
+}));
+
 export const listCluster = /*#__PURE__*/ createRequest<void, Array<Cluster>>(
   "dashboard.ListCluster",
   () => ({
     method: "GET",
     url: "/api/kubepkg-dashboard/v0/clusters",
-  })
+  }),
 );
 
 export const putCluster = /*#__PURE__*/ createRequest<
@@ -142,6 +156,16 @@ export const putCluster = /*#__PURE__*/ createRequest<
   headers: {
     "Content-Type": "application/json",
   },
+}));
+
+export const createClusterAgentResources = /*#__PURE__*/ createRequest<
+  {
+    name: string;
+  },
+  Array<ClientObject>
+>("dashboard.CreateClusterAgentResources", ({ name: path_name }) => ({
+  method: "POST",
+  url: `/api/kubepkg-dashboard/v0/clusters/${path_name}/agent/resources`,
 }));
 
 export const renameCluster = /*#__PURE__*/ createRequest<
@@ -170,7 +194,7 @@ export const listGroup = /*#__PURE__*/ createRequest<void, Array<Group>>(
   () => ({
     method: "GET",
     url: "/api/kubepkg-dashboard/v0/groups",
-  })
+  }),
 );
 
 export const deleteGroup = /*#__PURE__*/ createRequest<
@@ -237,7 +261,7 @@ export const listGroupAccount = /*#__PURE__*/ createRequest<
       offset: query_offset,
       roleType: query_roleType,
     },
-  })
+  }),
 );
 
 export const deleteGroupAccount = /*#__PURE__*/ createRequest<
@@ -251,7 +275,7 @@ export const deleteGroupAccount = /*#__PURE__*/ createRequest<
   ({ groupName: path_groupName, accountID: path_accountId }) => ({
     method: "DELETE",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/accounts/${path_accountId}`,
-  })
+  }),
 );
 
 export const putGroupAccount = /*#__PURE__*/ createRequest<
@@ -270,7 +294,7 @@ export const putGroupAccount = /*#__PURE__*/ createRequest<
     headers: {
       "Content-Type": "application/json",
     },
-  })
+  }),
 );
 
 export const listGroupEnv = /*#__PURE__*/ createRequest<
@@ -294,7 +318,7 @@ export const deleteGroupEnv = /*#__PURE__*/ createRequest<
   ({ groupName: path_groupName, envName: path_envName }) => ({
     method: "DELETE",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}`,
-  })
+  }),
 );
 
 export const putGroupEnv = /*#__PURE__*/ createRequest<
@@ -313,7 +337,7 @@ export const putGroupEnv = /*#__PURE__*/ createRequest<
     headers: {
       "Content-Type": "application/json",
     },
-  })
+  }),
 );
 
 export const listGroupEnvClusterDeployments = /*#__PURE__*/ createRequest<
@@ -327,7 +351,7 @@ export const listGroupEnvClusterDeployments = /*#__PURE__*/ createRequest<
   ({ groupName: path_groupName, envName: path_envName }) => ({
     method: "GET",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}/cluster/deployments`,
-  })
+  }),
 );
 
 export const unbindGroupEnvCluster = /*#__PURE__*/ createRequest<
@@ -346,7 +370,7 @@ export const unbindGroupEnvCluster = /*#__PURE__*/ createRequest<
   }) => ({
     method: "DELETE",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}/clusters/${path_clusterId}`,
-  })
+  }),
 );
 
 export const bindGroupEnvCluster = /*#__PURE__*/ createRequest<
@@ -365,7 +389,7 @@ export const bindGroupEnvCluster = /*#__PURE__*/ createRequest<
   }) => ({
     method: "PUT",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}/clusters/${path_clusterId}`,
-  })
+  }),
 );
 
 export const listGroupEnvDeployment = /*#__PURE__*/ createRequest<
@@ -393,7 +417,7 @@ export const listGroupEnvDeployment = /*#__PURE__*/ createRequest<
       size: query_size,
       offset: query_offset,
     },
-  })
+  }),
 );
 
 export const putGroupEnvDeployment = /*#__PURE__*/ createRequest<
@@ -412,7 +436,7 @@ export const putGroupEnvDeployment = /*#__PURE__*/ createRequest<
     headers: {
       "Content-Type": "application/json",
     },
-  })
+  }),
 );
 
 export const listGroupEnvDeploymentHistory = /*#__PURE__*/ createRequest<
@@ -439,7 +463,7 @@ export const listGroupEnvDeploymentHistory = /*#__PURE__*/ createRequest<
       size: query_size,
       offset: query_offset,
     },
-  })
+  }),
 );
 
 export const deleteGroupEnvDeployment = /*#__PURE__*/ createRequest<
@@ -458,7 +482,7 @@ export const deleteGroupEnvDeployment = /*#__PURE__*/ createRequest<
   }) => ({
     method: "DELETE",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/envs/${path_envName}/deployments/${path_deploymentName}`,
-  })
+  }),
 );
 
 export const listKubepkg = /*#__PURE__*/ createRequest<
@@ -484,7 +508,7 @@ export const listKubepkg = /*#__PURE__*/ createRequest<
       size: query_size,
       offset: query_offset,
     },
-  })
+  }),
 );
 
 export const getKubepkgRevision = /*#__PURE__*/ createRequest<
@@ -505,7 +529,7 @@ export const getKubepkgRevision = /*#__PURE__*/ createRequest<
   }) => ({
     method: "GET",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/kubepkgs/${path_name}/${path_channel}/revisions/${path_revisionId}`,
-  })
+  }),
 );
 
 export const listKubepkgVersion = /*#__PURE__*/ createRequest<
@@ -520,7 +544,7 @@ export const listKubepkgVersion = /*#__PURE__*/ createRequest<
   ({ groupName: path_groupName, name: path_name, channel: path_channel }) => ({
     method: "GET",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/kubepkgs/${path_name}/${path_channel}/versions`,
-  })
+  }),
 );
 
 export const putKubepkgVersion = /*#__PURE__*/ createRequest<
@@ -545,7 +569,7 @@ export const putKubepkgVersion = /*#__PURE__*/ createRequest<
     headers: {
       "Content-Type": "application/json",
     },
-  })
+  }),
 );
 
 export const deleteKubepkgVersion = /*#__PURE__*/ createRequest<
@@ -566,7 +590,7 @@ export const deleteKubepkgVersion = /*#__PURE__*/ createRequest<
   }) => ({
     method: "DELETE",
     url: `/api/kubepkg-dashboard/v0/groups/${path_groupName}/kubepkgs/${path_name}/${path_channel}/versions/${path_version}`,
-  })
+  }),
 );
 
 export const listGroupRobot = /*#__PURE__*/ createRequest<
@@ -598,7 +622,7 @@ export const listGroupRobot = /*#__PURE__*/ createRequest<
       offset: query_offset,
       roleType: query_roleType,
     },
-  })
+  }),
 );
 
 export const createGroupRobot = /*#__PURE__*/ createRequest<
@@ -616,7 +640,7 @@ export const createGroupRobot = /*#__PURE__*/ createRequest<
     headers: {
       "Content-Type": "application/json",
     },
-  })
+  }),
 );
 
 export const refreshGroupRobotToken = /*#__PURE__*/ createRequest<
@@ -635,7 +659,7 @@ export const refreshGroupRobotToken = /*#__PURE__*/ createRequest<
     headers: {
       "Content-Type": "application/json",
     },
-  })
+  }),
 );
 
 export const latestKubepkgs = /*#__PURE__*/ createRequest<
@@ -702,6 +726,7 @@ export type DatatypesTimestamp = string;
 export enum AccountType {
   USER = "USER",
   ROBOT = "ROBOT",
+  AGENT = "AGENT",
 }
 
 export const displayAccountType = (v: AccountType) => {
@@ -709,6 +734,7 @@ export const displayAccountType = (v: AccountType) => {
     {
       USER: "USER",
       ROBOT: "ROBOT",
+      AGENT: "AGENT",
     }[v] ?? v
   );
 };
@@ -766,23 +792,39 @@ export type AuthExchangeTokenData = {
 };
 
 export type AuthToken = {
-  accessToken: string;
+  access_token: string;
+  expires_in: number;
   id?: string;
-  refreshToken?: string;
+  issued_at: Time;
+  refresh_token?: string;
+  token?: string;
   type: string;
 };
 
+export type Time = string;
+
+export type Agent = {
+  endpoint: string;
+  labels?: { [k: string]: string };
+  name: string;
+  otpKeyURL?: string;
+  time?: DatatypesDatetime;
+  token?: string;
+};
+
+export type DatatypesDatetime = string;
+
 export type Cluster = ClusterInfo &
   DatatypesCreationUpdationDeletionTime & {
+    agentInfo?: ClusterAgentInfo;
     clusterID: ClusterId;
     name: string;
+    netType: ClusterNetType;
   };
 
 export type ClusterInfo = {
   desc?: string;
-  endpoint?: string;
   envType: ClusterEnvType;
-  netType: ClusterNetType;
 };
 
 export enum ClusterEnvType {
@@ -799,6 +841,13 @@ export const displayClusterEnvType = (v: ClusterEnvType) => {
   );
 };
 
+export type ClusterAgentInfo = {
+  endpoint?: string;
+  labels?: { [k: string]: string };
+};
+
+export type ClusterId = string;
+
 export enum ClusterNetType {
   DIRECT = "DIRECT",
   AIRGAP = "AIRGAP",
@@ -813,12 +862,34 @@ export const displayClusterNetType = (v: ClusterNetType) => {
   );
 };
 
-export type ClusterId = string;
+export type ClientObject = any;
 
-export type ClusterInstanceStatus = {
-  id: string;
+export type ClusterInstanceStatus = KubeutilClusterinfoClusterInfo & {
   ping?: StrfmtDuration;
-  supportedPlatforms?: Array<string>;
+};
+
+export type KubeutilClusterinfoClusterInfo = {
+  nodes: Array<KubeutilClusterinfoClusterNode>;
+};
+
+export type KubeutilClusterinfoClusterNode = K8SIoApiCoreV1NodeSystemInfo & {
+  externalIP: string;
+  hostname: string;
+  internalIP: string;
+  role: string;
+};
+
+export type K8SIoApiCoreV1NodeSystemInfo = {
+  architecture: string;
+  bootID: string;
+  containerRuntimeVersion: string;
+  kernelVersion: string;
+  kubeProxyVersion: string;
+  kubeletVersion: string;
+  machineID: string;
+  operatingSystem: string;
+  osImage: string;
+  systemUUID: string;
 };
 
 export type StrfmtDuration = string;
@@ -1759,19 +1830,19 @@ export const AccountUserDataListSchema = /*#__PURE__*/ t.object({
 export const AccountUserSchema = /*#__PURE__*/ t.intersection(
   t.ref("Account", () => AccountSchema),
   t.ref("AccountUserInfo", () => AccountUserInfoSchema),
-  t.object()
+  t.object(),
 );
 
 export const AccountSchema = /*#__PURE__*/ t.intersection(
   t.ref("DatatypesPrimaryId", () => DatatypesPrimaryIdSchema),
   t.ref(
     "DatatypesCreationUpdationDeletionTime",
-    () => DatatypesCreationUpdationDeletionTimeSchema
+    () => DatatypesCreationUpdationDeletionTimeSchema,
   ),
   t.object({
     accountID: t.ref("AccountId", () => AccountIdSchema),
     accountType: t.ref("AccountType", () => AccountTypeSchema),
-  })
+  }),
 );
 
 export const DatatypesPrimaryIdSchema = /*#__PURE__*/ t.object();
@@ -1780,20 +1851,20 @@ export const DatatypesCreationUpdationDeletionTimeSchema =
   /*#__PURE__*/ t.intersection(
     t.ref(
       "DatatypesCreationUpdationTime",
-      () => DatatypesCreationUpdationTimeSchema
+      () => DatatypesCreationUpdationTimeSchema,
     ),
     t.object({
       deletedAt: t
         .ref("DatatypesTimestamp", () => DatatypesTimestampSchema)
         .optional(),
-    })
+    }),
   );
 
 export const DatatypesCreationUpdationTimeSchema = /*#__PURE__*/ t.intersection(
   t.ref("DatatypesCreationTime", () => DatatypesCreationTimeSchema),
   t.object({
     updatedAt: t.ref("DatatypesTimestamp", () => DatatypesTimestampSchema),
-  })
+  }),
 );
 
 export const DatatypesCreationTimeSchema = /*#__PURE__*/ t.object({
@@ -1820,13 +1891,13 @@ export const GroupUserDataListSchema = /*#__PURE__*/ t.object({
 export const GroupUserSchema = /*#__PURE__*/ t.intersection(
   t.ref("GroupAccount", () => GroupAccountSchema),
   t.ref("AccountUserInfo", () => AccountUserInfoSchema),
-  t.object()
+  t.object(),
 );
 
 export const GroupAccountSchema = /*#__PURE__*/ t.intersection(
   t.ref(
     "DatatypesCreationUpdationTime",
-    () => DatatypesCreationUpdationTimeSchema
+    () => DatatypesCreationUpdationTimeSchema,
   ),
   t.object({
     accountID: t
@@ -1838,7 +1909,7 @@ export const GroupAccountSchema = /*#__PURE__*/ t.intersection(
     roleType: t
       .ref("GroupRoleType", () => GroupRoleTypeSchema)
       .annotate({ description: "角色" }),
-  })
+  }),
 );
 
 export const GroupIdSchema = /*#__PURE__*/ t.string();
@@ -1857,47 +1928,112 @@ export const AuthExchangeTokenDataSchema = /*#__PURE__*/ t.object({
 });
 
 export const AuthTokenSchema = /*#__PURE__*/ t.object({
-  accessToken: t.string(),
-  id: t.string().annotate({ description: "AccountID" }).optional(),
-  refreshToken: t.string().optional(),
-  type: t.string(),
+  access_token: t.string(),
+  expires_in: t.integer(),
+  id: t.string().annotate({ description: "ext" }).optional(),
+  issued_at: t.ref("Time", () => TimeSchema),
+  refresh_token: t.string().optional(),
+  token: t.string().optional(),
+  type: t.string().annotate({ description: "Token type" }),
 });
+
+export const TimeSchema = /*#__PURE__*/ t.string();
+
+export const AgentSchema = /*#__PURE__*/ t.object({
+  endpoint: t.string(),
+  labels: t.record(t.string(), t.string()).optional(),
+  name: t.string(),
+  otpKeyURL: t.string().optional(),
+  time: t.ref("DatatypesDatetime", () => DatatypesDatetimeSchema).optional(),
+  token: t.string().optional(),
+});
+
+export const DatatypesDatetimeSchema = /*#__PURE__*/ t.string();
 
 export const ClusterSchema = /*#__PURE__*/ t.intersection(
   t.ref("ClusterInfo", () => ClusterInfoSchema),
   t.ref(
     "DatatypesCreationUpdationDeletionTime",
-    () => DatatypesCreationUpdationDeletionTimeSchema
+    () => DatatypesCreationUpdationDeletionTimeSchema,
   ),
   t.object({
+    agentInfo: t
+      .ref("ClusterAgentInfo", () => ClusterAgentInfoSchema)
+      .optional(),
     clusterID: t
       .ref("ClusterId", () => ClusterIdSchema)
       .annotate({ description: "集群 ID" }),
     name: t.string().annotate({ description: "集群名称" }),
-  })
+    netType: t
+      .ref("ClusterNetType", () => ClusterNetTypeSchema)
+      .annotate({ description: "网络环境" }),
+  }),
 );
 
 export const ClusterInfoSchema = /*#__PURE__*/ t.object({
   desc: t.string().annotate({ description: "集群描述" }).optional(),
-  endpoint: t.string().annotate({ description: "Agent 地址" }).optional(),
   envType: t
     .ref("ClusterEnvType", () => ClusterEnvTypeSchema)
     .annotate({ description: "集群环境类型" }),
-  netType: t
-    .ref("ClusterNetType", () => ClusterNetTypeSchema)
-    .annotate({ description: "网络环境" }),
 });
 
 export const ClusterEnvTypeSchema = /*#__PURE__*/ t.nativeEnum(ClusterEnvType);
 
-export const ClusterNetTypeSchema = /*#__PURE__*/ t.nativeEnum(ClusterNetType);
+export const ClusterAgentInfoSchema = /*#__PURE__*/ t.object({
+  endpoint: t.string().optional(),
+  labels: t.record(t.string(), t.string()).optional(),
+});
 
 export const ClusterIdSchema = /*#__PURE__*/ t.string();
 
-export const ClusterInstanceStatusSchema = /*#__PURE__*/ t.object({
-  id: t.string(),
-  ping: t.ref("StrfmtDuration", () => StrfmtDurationSchema).optional(),
-  supportedPlatforms: t.array(t.string()).optional(),
+export const ClusterNetTypeSchema = /*#__PURE__*/ t.nativeEnum(ClusterNetType);
+
+export const ClientObjectSchema = /*#__PURE__*/ t.any();
+
+export const ClusterInstanceStatusSchema = /*#__PURE__*/ t.intersection(
+  t.ref(
+    "KubeutilClusterinfoClusterInfo",
+    () => KubeutilClusterinfoClusterInfoSchema,
+  ),
+  t.object({
+    ping: t.ref("StrfmtDuration", () => StrfmtDurationSchema).optional(),
+  }),
+);
+
+export const KubeutilClusterinfoClusterInfoSchema = /*#__PURE__*/ t.object({
+  nodes: t.array(
+    t.ref(
+      "KubeutilClusterinfoClusterNode",
+      () => KubeutilClusterinfoClusterNodeSchema,
+    ),
+  ),
+});
+
+export const KubeutilClusterinfoClusterNodeSchema =
+  /*#__PURE__*/ t.intersection(
+    t.ref(
+      "K8SIoApiCoreV1NodeSystemInfo",
+      () => K8SIoApiCoreV1NodeSystemInfoSchema,
+    ),
+    t.object({
+      externalIP: t.string(),
+      hostname: t.string(),
+      internalIP: t.string(),
+      role: t.string(),
+    }),
+  );
+
+export const K8SIoApiCoreV1NodeSystemInfoSchema = /*#__PURE__*/ t.object({
+  architecture: t.string(),
+  bootID: t.string(),
+  containerRuntimeVersion: t.string(),
+  kernelVersion: t.string(),
+  kubeProxyVersion: t.string(),
+  kubeletVersion: t.string(),
+  machineID: t.string(),
+  operatingSystem: t.string(),
+  osImage: t.string(),
+  systemUUID: t.string(),
 });
 
 export const StrfmtDurationSchema = /*#__PURE__*/ t.string();
@@ -1906,14 +2042,14 @@ export const GroupSchema = /*#__PURE__*/ t.intersection(
   t.ref("GroupInfo", () => GroupInfoSchema),
   t.ref(
     "DatatypesCreationUpdationDeletionTime",
-    () => DatatypesCreationUpdationDeletionTimeSchema
+    () => DatatypesCreationUpdationDeletionTimeSchema,
   ),
   t.object({
     groupID: t
       .ref("GroupId", () => GroupIdSchema)
       .annotate({ description: "组织 ID" }),
     name: t.string().annotate({ description: "组织名称" }),
-  })
+  }),
 );
 
 export const GroupInfoSchema = /*#__PURE__*/ t.object({
@@ -1929,7 +2065,7 @@ export const GroupEnvWithClusterSchema = /*#__PURE__*/ t.intersection(
   t.ref("GroupEnv", () => GroupEnvSchema),
   t.object({
     cluster: t.ref("Cluster", () => ClusterSchema).optional(),
-  })
+  }),
 );
 
 export const GroupEnvSchema = /*#__PURE__*/ t.intersection(
@@ -1937,7 +2073,7 @@ export const GroupEnvSchema = /*#__PURE__*/ t.intersection(
   t.ref("GroupEnvCluster", () => GroupEnvClusterSchema),
   t.ref(
     "DatatypesCreationUpdationDeletionTime",
-    () => DatatypesCreationUpdationDeletionTimeSchema
+    () => DatatypesCreationUpdationDeletionTimeSchema,
   ),
   t.object({
     envID: t.ref("GroupEnvId", () => GroupEnvIdSchema),
@@ -1945,7 +2081,7 @@ export const GroupEnvSchema = /*#__PURE__*/ t.intersection(
     groupID: t
       .ref("GroupId", () => GroupIdSchema)
       .annotate({ description: "组织 ID" }),
-  })
+  }),
 );
 
 export const GroupEnvInfoSchema = /*#__PURE__*/ t.object({
@@ -1973,7 +2109,7 @@ export const ApisKubepkgV1Alpha1KubePkgSchema = /*#__PURE__*/ t.intersection(
     status: t
       .ref("ApisKubepkgV1Alpha1Status", () => ApisKubepkgV1Alpha1StatusSchema)
       .optional(),
-  })
+  }),
 );
 
 export const ApisMetaV1TypeMetaSchema = /*#__PURE__*/ t.object({
@@ -1994,8 +2130,8 @@ export const ApisKubepkgV1Alpha1SpecSchema = /*#__PURE__*/ t.object({
       t.string(),
       t.ref(
         "ApisKubepkgV1Alpha1EnvVarValueOrFrom",
-        () => ApisKubepkgV1Alpha1EnvVarValueOrFromSchema
-      )
+        () => ApisKubepkgV1Alpha1EnvVarValueOrFromSchema,
+      ),
     )
     .optional(),
   containers: t
@@ -2003,8 +2139,8 @@ export const ApisKubepkgV1Alpha1SpecSchema = /*#__PURE__*/ t.object({
       t.string(),
       t.ref(
         "ApisKubepkgV1Alpha1Container",
-        () => ApisKubepkgV1Alpha1ContainerSchema
-      )
+        () => ApisKubepkgV1Alpha1ContainerSchema,
+      ),
     )
     .optional(),
   deploy: t
@@ -2013,13 +2149,13 @@ export const ApisKubepkgV1Alpha1SpecSchema = /*#__PURE__*/ t.object({
   manifests: t
     .ref(
       "ApisKubepkgV1Alpha1Manifests",
-      () => ApisKubepkgV1Alpha1ManifestsSchema
+      () => ApisKubepkgV1Alpha1ManifestsSchema,
     )
     .optional(),
   serviceAccount: t
     .ref(
       "ApisKubepkgV1Alpha1ServiceAccount",
-      () => ApisKubepkgV1Alpha1ServiceAccountSchema
+      () => ApisKubepkgV1Alpha1ServiceAccountSchema,
     )
     .optional(),
   services: t
@@ -2027,15 +2163,15 @@ export const ApisKubepkgV1Alpha1SpecSchema = /*#__PURE__*/ t.object({
       t.string(),
       t.ref(
         "ApisKubepkgV1Alpha1Service",
-        () => ApisKubepkgV1Alpha1ServiceSchema
-      )
+        () => ApisKubepkgV1Alpha1ServiceSchema,
+      ),
     )
     .optional(),
   version: t.string(),
   volumes: t
     .record(
       t.string(),
-      t.ref("ApisKubepkgV1Alpha1Volume", () => ApisKubepkgV1Alpha1VolumeSchema)
+      t.ref("ApisKubepkgV1Alpha1Volume", () => ApisKubepkgV1Alpha1VolumeSchema),
     )
     .optional(),
 });
@@ -2051,13 +2187,13 @@ export const ApisKubepkgV1Alpha1ContainerSchema = /*#__PURE__*/ t.object({
       t.string(),
       t.ref(
         "ApisKubepkgV1Alpha1EnvVarValueOrFrom",
-        () => ApisKubepkgV1Alpha1EnvVarValueOrFromSchema
-      )
+        () => ApisKubepkgV1Alpha1EnvVarValueOrFromSchema,
+      ),
     )
     .optional(),
   image: t.ref(
     "ApisKubepkgV1Alpha1Image",
-    () => ApisKubepkgV1Alpha1ImageSchema
+    () => ApisKubepkgV1Alpha1ImageSchema,
   ),
   lifecycle: t
     .ref("K8SIoApiCoreV1Lifecycle", () => K8SIoApiCoreV1LifecycleSchema)
@@ -2075,13 +2211,13 @@ export const ApisKubepkgV1Alpha1ContainerSchema = /*#__PURE__*/ t.object({
   resources: t
     .ref(
       "K8SIoApiCoreV1ResourceRequirements",
-      () => K8SIoApiCoreV1ResourceRequirementsSchema
+      () => K8SIoApiCoreV1ResourceRequirementsSchema,
     )
     .optional(),
   securityContext: t
     .ref(
       "K8SIoApiCoreV1SecurityContext",
-      () => K8SIoApiCoreV1SecurityContextSchema
+      () => K8SIoApiCoreV1SecurityContextSchema,
     )
     .optional(),
   startupProbe: t
@@ -2093,7 +2229,7 @@ export const ApisKubepkgV1Alpha1ContainerSchema = /*#__PURE__*/ t.object({
   terminationMessagePolicy: t
     .ref(
       "K8SIoApiCoreV1TerminationMessagePolicy",
-      () => K8SIoApiCoreV1TerminationMessagePolicySchema
+      () => K8SIoApiCoreV1TerminationMessagePolicySchema,
     )
     .optional(),
   tty: t.boolean().optional(),
@@ -2116,13 +2252,13 @@ export const K8SIoApiCoreV1LifecycleSchema = /*#__PURE__*/ t.object({
   postStart: t
     .ref(
       "K8SIoApiCoreV1LifecycleHandler",
-      () => K8SIoApiCoreV1LifecycleHandlerSchema
+      () => K8SIoApiCoreV1LifecycleHandlerSchema,
     )
     .optional(),
   preStop: t
     .ref(
       "K8SIoApiCoreV1LifecycleHandler",
-      () => K8SIoApiCoreV1LifecycleHandlerSchema
+      () => K8SIoApiCoreV1LifecycleHandlerSchema,
     )
     .optional(),
 });
@@ -2137,7 +2273,7 @@ export const K8SIoApiCoreV1LifecycleHandlerSchema = /*#__PURE__*/ t.object({
   tcpSocket: t
     .ref(
       "K8SIoApiCoreV1TcpSocketAction",
-      () => K8SIoApiCoreV1TcpSocketActionSchema
+      () => K8SIoApiCoreV1TcpSocketActionSchema,
     )
     .optional(),
 });
@@ -2150,7 +2286,7 @@ export const K8SIoApiCoreV1HttpGetActionSchema = /*#__PURE__*/ t.object({
   host: t.string().optional(),
   httpHeaders: t
     .array(
-      t.ref("K8SIoApiCoreV1HttpHeader", () => K8SIoApiCoreV1HttpHeaderSchema)
+      t.ref("K8SIoApiCoreV1HttpHeader", () => K8SIoApiCoreV1HttpHeaderSchema),
     )
     .optional(),
   path: t.string().optional(),
@@ -2176,7 +2312,7 @@ export const K8SIoApiCoreV1HttpHeaderSchema = /*#__PURE__*/ t.object({
 
 export const UtilIntstrIntOrStringSchema = /*#__PURE__*/ t.union(
   t.integer(),
-  t.string()
+  t.string(),
 );
 
 export const K8SIoApiCoreV1UriSchemeSchema = /*#__PURE__*/ t.string();
@@ -2200,7 +2336,7 @@ export const K8SIoApiCoreV1ProbeSchema = /*#__PURE__*/ t.intersection(
     successThreshold: t.integer().optional(),
     terminationGracePeriodSeconds: t.integer().optional(),
     timeoutSeconds: t.integer().optional(),
-  })
+  }),
 );
 
 export const K8SIoApiCoreV1ProbeHandlerSchema = /*#__PURE__*/ t.object({
@@ -2216,7 +2352,7 @@ export const K8SIoApiCoreV1ProbeHandlerSchema = /*#__PURE__*/ t.object({
   tcpSocket: t
     .ref(
       "K8SIoApiCoreV1TcpSocketAction",
-      () => K8SIoApiCoreV1TcpSocketActionSchema
+      () => K8SIoApiCoreV1TcpSocketActionSchema,
     )
     .optional(),
 });
@@ -2231,8 +2367,8 @@ export const K8SIoApiCoreV1ResourceRequirementsSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1ResourceClaim",
-        () => K8SIoApiCoreV1ResourceClaimSchema
-      )
+        () => K8SIoApiCoreV1ResourceClaimSchema,
+      ),
     )
     .optional(),
   limits: t
@@ -2257,7 +2393,7 @@ export const K8SIoApiCoreV1ResourceClaimSchema = /*#__PURE__*/ t.object({
 
 export const K8SIoApiCoreV1ResourceListSchema = /*#__PURE__*/ t.record(
   t.ref("K8SIoApiCoreV1ResourceName", () => K8SIoApiCoreV1ResourceNameSchema),
-  t.ref("ApiResourceQuantity", () => ApiResourceQuantitySchema)
+  t.ref("ApiResourceQuantity", () => ApiResourceQuantitySchema),
 );
 
 export const K8SIoApiCoreV1ResourceNameSchema = /*#__PURE__*/ t.string();
@@ -2280,19 +2416,19 @@ export const K8SIoApiCoreV1SecurityContextSchema = /*#__PURE__*/ t.object({
   seLinuxOptions: t
     .ref(
       "K8SIoApiCoreV1SeLinuxOptions",
-      () => K8SIoApiCoreV1SeLinuxOptionsSchema
+      () => K8SIoApiCoreV1SeLinuxOptionsSchema,
     )
     .optional(),
   seccompProfile: t
     .ref(
       "K8SIoApiCoreV1SeccompProfile",
-      () => K8SIoApiCoreV1SeccompProfileSchema
+      () => K8SIoApiCoreV1SeccompProfileSchema,
     )
     .optional(),
   windowsOptions: t
     .ref(
       "K8SIoApiCoreV1WindowsSecurityContextOptions",
-      () => K8SIoApiCoreV1WindowsSecurityContextOptionsSchema
+      () => K8SIoApiCoreV1WindowsSecurityContextOptionsSchema,
     )
     .optional(),
 });
@@ -2300,12 +2436,12 @@ export const K8SIoApiCoreV1SecurityContextSchema = /*#__PURE__*/ t.object({
 export const K8SIoApiCoreV1CapabilitiesSchema = /*#__PURE__*/ t.object({
   add: t
     .array(
-      t.ref("K8SIoApiCoreV1Capability", () => K8SIoApiCoreV1CapabilitySchema)
+      t.ref("K8SIoApiCoreV1Capability", () => K8SIoApiCoreV1CapabilitySchema),
     )
     .optional(),
   drop: t
     .array(
-      t.ref("K8SIoApiCoreV1Capability", () => K8SIoApiCoreV1CapabilitySchema)
+      t.ref("K8SIoApiCoreV1Capability", () => K8SIoApiCoreV1CapabilitySchema),
     )
     .optional(),
 });
@@ -2326,7 +2462,7 @@ export const K8SIoApiCoreV1SeccompProfileSchema = /*#__PURE__*/ t.object({
   type: t
     .ref(
       "K8SIoApiCoreV1SeccompProfileType",
-      () => K8SIoApiCoreV1SeccompProfileTypeSchema
+      () => K8SIoApiCoreV1SeccompProfileTypeSchema,
     )
     .annotate({
       description:
@@ -2357,7 +2493,7 @@ export const ApisKubepkgV1Alpha1DeploySchema =
       spec: t
         .ref(
           "K8SIoApiBatchV1CronJobSpec",
-          () => K8SIoApiBatchV1CronJobSpecSchema
+          () => K8SIoApiBatchV1CronJobSpecSchema,
         )
         .optional(),
     }),
@@ -2366,7 +2502,7 @@ export const ApisKubepkgV1Alpha1DeploySchema =
       spec: t
         .ref(
           "K8SIoApiAppsV1DaemonSetSpec",
-          () => K8SIoApiAppsV1DaemonSetSpecSchema
+          () => K8SIoApiAppsV1DaemonSetSpecSchema,
         )
         .optional(),
     }),
@@ -2375,7 +2511,7 @@ export const ApisKubepkgV1Alpha1DeploySchema =
       spec: t
         .ref(
           "K8SIoApiAppsV1DeploymentSpec",
-          () => K8SIoApiAppsV1DeploymentSpecSchema
+          () => K8SIoApiAppsV1DeploymentSpecSchema,
         )
         .optional(),
     }),
@@ -2393,7 +2529,7 @@ export const ApisKubepkgV1Alpha1DeploySchema =
       spec: t
         .ref(
           "K8SIoApiAppsV1StatefulSetSpec",
-          () => K8SIoApiAppsV1StatefulSetSpecSchema
+          () => K8SIoApiAppsV1StatefulSetSpecSchema,
         )
         .optional(),
     }),
@@ -2403,7 +2539,7 @@ export const K8SIoApiBatchV1CronJobSpecSchema = /*#__PURE__*/ t.object({
   concurrencyPolicy: t
     .ref(
       "K8SIoApiBatchV1ConcurrencyPolicy",
-      () => K8SIoApiBatchV1ConcurrencyPolicySchema
+      () => K8SIoApiBatchV1ConcurrencyPolicySchema,
     )
     .annotate({
       description:
@@ -2414,7 +2550,7 @@ export const K8SIoApiBatchV1CronJobSpecSchema = /*#__PURE__*/ t.object({
   jobTemplate: t
     .ref(
       "K8SIoApiBatchV1JobTemplateSpec",
-      () => K8SIoApiBatchV1JobTemplateSpecSchema
+      () => K8SIoApiBatchV1JobTemplateSpecSchema,
     )
     .annotate({
       description:
@@ -2448,7 +2584,7 @@ export const K8SIoApiBatchV1JobSpecSchema = /*#__PURE__*/ t.object({
   completionMode: t
     .ref(
       "K8SIoApiBatchV1CompletionMode",
-      () => K8SIoApiBatchV1CompletionModeSchema
+      () => K8SIoApiBatchV1CompletionModeSchema,
     )
     .optional(),
   completions: t.integer().optional(),
@@ -2457,7 +2593,7 @@ export const K8SIoApiBatchV1JobSpecSchema = /*#__PURE__*/ t.object({
   podFailurePolicy: t
     .ref(
       "K8SIoApiBatchV1PodFailurePolicy",
-      () => K8SIoApiBatchV1PodFailurePolicySchema
+      () => K8SIoApiBatchV1PodFailurePolicySchema,
     )
     .optional(),
   selector: t
@@ -2467,7 +2603,7 @@ export const K8SIoApiBatchV1JobSpecSchema = /*#__PURE__*/ t.object({
   template: t
     .ref(
       "K8SIoApiCoreV1PodTemplateSpec",
-      () => K8SIoApiCoreV1PodTemplateSpecSchema
+      () => K8SIoApiCoreV1PodTemplateSpecSchema,
     )
     .annotate({
       description:
@@ -2482,8 +2618,8 @@ export const K8SIoApiBatchV1PodFailurePolicySchema = /*#__PURE__*/ t.object({
   rules: t.array(
     t.ref(
       "K8SIoApiBatchV1PodFailurePolicyRule",
-      () => K8SIoApiBatchV1PodFailurePolicyRuleSchema
-    )
+      () => K8SIoApiBatchV1PodFailurePolicyRuleSchema,
+    ),
   ),
 });
 
@@ -2492,7 +2628,7 @@ export const K8SIoApiBatchV1PodFailurePolicyRuleSchema = /*#__PURE__*/ t.object(
     action: t
       .ref(
         "K8SIoApiBatchV1PodFailurePolicyAction",
-        () => K8SIoApiBatchV1PodFailurePolicyActionSchema
+        () => K8SIoApiBatchV1PodFailurePolicyActionSchema,
       )
       .annotate({
         description:
@@ -2501,16 +2637,16 @@ export const K8SIoApiBatchV1PodFailurePolicyRuleSchema = /*#__PURE__*/ t.object(
     onExitCodes: t
       .ref(
         "K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirement",
-        () => K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirementSchema
+        () => K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirementSchema,
       )
       .optional(),
     onPodConditions: t.array(
       t.ref(
         "K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPattern",
-        () => K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPatternSchema
-      )
+        () => K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPatternSchema,
+      ),
     ),
-  }
+  },
 );
 
 export const K8SIoApiBatchV1PodFailurePolicyActionSchema =
@@ -2522,7 +2658,7 @@ export const K8SIoApiBatchV1PodFailurePolicyOnExitCodesRequirementSchema =
     operator: t
       .ref(
         "K8SIoApiBatchV1PodFailurePolicyOnExitCodesOperator",
-        () => K8SIoApiBatchV1PodFailurePolicyOnExitCodesOperatorSchema
+        () => K8SIoApiBatchV1PodFailurePolicyOnExitCodesOperatorSchema,
       )
       .annotate({
         description:
@@ -2539,7 +2675,7 @@ export const K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPatternSchema =
     status: t
       .ref(
         "K8SIoApiCoreV1ConditionStatus",
-        () => K8SIoApiCoreV1ConditionStatusSchema
+        () => K8SIoApiCoreV1ConditionStatusSchema,
       )
       .annotate({
         description:
@@ -2548,7 +2684,7 @@ export const K8SIoApiBatchV1PodFailurePolicyOnPodConditionsPatternSchema =
     type: t
       .ref(
         "K8SIoApiCoreV1PodConditionType",
-        () => K8SIoApiCoreV1PodConditionTypeSchema
+        () => K8SIoApiCoreV1PodConditionTypeSchema,
       )
       .annotate({
         description:
@@ -2565,8 +2701,8 @@ export const ApisMetaV1LabelSelectorSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "ApisMetaV1LabelSelectorRequirement",
-        () => ApisMetaV1LabelSelectorRequirementSchema
-      )
+        () => ApisMetaV1LabelSelectorRequirementSchema,
+      ),
     )
     .optional(),
   matchLabels: t.record(t.string(), t.string()).optional(),
@@ -2577,7 +2713,7 @@ export const ApisMetaV1LabelSelectorRequirementSchema = /*#__PURE__*/ t.object({
   operator: t
     .ref(
       "ApisMetaV1LabelSelectorOperator",
-      () => ApisMetaV1LabelSelectorOperatorSchema
+      () => ApisMetaV1LabelSelectorOperatorSchema,
     )
     .annotate({
       description:
@@ -2620,7 +2756,7 @@ export const K8SIoApiCoreV1PodSpecSchema = /*#__PURE__*/ t.object({
   enableServiceLinks: t.boolean().optional(),
   hostAliases: t
     .array(
-      t.ref("K8SIoApiCoreV1HostAlias", () => K8SIoApiCoreV1HostAliasSchema)
+      t.ref("K8SIoApiCoreV1HostAlias", () => K8SIoApiCoreV1HostAliasSchema),
     )
     .optional(),
   hostIPC: t.boolean().optional(),
@@ -2632,8 +2768,8 @@ export const K8SIoApiCoreV1PodSpecSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1LocalObjectReference",
-        () => K8SIoApiCoreV1LocalObjectReferenceSchema
-      )
+        () => K8SIoApiCoreV1LocalObjectReferenceSchema,
+      ),
     )
     .optional(),
   nodeName: t.string().optional(),
@@ -2649,7 +2785,7 @@ export const K8SIoApiCoreV1PodSpecSchema = /*#__PURE__*/ t.object({
   preemptionPolicy: t
     .ref(
       "K8SIoApiCoreV1PreemptionPolicy",
-      () => K8SIoApiCoreV1PreemptionPolicySchema
+      () => K8SIoApiCoreV1PreemptionPolicySchema,
     )
     .optional(),
   priority: t.integer().optional(),
@@ -2658,16 +2794,16 @@ export const K8SIoApiCoreV1PodSpecSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1PodReadinessGate",
-        () => K8SIoApiCoreV1PodReadinessGateSchema
-      )
+        () => K8SIoApiCoreV1PodReadinessGateSchema,
+      ),
     )
     .optional(),
   resourceClaims: t
     .array(
       t.ref(
         "K8SIoApiCoreV1PodResourceClaim",
-        () => K8SIoApiCoreV1PodResourceClaimSchema
-      )
+        () => K8SIoApiCoreV1PodResourceClaimSchema,
+      ),
     )
     .optional(),
   restartPolicy: t
@@ -2683,14 +2819,14 @@ export const K8SIoApiCoreV1PodSpecSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1PodSchedulingGate",
-        () => K8SIoApiCoreV1PodSchedulingGateSchema
-      )
+        () => K8SIoApiCoreV1PodSchedulingGateSchema,
+      ),
     )
     .optional(),
   securityContext: t
     .ref(
       "K8SIoApiCoreV1PodSecurityContext",
-      () => K8SIoApiCoreV1PodSecurityContextSchema
+      () => K8SIoApiCoreV1PodSecurityContextSchema,
     )
     .optional(),
   serviceAccount: t.string().optional(),
@@ -2701,15 +2837,15 @@ export const K8SIoApiCoreV1PodSpecSchema = /*#__PURE__*/ t.object({
   terminationGracePeriodSeconds: t.integer().optional(),
   tolerations: t
     .array(
-      t.ref("K8SIoApiCoreV1Toleration", () => K8SIoApiCoreV1TolerationSchema)
+      t.ref("K8SIoApiCoreV1Toleration", () => K8SIoApiCoreV1TolerationSchema),
     )
     .optional(),
   topologySpreadConstraints: t
     .array(
       t.ref(
         "K8SIoApiCoreV1TopologySpreadConstraint",
-        () => K8SIoApiCoreV1TopologySpreadConstraintSchema
-      )
+        () => K8SIoApiCoreV1TopologySpreadConstraintSchema,
+      ),
     )
     .optional(),
 });
@@ -2724,7 +2860,7 @@ export const K8SIoApiCoreV1AffinitySchema = /*#__PURE__*/ t.object({
   podAntiAffinity: t
     .ref(
       "K8SIoApiCoreV1PodAntiAffinity",
-      () => K8SIoApiCoreV1PodAntiAffinitySchema
+      () => K8SIoApiCoreV1PodAntiAffinitySchema,
     )
     .optional(),
 });
@@ -2734,8 +2870,8 @@ export const K8SIoApiCoreV1NodeAffinitySchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1PreferredSchedulingTerm",
-        () => K8SIoApiCoreV1PreferredSchedulingTermSchema
-      )
+        () => K8SIoApiCoreV1PreferredSchedulingTermSchema,
+      ),
     )
     .optional(),
   requiredDuringSchedulingIgnoredDuringExecution: t
@@ -2748,7 +2884,7 @@ export const K8SIoApiCoreV1PreferredSchedulingTermSchema =
     preference: t
       .ref(
         "K8SIoApiCoreV1NodeSelectorTerm",
-        () => K8SIoApiCoreV1NodeSelectorTermSchema
+        () => K8SIoApiCoreV1NodeSelectorTermSchema,
       )
       .annotate({
         description:
@@ -2762,16 +2898,16 @@ export const K8SIoApiCoreV1NodeSelectorTermSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1NodeSelectorRequirement",
-        () => K8SIoApiCoreV1NodeSelectorRequirementSchema
-      )
+        () => K8SIoApiCoreV1NodeSelectorRequirementSchema,
+      ),
     )
     .optional(),
   matchFields: t
     .array(
       t.ref(
         "K8SIoApiCoreV1NodeSelectorRequirement",
-        () => K8SIoApiCoreV1NodeSelectorRequirementSchema
-      )
+        () => K8SIoApiCoreV1NodeSelectorRequirementSchema,
+      ),
     )
     .optional(),
 });
@@ -2782,7 +2918,7 @@ export const K8SIoApiCoreV1NodeSelectorRequirementSchema =
     operator: t
       .ref(
         "K8SIoApiCoreV1NodeSelectorOperator",
-        () => K8SIoApiCoreV1NodeSelectorOperatorSchema
+        () => K8SIoApiCoreV1NodeSelectorOperatorSchema,
       )
       .annotate({
         description:
@@ -2798,8 +2934,8 @@ export const K8SIoApiCoreV1NodeSelectorSchema = /*#__PURE__*/ t.object({
   nodeSelectorTerms: t.array(
     t.ref(
       "K8SIoApiCoreV1NodeSelectorTerm",
-      () => K8SIoApiCoreV1NodeSelectorTermSchema
-    )
+      () => K8SIoApiCoreV1NodeSelectorTermSchema,
+    ),
   ),
 });
 
@@ -2808,16 +2944,16 @@ export const K8SIoApiCoreV1PodAffinitySchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1WeightedPodAffinityTerm",
-        () => K8SIoApiCoreV1WeightedPodAffinityTermSchema
-      )
+        () => K8SIoApiCoreV1WeightedPodAffinityTermSchema,
+      ),
     )
     .optional(),
   requiredDuringSchedulingIgnoredDuringExecution: t
     .array(
       t.ref(
         "K8SIoApiCoreV1PodAffinityTerm",
-        () => K8SIoApiCoreV1PodAffinityTermSchema
-      )
+        () => K8SIoApiCoreV1PodAffinityTermSchema,
+      ),
     )
     .optional(),
 });
@@ -2827,7 +2963,7 @@ export const K8SIoApiCoreV1WeightedPodAffinityTermSchema =
     podAffinityTerm: t
       .ref(
         "K8SIoApiCoreV1PodAffinityTerm",
-        () => K8SIoApiCoreV1PodAffinityTermSchema
+        () => K8SIoApiCoreV1PodAffinityTermSchema,
       )
       .annotate({
         description:
@@ -2852,16 +2988,16 @@ export const K8SIoApiCoreV1PodAntiAffinitySchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1WeightedPodAffinityTerm",
-        () => K8SIoApiCoreV1WeightedPodAffinityTermSchema
-      )
+        () => K8SIoApiCoreV1WeightedPodAffinityTermSchema,
+      ),
     )
     .optional(),
   requiredDuringSchedulingIgnoredDuringExecution: t
     .array(
       t.ref(
         "K8SIoApiCoreV1PodAffinityTerm",
-        () => K8SIoApiCoreV1PodAffinityTermSchema
-      )
+        () => K8SIoApiCoreV1PodAffinityTermSchema,
+      ),
     )
     .optional(),
 });
@@ -2872,8 +3008,8 @@ export const K8SIoApiCoreV1PodDnsConfigSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1PodDnsConfigOption",
-        () => K8SIoApiCoreV1PodDnsConfigOptionSchema
-      )
+        () => K8SIoApiCoreV1PodDnsConfigOptionSchema,
+      ),
     )
     .optional(),
   searches: t.array(t.string()).optional(),
@@ -2907,14 +3043,14 @@ export const K8SIoApiCoreV1PodOsSchema = /*#__PURE__*/ t.object({
 export const K8SIoApiCoreV1OsNameSchema = /*#__PURE__*/ t.string();
 
 export const K8SIoApiCoreV1PreemptionPolicySchema = /*#__PURE__*/ t.nativeEnum(
-  K8SIoApiCoreV1PreemptionPolicy
+  K8SIoApiCoreV1PreemptionPolicy,
 );
 
 export const K8SIoApiCoreV1PodReadinessGateSchema = /*#__PURE__*/ t.object({
   conditionType: t
     .ref(
       "K8SIoApiCoreV1PodConditionType",
-      () => K8SIoApiCoreV1PodConditionTypeSchema
+      () => K8SIoApiCoreV1PodConditionTypeSchema,
     )
     .annotate({
       description:
@@ -2938,7 +3074,7 @@ export const K8SIoApiCoreV1ClaimSourceSchema = /*#__PURE__*/ t.object({
 });
 
 export const K8SIoApiCoreV1RestartPolicySchema = /*#__PURE__*/ t.nativeEnum(
-  K8SIoApiCoreV1RestartPolicy
+  K8SIoApiCoreV1RestartPolicy,
 );
 
 export const K8SIoApiCoreV1PodSchedulingGateSchema = /*#__PURE__*/ t.object({
@@ -2950,7 +3086,7 @@ export const K8SIoApiCoreV1PodSecurityContextSchema = /*#__PURE__*/ t.object({
   fsGroupChangePolicy: t
     .ref(
       "K8SIoApiCoreV1PodFsGroupChangePolicy",
-      () => K8SIoApiCoreV1PodFsGroupChangePolicySchema
+      () => K8SIoApiCoreV1PodFsGroupChangePolicySchema,
     )
     .optional(),
   runAsGroup: t.integer().optional(),
@@ -2959,13 +3095,13 @@ export const K8SIoApiCoreV1PodSecurityContextSchema = /*#__PURE__*/ t.object({
   seLinuxOptions: t
     .ref(
       "K8SIoApiCoreV1SeLinuxOptions",
-      () => K8SIoApiCoreV1SeLinuxOptionsSchema
+      () => K8SIoApiCoreV1SeLinuxOptionsSchema,
     )
     .optional(),
   seccompProfile: t
     .ref(
       "K8SIoApiCoreV1SeccompProfile",
-      () => K8SIoApiCoreV1SeccompProfileSchema
+      () => K8SIoApiCoreV1SeccompProfileSchema,
     )
     .optional(),
   supplementalGroups: t.array(t.integer()).optional(),
@@ -2975,7 +3111,7 @@ export const K8SIoApiCoreV1PodSecurityContextSchema = /*#__PURE__*/ t.object({
   windowsOptions: t
     .ref(
       "K8SIoApiCoreV1WindowsSecurityContextOptions",
-      () => K8SIoApiCoreV1WindowsSecurityContextOptionsSchema
+      () => K8SIoApiCoreV1WindowsSecurityContextOptionsSchema,
     )
     .optional(),
 });
@@ -3000,7 +3136,7 @@ export const K8SIoApiCoreV1TolerationSchema = /*#__PURE__*/ t.object({
   operator: t
     .ref(
       "K8SIoApiCoreV1TolerationOperator",
-      () => K8SIoApiCoreV1TolerationOperatorSchema
+      () => K8SIoApiCoreV1TolerationOperatorSchema,
     )
     .annotate({
       description:
@@ -3026,20 +3162,20 @@ export const K8SIoApiCoreV1TopologySpreadConstraintSchema =
     nodeAffinityPolicy: t
       .ref(
         "K8SIoApiCoreV1NodeInclusionPolicy",
-        () => K8SIoApiCoreV1NodeInclusionPolicySchema
+        () => K8SIoApiCoreV1NodeInclusionPolicySchema,
       )
       .optional(),
     nodeTaintsPolicy: t
       .ref(
         "K8SIoApiCoreV1NodeInclusionPolicy",
-        () => K8SIoApiCoreV1NodeInclusionPolicySchema
+        () => K8SIoApiCoreV1NodeInclusionPolicySchema,
       )
       .optional(),
     topologyKey: t.string(),
     whenUnsatisfiable: t
       .ref(
         "K8SIoApiCoreV1UnsatisfiableConstraintAction",
-        () => K8SIoApiCoreV1UnsatisfiableConstraintActionSchema
+        () => K8SIoApiCoreV1UnsatisfiableConstraintActionSchema,
       )
       .annotate({
         description:
@@ -3061,7 +3197,7 @@ export const K8SIoApiAppsV1DaemonSetSpecSchema = /*#__PURE__*/ t.object({
   template: t
     .ref(
       "K8SIoApiCoreV1PodTemplateSpec",
-      () => K8SIoApiCoreV1PodTemplateSpecSchema
+      () => K8SIoApiCoreV1PodTemplateSpecSchema,
     )
     .annotate({
       description:
@@ -3070,7 +3206,7 @@ export const K8SIoApiAppsV1DaemonSetSpecSchema = /*#__PURE__*/ t.object({
   updateStrategy: t
     .ref(
       "K8SIoApiAppsV1DaemonSetUpdateStrategy",
-      () => K8SIoApiAppsV1DaemonSetUpdateStrategySchema
+      () => K8SIoApiAppsV1DaemonSetUpdateStrategySchema,
     )
     .annotate({
       description:
@@ -3084,13 +3220,13 @@ export const K8SIoApiAppsV1DaemonSetUpdateStrategySchema =
     rollingUpdate: t
       .ref(
         "K8SIoApiAppsV1RollingUpdateDaemonSet",
-        () => K8SIoApiAppsV1RollingUpdateDaemonSetSchema
+        () => K8SIoApiAppsV1RollingUpdateDaemonSetSchema,
       )
       .optional(),
     type: t
       .ref(
         "K8SIoApiAppsV1DaemonSetUpdateStrategyType",
-        () => K8SIoApiAppsV1DaemonSetUpdateStrategyTypeSchema
+        () => K8SIoApiAppsV1DaemonSetUpdateStrategyTypeSchema,
       )
       .annotate({
         description:
@@ -3124,7 +3260,7 @@ export const K8SIoApiAppsV1DeploymentSpecSchema = /*#__PURE__*/ t.object({
   strategy: t
     .ref(
       "K8SIoApiAppsV1DeploymentStrategy",
-      () => K8SIoApiAppsV1DeploymentStrategySchema
+      () => K8SIoApiAppsV1DeploymentStrategySchema,
     )
     .annotate({
       description:
@@ -3134,7 +3270,7 @@ export const K8SIoApiAppsV1DeploymentSpecSchema = /*#__PURE__*/ t.object({
   template: t
     .ref(
       "K8SIoApiCoreV1PodTemplateSpec",
-      () => K8SIoApiCoreV1PodTemplateSpecSchema
+      () => K8SIoApiCoreV1PodTemplateSpecSchema,
     )
     .annotate({
       description:
@@ -3146,13 +3282,13 @@ export const K8SIoApiAppsV1DeploymentStrategySchema = /*#__PURE__*/ t.object({
   rollingUpdate: t
     .ref(
       "K8SIoApiAppsV1RollingUpdateDeployment",
-      () => K8SIoApiAppsV1RollingUpdateDeploymentSchema
+      () => K8SIoApiAppsV1RollingUpdateDeploymentSchema,
     )
     .optional(),
   type: t
     .ref(
       "K8SIoApiAppsV1DeploymentStrategyType",
-      () => K8SIoApiAppsV1DeploymentStrategyTypeSchema
+      () => K8SIoApiAppsV1DeploymentStrategyTypeSchema,
     )
     .annotate({
       description:
@@ -3179,19 +3315,19 @@ export const K8SIoApiAppsV1StatefulSetSpecSchema = /*#__PURE__*/ t.object({
   ordinals: t
     .ref(
       "K8SIoApiAppsV1StatefulSetOrdinals",
-      () => K8SIoApiAppsV1StatefulSetOrdinalsSchema
+      () => K8SIoApiAppsV1StatefulSetOrdinalsSchema,
     )
     .optional(),
   persistentVolumeClaimRetentionPolicy: t
     .ref(
       "K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicy",
-      () => K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicySchema
+      () => K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicySchema,
     )
     .optional(),
   podManagementPolicy: t
     .ref(
       "K8SIoApiAppsV1PodManagementPolicyType",
-      () => K8SIoApiAppsV1PodManagementPolicyTypeSchema
+      () => K8SIoApiAppsV1PodManagementPolicyTypeSchema,
     )
     .annotate({
       description:
@@ -3207,7 +3343,7 @@ export const K8SIoApiAppsV1StatefulSetSpecSchema = /*#__PURE__*/ t.object({
   template: t
     .ref(
       "K8SIoApiCoreV1PodTemplateSpec",
-      () => K8SIoApiCoreV1PodTemplateSpecSchema
+      () => K8SIoApiCoreV1PodTemplateSpecSchema,
     )
     .annotate({
       description:
@@ -3216,7 +3352,7 @@ export const K8SIoApiAppsV1StatefulSetSpecSchema = /*#__PURE__*/ t.object({
   updateStrategy: t
     .ref(
       "K8SIoApiAppsV1StatefulSetUpdateStrategy",
-      () => K8SIoApiAppsV1StatefulSetUpdateStrategySchema
+      () => K8SIoApiAppsV1StatefulSetUpdateStrategySchema,
     )
     .annotate({
       description:
@@ -3227,8 +3363,8 @@ export const K8SIoApiAppsV1StatefulSetSpecSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "K8SIoApiCoreV1PersistentVolumeClaim",
-        () => K8SIoApiCoreV1PersistentVolumeClaimSchema
-      )
+        () => K8SIoApiCoreV1PersistentVolumeClaimSchema,
+      ),
     )
     .optional(),
 });
@@ -3242,7 +3378,7 @@ export const K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicySchema
     whenDeleted: t
       .ref(
         "K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyType",
-        () => K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyTypeSchema
+        () => K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyTypeSchema,
       )
       .annotate({
         description:
@@ -3252,7 +3388,7 @@ export const K8SIoApiAppsV1StatefulSetPersistentVolumeClaimRetentionPolicySchema
     whenScaled: t
       .ref(
         "K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyType",
-        () => K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyTypeSchema
+        () => K8SIoApiAppsV1PersistentVolumeClaimRetentionPolicyTypeSchema,
       )
       .annotate({
         description:
@@ -3272,13 +3408,13 @@ export const K8SIoApiAppsV1StatefulSetUpdateStrategySchema =
     rollingUpdate: t
       .ref(
         "K8SIoApiAppsV1RollingUpdateStatefulSetStrategy",
-        () => K8SIoApiAppsV1RollingUpdateStatefulSetStrategySchema
+        () => K8SIoApiAppsV1RollingUpdateStatefulSetStrategySchema,
       )
       .optional(),
     type: t
       .ref(
         "K8SIoApiAppsV1StatefulSetUpdateStrategyType",
-        () => K8SIoApiAppsV1StatefulSetUpdateStrategyTypeSchema
+        () => K8SIoApiAppsV1StatefulSetUpdateStrategyTypeSchema,
       )
       .annotate({
         description:
@@ -3312,20 +3448,20 @@ export const K8SIoApiCoreV1PersistentVolumeClaimSchema =
       spec: t
         .ref(
           "K8SIoApiCoreV1PersistentVolumeClaimSpec",
-          () => K8SIoApiCoreV1PersistentVolumeClaimSpecSchema
+          () => K8SIoApiCoreV1PersistentVolumeClaimSpecSchema,
         )
         .optional(),
       status: t
         .ref(
           "K8SIoApiCoreV1PersistentVolumeClaimStatus",
-          () => K8SIoApiCoreV1PersistentVolumeClaimStatusSchema
+          () => K8SIoApiCoreV1PersistentVolumeClaimStatusSchema,
         )
         .annotate({
           description:
             "status represents the current information/status of a persistent volume claim. Read-only. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims",
         })
         .optional(),
-    })
+    }),
   );
 
 export const K8SIoApiCoreV1PersistentVolumeClaimSpecSchema =
@@ -3334,26 +3470,26 @@ export const K8SIoApiCoreV1PersistentVolumeClaimSpecSchema =
       .array(
         t.ref(
           "K8SIoApiCoreV1PersistentVolumeAccessMode",
-          () => K8SIoApiCoreV1PersistentVolumeAccessModeSchema
-        )
+          () => K8SIoApiCoreV1PersistentVolumeAccessModeSchema,
+        ),
       )
       .optional(),
     dataSource: t
       .ref(
         "K8SIoApiCoreV1TypedLocalObjectReference",
-        () => K8SIoApiCoreV1TypedLocalObjectReferenceSchema
+        () => K8SIoApiCoreV1TypedLocalObjectReferenceSchema,
       )
       .optional(),
     dataSourceRef: t
       .ref(
         "K8SIoApiCoreV1TypedObjectReference",
-        () => K8SIoApiCoreV1TypedObjectReferenceSchema
+        () => K8SIoApiCoreV1TypedObjectReferenceSchema,
       )
       .optional(),
     resources: t
       .ref(
         "K8SIoApiCoreV1ResourceRequirements",
-        () => K8SIoApiCoreV1ResourceRequirementsSchema
+        () => K8SIoApiCoreV1ResourceRequirementsSchema,
       )
       .annotate({
         description:
@@ -3367,7 +3503,7 @@ export const K8SIoApiCoreV1PersistentVolumeClaimSpecSchema =
     volumeMode: t
       .ref(
         "K8SIoApiCoreV1PersistentVolumeMode",
-        () => K8SIoApiCoreV1PersistentVolumeModeSchema
+        () => K8SIoApiCoreV1PersistentVolumeModeSchema,
       )
       .optional(),
     volumeName: t.string().optional(),
@@ -3399,8 +3535,8 @@ export const K8SIoApiCoreV1PersistentVolumeClaimStatusSchema =
       .array(
         t.ref(
           "K8SIoApiCoreV1PersistentVolumeAccessMode",
-          () => K8SIoApiCoreV1PersistentVolumeAccessModeSchema
-        )
+          () => K8SIoApiCoreV1PersistentVolumeAccessModeSchema,
+        ),
       )
       .optional(),
     allocatedResources: t
@@ -3421,14 +3557,14 @@ export const K8SIoApiCoreV1PersistentVolumeClaimStatusSchema =
       .array(
         t.ref(
           "K8SIoApiCoreV1PersistentVolumeClaimCondition",
-          () => K8SIoApiCoreV1PersistentVolumeClaimConditionSchema
-        )
+          () => K8SIoApiCoreV1PersistentVolumeClaimConditionSchema,
+        ),
       )
       .optional(),
     phase: t
       .ref(
         "K8SIoApiCoreV1PersistentVolumeClaimPhase",
-        () => K8SIoApiCoreV1PersistentVolumeClaimPhaseSchema
+        () => K8SIoApiCoreV1PersistentVolumeClaimPhaseSchema,
       )
       .annotate({
         description:
@@ -3438,7 +3574,7 @@ export const K8SIoApiCoreV1PersistentVolumeClaimStatusSchema =
     resizeStatus: t
       .ref(
         "K8SIoApiCoreV1PersistentVolumeClaimResizeStatus",
-        () => K8SIoApiCoreV1PersistentVolumeClaimResizeStatusSchema
+        () => K8SIoApiCoreV1PersistentVolumeClaimResizeStatusSchema,
       )
       .optional(),
   });
@@ -3462,11 +3598,11 @@ export const K8SIoApiCoreV1PersistentVolumeClaimConditionSchema =
     reason: t.string().optional(),
     status: t.ref(
       "K8SIoApiCoreV1ConditionStatus",
-      () => K8SIoApiCoreV1ConditionStatusSchema
+      () => K8SIoApiCoreV1ConditionStatusSchema,
     ),
     type: t.ref(
       "K8SIoApiCoreV1PersistentVolumeClaimConditionType",
-      () => K8SIoApiCoreV1PersistentVolumeClaimConditionTypeSchema
+      () => K8SIoApiCoreV1PersistentVolumeClaimConditionTypeSchema,
     ),
   });
 
@@ -3483,17 +3619,17 @@ export const K8SIoApiCoreV1PersistentVolumeClaimResizeStatusSchema =
 
 export const ApisKubepkgV1Alpha1ManifestsSchema = /*#__PURE__*/ t.record(
   t.string(),
-  t.any()
+  t.any(),
 );
 
 export const ApisKubepkgV1Alpha1ServiceAccountSchema = /*#__PURE__*/ t.object({
   rules: t.array(
-    t.ref("K8SIoApiRbacV1PolicyRule", () => K8SIoApiRbacV1PolicyRuleSchema)
+    t.ref("K8SIoApiRbacV1PolicyRule", () => K8SIoApiRbacV1PolicyRuleSchema),
   ),
   scope: t
     .ref(
       "ApisKubepkgV1Alpha1ScopeType",
-      () => ApisKubepkgV1Alpha1ScopeTypeSchema
+      () => ApisKubepkgV1Alpha1ScopeTypeSchema,
     )
     .optional(),
 });
@@ -3507,7 +3643,7 @@ export const K8SIoApiRbacV1PolicyRuleSchema = /*#__PURE__*/ t.object({
 });
 
 export const ApisKubepkgV1Alpha1ScopeTypeSchema = /*#__PURE__*/ t.nativeEnum(
-  ApisKubepkgV1Alpha1ScopeType
+  ApisKubepkgV1Alpha1ScopeType,
 );
 
 export const ApisKubepkgV1Alpha1ServiceSchema = /*#__PURE__*/ t.object({
@@ -3547,13 +3683,13 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
       opt: t
         .ref(
           "K8SIoApiCoreV1ConfigMapVolumeSource",
-          () => K8SIoApiCoreV1ConfigMapVolumeSourceSchema
+          () => K8SIoApiCoreV1ConfigMapVolumeSourceSchema,
         )
         .optional(),
       spec: t
         .ref(
           "ApisKubepkgV1Alpha1SpecData",
-          () => ApisKubepkgV1Alpha1SpecDataSchema
+          () => ApisKubepkgV1Alpha1SpecDataSchema,
         )
         .optional(),
     }),
@@ -3572,7 +3708,7 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
       opt: t
         .ref(
           "K8SIoApiCoreV1EmptyDirVolumeSource",
-          () => K8SIoApiCoreV1EmptyDirVolumeSourceSchema
+          () => K8SIoApiCoreV1EmptyDirVolumeSourceSchema,
         )
         .optional(),
     }),
@@ -3591,7 +3727,7 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
       opt: t
         .ref(
           "K8SIoApiCoreV1HostPathVolumeSource",
-          () => K8SIoApiCoreV1HostPathVolumeSourceSchema
+          () => K8SIoApiCoreV1HostPathVolumeSourceSchema,
         )
         .optional(),
     }),
@@ -3610,12 +3746,12 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
       opt: t
         .ref(
           "K8SIoApiCoreV1PersistentVolumeClaimVolumeSource",
-          () => K8SIoApiCoreV1PersistentVolumeClaimVolumeSourceSchema
+          () => K8SIoApiCoreV1PersistentVolumeClaimVolumeSourceSchema,
         )
         .optional(),
       spec: t.ref(
         "K8SIoApiCoreV1PersistentVolumeClaimSpec",
-        () => K8SIoApiCoreV1PersistentVolumeClaimSpecSchema
+        () => K8SIoApiCoreV1PersistentVolumeClaimSpecSchema,
       ),
     }),
     Secret: t.object({
@@ -3633,13 +3769,13 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
       opt: t
         .ref(
           "K8SIoApiCoreV1SecretVolumeSource",
-          () => K8SIoApiCoreV1SecretVolumeSourceSchema
+          () => K8SIoApiCoreV1SecretVolumeSourceSchema,
         )
         .optional(),
       spec: t
         .ref(
           "ApisKubepkgV1Alpha1SpecData",
-          () => ApisKubepkgV1Alpha1SpecDataSchema
+          () => ApisKubepkgV1Alpha1SpecDataSchema,
         )
         .optional(),
     }),
@@ -3649,17 +3785,17 @@ export const K8SIoApiCoreV1ConfigMapVolumeSourceSchema =
   /*#__PURE__*/ t.intersection(
     t.ref(
       "K8SIoApiCoreV1LocalObjectReference",
-      () => K8SIoApiCoreV1LocalObjectReferenceSchema
+      () => K8SIoApiCoreV1LocalObjectReferenceSchema,
     ),
     t.object({
       defaultMode: t.integer().optional(),
       items: t
         .array(
-          t.ref("K8SIoApiCoreV1KeyToPath", () => K8SIoApiCoreV1KeyToPathSchema)
+          t.ref("K8SIoApiCoreV1KeyToPath", () => K8SIoApiCoreV1KeyToPathSchema),
         )
         .optional(),
       optional: t.boolean().optional(),
-    })
+    }),
   );
 
 export const K8SIoApiCoreV1KeyToPathSchema = /*#__PURE__*/ t.object({
@@ -3709,7 +3845,7 @@ export const K8SIoApiCoreV1SecretVolumeSourceSchema = /*#__PURE__*/ t.object({
   defaultMode: t.integer().optional(),
   items: t
     .array(
-      t.ref("K8SIoApiCoreV1KeyToPath", () => K8SIoApiCoreV1KeyToPathSchema)
+      t.ref("K8SIoApiCoreV1KeyToPath", () => K8SIoApiCoreV1KeyToPathSchema),
     )
     .optional(),
   optional: t.boolean().optional(),
@@ -3721,8 +3857,8 @@ export const ApisKubepkgV1Alpha1StatusSchema = /*#__PURE__*/ t.object({
     .array(
       t.ref(
         "ApisKubepkgV1Alpha1DigestMeta",
-        () => ApisKubepkgV1Alpha1DigestMetaSchema
-      )
+        () => ApisKubepkgV1Alpha1DigestMetaSchema,
+      ),
     )
     .optional(),
   endpoint: t.record(t.string(), t.string()).optional(),
@@ -3736,12 +3872,12 @@ export const ApisKubepkgV1Alpha1DigestMetaSchema = /*#__PURE__*/ t.object({
   platform: t.string().optional(),
   size: t.ref(
     "ApisKubepkgV1Alpha1FileSize",
-    () => ApisKubepkgV1Alpha1FileSizeSchema
+    () => ApisKubepkgV1Alpha1FileSizeSchema,
   ),
   tag: t.string().optional(),
   type: t.ref(
     "ApisKubepkgV1Alpha1DigestMetaType",
-    () => ApisKubepkgV1Alpha1DigestMetaTypeSchema
+    () => ApisKubepkgV1Alpha1DigestMetaTypeSchema,
   ),
 });
 
@@ -3757,13 +3893,13 @@ export const ApisKubepkgV1Alpha1KubePkgListSchema =
       items: t.array(
         t.ref(
           "ApisKubepkgV1Alpha1KubePkg",
-          () => ApisKubepkgV1Alpha1KubePkgSchema
-        )
+          () => ApisKubepkgV1Alpha1KubePkgSchema,
+        ),
       ),
       metadata: t
         .ref("ApisMetaV1ListMeta", () => ApisMetaV1ListMetaSchema)
         .optional(),
-    })
+    }),
   );
 
 export const ApisMetaV1ListMetaSchema = /*#__PURE__*/ t.object({
@@ -3778,7 +3914,7 @@ export const GroupDeploymentIdSchema = /*#__PURE__*/ t.string();
 export const KubepkgSchema = /*#__PURE__*/ t.intersection(
   t.ref(
     "DatatypesCreationUpdationDeletionTime",
-    () => DatatypesCreationUpdationDeletionTimeSchema
+    () => DatatypesCreationUpdationDeletionTimeSchema,
   ),
   t.object({
     group: t.string().annotate({ description: "Kubepkg Group" }),
@@ -3786,7 +3922,7 @@ export const KubepkgSchema = /*#__PURE__*/ t.intersection(
       .ref("KubepkgId", () => KubepkgIdSchema)
       .annotate({ description: "Kubepkg ID" }),
     name: t.string().annotate({ description: "Kubepkg 名称" }),
-  })
+  }),
 );
 
 export const KubepkgIdSchema = /*#__PURE__*/ t.string();
@@ -3808,7 +3944,7 @@ export const GroupRobotDataListSchema = /*#__PURE__*/ t.object({
 export const GroupRobotSchema = /*#__PURE__*/ t.intersection(
   t.ref("GroupAccount", () => GroupAccountSchema),
   t.ref("AccountRobotInfo", () => AccountRobotInfoSchema),
-  t.object()
+  t.object(),
 );
 
 export const AccountRobotInfoSchema = /*#__PURE__*/ t.object({
@@ -3818,7 +3954,7 @@ export const AccountRobotInfoSchema = /*#__PURE__*/ t.object({
 export const AccountRobotSchema = /*#__PURE__*/ t.intersection(
   t.ref("Account", () => AccountSchema),
   t.ref("AccountRobotInfo", () => AccountRobotInfoSchema),
-  t.object()
+  t.object(),
 );
 
 export const GroupRefreshGroupRobotTokenDataSchema =
@@ -3826,7 +3962,7 @@ export const GroupRefreshGroupRobotTokenDataSchema =
     t.ref("GroupRoleInfo", () => GroupRoleInfoSchema),
     t.object({
       expiresIn: t.integer().annotate({ description: "秒" }),
-    })
+    }),
   );
 
 export const AuthOperatorAccountSchema = /*#__PURE__*/ t.intersection(
@@ -3837,13 +3973,13 @@ export const AuthOperatorAccountSchema = /*#__PURE__*/ t.intersection(
     groupRoles: t
       .record(
         t.ref("GroupId", () => GroupIdSchema),
-        t.ref("GroupRoleType", () => GroupRoleTypeSchema)
+        t.ref("GroupRoleType", () => GroupRoleTypeSchema),
       )
       .optional(),
-  })
+  }),
 );
 
 export const RbacPermissionsSchema = /*#__PURE__*/ t.record(
   t.string(),
-  t.array(t.any())
+  t.array(t.any()),
 );

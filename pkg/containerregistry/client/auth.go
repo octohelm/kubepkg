@@ -88,25 +88,34 @@ type userpass struct {
 }
 
 type credentials struct {
-	creds map[string]userpass
+	creds         sync.Map
+	refreshTokens sync.Map
 }
 
-func (c credentials) Basic(u *url.URL) (string, string) {
-	up := c.creds[u.String()]
-
-	return up.username, up.password
+func (c *credentials) Basic(u *url.URL) (string, string) {
+	up, ok := c.creds.Load(u.String())
+	if ok {
+		uu := up.(*userpass)
+		return uu.username, uu.password
+	}
+	return "", ""
 }
 
-func (c credentials) RefreshToken(u *url.URL, service string) string {
+func (c *credentials) RefreshToken(u *url.URL, service string) string {
+	t, ok := c.refreshTokens.Load(u.String())
+	if ok {
+		return t.(string)
+	}
 	return ""
 }
 
-func (c credentials) SetRefreshToken(u *url.URL, service, token string) {
+func (c *credentials) SetRefreshToken(u *url.URL, service, token string) {
+	c.refreshTokens.Store(u.String(), token)
 }
 
 // configureAuth stores credentials for challenge responses
 func configureAuth(username, password, remoteURL string) (auth.CredentialStore, error) {
-	creds := map[string]userpass{}
+	c := &credentials{}
 
 	authURLs, err := getAuthURLs(remoteURL)
 	if err != nil {
@@ -114,13 +123,13 @@ func configureAuth(username, password, remoteURL string) (auth.CredentialStore, 
 	}
 
 	for _, u := range authURLs {
-		creds[u] = userpass{
+		c.creds.Store(u, &userpass{
 			username: username,
 			password: password,
-		}
+		})
 	}
 
-	return credentials{creds: creds}, nil
+	return c, nil
 }
 
 func NewAuthChallenger(remoteURL *url.URL, username, password string) (AuthChallenger, error) {

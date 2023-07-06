@@ -16,5 +16,5 @@ export const PlatformProvider = createProvider(
   },
   {
     name: "Platform",
-  }
+  },
 );

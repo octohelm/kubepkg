@@ -9,7 +9,7 @@ import { isArray, mapValues } from "@innoai-tech/lodash";
 
 const parseQuery = <T extends any>(
   v: string | string[],
-  defaultValue: T
+  defaultValue: T,
 ): T => {
   if (isArray(v)) {
     if (isArray(defaultValue)) {
@@ -31,7 +31,7 @@ const parseQuery = <T extends any>(
 
 export const observableRefWithSyncURL = <T extends Record<string, any>>(
   defaults: T,
-  enabled = false
+  enabled = false,
 ) => {
   const router = useRouter();
   const route = useRoute();
@@ -39,7 +39,7 @@ export const observableRefWithSyncURL = <T extends Record<string, any>>(
   const values$ = observableRef<T>(
     mapValues(defaults, (v, k) => {
       return parseQuery((route.query[k] as any) ?? `${v}`, v);
-    }) as any
+    }) as any,
   );
 
   if (enabled) {
@@ -57,7 +57,7 @@ export const observableRefWithSyncURL = <T extends Record<string, any>>(
             }),
           },
         });
-      })
+      }),
     );
   }
 

@@ -42,7 +42,7 @@ const getErrorPosition = (error: SyntaxError, state: EditorState) => {
   if (m2) {
     return Math.min(
       state.doc.line(parseInt(m2[1]!)).from + parseInt(m2[2]!) - 1,
-      state.doc.length
+      state.doc.length,
     );
   }
 
@@ -51,7 +51,7 @@ const getErrorPosition = (error: SyntaxError, state: EditorState) => {
 
 const validateErrorsToDiagnostics = (
   errorSet: { [K: string]: string },
-  editorState: EditorState
+  editorState: EditorState,
 ): Diagnostic[] => {
   if (Object.keys(errorSet).length == 0) {
     return [];

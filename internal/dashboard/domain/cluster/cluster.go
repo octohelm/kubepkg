@@ -4,6 +4,7 @@ import "github.com/octohelm/kubepkg/pkg/datatypes"
 
 // +gengo:table:register=T
 // +gengo:table:group=cluster
+//
 // @def primary ID DeletedAt
 // @def unique_index i_name Name
 // @def index i_created_at CreatedAt
@@ -16,6 +17,18 @@ type Cluster struct {
 
 	Info
 
+	AgentInfo AgentInfo `db:"f_agent_info,default=''" json:"agentInfo,omitempty"`
+
+	AgentSecureInfo AgentSecureInfo `db:"f_agent_secure_info,default=''" json:"-"`
+
+	// 网络环境
+	// validate: string(required(),oneOf(['DIRECT','AIRGAP']))
+	NetType NetType `db:"f_net_type,default='1'" json:"netType"`
+
+	// Deprecated Agent 地址
+	// validate: when('netType',is('DIRECT'),then(string(required())))
+	Endpoint string `db:"f_endpoint,default=''" json:"-"`
+
 	datatypes.CreationUpdationDeletionTime
 }
 
@@ -24,12 +37,6 @@ type Info struct {
 	Desc string `db:"f_desc,default=''" json:"desc,omitempty"`
 	// 集群环境类型
 	EnvType EnvType `db:"f_env_type,default='1'" json:"envType"`
-	// 网络环境
-	// validate: string(required(),oneOf(['DIRECT','AIRGAP']))
-	NetType NetType `db:"f_net_type,default='1'" json:"netType"`
-	// Agent 地址
-	// validate: when('netType',is('DIRECT'),then(string(required())))
-	Endpoint string `db:"f_endpoint,default=''" json:"endpoint,omitempty"`
 }
 
 // +gengo:enum

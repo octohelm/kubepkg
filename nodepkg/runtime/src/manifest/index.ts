@@ -11,5 +11,5 @@ export const ManifestProvider = createProvider<Index>(
   }),
   {
     name: "Manifest",
-  }
+  },
 );

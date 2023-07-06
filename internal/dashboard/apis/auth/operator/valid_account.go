@@ -39,21 +39,25 @@ func (c *ValidAccount) Output(ctx context.Context) (interface{}, error) {
 
 	a := &Account{}
 
-	id, errForParse := strconv.ParseUint(audience[0], 10, 64)
-	if errForParse != nil {
-		return nil, statuserror.Wrap(errForParse, http.StatusUnauthorized, "InvalidToken")
-	}
-
-	a.AccountID = account.ID(id)
 	a.AdminRole = group.ROLE_TYPE__GUEST
 	a.AccountType = account.TYPE__USER
 
+	// []string{accountID,accountType}
 	for i, aud := range audience {
-		if i == 1 {
+		if i == 0 {
+			id, _ := strconv.ParseUint(audience[0], 10, 64)
+			a.AccountID = account.ID(id)
+		} else if i == 1 {
 			a.AccountType, _ = account.ParseTypeFromString(aud)
 		}
 		if aud == "ADMIN_INIT" {
 			a.AdminRole = group.ROLE_TYPE__OWNER
+		}
+	}
+
+	if a.AccountType != account.TYPE__AGENT {
+		if a.AccountID == 0 {
+			return nil, statuserror.Wrap(err, http.StatusUnauthorized, "InvalidToken")
 		}
 	}
 

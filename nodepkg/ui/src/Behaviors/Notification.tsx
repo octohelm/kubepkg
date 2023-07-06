@@ -32,7 +32,7 @@ const NotificationProvider = createProvider(
   },
   {
     name: "Notification",
-  }
+  },
 );
 
 export const useNotify = () => {
@@ -60,6 +60,6 @@ export const NotificationView = component$(() => {
           ))}
         </>
       );
-    })
+    }),
   );
 });

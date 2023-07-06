@@ -64,8 +64,8 @@ export const OpenAPIPlayground = component$(
             method: "GET",
             url: spec,
             inputs: {},
-          })
-        )
+          }),
+        ),
       ),
       subscribeOnMountedUntilUnmount({
         next: (resp) => {
@@ -75,7 +75,7 @@ export const OpenAPIPlayground = component$(
         error: (err) => {
           console.log(err);
         },
-      })
+      }),
     );
 
     return () => {
@@ -91,5 +91,5 @@ export const OpenAPIPlayground = component$(
 
       return <RequestPlayground key={props.spec} openapi={openapi.value} />;
     };
-  }
+  },
 );

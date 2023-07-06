@@ -38,8 +38,8 @@ export const AuthProviderCallback = component$(() => {
     subscribeUntilUnmount((resp) => {
       token$.next({
         type: resp.body.type,
-        accessToken: resp.body.accessToken,
-        refreshToken: resp.body.refreshToken ?? "",
+        accessToken: resp.body.access_token,
+        refreshToken: resp.body.refresh_token ?? "",
         id: resp.body.id ?? ""
       });
 

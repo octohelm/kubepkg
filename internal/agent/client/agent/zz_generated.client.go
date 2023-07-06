@@ -6,51 +6,34 @@ package agent
 
 import (
 	context "context"
-	io "io"
 
 	github_com_octohelm_courier_pkg_courier "github.com/octohelm/courier/pkg/courier"
 	github_com_octohelm_courier_pkg_courierhttp "github.com/octohelm/courier/pkg/courierhttp"
 	github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
+	github_com_octohelm_kubepkg_pkg_kubeutil_clusterinfo "github.com/octohelm/kubepkg/pkg/kubeutil/clusterinfo"
+	k8s_io_apimachinery_pkg_apis_meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type UploadBlob struct {
-	github_com_octohelm_courier_pkg_courierhttp.MethodPut `path:"/api/kubepkg-agent/v1/blobs"`
+type GetClusterInfo struct {
+	github_com_octohelm_courier_pkg_courierhttp.MethodGet `path:"/api/kubepkg-agent/v1/cluster"`
 
-	ContentType string `name:"Content-Type" in:"header"`
-
-	io.ReadCloser `in:"body" mime:"octet-stream"`
+	Authorization string `name:"Authorization,omitempty" in:"header"`
 }
 
-func (r *UploadBlob) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
+func (r *GetClusterInfo) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
 	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
 }
 
-func (r *UploadBlob) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {
-	return r.Do(ctx, metas...).Into(nil)
-}
-
-type StatBlobResponse = GithubComDistributionDistributionV3Descriptor
-
-type StatBlob struct {
-	github_com_octohelm_courier_pkg_courierhttp.MethodGet `path:"/api/kubepkg-agent/v1/blobs/:digest/stat"`
-
-	Digest string `name:"digest" in:"path"`
-}
-
-func (r *StatBlob) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
-}
-
-func (r *StatBlob) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (*StatBlobResponse, github_com_octohelm_courier_pkg_courier.Metadata, error) {
-	var resp StatBlobResponse
+func (r *GetClusterInfo) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (*GetClusterInfoResponse, github_com_octohelm_courier_pkg_courier.Metadata, error) {
+	var resp GetClusterInfoResponse
 	meta, err := r.Do(ctx, metas...).Into(&resp)
 	return &resp, meta, err
 }
 
-type ListKubePkgResponse = []ApisKubepkgV1Alpha1KubePkg
-
 type ListKubePkg struct {
 	github_com_octohelm_courier_pkg_courierhttp.MethodGet `path:"/api/kubepkg-agent/v1/kubepkgs"`
+
+	Authorization string `name:"Authorization,omitempty" in:"header"`
 
 	Namespace string `name:"namespace,omitempty" in:"query"`
 }
@@ -68,8 +51,9 @@ func (r *ListKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_c
 type ApplyKubePkg struct {
 	github_com_octohelm_courier_pkg_courierhttp.MethodPut `path:"/api/kubepkg-agent/v1/kubepkgs"`
 
-	*ApisKubepkgV1Alpha1KubePkg `in:"body" mime:"json,strict"`
-	io.ReadCloser               `in:"body" mime:"octet-stream,strict"`
+	Authorization string `name:"Authorization,omitempty" in:"header"`
+
+	ApisKubepkgV1Alpha1KubePkg `in:"body" mime:"json"`
 }
 
 func (r *ApplyKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
@@ -80,10 +64,28 @@ func (r *ApplyKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_
 	return r.Do(ctx, metas...).Into(nil)
 }
 
-type GetKubePkgResponse = ApisKubepkgV1Alpha1KubePkg
+type DelKubePkg struct {
+	github_com_octohelm_courier_pkg_courierhttp.MethodDelete `path:"/api/kubepkg-agent/v1/kubepkgs/:name"`
+
+	Authorization string `name:"Authorization,omitempty" in:"header"`
+
+	Name string `name:"name" in:"path"`
+
+	Namespace string `name:"namespace,omitempty" in:"query"`
+}
+
+func (r *DelKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
+	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
+}
+
+func (r *DelKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {
+	return r.Do(ctx, metas...).Into(nil)
+}
 
 type GetKubePkg struct {
 	github_com_octohelm_courier_pkg_courierhttp.MethodGet `path:"/api/kubepkg-agent/v1/kubepkgs/:name"`
+
+	Authorization string `name:"Authorization,omitempty" in:"header"`
 
 	Name string `name:"name" in:"path"`
 
@@ -100,48 +102,20 @@ func (r *GetKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_co
 	return &resp, meta, err
 }
 
-type DelKubePkg struct {
-	github_com_octohelm_courier_pkg_courierhttp.MethodDelete `path:"/api/kubepkg-agent/v1/kubepkgs/:name"`
-
-	Name string `name:"name" in:"path"`
-
-	Namespace string `name:"namespace,omitempty" in:"query"`
-}
-
-func (r *DelKubePkg) Do(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) github_com_octohelm_courier_pkg_courier.Result {
-	return github_com_octohelm_courier_pkg_courier.ClientFromContext(ctx, "agent").Do(ctx, r, metas...)
-}
-
-func (r *DelKubePkg) Invoke(ctx context.Context, metas ...github_com_octohelm_courier_pkg_courier.Metadata) (github_com_octohelm_courier_pkg_courier.Metadata, error) {
-	return r.Do(ctx, metas...).Into(nil)
-}
-
-type GithubComDistributionDistributionV3Descriptor struct {
-	Annotations map[string]string `json:"annotations,omitempty" name:"annotations,omitempty" `
-
-	Digest GithubComOpencontainersGoDigestDigest `json:"digest,omitempty" name:"digest,omitempty" `
-
-	MediaType string `json:"mediaType,omitempty" name:"mediaType,omitempty" `
-
-	Platform GithubComOpencontainersImageSpecSpecsGoV1Platform `json:"platform,omitempty" name:"platform,omitempty" `
-
-	Size int64 `json:"size,omitempty" name:"size,omitempty" `
-
-	Urls []string `json:"urls,omitempty" name:"urls,omitempty" `
-}
+type GetClusterInfoResponse = KubeutilClusterinfoClusterInfo
 
 type ApisKubepkgV1Alpha1KubePkg = github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.KubePkg
 
-type GithubComOpencontainersGoDigestDigest string
+type ApisMetaV1ObjectMeta = k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta
 
-type GithubComOpencontainersImageSpecSpecsGoV1Platform struct {
-	Architecture string `json:"architecture" name:"architecture" `
+type ListKubePkgResponse = []ApisKubepkgV1Alpha1KubePkg
 
-	Os string `json:"os" name:"os" `
+type KubeutilClusterinfoClusterInfo = github_com_octohelm_kubepkg_pkg_kubeutil_clusterinfo.ClusterInfo
 
-	OsFeatures []string `json:"os.features,omitempty" name:"os.features,omitempty" `
+type ApisMetaV1TypeMeta = k8s_io_apimachinery_pkg_apis_meta_v1.TypeMeta
 
-	OsVersion string `json:"os.version,omitempty" name:"os.version,omitempty" `
+type ApisKubepkgV1Alpha1Spec = github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.Spec
 
-	Variant string `json:"variant,omitempty" name:"variant,omitempty" `
-}
+type ApisKubepkgV1Alpha1Status = github_com_octohelm_kubepkg_pkg_apis_kubepkg_v1alpha1.Status
+
+type GetKubePkgResponse = ApisKubepkgV1Alpha1KubePkg

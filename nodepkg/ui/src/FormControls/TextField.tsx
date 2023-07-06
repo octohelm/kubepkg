@@ -15,7 +15,7 @@ export const TextField = styled(
     $supporting: t.custom<VNodeChild>().optional(),
     $leading: t.custom<VNodeChild>().optional(),
     $trailing: t.custom<VNodeChild>().optional(),
-    $default: t.custom<VNodeChild>()
+    $default: t.custom<VNodeChild>(),
   },
   (props, { slots }) => {
     return (Wrap) => {
@@ -28,13 +28,13 @@ export const TextField = styled(
           valued = !!get(
             c.props,
             ["value"],
-            get(c.props, ["placeholder"], valued)
+            get(c.props, ["placeholder"], valued),
           );
 
           disabled = get(c.props, ["disabled"], disabled);
 
           return cloneVNode(c, {
-            disabled: disabled
+            disabled: disabled,
           });
         }
         return cloneVNode(c);
@@ -63,14 +63,14 @@ export const TextField = styled(
         </Wrap>
       );
     };
-  }
+  },
 )({
   display: "block",
   pos: "relative",
   textStyle: "sys.body-large",
 
   $data_input_container: {
-    pos: "relative"
+    pos: "relative",
   },
 
   $data_input: {
@@ -89,7 +89,7 @@ export const TextField = styled(
 
     cursor: "text",
     "&[readonly]": {
-      cursor: "pointer"
+      cursor: "pointer",
     },
 
     bgColor: "sys.surface-container-highest",
@@ -103,7 +103,7 @@ export const TextField = styled(
     textStyle: "sys.body-large",
 
     transitionDuration: "sm1",
-    transitionTimingFunction: "standard"
+    transitionTimingFunction: "standard",
   },
 
   $data_input_label: {
@@ -117,7 +117,7 @@ export const TextField = styled(
     display: "flex",
     alignItems: "center",
     transitionDuration: "sm2",
-    transitionTimingFunction: "standard-accelerate"
+    transitionTimingFunction: "standard-accelerate",
   },
 
   $data_input_supporting: {
@@ -127,74 +127,74 @@ export const TextField = styled(
     display: "flex",
     gap: 16,
 
-    color: "sys.on-surface-variant"
+    color: "sys.on-surface-variant",
   },
 
   _has_leading: {
     $data_input: {
-      pl: 16 + 20
+      pl: 16 + 20,
     },
     $data_input_label: {
-      left: 16 + 20
-    }
+      left: 16 + 20,
+    },
   },
 
   _has_trailing: {
     $data_input: {
-      pr: 12 + 20
-    }
+      pr: 12 + 20,
+    },
   },
 
   _valued: {
     $data_input: {
-      pt: 18
-    },
-
-    $data_input_label: {
-      top: 8,
-      bottom: "auto",
-      textStyle: "sys.body-small"
-    }
-  },
-
-  _focusWithin: {
-    $data_input: {
       pt: 18,
-      borderBottom: "2px solid",
-      borderColor: "sys.primary"
     },
 
     $data_input_label: {
       top: 8,
       bottom: "auto",
       textStyle: "sys.body-small",
-      color: "sys.primary"
-    }
+    },
+  },
+
+  _focusWithin: {
+    $data_input: {
+      pt: 18,
+      borderBottom: "2px solid",
+      borderColor: "sys.primary",
+    },
+
+    $data_input_label: {
+      top: 8,
+      bottom: "auto",
+      textStyle: "sys.body-small",
+      color: "sys.primary",
+    },
   },
 
   _invalid: {
     $data_input: {
       borderBottom: "2px solid",
-      borderColor: "sys.error"
+      borderColor: "sys.error",
     },
 
     $data_input_label: {
-      color: "sys.error"
+      color: "sys.error",
     },
 
     $data_input_supporting: {
-      color: "sys.error"
-    }
+      color: "sys.error",
+    },
   },
 
   _disabled: {
     opacity: 0.38,
-    cursor: "not-allowed"
-  }
+    cursor: "not-allowed",
+  },
 });
 
 const Maker = styled("div", {
-  role: t.enums(["leading", "trailing"])
+  role: t.enums(["leading", "trailing"]),
 })({
   pos: "absolute",
   top: 4,
@@ -207,15 +207,15 @@ const Maker = styled("div", {
     left: 12,
 
     $data_icon: {
-      ml: -4
-    }
+      ml: -4,
+    },
   },
 
   _role__trailing: {
     right: 12,
 
     $data_icon: {
-      mr: -4
-    }
-  }
+      mr: -4,
+    },
+  },
 });

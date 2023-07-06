@@ -135,7 +135,7 @@ const CodeView = component(
         </Box>
       </Box>
     );
-  }
+  },
 );
 
 export const HttpRequest = component(
@@ -154,7 +154,7 @@ export const HttpRequest = component(
               sortObject(assign(getDefaultHeads(), request.headers)),
               (value: string, key: string) => (
                 <HeadRow key={key} field={key} value={value} />
-              )
+              ),
             )}
           </>
           {request.body && (
@@ -166,7 +166,7 @@ export const HttpRequest = component(
         </CodeView>
       );
     };
-  }
+  },
 );
 
 // @ts-ignore
@@ -220,5 +220,5 @@ export const HTTPResponse = component(
         </CodeView>
       );
     };
-  }
+  },
 );

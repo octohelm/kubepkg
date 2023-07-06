@@ -43,7 +43,7 @@ export const RequestSchemaProvider = createProvider(
   },
   {
     name: "RequestSchema",
-  }
+  },
 );
 
 export const toEnumMap = (schema: any) => {
@@ -53,7 +53,7 @@ export const toEnumMap = (schema: any) => {
     enumMap[value] = get(
       schema,
       ["x-enum-options", i, "label"],
-      get(schema, ["x-enum-labels", i], value)
+      get(schema, ["x-enum-labels", i], value),
     );
   });
 
@@ -91,7 +91,7 @@ const hasValidate = (schema: any) => {
       "maxProperties",
       "minProperties",
     ] as Array<keyof IValidatedSchema>,
-    (key) => has(schema, key)
+    (key) => has(schema, key),
   );
 };
 
@@ -168,7 +168,7 @@ export const displayValidate = (schema: SchemaType): string => {
   }
 
   return `@${schema.meta("exclusiveMinimum")} ? "(" : "["}${getMin(
-    schema.schema
+    schema.schema,
   )},${getMax(schema.schema)}${schema.meta("exclusiveMaximum") ? ")" : "]"}`;
 };
 
@@ -220,7 +220,7 @@ export const TypeLink = styled(
         {slots.default?.()}
       </Root>
     );
-  }
+  },
 )({
   display: "inline-block",
   textDecoration: "none",
@@ -254,7 +254,7 @@ const IntentContextProvider = createProvider(
   },
   {
     name: "IntentContext",
-  }
+  },
 );
 
 const Line = styled(
@@ -276,7 +276,7 @@ const Line = styled(
         {slots.default?.()}
       </Root>
     );
-  }
+  },
 )({
   position: "relative",
   display: "block",
@@ -316,7 +316,7 @@ export const Description = styled(
         </Root>
       );
     };
-  }
+  },
 )({
   position: "relative",
   fontSize: "0.8em",
@@ -348,7 +348,7 @@ const Indent = component(
         {slots.default?.()}
       </IntentContextProvider>
     );
-  }
+  },
 );
 
 export const SchemaTypeView = component(
@@ -511,7 +511,7 @@ export const SchemaTypeView = component(
                     key={value}
                     name={"enum"}
                     value={`${value},${JSON.stringify(
-                      get(schema, ["x-enum-labels", i], value)
+                      get(schema, ["x-enum-labels", i], value),
                     )}`}
                   />
                 ))}
@@ -521,7 +521,7 @@ export const SchemaTypeView = component(
         </>
       );
     };
-  }
+  },
 );
 
 export const RequestSchemaView = ({ schema }: { schema?: SchemaType }) => {

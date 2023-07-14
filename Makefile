@@ -62,6 +62,14 @@ k.export:
  		--output=.tmp/ \
  			./testdata/demo.yaml
 
+k.export.airgap:
+	$(KUBEPKG) export \
+		--log-level=debug \
+		--storage-root=.tmp/kubepkg \
+		--platform=linux/$(ARCH) \
+ 		--output=.tmp/ \
+ 			./testdata/demo.k0s.yaml
+
 
 k.upload:
 	$(KUBEPKG) upload \

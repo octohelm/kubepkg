@@ -25,16 +25,3 @@ package kubepkg
 	}
 	deploy: spec: template: spec: #DefaultNodeSelector
 }
-
-#KubepkgAgent: spec: {
-	services: "#": {
-		expose: type: "NodePort"
-	}
-	config: {
-		KUBEPKG_AGENT_ID: "@configMap/cluster-info/id?"
-		KUBEPKG_PLATFORM: "@configMap/cluster-info/platforms?"
-	}
-	volumes: "~container-registry-storage": #KubepkgStorage
-	serviceAccount: #KubepkgServiceAccount
-	deploy: spec: template: spec: #DefaultNodeSelector
-}

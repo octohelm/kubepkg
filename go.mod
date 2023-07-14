@@ -9,7 +9,7 @@ require (
 	github.com/containerd/containerd v1.7.2
 	github.com/coreos/go-oidc/v3 v3.6.0
 	github.com/davecgh/go-spew v1.1.1
-	github.com/distribution/distribution/v3 v3.0.0-20230706062936-ac79c0d94a03
+	github.com/distribution/distribution/v3 v3.0.0-20230714074319-69023c7f8507
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7
 	github.com/go-courier/logr v0.2.0
 	github.com/go-courier/snowflakeid v1.2.1

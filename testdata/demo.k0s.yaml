@@ -1,0 +1,18 @@
+apiVersion: octohelm.tech/v1alpha1
+kind: KubePkg
+metadata:
+  name: demo
+  namespace: default
+status:
+  images:
+    "quay.io/k0sproject/calico-cni:v3.24.5-1": ""
+    "quay.io/k0sproject/calico-kube-controllers:v3.24.5-1": ""
+    "quay.io/k0sproject/calico-node:v3.24.5-1": ""
+    "quay.io/k0sproject/coredns:1.10.1": ""
+    "quay.io/k0sproject/apiserver-network-proxy-agent:0.0.33-k0s.1": ""
+    "quay.io/k0sproject/kube-proxy:v1.27.3": ""
+    "quay.io/k0sproject/kube-router:v1.5.1": ""
+    "quay.io/k0sproject/cni-node:1.1.1-k0s.1": ""
+    "registry.k8s.io/metrics-server/metrics-server:v0.6.2": ""
+    "registry.k8s.io/pause:3.8": ""
+    "quay.io/k0sproject/envoy-distroless:v1.24.1": ""

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/distribution/distribution/v3/manifest/ocischema"
+
 	"github.com/octohelm/kubepkg/pkg/kubepkg/manifest"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -147,7 +149,7 @@ func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Reposito
 		}
 
 		switch mt {
-		case manifestlist.MediaTypeManifestList:
+		case manifestlist.MediaTypeManifestList, v1.MediaTypeImageIndex:
 			for _, sub := range m.References() {
 				subImgCtx := imgCtx.withDigest(sub.Digest)
 
@@ -172,6 +174,20 @@ func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Reposito
 				imgCtx = imgCtx.withPlatform(p)
 			}
 
+			for _, sub := range dm.References() {
+				subImgCtx := imgCtx.withDigest(sub.Digest)
+				status.Digests = append(status.Digests, subImgCtx.toDigestMeta(sub.MediaType, sub.Size))
+			}
+		case v1.MediaTypeImageManifest:
+			dm := m.(*ocischema.DeserializedManifest)
+
+			// Read platform from config
+			data, _ := repo.Blobs(ctx).Get(ctx, dm.Config.Digest)
+			p := &v1.Platform{}
+			_ = json.Unmarshal(data, p)
+			if p.OS != "" {
+				imgCtx = imgCtx.withPlatform(p)
+			}
 			for _, sub := range dm.References() {
 				subImgCtx := imgCtx.withDigest(sub.Digest)
 				status.Digests = append(status.Digests, subImgCtx.toDigestMeta(sub.MediaType, sub.Size))
@@ -279,7 +295,7 @@ func (i imageCtx) toDigestMeta(mediaType string, size int64) v1alpha1.DigestMeta
 	typ := v1alpha1.DigestMetaBlob
 
 	switch mediaType {
-	case schema2.MediaTypeManifest, manifestlist.MediaTypeManifestList:
+	case manifestlist.MediaTypeManifestList, schema2.MediaTypeManifest, v1.MediaTypeImageIndex, v1.MediaTypeImageManifest:
 		typ = v1alpha1.DigestMetaManifest
 	}
 

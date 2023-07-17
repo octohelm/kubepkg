@@ -132,7 +132,10 @@ func (r *KubePkgApplyReconciler) Reconcile(ctx context.Context, request reconcil
 func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx context.Context, kpkg *kubepkgv1alpha1.KubePkg, o client.Object) error {
 	if v := kubeutil.GetAnnotate(o, annotation.ReloadConfigMap); v != "" {
 		cms := &corev1.ConfigMapList{}
-		s, _ := labels.Parse(fmt.Sprintf("%s in (%s)", annotation.LabelAppName, v))
+		s, err := labels.Parse(fmt.Sprintf("%s in (%s)", annotation.LabelAppName, v))
+		if err != nil {
+			return err
+		}
 
 		if err := r.GetClient().List(ctx, cms, client.InNamespace(kpkg.Namespace), client.MatchingLabelsSelector{
 			Selector: s,

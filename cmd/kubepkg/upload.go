@@ -57,7 +57,7 @@ func (s *Uploader) Run(ctx context.Context) error {
 
 	l := logr.FromContext(ctx)
 
-	kubepkgs, err := kubepkg.KubeTgzRange(ctx, kubePkgTgz, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
+	kubepkgs, err := kubepkg.KubeTarRange(ctx, kubePkgTgz, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
 		repoName, err := reference.WithName(dm.Name)
 		if err != nil {
 			return err

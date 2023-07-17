@@ -2,7 +2,6 @@ package kubepkg
 
 import (
 	"archive/tar"
-	"compress/gzip"
 	"context"
 	"encoding/json"
 	"io"
@@ -79,16 +78,8 @@ func (reg *Registry) Wrap(ctx context.Context, r io.ReadCloser, dgst *digest.Dig
 	return rc, nil
 }
 
-func KubeTgzRange(ctx context.Context, r io.Reader, eachBlob func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error) ([]*v1alpha1.KubePkg, error) {
-	gzr, err := gzip.NewReader(r)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = gzr.Close()
-	}()
-
-	tr := tar.NewReader(gzr)
+func KubeTarRange(ctx context.Context, r io.Reader, eachBlob func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error) ([]*v1alpha1.KubePkg, error) {
+	tr := tar.NewReader(r)
 
 	var kpkgs []*v1alpha1.KubePkg
 	var digests map[string]v1alpha1.DigestMeta
@@ -158,7 +149,7 @@ func KubeTgzRange(ctx context.Context, r io.Reader, eachBlob func(ctx context.Co
 }
 
 func (reg *Registry) ImportFromKubeTgzReader(ctx context.Context, r io.Reader) ([]*v1alpha1.KubePkg, error) {
-	return KubeTgzRange(ctx, r, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
+	return KubeTarRange(ctx, r, func(ctx context.Context, dm *v1alpha1.DigestMeta, br io.Reader, i, total int) error {
 		return reg.ImportDigest(ctx, dm, br)
 	})
 }

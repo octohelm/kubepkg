@@ -70,7 +70,7 @@ sequenceDiagram
 * Docker Image only support v2
 * k3s/k8s 1.22+
 
-## `kubepkg.airgap.tgz`
+## `kubepkg.airgap.tar`
 
 * `kubepkg.json`: KubePkg CRD json
 * [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md)

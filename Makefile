@@ -77,7 +77,7 @@ k.upload:
 			--registry-endpoint=https://${CONTAINER_REGISTRY} \
 			--registry-username=${CONTAINER_REGISTRY_USERNAME} \
 			--registry-password=${CONTAINER_REGISTRY_PASSWORD} \
-				./.tmp/demo-0.0.2-linux-arm64.kube.tgz
+				./.tmp/demo-0.0.2-linux-arm64.kube.tar
 
 PASSCODE =
 
@@ -87,7 +87,7 @@ k.upload.agent:
 			--registry-username=otp \
 			--registry-password=${PASSCODE} \
 			--keep-origin-host=true \
-				./.tmp/demo-0.0.2-linux-arm64.kube.tgz
+				./.tmp/demo-0.0.2-linux-arm64.kube.tar
 
 k.export.patch:
 	$(KUBEPKG) export \
@@ -106,7 +106,7 @@ k.export.list:
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
 		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
- 		--output=.tmp/demo.kube.tgz \
+ 		--output=.tmp/demo.kube.tar \
  			./testdata/demo.list.yaml
 
 k.apply.demo:
@@ -121,7 +121,7 @@ install.demo:
 remote.debug: k.export remote.sync remote.ctr.import
 
 remote.sync:
-	scp .tmp/demo.kube.tgt root@localhost:/data/demo.kube.tgz
+	scp .tmp/demo.kube.tgt root@localhost:/data/demo.kube.tar
 
 remote.ctr.import:
 	@echo "if kube.pkg multi-arch supported --all-platforms is required"
@@ -166,6 +166,6 @@ kubetgz:
 kubetgt.dashboard:
 	$(WAGON) do dashboard $(ARCH)
 
-KUBEPKGTGZ=.build/kubepkg/$(ARCH)/images/kubepkg.$(ARCH).kube.tgz
+KUBEPKGTGZ=.build/kubepkg/$(ARCH)/images/kubepkg.$(ARCH).kube.tar
 
 

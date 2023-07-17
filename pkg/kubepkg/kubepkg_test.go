@@ -48,7 +48,7 @@ func TestKubePkg(t *testing.T) {
 				f, _ := ioutil.CreateOrOpen(kubeTgz)
 				defer f.Close()
 
-				dgst, e := p.KubeTgzTo(ctx, f, resolved)
+				dgst, e := p.KubeTarTo(ctx, f, resolved)
 				if e != nil {
 					fmt.Printf("%+v", e)
 				}

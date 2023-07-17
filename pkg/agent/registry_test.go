@@ -31,7 +31,7 @@ func TestRegistry(t *testing.T) {
 		t.Run("otp validate", func(t *testing.T) {
 			passcode, now, err := a.GenerateOtp()
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
-			_, err = a.ValidateOtp(passcode, now)
+			err = a.ValidateOtp(passcode, now)
 			testingutil.Expect(t, err, testingutil.Be[error](nil))
 		})
 	})

@@ -16,7 +16,15 @@ func ExtractSorted(kpkg *v1alpha1.KubePkg) ([]Object, error) {
 		return nil, err
 	}
 
-	list := make([]Object, 0, len(manifests))
+	list := make([]Object, 0, len(manifests)+1)
+
+	if namespace := kpkg.Namespace; namespace != "" {
+		n := &corev1.Namespace{}
+		n.APIVersion = "v1"
+		n.Kind = "Namespace"
+		n.Name = namespace
+		list = append(list, n)
+	}
 
 	for k := range manifests {
 		list = append(list, manifests[k])

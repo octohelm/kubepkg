@@ -140,7 +140,7 @@ func (s *Exporter) Run(ctx context.Context) error {
 		return err
 	}
 
-	d, err := p.KubeTgzTo(ctx, tgz, kubepkgs...)
+	d, err := p.KubeTarTo(ctx, tgz, kubepkgs...)
 	if err != nil {
 		return err
 	}

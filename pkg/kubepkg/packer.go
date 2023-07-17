@@ -3,7 +3,6 @@ package kubepkg
 import (
 	"archive/tar"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -52,19 +51,16 @@ type Packer struct {
 	options packerOptions
 }
 
-func (p *Packer) KubeTgzTo(ctx context.Context, w io.Writer, kpkgs ...*v1alpha1.KubePkg) (dgst digest.Digest, err error) {
+func (p *Packer) KubeTarTo(ctx context.Context, w io.Writer, kpkgs ...*v1alpha1.KubePkg) (dgst digest.Digest, err error) {
 	digester := digest.Canonical.Digester()
 
 	mw := io.MultiWriter(w, digester.Hash())
-
-	gw := gzip.NewWriter(mw)
 	defer func() {
-		_ = gw.Close()
 		// should calc 	digest when gz close
 		dgst = digester.Digest()
 	}()
 
-	tw := tar.NewWriter(gw)
+	tw := tar.NewWriter(mw)
 	defer func() {
 		_ = tw.Close()
 	}()

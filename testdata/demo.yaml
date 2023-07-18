@@ -27,6 +27,7 @@ spec:
           - linux/arm64
       ports:
         http: 80
+        "http-p:80": 80
 
   services:
     "#":

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/octohelm/kubepkg/pkg/annotation"
@@ -244,9 +245,9 @@ func toContainer(c Container, name string, podTemplateSpec *corev1.PodTemplateSp
 
 	for _, n := range portNames {
 		p := corev1.ContainerPort{}
+		p.Protocol = PortProtocol(n)
 		p.ContainerPort = c.Ports[n]
-		p.Name = n
-		p.Protocol = PortProtocol(name)
+		p.Name, p.HostPort = PortNameAndHostPort(n)
 
 		container.Ports = append(container.Ports, p)
 	}
@@ -335,6 +336,15 @@ func PortProtocol(n string) corev1.Protocol {
 	} else {
 		return corev1.ProtocolTCP
 	}
+}
+
+func PortNameAndHostPort(n string) (string, int32) {
+	// <portName>:80
+	if i := strings.Index(n, ":"); i > 0 {
+		hostPort, _ := strconv.ParseInt(n[i+1:], 10, 32)
+		return n[0:i], int32(hostPort)
+	}
+	return n, 0
 }
 
 func must[T any](v *T) *T {

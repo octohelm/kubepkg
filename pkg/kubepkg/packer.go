@@ -161,7 +161,7 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 			}
 
 			switch desc.MediaType {
-			case images.MediaTypeDockerSchema2Manifest:
+			case images.MediaTypeDockerSchema2Manifest, ocispec.MediaTypeImageManifest:
 				index.Manifests = append(index.Manifests, ocispec.Descriptor{
 					MediaType:   desc.MediaType,
 					Digest:      desc.Digest,
@@ -172,6 +172,10 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 				})
 			}
 		}
+	}
+
+	if len(index.Manifests) == 0 {
+		return errors.New("invalid oci image: missing manifests")
 	}
 
 	if err := writeJsonToTar(tw, "index.json", index); err != nil {

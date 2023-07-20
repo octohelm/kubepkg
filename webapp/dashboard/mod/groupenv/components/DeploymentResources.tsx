@@ -214,9 +214,11 @@ export const isDeployFailed = (kubepkg: ApisKubepkgV1Alpha1KubePkg) => {
             return true;
           }
 
-          for (const containerStatus of podStatus.containerStatuses) {
-            if (!(containerStatus.ready && containerStatus.started)) {
-              return true;
+          if (podStatus.containerStatuses) {
+            for (const containerStatus of podStatus.containerStatuses) {
+              if (!(containerStatus.ready && containerStatus.started)) {
+                return true;
+              }
             }
           }
         }

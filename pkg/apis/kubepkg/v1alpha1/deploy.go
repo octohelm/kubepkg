@@ -151,16 +151,20 @@ func toPodTemplateSpec(kpkg *KubePkg) (*corev1.PodTemplateSpec, error) {
 		template.Spec.Affinity = must(template.Spec.Affinity)
 		template.Spec.Affinity.NodeAffinity = must(template.Spec.Affinity.NodeAffinity)
 		template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = must(template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution)
-		template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = append(
-			template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-			corev1.NodeSelectorTerm{
-				MatchExpressions: []corev1.NodeSelectorRequirement{{
-					Key:      "kubernetes.io/arch",
-					Operator: "In",
-					Values:   arch,
-				}},
-			},
-		)
+
+		// patch only when empty
+		if len(template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) == 0 {
+			template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = append(
+				template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+				corev1.NodeSelectorTerm{
+					MatchExpressions: []corev1.NodeSelectorRequirement{{
+						Key:      "kubernetes.io/arch",
+						Operator: "In",
+						Values:   arch,
+					}},
+				},
+			)
+		}
 	}
 
 	return template, nil

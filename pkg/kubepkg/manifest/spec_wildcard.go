@@ -205,16 +205,19 @@ func (c *completer) patchPodNodeAffinity(pls []string, pod *corev1.PodTemplateSp
 		pod.Spec.Affinity = must(pod.Spec.Affinity)
 		pod.Spec.Affinity.NodeAffinity = must(pod.Spec.Affinity.NodeAffinity)
 		pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = must(pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution)
-		pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = append(
-			pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-			corev1.NodeSelectorTerm{
-				MatchExpressions: []corev1.NodeSelectorRequirement{{
-					Key:      "kubernetes.io/arch",
-					Operator: "In",
-					Values:   archs,
-				}},
-			},
-		)
+
+		if len(pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) == 0 {
+			pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = append(
+				pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+				corev1.NodeSelectorTerm{
+					MatchExpressions: []corev1.NodeSelectorRequirement{{
+						Key:      "kubernetes.io/arch",
+						Operator: "In",
+						Values:   archs,
+					}},
+				},
+			)
+		}
 	}
 }
 

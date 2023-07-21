@@ -1,1 +1,0 @@
-export WAGON_IMAGE_PULL_PREFIX = harbor.innoai.tech/

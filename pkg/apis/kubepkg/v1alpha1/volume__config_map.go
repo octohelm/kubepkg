@@ -2,7 +2,6 @@ package v1alpha1
 
 import (
 	"github.com/octohelm/kubepkg/pkg/annotation"
-	"github.com/octohelm/x/ptr"
 	v1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -58,16 +57,8 @@ func (v *VolumeConfigMap) Mount(name string) *MountResult {
 	ret.VolumeMount = &v1.VolumeMount{
 		Name: ret.ResourceName,
 	}
-	ret.VolumeMount.MountPath = v.MountPath
-	ret.VolumeMount.SubPath = v.SubPath
-	ret.VolumeMount.ReadOnly = v.ReadOnly
 
-	switch v1.MountPropagationMode(v.MountPropagation) {
-	case v1.MountPropagationBidirectional:
-		ret.VolumeMount.MountPropagation = ptr.Ptr(v1.MountPropagationBidirectional)
-	case v1.MountPropagationHostToContainer:
-		ret.VolumeMount.MountPropagation = ptr.Ptr(v1.MountPropagationHostToContainer)
-	}
+	v.VolumeMount.MountTo(ret.VolumeMount)
 
 	return ret
 }

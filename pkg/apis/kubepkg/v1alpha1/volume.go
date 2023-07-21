@@ -3,6 +3,8 @@ package v1alpha1
 import (
 	"encoding/json"
 
+	"github.com/octohelm/x/ptr"
+
 	"github.com/tidwall/gjson"
 	v1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -20,6 +22,19 @@ type VolumeMount struct {
 	// else volumeMounts
 	ReadOnly bool   `json:"readOnly,omitempty"`
 	SubPath  string `json:"subPath,omitempty"`
+}
+
+func (v *VolumeMount) MountTo(vv *v1.VolumeMount) {
+	vv.MountPath = v.MountPath
+	vv.SubPath = v.SubPath
+	vv.ReadOnly = v.ReadOnly
+
+	switch v1.MountPropagationMode(v.MountPropagation) {
+	case v1.MountPropagationBidirectional:
+		vv.MountPropagation = ptr.Ptr(v1.MountPropagationBidirectional)
+	case v1.MountPropagationHostToContainer:
+		vv.MountPropagation = ptr.Ptr(v1.MountPropagationHostToContainer)
+	}
 }
 
 // +gengo:deepcopy=false

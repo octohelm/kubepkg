@@ -136,11 +136,14 @@ func (s *Exporter) Run(ctx context.Context) error {
 	}
 	defer tgz.Close()
 
-	if err := s.resolveDigests(ctx, dr, kubepkgs); err != nil {
+	kubepkgsForExport := make([]*v1alpha1.KubePkg, len(kubepkgs))
+	for i := range kubepkgsForExport {
+		kubepkgsForExport[i] = kubepkgs[i].DeepCopy()
+	}
+	if err := s.resolveDigests(ctx, dr, kubepkgsForExport); err != nil {
 		return err
 	}
-
-	d, err := p.KubeTarTo(ctx, tgz, kubepkgs...)
+	d, err := p.KubeTarTo(ctx, tgz, kubepkgsForExport...)
 	if err != nil {
 		return err
 	}

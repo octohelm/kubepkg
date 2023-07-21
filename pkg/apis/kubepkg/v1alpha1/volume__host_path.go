@@ -33,9 +33,8 @@ func (v *VolumeHostPath) Mount(name string) *MountResult {
 		ret.VolumeMount = &corev1.VolumeMount{
 			Name: ret.ResourceName,
 		}
-		ret.VolumeMount.MountPath = v.MountPath
-		ret.VolumeMount.SubPath = v.SubPath
-		ret.VolumeMount.ReadOnly = v.ReadOnly
+
+		v.VolumeMount.MountTo(ret.VolumeMount)
 	}
 
 	return ret

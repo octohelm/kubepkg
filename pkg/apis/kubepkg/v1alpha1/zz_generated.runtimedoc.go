@@ -559,6 +559,8 @@ func (v VolumeMount) RuntimeDoc(names ...string) ([]string, bool) {
 		switch names[0] {
 		case "MountPath":
 			return []string{}, true
+		case "MountPropagation":
+			return []string{}, true
 		case "Prefix":
 			return []string{
 				"Prefix mountPath == export, use as envFrom",

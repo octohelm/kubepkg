@@ -599,6 +599,7 @@ func (in *VolumeMount) DeepCopy() *VolumeMount {
 
 func (in *VolumeMount) DeepCopyInto(out *VolumeMount) {
 	out.MountPath = in.MountPath
+	out.MountPropagation = in.MountPropagation
 	out.Prefix = in.Prefix
 	out.Optional = in.Optional
 	out.ReadOnly = in.ReadOnly

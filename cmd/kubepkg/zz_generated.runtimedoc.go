@@ -19,6 +19,8 @@ func (v Agent) RuntimeDoc(names ...string) ([]string, bool) {
 		switch names[0] {
 		case "Otel":
 			return []string{}, true
+		case "Metric":
+			return []string{}, true
 		case "KubeClient":
 			return []string{}, true
 		case "Server":
@@ -69,6 +71,8 @@ func (v Dashboard) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
 		case "Otel":
+			return []string{}, true
+		case "Metric":
 			return []string{}, true
 		case "Sign":
 			return []string{}, true

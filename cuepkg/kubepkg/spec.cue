@@ -727,11 +727,12 @@ package kubepkg
 }
 
 #VolumeMount: {
-	mountPath: string
-	optional?: bool
-	prefix?:   string
-	readOnly?: bool
-	subPath?:  string
+	mountPath:         string
+	mountPropagation?: "Bidirectional" | "HostToContainer"
+	optional?:         bool
+	prefix?:           string
+	readOnly?:         bool
+	subPath?:          string
 }
 
 #WeightedPodAffinityTerm: {

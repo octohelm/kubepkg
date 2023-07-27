@@ -4531,6 +4531,15 @@
           "type": "string",
           "x-go-field-name": "MountPath"
         },
+        "mountPropagation": {
+          "type": "string",
+          "enum": [
+            "Bidirectional",
+            "HostToContainer"
+          ],
+          "x-go-field-name": "MountPropagation",
+          "x-tag-validate": "@string{Bidirectional,HostToContainer}"
+        },
         "optional": {
           "type": "boolean",
           "nullable": true,

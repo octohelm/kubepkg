@@ -11,6 +11,8 @@ import (
 type VolumeMount struct {
 	MountPath string `json:"mountPath"`
 
+	MountPropagation string `json:"mountPropagation,omitempty" validate:"@string{Bidirectional,HostToContainer}"`
+
 	// Prefix mountPath == export, use as envFrom
 	Prefix   string `json:"prefix,omitempty"`
 	Optional *bool  `json:"optional,omitempty"`

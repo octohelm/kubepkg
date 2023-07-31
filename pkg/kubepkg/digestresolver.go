@@ -206,7 +206,7 @@ func (r *DigestResolver) resolve(ctx context.Context, repo distribution.Reposito
 	// resolve by tag
 	d, err := repo.Tags(ctx).Get(ctx, imgCtx.tag)
 	if err != nil {
-		return distribution.Descriptor{}, nil
+		return distribution.Descriptor{}, err
 	}
 
 	return r.resolve(ctx, repo, imgCtx.withDigest(d.Digest), status)

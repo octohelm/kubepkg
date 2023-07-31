@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
+
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/opencontainers/go-digest"
 
@@ -175,17 +178,55 @@ func (s *Exporter) resolveDigests(ctx context.Context, dr *kubepkg.DigestResolve
 }
 
 type ManifestDumper struct {
-	ExtractManifestsYaml string `flag:",omitempty"`
+	// output manifests yaml
+	OutputManifestsYaml string `flag:",omitempty"`
+	// output external ConfigMap DataFiles with annotation `config.kubepkg.octohelm.tech/type=external`
+	OutputDirExternalConfig string `flag:",omitempty"`
 }
 
 func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
-	if s.ExtractManifestsYaml != "" {
+	if s.OutputDirExternalConfig != "" {
+		for i := range kubepkgs {
+			manifests, err := manifest.ExtractSorted(kubepkgs[i])
+			if err != nil {
+				return errors.Wrapf(err, "extract manifests failed: %s", s.OutputManifestsYaml)
+			}
+			for _, m := range manifests {
+				if m.GetObjectKind().GroupVersionKind().Kind == "ConfigMap" {
+					annotations := m.GetAnnotations()
+					if annotations != nil {
+						if ct, ok := annotations["config.kubepkg.octohelm.tech/type"]; ok && ct == "external" {
+							cm, err := manifest.FromUnstructured[corev1.ConfigMap](m)
+							if err != nil {
+								return err
+							}
+							for k, contents := range cm.Data {
+								if err := func(filename string, contents string) error {
+									configFile, err := ioutil.CreateOrOpen(filepath.Join(s.OutputDirExternalConfig, filename))
+									if err != nil {
+										return err
+									}
+									defer configFile.Close()
+									_, err = configFile.WriteString(contents)
+									return err
+								}(k, contents); err != nil {
+									return err
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if s.OutputManifestsYaml != "" {
 		var w io.Writer = os.Stdout
 
-		if s.ExtractManifestsYaml != "-" {
-			manifestsYamlFile, err := ioutil.CreateOrOpen(s.ExtractManifestsYaml)
+		if s.OutputManifestsYaml != "-" {
+			manifestsYamlFile, err := ioutil.CreateOrOpen(s.OutputManifestsYaml)
 			if err != nil {
-				return errors.Wrapf(err, "open %s failed", s.ExtractManifestsYaml)
+				return errors.Wrapf(err, "open %s failed", s.OutputManifestsYaml)
 			}
 			defer manifestsYamlFile.Close()
 
@@ -195,12 +236,12 @@ func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 		for i := range kubepkgs {
 			manifests, err := manifest.ExtractSorted(kubepkgs[i])
 			if err != nil {
-				return errors.Wrapf(err, "extract manifests failed: %s", s.ExtractManifestsYaml)
+				return errors.Wrapf(err, "extract manifests failed: %s", s.OutputManifestsYaml)
 			}
 			for _, m := range manifests {
 				data, err := yaml.Marshal(m)
 				if err != nil {
-					return errors.Wrapf(err, "encoding to yaml failed: %s", s.ExtractManifestsYaml)
+					return errors.Wrapf(err, "encoding to yaml failed: %s", s.OutputManifestsYaml)
 				}
 				_, _ = fmt.Fprint(w, "---\n")
 				_, _ = w.Write(data)

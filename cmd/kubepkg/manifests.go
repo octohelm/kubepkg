@@ -38,11 +38,11 @@ func (p *PrintManifests) Run(ctx context.Context) error {
 	}
 
 	d := ManifestDumper{
-		ExtractManifestsYaml: "-",
+		OutputManifestsYaml: "-",
 	}
 
 	if p.Output != "" {
-		d.ExtractManifestsYaml = p.Output
+		d.OutputManifestsYaml = p.Output
 	}
 
 	return d.DumpManifests(kpkgs)

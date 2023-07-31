@@ -73,7 +73,7 @@ k.export.airgap:
 
 k.upload:
 	$(KUBEPKG) upload \
-			--extract-manifests-yaml=.tmp/manifests/demo.manifests.yaml \
+			--output-manifests-yaml=.tmp/manifests/demo.manifests.yaml \
 			--registry-endpoint=https://${CONTAINER_REGISTRY} \
 			--registry-username=${CONTAINER_REGISTRY_USERNAME} \
 			--registry-password=${CONTAINER_REGISTRY_PASSWORD} \
@@ -105,7 +105,7 @@ k.export.list:
 		--log-level=debug \
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
-		--extract-manifests-yaml=.tmp/manifests/demo.yaml \
+		--output-manifests-yaml=.tmp/manifests/demo.yaml \
  		--output=.tmp/demo.kube.tar \
  			./testdata/demo.list.yaml
 

@@ -90,7 +90,7 @@ func (s *Exporter) Run(ctx context.Context) error {
 	dr := kubepkg.NewDigestResolver(cr)
 	p := kubepkg.NewPacker(cr)
 
-	ext := ".kube.tgz"
+	ext := ".airgap.tar"
 
 	if s.SinceKubepkgJSON != "" {
 		previousKubepkgs, err := kubepkg.Load(s.SinceKubepkgJSON)

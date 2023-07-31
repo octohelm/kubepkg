@@ -9,6 +9,8 @@ import (
 	"io"
 	"path"
 
+	"github.com/distribution/distribution/v3/manifest/schema2"
+
 	"github.com/octohelm/kubepkg/pkg/ioutil"
 
 	"github.com/containerd/containerd/images"
@@ -90,10 +92,18 @@ func (p *Packer) KubeTarTo(ctx context.Context, w io.Writer, kpkgs ...*v1alpha1.
 	return "", nil
 }
 
+type DockerManifest struct {
+	Config   string   `json:"Config"`
+	RepoTags []string `json:"RepoTags"`
+	Layers   []string `json:"Layers"`
+}
+
 func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alpha1.KubePkg) error {
 	index := ocispec.Index{
 		Versioned: ocispecs.Versioned{SchemaVersion: 2},
 	}
+
+	dockerManifest := make([]DockerManifest, 0)
 
 	for i := range kpkg.Status.Digests {
 		dm := kpkg.Status.Digests[i]
@@ -151,6 +161,27 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 				desc.Annotations[images.AnnotationImageName] = fmt.Sprintf("%s:%s", dm.Name, tag)
 			}
 
+			switch mt {
+			case schema2.MediaTypeManifest:
+				dockerM := DockerManifest{}
+
+				if tag := dm.Tag; tag != "" {
+					dockerM.RepoTags = append(dockerM.RepoTags, fmt.Sprintf("%s:%s", dm.Name, tag))
+				}
+
+				dm := m.(*schema2.DeserializedManifest)
+
+				dockerM.Config = fmt.Sprintf("blobs/%s/%s", dm.Config.Digest.Algorithm(), dm.Config.Digest.Hex())
+
+				dockerM.Layers = make([]string, len(dm.Layers))
+
+				for i, l := range dm.Layers {
+					dockerM.Layers[i] = fmt.Sprintf("blobs/%s/%s", l.Digest.Algorithm(), l.Digest.Hex())
+				}
+
+				dockerManifest = append(dockerManifest, dockerM)
+			}
+
 			if p := dm.Platform; p != "" {
 				pp := platforms.MustParse(dm.Platform)
 				desc.Platform = &pp
@@ -180,6 +211,13 @@ func (p *Packer) writeToKubeTar(ctx context.Context, tw *tar.Writer, kpkg *v1alp
 
 	if err := writeJsonToTar(tw, "index.json", index); err != nil {
 		return err
+	}
+
+	// docker compatible
+	if len(dockerManifest) > 0 {
+		if err := writeJsonToTar(tw, "manifest.json", dockerManifest); err != nil {
+			return err
+		}
 	}
 
 	if err := writeJsonToTar(tw, "oci-layout", map[string]string{"imageLayoutVersion": "1.0.0"}); err != nil {

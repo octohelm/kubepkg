@@ -136,13 +136,15 @@ func (v Exporter) RuntimeDoc(names ...string) ([]string, bool) {
 			return []string{}, true
 		case "RemoteRegistry":
 			return []string{}, true
+		case "Namespace":
+			return []string{}, true
 		case "ForceResolve":
 			return []string{
 				"Ignore image locked sha256 digest",
 			}, true
-		case "Output":
+		case "OutputOci":
 			return []string{
-				"Output path for kubepkg.tgz",
+				"Output path for airgap.tar",
 			}, true
 		case "Platform":
 			return []string{
@@ -184,7 +186,7 @@ func (v JWTSigner) RuntimeDoc(names ...string) ([]string, bool) {
 func (v ManifestDumper) RuntimeDoc(names ...string) ([]string, bool) {
 	if len(names) > 0 {
 		switch names[0] {
-		case "OutputManifestsYaml":
+		case "OutputManifests":
 			return []string{
 				"output manifests yaml",
 			}, true
@@ -198,24 +200,6 @@ func (v ManifestDumper) RuntimeDoc(names ...string) ([]string, bool) {
 		return nil, false
 	}
 	return []string{}, true
-}
-
-func (v Manifests) RuntimeDoc(names ...string) ([]string, bool) {
-	if len(names) > 0 {
-		switch names[0] {
-		case "PrintManifests":
-			return []string{}, true
-
-		}
-		if doc, ok := runtimeDoc(v.PrintManifests, names...); ok {
-			return doc, ok
-		}
-
-		return nil, false
-	}
-	return []string{
-		"Show manifests",
-	}, true
 }
 
 func (v Operator) RuntimeDoc(names ...string) ([]string, bool) {
@@ -244,23 +228,6 @@ func (v Operator) RuntimeDoc(names ...string) ([]string, bool) {
 	return []string{
 		"Serve Operator",
 	}, true
-}
-
-func (v PrintManifests) RuntimeDoc(names ...string) ([]string, bool) {
-	if len(names) > 0 {
-		switch names[0] {
-		case "Namespace":
-			return []string{}, true
-		case "Output":
-			return []string{}, true
-		case "KubepkgJSON":
-			return []string{}, true
-
-		}
-
-		return nil, false
-	}
-	return []string{}, true
 }
 
 func (v Registry) RuntimeDoc(names ...string) ([]string, bool) {

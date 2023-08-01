@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -42,14 +41,14 @@ type Exporter struct {
 	Storage        containerregistry.Storage
 	RemoteRegistry containerregistry.RemoteRegistry
 
+	Namespace string `flag:",omitempty"`
+
 	// Ignore image locked sha256 digest
 	ForceResolve bool `flag:",omitempty"`
-	// Output path for kubepkg.tgz
-	Output string
-
+	// Output path for airgap.tar
+	OutputOci string `flag:",omitempty"`
 	// Supported platforms
 	Platform []string `flag:",omitempty"`
-
 	// For create patcher
 	SinceKubepkgJSON string `flag:"since,omitempty"`
 
@@ -74,84 +73,79 @@ func (s *Exporter) Run(ctx context.Context) error {
 		return errors.New("at least one kubepkg")
 	}
 
+	for _, kpkg := range kubepkgs {
+		if s.Namespace != "" {
+			kpkg.Namespace = s.Namespace
+		}
+	}
+
 	l := logr.FromContext(ctx)
 
-	c := containerregistry.Configuration{}
+	if s.OutputOci != "" {
+		c := containerregistry.Configuration{}
 
-	c.StorageRoot = s.Storage.Root
-	c.Proxy = &containerregistry.Proxy{
-		RemoteURL: s.RemoteRegistry.Endpoint,
-		Username:  s.RemoteRegistry.Username,
-		Password:  s.RemoteRegistry.Password,
-	}
+		c.StorageRoot = s.Storage.Root
+		c.Proxy = &containerregistry.Proxy{
+			RemoteURL: s.RemoteRegistry.Endpoint,
+			Username:  s.RemoteRegistry.Username,
+			Password:  s.RemoteRegistry.Password,
+		}
 
-	cr, err := c.New(ctx)
-	if err != nil {
-		return err
-	}
-
-	dr := kubepkg.NewDigestResolver(cr)
-	p := kubepkg.NewPacker(cr)
-
-	ext := ".airgap.tar"
-
-	if s.SinceKubepkgJSON != "" {
-		previousKubepkgs, err := kubepkg.Load(s.SinceKubepkgJSON)
+		cr, err := c.New(ctx)
 		if err != nil {
 			return err
 		}
-		if err := s.resolveDigests(ctx, dr, previousKubepkgs); err != nil {
-			return err
-		}
-		if len(previousKubepkgs) == 0 {
-			return errors.New("at least one kubepkg")
-		}
 
-		blobsExists := map[string]bool{}
+		dr := kubepkg.NewDigestResolver(cr)
+		p := kubepkg.NewPacker(cr)
 
-		for i := range previousKubepkgs {
-			for _, d := range previousKubepkgs[i].Status.Digests {
-				if d.Type == v1alpha1.DigestMetaBlob {
-					blobsExists[d.Digest] = true
+		if s.SinceKubepkgJSON != "" {
+			previousKubepkgs, err := kubepkg.Load(s.SinceKubepkgJSON)
+			if err != nil {
+				return err
+			}
+			if err := s.resolveDigests(ctx, dr, previousKubepkgs); err != nil {
+				return err
+			}
+			if len(previousKubepkgs) == 0 {
+				return errors.New("at least one kubepkg")
+			}
+
+			blobsExists := map[string]bool{}
+
+			for i := range previousKubepkgs {
+				for _, d := range previousKubepkgs[i].Status.Digests {
+					if d.Type == v1alpha1.DigestMetaBlob {
+						blobsExists[d.Digest] = true
+					}
 				}
 			}
+
+			p = kubepkg.NewPacker(cr, kubepkg.WithFilterBlob(func(d digest.Digest) bool {
+				return !blobsExists[d.String()]
+			}))
 		}
 
-		p = kubepkg.NewPacker(cr, kubepkg.WithFilterBlob(func(d digest.Digest) bool {
-			return !blobsExists[d.String()]
-		}))
-
-		ext = fmt.Sprintf(".patch.since.%s-%s.kube.tgz", previousKubepkgs[0].Name, previousKubepkgs[0].Spec.Version)
-	}
-
-	output := s.Output
-	if strings.HasSuffix(output, "/") {
-		platform := "all"
-		if len(s.Platform) == 1 {
-			platform = strings.ReplaceAll(s.Platform[0], "/", "-")
+		tgz, err := ioutil.CreateOrOpen(s.OutputOci)
+		if err != nil {
+			return errors.Errorf("open output %s failed", s.OutputOci)
 		}
-		output = fmt.Sprintf("%s%s-%s-%s%s", output, kubepkgs[0].Name, kubepkgs[0].Spec.Version, platform, ext)
-	}
+		defer tgz.Close()
 
-	tgz, err := ioutil.CreateOrOpen(output)
-	if err != nil {
-		return errors.Errorf("open output %s failed", output)
-	}
-	defer tgz.Close()
+		kubepkgsForExport := make([]*v1alpha1.KubePkg, len(kubepkgs))
+		for i := range kubepkgsForExport {
+			kubepkgsForExport[i] = kubepkgs[i].DeepCopy()
+		}
+		if err := s.resolveDigests(ctx, dr, kubepkgsForExport); err != nil {
+			return err
+		}
+		d, err := p.KubeTarTo(ctx, tgz, kubepkgsForExport...)
+		if err != nil {
+			return err
+		}
 
-	kubepkgsForExport := make([]*v1alpha1.KubePkg, len(kubepkgs))
-	for i := range kubepkgsForExport {
-		kubepkgsForExport[i] = kubepkgs[i].DeepCopy()
+		l.WithValues("digest", d).Info("%s generated.", s.OutputOci)
 	}
-	if err := s.resolveDigests(ctx, dr, kubepkgsForExport); err != nil {
-		return err
-	}
-	d, err := p.KubeTarTo(ctx, tgz, kubepkgsForExport...)
-	if err != nil {
-		return err
-	}
-
-	l.WithValues("digest", d).Info("%s generated.", output)
 
 	return s.ManifestDumper.DumpManifests(kubepkgs)
 }
@@ -179,7 +173,7 @@ func (s *Exporter) resolveDigests(ctx context.Context, dr *kubepkg.DigestResolve
 
 type ManifestDumper struct {
 	// output manifests yaml
-	OutputManifestsYaml string `flag:",omitempty"`
+	OutputManifests string `flag:",omitempty"`
 	// output external ConfigMap DataFiles with annotation `config.kubepkg.octohelm.tech/type=external`
 	OutputDirExternalConfig string `flag:",omitempty"`
 }
@@ -189,7 +183,7 @@ func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 		for i := range kubepkgs {
 			manifests, err := manifest.ExtractSorted(kubepkgs[i])
 			if err != nil {
-				return errors.Wrapf(err, "extract manifests failed: %s", s.OutputManifestsYaml)
+				return errors.Wrapf(err, "extract manifests failed: %s", s.OutputManifests)
 			}
 			for _, m := range manifests {
 				if m.GetObjectKind().GroupVersionKind().Kind == "ConfigMap" {
@@ -220,13 +214,13 @@ func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 		}
 	}
 
-	if s.OutputManifestsYaml != "" {
+	if s.OutputManifests != "" {
 		var w io.Writer = os.Stdout
 
-		if s.OutputManifestsYaml != "-" {
-			manifestsYamlFile, err := ioutil.CreateOrOpen(s.OutputManifestsYaml)
+		if s.OutputManifests != "-" {
+			manifestsYamlFile, err := ioutil.CreateOrOpen(s.OutputManifests)
 			if err != nil {
-				return errors.Wrapf(err, "open %s failed", s.OutputManifestsYaml)
+				return errors.Wrapf(err, "open %s failed", s.OutputManifests)
 			}
 			defer manifestsYamlFile.Close()
 
@@ -236,12 +230,12 @@ func (s *ManifestDumper) DumpManifests(kubepkgs []*v1alpha1.KubePkg) error {
 		for i := range kubepkgs {
 			manifests, err := manifest.ExtractSorted(kubepkgs[i])
 			if err != nil {
-				return errors.Wrapf(err, "extract manifests failed: %s", s.OutputManifestsYaml)
+				return errors.Wrapf(err, "extract manifests failed: %s", s.OutputManifests)
 			}
 			for _, m := range manifests {
 				data, err := yaml.Marshal(m)
 				if err != nil {
-					return errors.Wrapf(err, "encoding to yaml failed: %s", s.OutputManifestsYaml)
+					return errors.Wrapf(err, "encoding to yaml failed: %s", s.OutputManifests)
 				}
 				_, _ = fmt.Fprint(w, "---\n")
 				_, _ = w.Write(data)

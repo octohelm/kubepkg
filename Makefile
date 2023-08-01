@@ -54,26 +54,9 @@ k.registry:
 		--storage-root=.tmp/kubepkg \
 			serve registry
 
-k.export:
-	$(KUBEPKG) export \
-		--log-level=debug \
-		--storage-root=.tmp/kubepkg \
-		--platform=linux/$(ARCH) \
- 		--output=.tmp/ \
- 			./testdata/demo.yaml
-
-k.export.airgap:
-	$(KUBEPKG) export \
-		--log-level=debug \
-		--storage-root=.tmp/kubepkg \
-		--platform=linux/$(ARCH) \
- 		--output=.tmp/ \
- 			./testdata/demo.k0s.yaml
-
-
 k.upload:
 	$(KUBEPKG) upload \
-			--output-manifests-yaml=.tmp/manifests/demo.manifests.yaml \
+			--output-manifests=.tmp/manifests/demo.manifests.yaml \
 			--registry-endpoint=https://${CONTAINER_REGISTRY} \
 			--registry-username=${CONTAINER_REGISTRY_USERNAME} \
 			--registry-password=${CONTAINER_REGISTRY_PASSWORD} \
@@ -89,31 +72,35 @@ k.upload.agent:
 			--keep-origin-host=true \
 				./.tmp/demo-0.0.2-linux-arm64.kube.tar
 
+k.export:
+	$(KUBEPKG) export \
+		--log-level=debug \
+ 		--output-oci=.tmp/demo.airgap.tar \
+		--storage-root=.tmp/kubepkg \
+		--platform=linux/$(ARCH) \
+ 			./testdata/demo.yaml
+
 k.export.patch:
 	$(KUBEPKG) export \
 		--log-level=debug \
+ 		--output-oci=.tmp/demo.diff.airgap.tar \
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
 		--since=./testdata/demo.previous.yaml \
- 		--output=.tmp/ \
  			./testdata/demo.yaml
-
-
 
 k.export.list:
 	$(KUBEPKG) export \
 		--log-level=debug \
 		--storage-root=.tmp/kubepkg \
 		--platform=linux/$(ARCH) \
-		--output-manifests-yaml=.tmp/manifests/demo.yaml \
- 		--output=.tmp/demo.kube.tar \
+		--output-manifests=.tmp/manifests/demo.yaml \
+ 		--output-oci=.tmp/demo.all.kube.tar \
  			./testdata/demo.list.yaml
 
 k.apply.demo:
 	$(KUBEPKG) apply --kubeconfig=$(KUBECONFIG) --force --dry-run ./testdata/demo.yaml
 
-k.manifests:
-	$(KUBEPKG) manifests ./testdata/demo.yaml
 
 install.demo:
 	$(KUBEPKG) upload -i=http://localhost:32060 ./testdata/demo.yaml

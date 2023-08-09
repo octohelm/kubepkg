@@ -1,5 +1,6 @@
 import { EditorState } from "@codemirror/state";
 import { type SyntaxNode } from "@lezer/common";
+import { JSONPointer } from "./JSONPointer";
 
 const unquote = (s: string) => {
   try {
@@ -13,7 +14,7 @@ export const walkNode = (
   editorState: EditorState,
   node: SyntaxNode | null,
   each: (path: string, node: SyntaxNode) => void,
-  path = "/",
+  path = "/"
 ) => {
   if (!node) {
     return;
@@ -32,10 +33,10 @@ export const walkNode = (
           const propValueNode = n.lastChild;
 
           if (propNameNode && propValueNode) {
-            const propName = unquote(
-              editorState.sliceDoc(propNameNode.from, propNameNode.to),
-            );
-            each(`${path}${propName}`, propNameNode);
+            let propName = unquote(editorState.sliceDoc(propNameNode.from, propNameNode.to));
+
+            each(`${path}${JSONPointer.escape(propName)}`, propNameNode);
+
             walkNode(editorState, propValueNode, each, `${path}${propName}/`);
           }
         }

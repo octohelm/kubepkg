@@ -12,9 +12,7 @@
   "dependencies": {
     "@nodepkg/runtime": "workspace:^"
   },
-  "peerDependencies": {
-    "core-js": "*"
-  },
+  "peerDependencies": {},
   "exports": {
     ".": {
       "import": {

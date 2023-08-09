@@ -37,7 +37,7 @@ k.operator:
 	$(KUBEPKG) \
 		--ingress-gateway="public+https://{{ .Name }}---{{ .Namespace }}.public" \
 		--ingress-gateway="internal+https://{{ .Name }}---{{ .Namespace }}.local?always=true" \
-		--watch-namespace=default \
+		--watch-namespace=pre--algo-agent01 \
 		--kubeconfig=$(KUBECONFIG) \
 			serve operator
 

@@ -16,9 +16,7 @@
     "@nodepkg/ui": "workspace:^",
     "@nodepkg/vuemarkdown": "workspace:^"
   },
-  "peerDependencies": {
-    "core-js": "*"
-  },
+  "peerDependencies": {},
   "exports": {
     ".": {
       "import": {

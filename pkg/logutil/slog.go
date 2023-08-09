@@ -5,13 +5,13 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"strings"
 	"sync"
 	"sync/atomic"
 
 	"github.com/go-courier/logr"
 	"github.com/mattn/go-colorable"
-	"golang.org/x/exp/slog"
 )
 
 type logger struct {

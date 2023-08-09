@@ -1636,6 +1636,7 @@ export type ApisKubepkgV1Alpha1Volume =
   | {
       type: "ConfigMap";
       mountPath: string;
+      mountPropagation?: "Bidirectional" | "HostToContainer";
       optional?: boolean;
       prefix?: string;
       readOnly?: boolean;
@@ -1646,6 +1647,7 @@ export type ApisKubepkgV1Alpha1Volume =
   | {
       type: "EmptyDir";
       mountPath: string;
+      mountPropagation?: "Bidirectional" | "HostToContainer";
       optional?: boolean;
       prefix?: string;
       readOnly?: boolean;
@@ -1655,6 +1657,7 @@ export type ApisKubepkgV1Alpha1Volume =
   | {
       type: "HostPath";
       mountPath: string;
+      mountPropagation?: "Bidirectional" | "HostToContainer";
       optional?: boolean;
       prefix?: string;
       readOnly?: boolean;
@@ -1664,6 +1667,7 @@ export type ApisKubepkgV1Alpha1Volume =
   | {
       type: "PersistentVolumeClaim";
       mountPath: string;
+      mountPropagation?: "Bidirectional" | "HostToContainer";
       optional?: boolean;
       prefix?: string;
       readOnly?: boolean;
@@ -1674,6 +1678,7 @@ export type ApisKubepkgV1Alpha1Volume =
   | {
       type: "Secret";
       mountPath: string;
+      mountPropagation?: "Bidirectional" | "HostToContainer";
       optional?: boolean;
       prefix?: string;
       readOnly?: boolean;
@@ -3670,6 +3675,9 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
   /*#__PURE__*/ t.discriminatorMapping("type", {
     ConfigMap: t.object({
       mountPath: t.string(),
+      mountPropagation: t
+        .enums(["Bidirectional", "HostToContainer"])
+        .optional(),
       optional: t.boolean().optional(),
       prefix: t
         .string()
@@ -3695,6 +3703,9 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
     }),
     EmptyDir: t.object({
       mountPath: t.string(),
+      mountPropagation: t
+        .enums(["Bidirectional", "HostToContainer"])
+        .optional(),
       optional: t.boolean().optional(),
       prefix: t
         .string()
@@ -3714,6 +3725,9 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
     }),
     HostPath: t.object({
       mountPath: t.string(),
+      mountPropagation: t
+        .enums(["Bidirectional", "HostToContainer"])
+        .optional(),
       optional: t.boolean().optional(),
       prefix: t
         .string()
@@ -3733,6 +3747,9 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
     }),
     PersistentVolumeClaim: t.object({
       mountPath: t.string(),
+      mountPropagation: t
+        .enums(["Bidirectional", "HostToContainer"])
+        .optional(),
       optional: t.boolean().optional(),
       prefix: t
         .string()
@@ -3756,6 +3773,9 @@ export const ApisKubepkgV1Alpha1VolumeSchema =
     }),
     Secret: t.object({
       mountPath: t.string(),
+      mountPropagation: t
+        .enums(["Bidirectional", "HostToContainer"])
+        .optional(),
       optional: t.boolean().optional(),
       prefix: t
         .string()

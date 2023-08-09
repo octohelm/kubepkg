@@ -1,9 +1,10 @@
 package logutil
 
 import (
+	"log/slog"
+
 	"github.com/go-courier/logr"
 	"github.com/innoai-tech/infra/pkg/configuration"
-	"golang.org/x/exp/slog"
 	"golang.org/x/net/context"
 )
 

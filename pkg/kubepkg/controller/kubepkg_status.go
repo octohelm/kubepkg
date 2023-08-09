@@ -51,7 +51,7 @@ func (r *KubePkgStatusReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *KubePkgStatusReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
-	l := r.GetLogger().WithValues("Reconcile", "Status", "request", request.NamespacedName)
+	l := r.GetLogger().WithValues("Reconcile", "Status", "request", request.NamespacedName).V(1)
 
 	kpkg := &kubepkgv1alpha1.KubePkg{}
 

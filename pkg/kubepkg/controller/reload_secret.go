@@ -68,12 +68,13 @@ func (r *SecretReloadReconciler) Reconcile(ctx context.Context, request reconcil
 
 	err := RangeWorkload(ctx, r.GetClient(), request.Namespace, func(o client.Object) error {
 		if IsReloadMatch(o, annotation.ReloadSecret, request.Name) {
-			manifest.AnnotateHash(o, hashKey, hash)
-			if err := r.GetClient().Patch(ctx, o, client.Merge); err != nil {
-				return err
+			if manifest.AnnotateHash(o, hashKey, hash) {
+				if err := r.GetClient().Patch(ctx, o, client.Merge); err != nil {
+					return err
+				}
+				gvk := o.GetObjectKind().GroupVersionKind()
+				l.Info(fmt.Sprintf("Reload %s %s.%s", gvk.Kind, o.GetName(), o.GetNamespace()))
 			}
-			gvk := o.GetObjectKind().GroupVersionKind()
-			l.Info(fmt.Sprintf("Reload %s %s.%s", gvk.Kind, o.GetName(), o.GetNamespace()))
 		}
 		return nil
 	})

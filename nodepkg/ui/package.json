@@ -7,15 +7,13 @@
     }
   },
   "dependencies": {
-    "@innoai-tech/vueuikit": "^0.9.5",
+    "@innoai-tech/vueuikit": "^0.9.6",
     "@mdi/js": "^7.2.96",
     "@nodepkg/runtime": "workspace:^",
     "copy-to-clipboard": "^3.3.3",
     "vue": "^3.3.4"
   },
-  "peerDependencies": {
-    "core-js": "*"
-  },
+  "peerDependencies": {},
   "devDependencies": {
     "@popperjs/core": "^2.11.8"
   },

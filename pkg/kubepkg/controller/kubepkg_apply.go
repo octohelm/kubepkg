@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"k8s.io/utils/strings/slices"
+
 	"github.com/pkg/errors"
 
 	"github.com/octohelm/kubepkg/pkg/annotation"
@@ -137,15 +139,18 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 			return err
 		}
 
+		reloads := strings.Split(v, ",")
+
 		if err := r.GetClient().List(ctx, cms, client.InNamespace(kpkg.Namespace), client.MatchingLabelsSelector{
 			Selector: s,
 		}); err != nil {
 			return err
 		}
 
-		for i := range cms.Items {
-			cm := cms.Items[i]
-			manifest.AnnotateHash(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
+		for _, cm := range cms.Items {
+			if slices.Contains(reloads, cm.Name) {
+				manifest.AnnotateHash(o, annotation.ConfigMapHashKey(cm.Name), manifest.StringDataHash(cm.Data))
+			}
 		}
 	}
 
@@ -153,15 +158,18 @@ func (r *KubePkgApplyReconciler) patchExternalConfigMapOrSecretIfNeed(ctx contex
 		ss := &corev1.SecretList{}
 		s, _ := labels.Parse(fmt.Sprintf("%s in (%s)", annotation.LabelAppName, v))
 
+		reloads := strings.Split(v, ",")
+
 		if err := r.GetClient().List(ctx, ss, client.InNamespace(kpkg.Namespace), client.MatchingLabelsSelector{
 			Selector: s,
 		}); err != nil {
 			return err
 		}
 
-		for i := range ss.Items {
-			s := ss.Items[i]
-			manifest.AnnotateHash(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
+		for _, s := range ss.Items {
+			if slices.Contains(reloads, s.Name) {
+				manifest.AnnotateHash(o, annotation.SecretHashKey(s.Name), manifest.DataHash(s.Data))
+			}
 		}
 	}
 

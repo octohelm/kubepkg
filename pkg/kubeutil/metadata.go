@@ -35,17 +35,28 @@ type AnnotationsAccessor interface {
 	SetAnnotations(annotations map[string]string)
 }
 
-func Annotate(o AnnotationsAccessor, key string, value string) {
+func Annotate(o AnnotationsAccessor, key string, value string) bool {
 	annotations := o.GetAnnotations()
 	if annotations == nil {
 		annotations = map[string]string{}
 	}
+
 	if value != "" {
+		if current, ok := annotations[key]; ok {
+			if current == value {
+				return false
+			}
+		}
 		annotations[key] = value
 	} else {
+		if _, ok := annotations[key]; !ok {
+			return false
+		}
 		delete(annotations, key)
 	}
+
 	o.SetAnnotations(annotations)
+	return true
 }
 
 func AppendAnnotate(o AnnotationsAccessor, key string, value string) {

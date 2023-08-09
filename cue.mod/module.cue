@@ -1,10 +1,8 @@
 module: "github.com/octohelm/kubepkg"
 
 require: {
-	"github.com/innoai-tech/runtime": "v0.0.0-20230313062040-872280802f3b"
-	"k8s.io/api":                     "v0.25.4"
-	"k8s.io/apimachinery":            "v0.25.4"
-	"wagon.octohelm.tech":            "v0.0.0-20200202235959-e64a70c55ed2"
+	"github.com/innoai-tech/runtime": "v0.0.0-20230822100237-c611c3ecb10d"
+	"wagon.octohelm.tech":            "v0.0.0"
 }
 
 replace: {

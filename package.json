@@ -18,22 +18,22 @@
     "@innoai-tech/config": "^0.5.2",
     "@innoai-tech/gents": "^0.6.4",
     "@innoai-tech/monobundle": "^0.10.1",
-    "@innoai-tech/vue-vite-presets": "^0.5.1",
+    "@innoai-tech/vue-vite-presets": "^0.5.3",
     "@nodepkg/devconfig": "workspace:^",
     "@types/js-yaml": "^4.0.5",
-    "@vue/test-utils": "^2.4.0",
+    "@vue/test-utils": "^2.4.1",
     "copy-to-clipboard": "^3.3.3",
     "js-yaml": "^4.1.0",
     "jsdom": "^22.1.0",
     "normalize.css": "^8.0.1",
-    "prettier": "^3.0.0",
+    "prettier": "^3.0.2",
     "rollup-plugin-visualizer": "^5.9.2",
     "semver": "^7.5.4",
     "tsx": "^3.12.7",
-    "turbo": "^1.10.7",
+    "turbo": "^1.10.12",
     "typescript": "^5.1.6",
-    "vite": "^4.4.2",
-    "vitest": "^0.33.0"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.2"
   },
   "prettier": {}
 }

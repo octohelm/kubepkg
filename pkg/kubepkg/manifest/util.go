@@ -24,13 +24,14 @@ func DataHash(inputs map[string][]byte) string {
 	return fmt.Sprintf("%x", w.Sum(nil))
 }
 
-func AnnotateHash(o client.Object, key string, hash string) {
+func AnnotateHash(o client.Object, key string, hash string) bool {
 	switch m := o.(type) {
 	case *appsv1.Deployment:
-		kubeutil.Annotate(&m.Spec.Template, key, hash)
+		return kubeutil.Annotate(&m.Spec.Template, key, hash)
 	case *appsv1.StatefulSet:
-		kubeutil.Annotate(&m.Spec.Template, key, hash)
+		return kubeutil.Annotate(&m.Spec.Template, key, hash)
 	case *appsv1.DaemonSet:
-		kubeutil.Annotate(&m.Spec.Template, key, hash)
+		return kubeutil.Annotate(&m.Spec.Template, key, hash)
 	}
+	return false
 }

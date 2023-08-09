@@ -141,7 +141,7 @@ type Array = []any
 func init() {
 	k.Name = "test"
 	k.Namespace = "test"
-	k.Spec.Version = "0.0.0"
+	k.Spec.Version = "v3.0.0-20230822080114-147d45f4785d"
 	k.Spec.Manifests = Obj{
 		"web": Obj{
 			"apiVersion": "apps/v1",

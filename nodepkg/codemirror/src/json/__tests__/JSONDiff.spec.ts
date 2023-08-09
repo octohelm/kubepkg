@@ -13,20 +13,20 @@ describe("JSONDiff", () => {
       {
         x: {
           a: {
-            b: 2,
-          },
-        },
+            "aliyun.com/gpu-mem": 2
+          }
+        }
       },
       {
         x: {
           a: {
-            b: 1,
-          },
-        },
-      },
+            "aliyun.com/gpu-mem": 1
+          }
+        }
+      }
     );
 
-    expect([...ret.entries()]).toEqual([["/x/a/b", ["m", 2, 1]]]);
+    expect([...ret.entries()]).toEqual([[`/x/a/aliyun.com~1gpu-mem`, ["m", 2, 1]]]);
   });
 
   it("should diff deletes", () => {

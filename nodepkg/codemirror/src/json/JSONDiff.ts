@@ -4,7 +4,7 @@ import {
   EditorView,
   gutterLineClass,
   GutterMarker,
-  ViewUpdate,
+  ViewUpdate
 } from "@codemirror/view";
 import { useExtension } from "../EditorContextProvider";
 import { isUndefined, isPlainObject, isEqual } from "@nodepkg/runtime/lodash";
@@ -13,10 +13,11 @@ import {
   Range,
   RangeSet,
   StateEffect,
-  StateField,
+  StateField
 } from "@codemirror/state";
 import { walkNode } from "./util";
 import { ensureSyntaxTree } from "@codemirror/language";
+import { JSONPointer } from "./JSONPointer";
 
 const addDiffLineEffect = StateEffect.define<{
   type?: "m" | "d" | "a";
@@ -47,7 +48,7 @@ const diffedLines = StateField.define<DecorationSet>({
     tr.effects.forEach((e) => {
       if (e.is(addDiffLineEffect)) {
         lines = lines.update({
-          add: [diffLine.range(e.value.from, e.value.to)],
+          add: [diffLine.range(e.value.from, e.value.to)]
         });
       } else if (e.is(removeDiffLineEffect)) {
         lines = cutRange(lines, e.value);
@@ -57,10 +58,10 @@ const diffedLines = StateField.define<DecorationSet>({
     return lines.update({
       filterFrom: 0,
       filterTo: tr.newDoc.length,
-      filter: () => true,
+      filter: () => true
     });
   },
-  provide: (f) => EditorView.decorations.from(f),
+  provide: (f) => EditorView.decorations.from(f)
 });
 
 function cutRange(ranges: DecorationSet, r: { from: number; to: number }) {
@@ -75,7 +76,7 @@ function cutRange(ranges: DecorationSet, r: { from: number; to: number }) {
     filterFrom: r.from,
     filterTo: r.to,
     filter: () => false,
-    add: leftover,
+    add: leftover
   });
 }
 
@@ -95,7 +96,7 @@ const jsonDiff = (base: () => any): Extension[] => {
       if (v.viewportChanged || v.docChanged) {
         diffAndDispatchEffects(v, base());
       }
-    }),
+    })
   ];
 };
 
@@ -151,8 +152,8 @@ const diffAndDispatchEffects = (v: ViewUpdate, src: string) => {
             addDiffLineEffect.of({
               type,
               from: linePos,
-              to: linePos,
-            }),
+              to: linePos
+            })
           );
           newLines.add(linePos);
         }
@@ -187,7 +188,7 @@ class JSONDiff {
   ret = new Map<string, ["m" | "d" | "a", ...any[]]>();
 
   mark(path: any[], type: "m" | "d" | "a", right: any, left: any) {
-    this.ret.set(`/${path.join("/")}`, [type, right, left]);
+    this.ret.set(JSONPointer.compile(path), [type, right, left]);
   }
 
   diff(r: any, l: any, path: any[] = []) {

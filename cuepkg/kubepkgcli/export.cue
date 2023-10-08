@@ -51,8 +51,8 @@ import (
 			args: [
 				"--storage-root=/etc/kubepkg",
 				"--platform=linux/\(arch)",
-				"--extract-manifests-yaml=/build/manifests/\(path.Base(filename)).yaml",
-				"--output=/build/images/\(filename)",
+				"--output-manifests=/build/manifests/\(path.Base(filename)).yaml",
+				"--output-oci=/build/images/\(filename)",
 				"/src/kubepkg.json",
 			]
 		}

@@ -1,4 +1,4 @@
-import { expect, describe, it } from "vitest";
+import { expect, describe, it } from "bun:test";
 import { diff } from "../JSONDiff";
 
 describe("JSONDiff", () => {
@@ -13,20 +13,22 @@ describe("JSONDiff", () => {
       {
         x: {
           a: {
-            "aliyun.com/gpu-mem": 2
-          }
-        }
+            "aliyun.com/gpu-mem": 2,
+          },
+        },
       },
       {
         x: {
           a: {
-            "aliyun.com/gpu-mem": 1
-          }
-        }
-      }
+            "aliyun.com/gpu-mem": 1,
+          },
+        },
+      },
     );
 
-    expect([...ret.entries()]).toEqual([[`/x/a/aliyun.com~1gpu-mem`, ["m", 2, 1]]]);
+    expect([...ret.entries()]).toEqual([
+      [`/x/a/aliyun.com~1gpu-mem`, ["m", 2, 1]],
+    ]);
   });
 
   it("should diff deletes", () => {

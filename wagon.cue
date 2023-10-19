@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"wagon.octohelm.tech/core"
-	"github.com/innoai-tech/runtime/cuepkg/imagetool"
+
 	"github.com/innoai-tech/runtime/cuepkg/kubepkgtool"
-	"github.com/innoai-tech/runtime/cuepkg/node"
 	"github.com/innoai-tech/runtime/cuepkg/golang"
+	"github.com/innoai-tech/runtime/cuepkg/bun"
 
 	"github.com/octohelm/kubepkg/tool"
 	kubepkgcomponent "github.com/octohelm/kubepkg/cuepkg/component/kubepkg"
@@ -15,25 +15,32 @@ import (
 
 tool
 
-actions: webapp: node.#Project & {
+actions: webapp: bun.#Project & {
 	source: {
 		path: "."
 		include: [
 			"nodedevpkg/",
 			"nodepkg/",
 			"webapp/",
-			".npmrc",
 			"*.json",
 			"*.config.ts",
-			"pnpm-*.yaml",
+			"bun.lockb",
+			"bunfig.toml",
 		]
 		exclude: [
-			"*/node_modules",
+			"**/.swc",
+			"**/.turbo",
+			"**/node_modules",
 		]
 	}
 
+	_env: core.#ClientEnv & {
+		GH_PASSWORD: core.#Secret
+	}
+
 	env: {
-		"CI": "true"
+		"CI":                              "true"
+		"INNOAI_TECH_REGISTRY_AUTH_TOKEN": _env.GH_PASSWORD
 	}
 
 	build: {
@@ -42,33 +49,12 @@ actions: webapp: node.#Project & {
 		}
 
 		pre: [
-			"pnpm install",
+			"bun install --no-save",
 		]
 
 		script: """
-			APP=dashboard pnpm exec vite build --mode production
+			APP=dashboard bunx --bun vite build --mode production
 			"""
-
-		image: {
-			"node": "20"
-
-			"steps": [
-				node.#ConfigPrivateRegistry & {
-					_env: core.#ClientEnv & {
-						GH_PASSWORD: core.#Secret
-					}
-
-					scope: "@innoai-tech"
-					host:  "npm.pkg.github.com"
-					token: _env.GH_PASSWORD
-				},
-				imagetool.#Script & {
-					run: [
-						"npm i -g pnpm",
-					]
-				},
-			]
-		}
 	}
 }
 

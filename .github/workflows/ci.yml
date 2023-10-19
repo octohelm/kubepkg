@@ -23,7 +23,7 @@ jobs:
       - uses: docker/setup-qemu-action@v2
       - run: curl -sSLf https://raw.githubusercontent.com/octohelm/wagon/main/install.sh | sudo sh
 
-      - run: gst
+      - run: make build.webapp
       - run: make ship
       - run: make archive
 

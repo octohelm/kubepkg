@@ -16,7 +16,6 @@ export class JSONPointer {
     return "/" + keyPath.map(JSONPointer.escape).join("/");
   }
 
-
   static unescape(str: string) {
     return str.replace(/~1/g, "/").replace(/~0/g, "~");
   }

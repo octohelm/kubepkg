@@ -17,9 +17,9 @@
   "dependencies": {
     "@innoai-tech/fetcher": "^0.5.3",
     "@innoai-tech/lodash": "^0.2.1",
-    "@innoai-tech/typedef": "^0.2.8",
-    "@innoai-tech/vueformdata": "^0.1.2",
-    "@innoai-tech/vuekit": "^0.6.3",
+    "@innoai-tech/typedef": "^0.2.13",
+    "@innoai-tech/vueformdata": "^0.1.4",
+    "@innoai-tech/vuekit": "^0.6.6",
     "date-fns": "^2.30.0",
     "rxjs": "^7.8.1",
     "vue": "^3.3.4"
@@ -27,54 +27,63 @@
   "peerDependencies": {},
   "exports": {
     ".": {
+      "bun": "./src/index.ts",
       "import": {
         "types": "./index.d.ts",
         "default": "./index.mjs"
       }
     },
     "./jsx-runtime": {
+      "bun": "./src/jsx-runtime.ts",
       "import": {
         "types": "./jsx-runtime.d.ts",
         "default": "./jsx-runtime.mjs"
       }
     },
     "./jsx-dev-runtime": {
+      "bun": "./src/jsx-dev-runtime.ts",
       "import": {
         "types": "./jsx-dev-runtime.d.ts",
         "default": "./jsx-dev-runtime.mjs"
       }
     },
     "./lodash": {
+      "bun": "./src/lodash.ts",
       "import": {
         "types": "./lodash.d.ts",
         "default": "./lodash.mjs"
       }
     },
     "./fetcher": {
+      "bun": "./src/fetcher.ts",
       "import": {
         "types": "./fetcher.d.ts",
         "default": "./fetcher.mjs"
       }
     },
     "./typedef": {
+      "bun": "./src/typedef.ts",
       "import": {
         "types": "./typedef.d.ts",
         "default": "./typedef.mjs"
       }
     },
     "./rxjs": {
+      "bun": "./src/rxjs.ts",
       "import": {
         "types": "./rxjs.d.ts",
         "default": "./rxjs.mjs"
       }
     },
     "./vue": {
+      "bun": "./src/vue.ts",
       "import": {
         "types": "./vue.d.ts",
         "default": "./vue.mjs"
       }
     },
     "./date-fns": {
+      "bun": "./src/date-fns.ts",
       "import": {
         "types": "./date-fns.d.ts",
         "default": "./date-fns.mjs"
@@ -88,10 +97,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "lint": "prettier --write .",
-    "build": "monobundle",
-    "test": "vitest --run --passWithNoTests --dir .",
-    "prepublishOnly": "pnpm run build"
+    "lint": "bunx --bun prettier --write .",
+    "build": "bunx --bun monobundle",
+    "prepublishOnly": "bun run build"
   },
   "type": "module"
 }

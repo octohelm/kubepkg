@@ -20,6 +20,7 @@
   "peerDependencies": {},
   "exports": {
     ".": {
+      "bun": "./src/index.ts",
       "import": {
         "types": "./index.d.ts",
         "default": "./index.mjs"
@@ -32,10 +33,9 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "monobundle",
-    "test": "vitest --run --passWithNoTests --dir .",
-    "prepublishOnly": "pnpm run build",
-    "lint": "prettier --write ."
+    "build": "bunx --bun monobundle",
+    "prepublishOnly": "bun run build",
+    "lint": "bunx --bun prettier --write ."
   },
   "type": "module"
 }

@@ -1,9 +1,6 @@
 {
   "name": "@nodepkg/devconfig",
   "version": "0.0.0",
-  "dependencies": {
-    "@innoai-tech/vuedevconfig": "^0.1.1"
-  },
   "license": "MIT",
   "private": true,
   "scripts": {},

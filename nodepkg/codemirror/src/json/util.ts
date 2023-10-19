@@ -14,7 +14,7 @@ export const walkNode = (
   editorState: EditorState,
   node: SyntaxNode | null,
   each: (path: string, node: SyntaxNode) => void,
-  path = "/"
+  path = "/",
 ) => {
   if (!node) {
     return;
@@ -33,7 +33,9 @@ export const walkNode = (
           const propValueNode = n.lastChild;
 
           if (propNameNode && propValueNode) {
-            let propName = unquote(editorState.sliceDoc(propNameNode.from, propNameNode.to));
+            let propName = unquote(
+              editorState.sliceDoc(propNameNode.from, propNameNode.to),
+            );
 
             each(`${path}${JSONPointer.escape(propName)}`, propNameNode);
 

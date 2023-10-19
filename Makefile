@@ -108,35 +108,39 @@ install.demo:
 remote.debug: k.export remote.sync remote.ctr.import
 
 remote.sync:
-	scp .tmp/demo.kube.tgt root@localhost:/data/demo.kube.tar
+	scp .tmp/demo.kube.tar root@localhost:/data/demo.kube.tar
 
 remote.ctr.import:
 	@echo "if kube.pkg multi-arch supported --all-platforms is required"
-	ssh root@localhost "gzip --decompress --stdout /data/demo.kube.tgt | ctr image import --all-platforms -"
+	ssh root@localhost "gzip --decompress --stdout /data/demo.kube.tar | ctr image import --all-platforms -"
 
 eval:
 	cuem eval -o components.yaml ./cuepkg/kubepkg
 
-update.node:
-	pnpm up -r --latest
-
-clean.node:
-	find . -name 'node_modules' -type d -prune -print -exec rm -rf '{}' \;
-
 dep.node:
-	pnpm install
+	bun install
+
+dep.node.update:
+	bun update --latest --save
+
+test.node:
+	bun test
 
 lint.node:
-	pnpm exec turbo run lint --force
+	bunx --bun turbo run lint --force
+
+clean.node:
+	find . -name '.turbo' -type d -prune -print -exec rm -rf '{}' \;
+	find . -name 'node_modules' -type d -prune -print -exec rm -rf '{}' \;
 
 build.node:
-	pnpm exec turbo run build --force
+	bunx --bun turbo run build --force
 
 build.dashboard:
-	APP=dashboard pnpm exec vite build --mode production
+	APP=dashboard bunx --bun vite build --mode production
 
 dev.dashboard:
-	pnpm exec vite
+	bunx --bun vite
 
 build.webapp:
 	$(WAGON) do webapp build --output=cmd/kubepkg/webapp
@@ -154,5 +158,3 @@ kubetgt.dashboard:
 	$(WAGON) do dashboard $(ARCH)
 
 KUBEPKGTGZ=.build/kubepkg/$(ARCH)/images/kubepkg.$(ARCH).kube.tar
-
-

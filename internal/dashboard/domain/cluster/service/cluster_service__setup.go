@@ -53,8 +53,9 @@ func (c *ClusterService) CreateResources(ctx context.Context) ([]manifest.Object
 	}
 
 	n := &corev1.Namespace{}
+	n.APIVersion = "v1"
 	n.Kind = "Namespace"
-	n.Name = "kube-agent"
+	n.Name = "kubepkg-agent"
 
 	return append([]manifest.Object{n}, list...), nil
 }
@@ -98,7 +99,7 @@ func createKubePkgAgent(info cluster.AgentInfo, registryEndpoint string) *v1alph
 	k.Spec.Containers = map[string]v1alpha1.Container{}
 	k.Spec.Containers["kube-agent"] = v1alpha1.Container{
 		Image: v1alpha1.Image{
-			Name: "gcr.io/octohelm/kubepkg",
+			Name: "ghcr.io/octohelm/kubepkg",
 			Tag:  k.Spec.Version,
 		},
 		Args: []string{
@@ -131,6 +132,9 @@ func createKubePkgAgent(info cluster.AgentInfo, registryEndpoint string) *v1alph
 	k.Spec.Volumes["storage"] = v1alpha1.Volume{
 		VolumeSource: &v1alpha1.VolumePersistentVolumeClaim{
 			Type: "PersistentVolumeClaim",
+			VolumeMount: v1alpha1.VolumeMount{
+				MountPath: "/etc/kubepkg",
+			},
 			Opt: &corev1.PersistentVolumeClaimVolumeSource{
 				ClaimName: "storage-kubepkg",
 			},

@@ -62,8 +62,10 @@ export class LSP {
               return `布尔类型不匹配`;
             case "enums": {
               const t = this.typeAt(f.path)!;
-              return `值只能是: ${Object.values(t.schema)
-                .map((v) => JSON.stringify(v))
+
+              return `值只能是: ${t
+                .getSchema("enum")
+                .map((v: any) => JSON.stringify(v))
                 .join(", ")}`;
             }
           }

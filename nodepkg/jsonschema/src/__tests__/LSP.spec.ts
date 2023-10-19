@@ -1,8 +1,79 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { LSP } from "../LSP";
 
+const schema = {
+  definitions: {
+    A: { type: "string" },
+    B: { type: "integer" },
+    C: { type: "string", enum: ["X", "Y", "Z"] },
+    ObjC: {
+      type: "object",
+      properties: {
+        c: { $ref: "#/definitions/C" },
+      },
+    },
+    Obj: {
+      allOf: [
+        { $ref: "#/definitions/ObjC" },
+        {
+          type: "object",
+          properties: {
+            a: { $ref: "#/definitions/A" },
+            nested: { $ref: "#/definitions/ObjC" },
+          },
+          required: ["a"],
+        },
+      ],
+    },
+    Arr: {
+      type: "array",
+      items: { type: "string" },
+    },
+    Map: {
+      type: "object",
+      additionalProperties: {
+        type: "string",
+      },
+    },
+    Union: {
+      type: "object",
+      discriminator: {
+        propertyName: "type",
+      },
+      required: ["type"],
+      oneOf: [
+        {
+          properties: {
+            type: { enum: ["A"] },
+            a: { $ref: "#/definitions/A" },
+            b: { $ref: "#/definitions/B" },
+          },
+          required: ["a"],
+          additionalProperties: false,
+        },
+        {
+          properties: {
+            type: { enum: ["B"], type: "string" },
+            b: { $ref: "#/definitions/B" },
+          },
+          required: ["b"],
+          additionalProperties: false,
+        },
+      ],
+    },
+  },
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    obj: { $ref: "#/definitions/Obj" },
+    arr: { $ref: "#/definitions/Arr" },
+    map: { $ref: "#/definitions/Map" },
+    union: { $ref: "#/definitions/Union" },
+  },
+};
+
 describe("LSP", () => {
-  const lsp = LSP.create(schema)!;
+  const lsp = LSP.create(schema);
 
   describe("#validate", () => {
     it.skip("should validate additional properties", () => {
@@ -139,74 +210,3 @@ describe("LSP", () => {
     });
   });
 });
-
-const schema = {
-  definitions: {
-    A: { type: "string" },
-    B: { type: "integer" },
-    C: { type: "string", enum: ["X", "Y", "Z"] },
-    ObjC: {
-      type: "object",
-      properties: {
-        c: { $ref: "#/definitions/C" },
-      },
-    },
-    Obj: {
-      allOf: [
-        { $ref: "#/definitions/ObjC" },
-        {
-          type: "object",
-          properties: {
-            a: { $ref: "#/definitions/A" },
-            nested: { $ref: "#/definitions/ObjC" },
-          },
-          required: ["a"],
-        },
-      ],
-    },
-    Arr: {
-      type: "array",
-      items: { type: "string" },
-    },
-    Map: {
-      type: "object",
-      additionalProperties: {
-        type: "string",
-      },
-    },
-    Union: {
-      type: "object",
-      discriminator: {
-        propertyName: "type",
-      },
-      required: ["type"],
-      oneOf: [
-        {
-          properties: {
-            type: { enum: ["A"] },
-            a: { $ref: "#/definitions/A" },
-            b: { $ref: "#/definitions/B" },
-          },
-          required: ["a"],
-          additionalProperties: false,
-        },
-        {
-          properties: {
-            type: { enum: ["B"], type: "string" },
-            b: { $ref: "#/definitions/B" },
-          },
-          required: ["b"],
-          additionalProperties: false,
-        },
-      ],
-    },
-  },
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    obj: { $ref: "#/definitions/Obj" },
-    arr: { $ref: "#/definitions/Arr" },
-    map: { $ref: "#/definitions/Map" },
-    union: { $ref: "#/definitions/Union" },
-  },
-};

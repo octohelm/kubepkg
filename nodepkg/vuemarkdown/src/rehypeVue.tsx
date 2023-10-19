@@ -3,8 +3,8 @@ import { toJsxRuntime } from "hast-util-to-jsx-runtime";
 import { Fragment, jsx, jsxs } from "@innoai-tech/vuekit/jsx-runtime";
 
 export function rehypeVue({
-                            components
-                          }: {
+  components,
+}: {
   components: Record<string, Component<any>>;
 }) {
   // @ts-ignore
@@ -15,7 +15,7 @@ export function rehypeVue({
       Fragment,
       jsx,
       jsxs,
-      components
+      components,
     });
   }
 }

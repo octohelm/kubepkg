@@ -70,7 +70,12 @@ func (r *GroupAccountRepository) List(ctx context.Context, where b.SqlExpr) ([]*
 	list := make([]*group.Account, 0)
 
 	if err := dal.From(group.AccountT).
-		Where(where).
+		Where(
+			b.And(
+				group.AccountT.GroupID.By(b.Value(r.Group.ID)),
+				where,
+			),
+		).
 		Scan(dal.Recv(func(v *group.Account) error {
 			list = append(list, v)
 			return nil

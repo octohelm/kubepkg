@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 import {
   t,
   rx,
@@ -28,7 +30,13 @@ import {
   alpha,
   mdiHistory
 } from "@nodepkg/ui";
-import { KubePkgEditor, mergeOverwritesIfExists } from "@webapp/dashboard/mod/kubepkg";
+import {
+  annotationKubepkgOverwrites,
+  getAnnotation,
+  KubePkgEditor,
+  mergeOverwritesIfExists,
+  parseOverwrites
+} from "@webapp/dashboard/mod/kubepkg";
 import { AccessControl } from "@webapp/dashboard/mod/auth";
 import { pick, omit, get } from "@nodepkg/runtime/lodash";
 import { parseISO, format } from "@nodepkg/runtime/date-fns";
@@ -134,7 +142,7 @@ const GroupEnvDeploymentHistoryPut = component$(
       kubepkg$,
       render((kubepkg) => {
         const t = pick(kubepkg, ["kind", "apiVersion", "metadata", "spec"]);
-        const overwrites = get(t, ["metadata", "annotations", "kubepkg.innoai.tech/overwrites"]);
+        const overwrites = getAnnotation(t, annotationKubepkgOverwrites)
 
         return (
           <KubePkgEditor
@@ -143,10 +151,10 @@ const GroupEnvDeploymentHistoryPut = component$(
               ...t,
               metadata: {
                 ...t.metadata,
-                annotations: omit(t.metadata?.annotations ?? {}, "kubepkg.innoai.tech/overwrites")
+                annotations: omit(t.metadata?.annotations ?? {}, annotationKubepkgOverwrites)
               }
             }}
-            overwrites={overwrites ? JSON.parse(overwrites) : {}}
+            overwrites={parseOverwrites(overwrites)}
             onSubmit={(k) => emit("submit", k)}
           />
         );

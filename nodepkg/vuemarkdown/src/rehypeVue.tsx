@@ -1,4 +1,4 @@
-import { type Component } from "@nodepkg/runtime";
+import { type Component } from "@innoai-tech/vuekit";
 import { toJsxRuntime } from "hast-util-to-jsx-runtime";
 import { Fragment, jsx, jsxs } from "@innoai-tech/vuekit/jsx-runtime";
 

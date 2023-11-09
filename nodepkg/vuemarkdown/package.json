@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@nodepkg/runtime": "workspace:^",
-    "hast-util-to-jsx-runtime": "^2.0.0",
-    "remark-parse": "^10.0.2",
-    "remark-rehype": "^10.1.0",
-    "unified": "^11.0.1",
-    "@innoai-tech/vuekit": "^0.6.3"
+    "hast-util-to-jsx-runtime": "^2.2.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.0.0",
+    "unified": "^11.0.4",
+    "@innoai-tech/vuekit": "^0.6.6"
   },
   "peerDependencies": {},
   "exports": {

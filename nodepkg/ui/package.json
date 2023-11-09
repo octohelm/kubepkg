@@ -8,10 +8,10 @@
   },
   "dependencies": {
     "@innoai-tech/vueuikit": "^0.9.7",
-    "@mdi/js": "^7.2.96",
+    "@mdi/js": "^7.3.67",
     "@nodepkg/runtime": "workspace:^",
     "copy-to-clipboard": "^3.3.3",
-    "vue": "^3.3.4"
+    "vue": "^3.3.8"
   },
   "peerDependencies": {},
   "devDependencies": {

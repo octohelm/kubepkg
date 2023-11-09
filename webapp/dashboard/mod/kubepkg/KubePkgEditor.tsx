@@ -32,7 +32,8 @@ import {
   merge,
   set,
   isPlainObject,
-  isArray
+  isArray,
+  isNull
 } from "@nodepkg/runtime/lodash";
 
 export const annotationKubepkgName = "kubepkg.innoai.tech/name";
@@ -42,11 +43,24 @@ export const annotationKubepkgDeploymentSettingID =
   "kubepkg.innoai.tech/deploymentSettingID";
 export const annotationKubepkgOverwrites = "kubepkg.innoai.tech/overwrites";
 
-const getAnnotation = (
+export const getAnnotation = (
   kubepkg: ApisKubepkgV1Alpha1KubePkg,
   key: string
 ): string | undefined => {
   return get(kubepkg, ["metadata", "annotations", key]);
+};
+
+export const parseOverwrites = (jsonRaw: string = "") => {
+  try {
+    const v = JSON.parse(jsonRaw);
+    if (isNull(v.spec)) {
+      return undefined;
+    }
+    return v;
+  } catch (e) {
+    //
+  }
+  return undefined;
 };
 
 export const mergeOverwritesIfExists = (
@@ -64,7 +78,7 @@ export const mergeOverwritesIfExists = (
           }
         }
       },
-      JSON.parse(overwrites)
+      parseOverwrites(overwrites)
     );
   }
 

@@ -261,7 +261,7 @@ export const GroupEnvDeploymentList = component$(
         });
       }),
       tap(() => {
-        if (props.env.cluster && !!props.env.cluster.endpoint) {
+        if (props.env.cluster && !!props.env.cluster.agentInfo?.endpoint) {
           listDeployed$.next({
             groupName: props.groupName,
             envName: props.env.envName

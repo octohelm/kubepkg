@@ -4,8 +4,8 @@ import {
   component$,
   type Component,
   type VNode,
-} from "@nodepkg/runtime";
-import { combineLatest, from, switchMap, map } from "@nodepkg/runtime/rxjs";
+} from "@innoai-tech/vuekit";
+import { combineLatest, from, switchMap, map } from "rxjs";
 import { unified, remarkRehype, remarkParse, rehypeVue } from "./unified";
 
 export const Markdown = component$(

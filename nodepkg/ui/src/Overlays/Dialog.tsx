@@ -4,7 +4,7 @@ import {
   transition,
   variant,
   alpha,
-  defineTransition,
+  defineTransition
 } from "@innoai-tech/vueuikit";
 import {
   component,
@@ -13,13 +13,13 @@ import {
   type ObservableRef,
   ext,
   rx,
-  render,
+  render
 } from "@nodepkg/runtime";
 import { watch, ref, type VNodeChild } from "vue";
 import { FilledButton, TextButton } from "../Buttons";
 
 export const useDialog = (
-  r: (dialog$: ObservableRef<boolean>) => JSX.Element,
+  r: (dialog$: ObservableRef<boolean>) => JSX.Element
 ) => {
   const isOpen$ = observableRef(false);
 
@@ -32,8 +32,8 @@ export const useDialog = (
             {r(isOpen$)}
           </Dialog>
         );
-      }),
-    ),
+      })
+    )
   });
 };
 
@@ -44,8 +44,12 @@ export const useDialogModal = (opt: {
   return useDialog(() => {
     return (
       <DialogContainer>
-        <DialogHeadline>{opt.$title()}</DialogHeadline>
-        <DialogContent>{opt.$content()}</DialogContent>
+        <DialogHeadline>
+          <>{opt.$title()}</>
+        </DialogHeadline>
+        <DialogContent>
+          <>{opt.$content()}</>
+        </DialogContent>
       </DialogContainer>
     );
   });
@@ -60,7 +64,9 @@ export const useDialogPrompt = (opt: {
   const dialog$ = useDialog(() => {
     return (
       <DialogContainer>
-        <DialogHeadline>{opt.$title()}</DialogHeadline>
+        <DialogHeadline>
+          <>{opt.$title()}</>
+        </DialogHeadline>
         <DialogContent
           component={"form"}
           onSubmit={(e) => {
@@ -83,7 +89,7 @@ export const useDialogPrompt = (opt: {
             </>
           }
         >
-          {opt.$content()}
+          <>{opt.$content()}</>
         </DialogContent>
       </DialogContainer>
     );
@@ -111,8 +117,8 @@ const Container = styled("div")({
     h: "100vh",
     w: "100vw",
     zIndex: -1,
-    bgColor: variant("sys.scrim", alpha(0.38)),
-  },
+    bgColor: variant("sys.scrim", alpha(0.38))
+  }
 });
 
 export const DialogContainer = styled("div")({
@@ -123,18 +129,18 @@ export const DialogContainer = styled("div")({
   containerStyle: "sys.surface-container-high",
   display: "flex",
   flexDirection: "column",
-  gap: 16,
+  gap: 16
 });
 
 export const DialogHeadline = styled("div")({
-  textStyle: "sys.headline-small",
+  textStyle: "sys.headline-small"
 });
 
 export const DialogContent = styled(
   "div",
   {
     $action: t.custom<VNodeChild>().optional(),
-    $default: t.custom<VNodeChild>().optional(),
+    $default: t.custom<VNodeChild>().optional()
   },
   ({}, { slots }) => {
     return (Wrap) => (
@@ -143,7 +149,7 @@ export const DialogContent = styled(
         {slots.action && <div data-role={"action"}>{slots.action()}</div>}
       </Wrap>
     );
-  },
+  }
 )({
   display: "flex",
   flexDirection: "column",
@@ -153,38 +159,38 @@ export const DialogContent = styled(
     display: "flex",
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 16,
-  },
+    gap: 16
+  }
 });
 
 const FadeInOutTransition = defineTransition(
   {
     from: {
-      opacity: 0,
+      opacity: 0
     },
     to: {
-      opacity: 1,
+      opacity: 1
     },
     duration: transition.duration.md1,
-    easing: transition.easing.standard.accelerate,
+    easing: transition.easing.standard.accelerate
   },
   {
     from: {
-      opacity: 1,
+      opacity: 1
     },
     to: {
-      opacity: 0,
+      opacity: 0
     },
     duration: transition.duration.sm4,
-    easing: transition.easing.standard.accelerate,
-  },
+    easing: transition.easing.standard.accelerate
+  }
 );
 
 export const Dialog = component(
   {
     isOpen: Overlay.propTypes!.isOpen,
     onClose: t.custom<() => void>(),
-    $default: t.custom<VNodeChild>(),
+    $default: t.custom<VNodeChild>()
   },
   (props, { slots, emit }) => {
     const animateToEnterOrLevel = ref(false);
@@ -200,7 +206,7 @@ export const Dialog = component(
           // animate leave first，then unmount
           animateToEnterOrLevel.value = false;
         }
-      },
+      }
     );
 
     return () => {
@@ -231,5 +237,5 @@ export const Dialog = component(
         </Overlay>
       );
     };
-  },
+  }
 );

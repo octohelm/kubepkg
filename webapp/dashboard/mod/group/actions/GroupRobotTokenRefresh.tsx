@@ -45,12 +45,12 @@ export const GroupRobotTokenRefreshBtn = component$(
             rounded: "sm",
             containerStyle: "sys.surface-container-low",
           }}
-          content={token?.accessToken ?? ""}
+          content={token?.access_token ?? ""}
           onDidCopy={() => {
             notify("复制成功");
           }}
         >
-          <code>{token?.accessToken}</code>
+          <code>{token?.access_token}</code>
         </CopyToClipboard>
       ))
     );

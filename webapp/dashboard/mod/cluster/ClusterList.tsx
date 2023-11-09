@@ -51,7 +51,7 @@ export const ClusterStatus = component$(
       render((status) => {
         return (
           <StyledStatus data-error={status.ping == "-"}>
-            {status.id} {status.ping}
+            {(status as any).id} {status.ping}
           </StyledStatus>
         );
       })

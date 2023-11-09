@@ -121,7 +121,7 @@ dep.node:
 	bun install
 
 dep.node.update:
-	bun update --latest --save
+	bun x npm-check-updates -ws -ui
 
 test.node:
 	bun test

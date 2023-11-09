@@ -115,6 +115,10 @@
       "type": "string",
       "x-go-vendor-type": "k8s.io/api/core/v1.Capability"
     },
+    "ClaimResourceStatus": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/core/v1.ClaimResourceStatus"
+    },
     "ClaimSource": {
       "type": "object",
       "properties": {
@@ -1457,6 +1461,13 @@
           "x-go-field-name": "BackoffLimit",
           "x-go-star-level": 1
         },
+        "backoffLimitPerIndex": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "BackoffLimitPerIndex",
+          "x-go-star-level": 1
+        },
         "completionMode": {
           "allOf": [
             {
@@ -1482,6 +1493,13 @@
           "x-go-field-name": "ManualSelector",
           "x-go-star-level": 1
         },
+        "maxFailedIndexes": {
+          "type": "integer",
+          "format": "int32",
+          "nullable": true,
+          "x-go-field-name": "MaxFailedIndexes",
+          "x-go-star-level": 1
+        },
         "parallelism": {
           "type": "integer",
           "format": "int32",
@@ -1500,6 +1518,18 @@
             }
           ],
           "x-go-field-name": "PodFailurePolicy"
+        },
+        "podReplacementPolicy": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PodReplacementPolicy"
+            },
+            {
+              "nullable": true,
+              "x-go-star-level": 1
+            }
+          ],
+          "x-go-field-name": "PodReplacementPolicy"
         },
         "selector": {
           "allOf": [
@@ -2015,10 +2045,6 @@
       "type": "string",
       "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimPhase"
     },
-    "PersistentVolumeClaimResizeStatus": {
-      "type": "string",
-      "x-go-vendor-type": "k8s.io/api/core/v1.PersistentVolumeClaimResizeStatus"
-    },
     "PersistentVolumeClaimRetentionPolicyType": {
       "type": "string",
       "x-go-vendor-type": "k8s.io/api/apps/v1.PersistentVolumeClaimRetentionPolicyType"
@@ -2116,13 +2142,23 @@
           },
           "x-go-field-name": "AccessModes"
         },
+        "allocatedResourceStatuses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ClaimResourceStatus"
+          },
+          "propertyNames": {
+            "$ref": "#/definitions/ResourceName"
+          },
+          "x-go-field-name": "AllocatedResourceStatuses"
+        },
         "allocatedResources": {
           "allOf": [
             {
               "$ref": "#/definitions/ResourceList"
             },
             {
-              "description": "allocatedResources is the storage resource within AllocatedResources tracks the capacity allocated to a PVC. It may be larger than the actual capacity when a volume expansion operation is requested. For storage quota, the larger value from allocatedResources and PVC.spec.resources is used. If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation. If a volume expansion capacity request is lowered, allocatedResources is only lowered if there are no expansion operations in progress and if the actual volume capacity is equal or lower than the requested capacity. This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.",
+              "description": "allocatedResources tracks the resources allocated to a PVC including its capacity. Key names follow standard Kubernetes label syntax. Valid values are either:\n\t* Un-prefixed keys:\n\t\t- storage - the capacity of the volume.\n\t* Custom resources must use implementation-defined prefixed names such as \"example.com/my-custom-resource\"\nApart from above values - keys that are unprefixed or have kubernetes.io prefix are considered reserved and hence may not be used.\n\nCapacity reported here may be larger than the actual capacity when a volume expansion operation is requested. For storage quota, the larger value from allocatedResources and PVC.spec.resources is used. If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation. If a volume expansion capacity request is lowered, allocatedResources is only lowered if there are no expansion operations in progress and if the actual volume capacity is equal or lower than the requested capacity.\n\nA controller that receives PVC update with previously unknown resourceName should ignore the update for the purpose it was designed. For example - a controller that only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid resources associated with PVC.\n\nThis is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.",
               "x-go-field-name": "AllocatedResources"
             }
           ]
@@ -2155,18 +2191,6 @@
               "x-go-field-name": "Phase"
             }
           ]
-        },
-        "resizeStatus": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PersistentVolumeClaimResizeStatus"
-            },
-            {
-              "nullable": true,
-              "x-go-star-level": 1
-            }
-          ],
-          "x-go-field-name": "ResizeStatus"
         }
       },
       "additionalProperties": false,
@@ -2438,7 +2462,7 @@
               "$ref": "#/definitions/PodFailurePolicyAction"
             },
             {
-              "description": "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are:\n\n- FailJob: indicates that the pod's job is marked as Failed and all\n  running pods are terminated.\n- Ignore: indicates that the counter towards the .backoffLimit is not\n  incremented and a replacement pod is created.\n- Count: indicates that the pod is handled in the default way - the\n  counter towards the .backoffLimit is incremented.\nAdditional values are considered to be added in the future. Clients should react to an unknown action by skipping the rule.",
+              "description": "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are:\n\n- FailJob: indicates that the pod's job is marked as Failed and all\n  running pods are terminated.\n- FailIndex: indicates that the pod's index is marked as Failed and will\n  not be restarted.\n  This value is alpha-level. It can be used when the\n  `JobBackoffLimitPerIndex` feature gate is enabled (disabled by default).\n- Ignore: indicates that the counter towards the .backoffLimit is not\n  incremented and a replacement pod is created.\n- Count: indicates that the pod is handled in the default way - the\n  counter towards the .backoffLimit is incremented.\nAdditional values are considered to be added in the future. Clients should react to an unknown action by skipping the rule.",
               "x-go-field-name": "Action"
             }
           ]
@@ -2516,6 +2540,10 @@
         "conditionType"
       ],
       "x-go-vendor-type": "k8s.io/api/core/v1.PodReadinessGate"
+    },
+    "PodReplacementPolicy": {
+      "type": "string",
+      "x-go-vendor-type": "k8s.io/api/batch/v1.PodReplacementPolicy"
     },
     "PodResourceClaim": {
       "type": "object",

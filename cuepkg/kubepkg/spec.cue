@@ -13,6 +13,8 @@ package kubepkg
 
 #Capability: string
 
+#ClaimResourceStatus: string
+
 #ClaimSource: {
 	resourceClaimName?:         string
 	resourceClaimTemplateName?: string
@@ -197,11 +199,14 @@ package kubepkg
 #JobSpec: {
 	activeDeadlineSeconds?:   int64
 	backoffLimit?:            int32
+	backoffLimitPerIndex?:    int32
 	completionMode?:          #CompletionMode
 	completions?:             int32
 	manualSelector?:          bool
+	maxFailedIndexes?:        int32
 	parallelism?:             int32
 	podFailurePolicy?:        #PodFailurePolicy
+	podReplacementPolicy?:    #PodReplacementPolicy
 	selector?:                #LabelSelector
 	suspend?:                 bool
 	template:                 #PodTemplateSpec
@@ -311,8 +316,6 @@ package kubepkg
 
 #PersistentVolumeClaimPhase: string
 
-#PersistentVolumeClaimResizeStatus: string
-
 #PersistentVolumeClaimRetentionPolicyType: string
 
 #PersistentVolumeClaimSpec: {
@@ -328,11 +331,11 @@ package kubepkg
 
 #PersistentVolumeClaimStatus: {
 	accessModes?: [...#PersistentVolumeAccessMode]
+	allocatedResourceStatuses?: [X=string]: #ClaimResourceStatus
 	allocatedResources?: #ResourceList
 	capacity?:           #ResourceList
 	conditions?: [...#PersistentVolumeClaimCondition]
-	phase?:        #PersistentVolumeClaimPhase
-	resizeStatus?: #PersistentVolumeClaimResizeStatus
+	phase?: #PersistentVolumeClaimPhase
 }
 
 #PersistentVolumeClaimVolumeSource: {
@@ -402,6 +405,8 @@ package kubepkg
 #PodOS: name: #OSName
 
 #PodReadinessGate: conditionType: #PodConditionType
+
+#PodReplacementPolicy: string
 
 #PodResourceClaim: {
 	name:    string

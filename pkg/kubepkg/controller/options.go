@@ -3,15 +3,14 @@ package controller
 import (
 	"context"
 
-	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 
 	"github.com/go-courier/logr"
 	"github.com/octohelm/kubepkg/pkg/apis/kubepkg"
-
-	"github.com/octohelm/kubepkg/pkg/logutil"
-
 	kubepkgv1alpha1 "github.com/octohelm/kubepkg/pkg/apis/kubepkg/v1alpha1"
 	"github.com/octohelm/kubepkg/pkg/kubeutil"
+	kubeutilclient "github.com/octohelm/kubepkg/pkg/kubeutil/client"
+	"github.com/octohelm/kubepkg/pkg/logutil"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -52,12 +51,18 @@ func (s *Operator) Serve(ctx context.Context) error {
 	utilruntime.Must(kubepkgv1alpha1.AddToScheme(scheme))
 
 	ctrlOpt := ctrl.Options{
-		Logger:             logutil.GoLogrFromContext(ctx),
-		Scheme:             scheme,
-		LeaderElectionID:   "a2v1z20az.octohelm.tech",
-		LeaderElection:     s.EnableLeaderElection,
-		Namespace:          s.WatchNamespace,
-		MetricsBindAddress: s.MetricsAddr,
+		Logger:           logutil.GoLogrFromContext(ctx),
+		Scheme:           scheme,
+		LeaderElectionID: "a2v1z20az.octohelm.tech",
+		LeaderElection:   s.EnableLeaderElection,
+	}
+
+	ctrlOpt.Metrics.BindAddress = s.MetricsAddr
+
+	if s.WatchNamespace != "" {
+		ctrlOpt.Cache.DefaultNamespaces = map[string]cache.Config{
+			s.WatchNamespace: {},
+		}
 	}
 
 	mgr, err := ctrl.NewManager(kubeutilclient.KubeConfigFromClient(kubeutilclient.ClientFromContext(ctx)), ctrlOpt)

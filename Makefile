@@ -16,8 +16,8 @@ gen:
 	go run ./tool/internal/cmd/tool gen ./cmd/kubepkg
 
 test:
-	CI=true go test -v ./pkg/...
-	CI=true go test -v ./internal/...
+	CI=true go test -v -failfast ./pkg/...
+	CI=true go test -v -failfast ./internal/...
 
 install:
 	go install ./cmd/kubepkg
@@ -37,7 +37,7 @@ k.operator:
 	$(KUBEPKG) \
 		--ingress-gateway="public+https://{{ .Name }}---{{ .Namespace }}.public" \
 		--ingress-gateway="internal+https://{{ .Name }}---{{ .Namespace }}.local?always=true" \
-		--watch-namespace=pre--algo-agent01 \
+		--watch-namespace=default \
 		--kubeconfig=$(KUBECONFIG) \
 			serve operator
 

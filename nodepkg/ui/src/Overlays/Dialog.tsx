@@ -13,7 +13,8 @@ import {
   type ObservableRef,
   ext,
   rx,
-  render
+  render,
+  type VNodeChildAtom
 } from "@nodepkg/runtime";
 import { watch, ref, type VNodeChild } from "vue";
 import { FilledButton, TextButton } from "../Buttons";
@@ -38,17 +39,17 @@ export const useDialog = (
 };
 
 export const useDialogModal = (opt: {
-  $title: () => VNodeChild;
-  $content: () => VNodeChild;
+  $title: () => VNodeChildAtom;
+  $content: () => VNodeChildAtom;
 }) => {
   return useDialog(() => {
     return (
       <DialogContainer>
         <DialogHeadline>
-          <>{opt.$title()}</>
+          {opt.$title()}
         </DialogHeadline>
         <DialogContent>
-          <>{opt.$content()}</>
+          {opt.$content()}
         </DialogContent>
       </DialogContainer>
     );
@@ -56,16 +57,18 @@ export const useDialogModal = (opt: {
 };
 
 export const useDialogPrompt = (opt: {
-  $title: () => VNodeChild;
-  $content: () => VNodeChild;
+  $title: () => VNodeChildAtom;
+  $content: () => VNodeChildAtom;
 
   onConfirm?: () => void;
 }) => {
   const dialog$ = useDialog(() => {
+
+
     return (
       <DialogContainer>
         <DialogHeadline>
-          <>{opt.$title()}</>
+          {opt.$title()}
         </DialogHeadline>
         <DialogContent
           component={"form"}
@@ -89,7 +92,7 @@ export const useDialogPrompt = (opt: {
             </>
           }
         >
-          <>{opt.$content()}</>
+          {opt.$content()}
         </DialogContent>
       </DialogContainer>
     );

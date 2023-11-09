@@ -18,7 +18,7 @@
     "@innoai-tech/config": "^0.5.2",
     "@innoai-tech/gents": "^0.6.5",
     "@innoai-tech/monobundle": "^0.11.10",
-    "@innoai-tech/vue-vite-presets": "^0.6.0",
+    "@innoai-tech/vue-vite-presets": "^0.6.1",
     "@nodepkg/devconfig": "workspace:*",
     "@types/js-yaml": "^4.0.9",
     "@vue/test-utils": "^2.4.1",

@@ -55,12 +55,20 @@ func (c *AgentRegistryConnect) patchAgentInfo(ctx context.Context) error {
 			for _, n := range clusterinfo.FromContext(ctx).Nodes {
 				if n.Role == "control-plane" {
 					if e.Hostname() != "127.0.0.1" {
-						if internalIP := n.InternalIP; internalIP != "" {
+						if externalIP := n.ExternalIP; externalIP != "" {
 							port := e.Port()
 							if port == "" {
 								port = "80"
 							}
-							e.Host = fmt.Sprintf("%s:%s", internalIP, port)
+							e.Host = fmt.Sprintf("%s:%s", externalIP, port)
+						} else {
+							if internalIP := n.InternalIP; internalIP != "" {
+								port := e.Port()
+								if port == "" {
+									port = "80"
+								}
+								e.Host = fmt.Sprintf("%s:%s", internalIP, port)
+							}
 						}
 					}
 

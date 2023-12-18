@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -73,7 +74,13 @@ func (c *collector) walkNetworks(kpkg *v1alpha1.KubePkg) error {
 			paths[portName] = p
 		}
 
+		portNames := make([]string, 0, len(s.Ports))
 		for n := range s.Ports {
+			portNames = append(portNames, n)
+		}
+		sort.Strings(portNames)
+
+		for _, n := range portNames {
 			p := corev1.ServicePort{}
 			p.Protocol = v1alpha1.PortProtocol(n)
 			p.Port = s.Ports[n]
